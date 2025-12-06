@@ -5,6 +5,25 @@ using Sirenix.OdinInspector;
 [CreateAssetMenu(fileName = "New DataRepository", menuName = "Data/DataRepository")]
 public class DataRepository : SerializedScriptableObject   // ★ SerializedScriptableObject!!
 {
+    private static DataRepository _instance;
+
+    public static DataRepository Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                // Resources 폴더에 있어야 자동 로딩 가능
+                _instance = Resources.Load<DataRepository>("DataRepository");
+
+                if (_instance == null)
+                    Debug.LogError("❌ Resources/DataRepository.asset 을 찾을 수 없습니다!");
+            }
+
+            return _instance;
+        }
+    }
+
     [TabGroup("블럭 DB"), TableList(ShowIndexLabels = true)]
     [LabelText("블럭 데이터")]
     public Dictionary<int, BlockData> blockDatas = new();
@@ -20,4 +39,25 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
     [TabGroup("스테이지 DB"), TableList(ShowIndexLabels = true)]
     [LabelText("스테이지 데이터")]
     public Dictionary<int, StageData> stageDatas = new();
+
+    public BlockData GetBlock(int id)
+    {
+        return blockDatas.TryGetValue(id, out var data) ? data : null;
+    }
+
+    public KeywordData GetKeyword(int id)
+    {
+        return keywordDatas.TryGetValue(id, out var data) ? data : null;
+    }
+
+    public RelicData GetRelic(int id)
+    {
+        return relicDatas.TryGetValue(id, out var data) ? data : null;
+    }
+
+    public StageData GetStage(int id)
+    {
+        return stageDatas.TryGetValue(id, out var data) ? data : null;
+    }
+
 }
