@@ -6,7 +6,6 @@ public enum ActionType
     None,
     Attack,
     Move,
-    Parrying
 }
 
 public enum MoveDirection
