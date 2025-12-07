@@ -136,14 +136,14 @@ public class Draggable_Block : MonoBehaviour,
                         if (cellText != null) cellText.text = "↻";
                         break;
 
-                    case ActionType.Parrying:
+                    //case ActionType.Parrying:
                         //if (cellImage != null) cellImage.color = new Color(1f, 0.85f, 0.2f); // 취향대로 바꿔도 됨
                         //if (iconImage != null && parryIcon != null)
                         //{
                         //    iconImage.enabled = true;
                         //    iconImage.sprite = parryIcon; // ⬅ 스프라이트로 표시
                         //}
-                        break;
+                        //break;
                 }
             }
         }
@@ -359,12 +359,6 @@ public class Draggable_Block : MonoBehaviour,
             //}
 
         }
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
     }
 
     /// <summary>

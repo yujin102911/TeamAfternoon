@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 키워드 베이스 클래스 - 상속받아서 구체적인 효과 구현
+/// </summary>
 public class KeywordData : ScriptableObject
 {
     [Header("키워드 아이디")]
@@ -19,7 +22,6 @@ public class KeywordData : ScriptableObject
     public string KeywordName => _keywordName;
     public string KeywordDescription => _keywordDescription;
 
-    //나중에 구현
 
     ///// <summary>
     ///// 카드가 타임라인에 배치될 때 호출
@@ -31,30 +33,30 @@ public class KeywordData : ScriptableObject
     ///// </summary>
     //public virtual void OnCardRemoved(GameManager gm, DeckManager dm, PlacedCard placed) { }
 
-    ///// <summary>
-    ///// 라운드 실행 중 이 카드가 현재 틱에서 활성될 때 호출
-    ///// </summary>
-    //public virtual void OnTick(GameManager gm, DeckManager dm, PlacedCard placed, int currentTick, EffectType effectThisTick) { }
+    /// <summary>
+    /// 블록이 활성화된 상태에서 매 틱마다 호출
+    /// </summary>
+    public virtual void OnTick(PlacedBlock placed, int currentTick, ActionType actionThisBlock) { }
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어 블록 내 1틱이 시작될 때 호출
-    ///// </summary>
-    //public virtual void OnBlockStart(GameManager gm, DeckManager dm, PlacedCard placed) { }
+    /// <summary>
+    /// 이 카드가 타임라인에 배치되어 블록 내 첫틱이 시작될 때 호출
+    /// </summary>
+    public virtual void OnBlockStart(PlacedBlock placed, int currentTick) { }
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어있고 블록이 끝날 때 호출
-    ///// </summary>
-    //public virtual void OnBlockEnded(GameManager gm, DeckManager dm, PlacedCard placed) { }
+    /// <summary>
+    /// 이 카드가 타임라인에 배치되어있고 블록이 끝날 때 호출
+    /// </summary>
+    public virtual void OnBlockEnded(PlacedBlock placed, int currentTick) { }
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어있고 1틱 시작할 때
-    ///// </summary>
-    //public virtual void OnRoundStart(GameManager gm, DeckManager dm, PlacedCard placed) { }
+    /// <summary>
+    /// 이 카드가 타임라인에 배치되어있고 1틱 시작할 때
+    /// </summary>
+    public virtual void OnRoundStart(PlacedBlock placed) { }
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어있고 마지막틱 끝나고
-    ///// </summary>
-    //public virtual void OnRoundEnded(GameManager gm, DeckManager dm, PlacedCard placed) { }
+    /// <summary>
+    /// 이 카드가 타임라인에 배치되어있고 마지막틱 끝나고
+    /// </summary>
+    public virtual void OnRoundEnded(PlacedBlock placed) { }
 
     ///// <summary>
     ///// 이 카드가 타임라인에 배치되어 있고 블록이 시작할 때 호출(코루틴 전용 Virtual)

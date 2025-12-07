@@ -7,13 +7,13 @@ public class PlacedBlock
 {
     public Saved_BlockData block;            // 블럭 데이터
     public int startTick;             // 시작 틱 (1~8)
-    public bool isClockwise;          // 이동 방향 (시계방향 true, 반시계 false)
+    //public bool isClockwise;          // 이동 방향 (시계방향 true, 반시계 false)
 
     public PlacedBlock(Saved_BlockData c, int start, bool clockwise = true)
     {
         block = c;
         startTick = start;
-        isClockwise = clockwise;
+        //isClockwise = clockwise;
     }
 
     /// <summary>

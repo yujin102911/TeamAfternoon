@@ -311,9 +311,9 @@ public class TimelineUI : MonoBehaviour
                 else if (moveDir == MoveDirection.Left)
                     effectText = $"이동: 반시계방향";
                 break;
-            case ActionType.Parrying:
-                effectText = $"패링: 100% 확률로 방어";
-                break;
+            //case ActionType.Parrying:
+                //effectText = $"패링: 100% 확률로 방어";
+                //break;
         }
 
         // 툴팁 텍스트 설정
@@ -448,11 +448,11 @@ public class TimelineUI : MonoBehaviour
                                 text = "↻";
                             break;
 
-                        case ActionType.Parrying:
-                            color = new Color(1f, 0.85f, 0.2f, 0.25f); // 패링용 색
-                            showIcon = (parryIcon != null);
-                            iconSprite = parryIcon;
-                            break;
+                        //case ActionType.Parrying:
+                            //color = new Color(1f, 0.85f, 0.2f, 0.25f); // 패링용 색
+                            //showIcon = (parryIcon != null);
+                            //iconSprite = parryIcon;
+                            //break;
                     }
 
                     // 적용
@@ -530,11 +530,11 @@ public class TimelineUI : MonoBehaviour
                                 text = "↻";
                             break;
 
-                        case ActionType.Parrying:
-                            color = new Color(1f, 0.85f, 0.2f); // 패링용 색
-                            showIcon = (parryIcon != null);
-                            iconSprite = parryIcon;
-                            break;
+                        //case ActionType.Parrying:
+                            //color = new Color(1f, 0.85f, 0.2f); // 패링용 색
+                            //showIcon = (parryIcon != null);
+                            //iconSprite = parryIcon;
+                            //break;
                     }
 
                     // 적용
