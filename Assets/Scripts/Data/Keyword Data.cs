@@ -22,55 +22,30 @@ public class KeywordData : ScriptableObject
     public string KeywordName => _keywordName;
     public string KeywordDescription => _keywordDescription;
 
-
-    ///// <summary>
-    ///// 카드가 타임라인에 배치될 때 호출
-    ///// </summary>
-    //public virtual void OnCardPlaced(GameManager gm, DeckManager dm, PlacedCard placed) { }
-
-    ///// <summary>
-    ///// 카드가 타임라인에서 제거될 때 호출
-    ///// </summary>
-    //public virtual void OnCardRemoved(GameManager gm, DeckManager dm, PlacedCard placed) { }
-
     /// <summary>
     /// 블록이 활성화된 상태에서 매 틱마다 호출
     /// </summary>
-    public virtual void OnTick(PlacedBlock placed, int currentTick, ActionType actionThisBlock) { }
+    public virtual void OnTick(PlacedBlock placed, int currentTick, ActionType action, BattleSystem battleSystem) { }
 
     /// <summary>
     /// 이 카드가 타임라인에 배치되어 블록 내 첫틱이 시작될 때 호출
     /// </summary>
-    public virtual void OnBlockStart(PlacedBlock placed, int currentTick) { }
+    public virtual void OnBlockStart(PlacedBlock placed, int currentTick, BattleSystem battleSystem) { }
 
     /// <summary>
     /// 이 카드가 타임라인에 배치되어있고 블록이 끝날 때 호출
     /// </summary>
-    public virtual void OnBlockEnded(PlacedBlock placed, int currentTick) { }
+    public virtual void OnBlockEnded(PlacedBlock placed, int currentTick, BattleSystem battleSystem) { }
 
     /// <summary>
-    /// 이 카드가 타임라인에 배치되어있고 1틱 시작할 때
+    /// 라운드 시작 시
     /// </summary>
     public virtual void OnRoundStart(PlacedBlock placed) { }
 
     /// <summary>
-    /// 이 카드가 타임라인에 배치되어있고 마지막틱 끝나고
+    /// 라운드 끝날 때 호출
     /// </summary>
     public virtual void OnRoundEnded(PlacedBlock placed) { }
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어 있고 블록이 시작할 때 호출(코루틴 전용 Virtual)
-    ///// </summary>
-    //public virtual IEnumerator OnBlockStartCoroutine(GameManager gm, DeckManager dm, PlacedCard placed)
-    //{
-    //    yield return null;
-    //}
 
-    ///// <summary>
-    ///// 이 카드가 타임라인에 배치되어 있고 블록이 끝날 때 호출(코루틴 전용 Virtual)
-    ///// </summary>
-    //public virtual IEnumerator OnBlockEndedCoroutine(GameManager gm, DeckManager dm, PlacedCard placed)
-    //{
-    //    yield return null;
-    //}
 }

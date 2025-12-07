@@ -15,6 +15,7 @@ public class TimelineManager : MonoBehaviour
 
     // System
     private TimelineSystem _timelineSystem;
+    private BattleSystem _battleSystem;
 
     // 현재 손패 (GameDirector로부터 받음)
     private List<RuntimeBlock> _currentHand = new List<RuntimeBlock>();
@@ -75,20 +76,12 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleAttackRequest(int baseDamage)
     {
-        BattleSystem battle = GameManager.Instance?.BattleSystem;
-        if (battle != null)
-        {
-            battle.DealDamageToEnemy(baseDamage);
-        }
+        _battleSystem.DealDamageToEnemy(baseDamage);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
     {
-        BattleSystem battle = GameManager.Instance?.BattleSystem;
-        if (battle != null)
-        {
-            battle.MovePlayer(direction);
-        }
+        _battleSystem.MovePlayer(direction);
     }
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
@@ -96,7 +89,7 @@ public class TimelineManager : MonoBehaviour
         // 키워드 OnBlockStart 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
-            keyword.OnBlockStart(placed, tick);
+            keyword.OnBlockStart(placed, tick, _battleSystem);
         }
     }
 
@@ -105,7 +98,7 @@ public class TimelineManager : MonoBehaviour
         // 키워드 OnBlockEnded 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
-            keyword.OnBlockEnded(placed, tick);
+            keyword.OnBlockEnded(placed, tick, _battleSystem);
         }
     }
 
@@ -114,7 +107,7 @@ public class TimelineManager : MonoBehaviour
         // 키워드 OnTick 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
-            keyword.OnTick(placed, tick, action);
+            keyword.OnTick(placed, tick, action, _battleSystem);
         }
 
     }
@@ -206,8 +199,6 @@ public class TimelineManager : MonoBehaviour
     {
         Debug.Log("[TimelineDirector] 타임라인 실행 시작");
 
-        BattleSystem battleSystem = GameManager.Instance?.BattleSystem;
-
         // 라운드 시작 키워드 호출
         var allBlocks = _timelineSystem.GetAllPlacedBlocksWithRuntime();
         foreach (var (placed, runtime) in allBlocks)
@@ -226,12 +217,12 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.ProcessTick(tick);
 
             // 2. 적 공격 처리
-            if (_currentEnemyPattern != null && battleSystem != null)
+            if (_currentEnemyPattern != null && _battleSystem != null)
             {
                 EnemyAttack attack = _currentEnemyPattern.GetAttackAt(tick);
                 if (attack != null)
                 {
-                    battleSystem.ProcessEnemyAttack(attack);
+                    _battleSystem.ProcessEnemyAttack(attack);
                 }
             }
 
@@ -276,5 +267,10 @@ public class TimelineManager : MonoBehaviour
     public bool CanPlaceAt(int startTick, int length)
     {
         return _timelineSystem.CanPlaceBlock(startTick, length);
+    }
+
+    public void Initialize(BattleSystem battleSystem)
+    {
+        _battleSystem = battleSystem;
     }
 }

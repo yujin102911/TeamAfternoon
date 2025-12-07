@@ -88,15 +88,49 @@ public class BattleSystem
 
     private int CalculateDamage(int baseDamage, bool isPlayerAttack)
     {
-        int damage = baseDamage;
-        Dictionary<string, int> buffs = isPlayerAttack ?_playerBuffs : _enemyBuffs;
+        int finalDamage = baseDamage;
+        if (isPlayerAttack)
+        {
+            int power = GetBuffValue("Power", true);
+            finalDamage += power;
 
-        // TODO: 다양한 키워드 시스템이 생기고 업데이트 해야됨요
-        return Mathf.Max(0, damage);
+            int enemyWeaken = GetBuffValue("Weaken", false);
+            if (enemyWeaken > 0)
+            {
+                finalDamage += enemyWeaken;
+                Debug.Log($"[BattleSystem] 적 약화({enemyWeaken})로 추가 피해 적용!");
+            }
+
+        }
+        else
+        {
+            int playerWeaken = GetBuffValue("Weaken", true);
+            if (playerWeaken > 0) finalDamage += playerWeaken;
+        }
+
+        return Mathf.Max(0, finalDamage);   
     }
 
 
-    public void MovePlayer(MoveDirection moveDirection) { }
+    public void MovePlayer(MoveDirection moveDirection) 
+    {
+        if (moveDirection == MoveDirection.None) return;
+
+        int speedBonus = GetBuffValue("Speed", true);
+        int moveAmount = 1 + speedBonus;
+
+        int direction = (moveDirection == MoveDirection.Right) ? 1 : -1;
+        int targetSector = _playerCurrentSector + (direction * moveAmount);
+
+        int prevSector = _playerCurrentSector;
+        _playerCurrentSector = Mathf.Clamp(targetSector, 1, 8);
+
+        if (prevSector != _playerCurrentSector)
+        {
+            Debug.Log($"[BattleSystem] 이동: {prevSector} -> {_playerCurrentSector} (Speed보너스: {speedBonus})");
+            OnPlayerMoved?.Invoke(_playerCurrentSector);
+        }
+    }
 
     public bool IsPlayerHitByAttack(EnemyAttack attack)
     {

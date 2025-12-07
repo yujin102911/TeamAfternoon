@@ -12,6 +12,11 @@ public class GameManager : MonoBehaviour
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
+    [SerializeField] private int _playerMaxHP = 20;
+    [SerializeField] private int _enemyMaxHP = 20;
+
+
+    // System
     private DeckSystem _deckSystem;
     private BattleSystem _battleSystem;
 
@@ -44,6 +49,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _timelineManager = TimelineManager.Instance;
+        InitializeSystem();
         StartNewBattle();
     }
 
@@ -51,6 +57,9 @@ public class GameManager : MonoBehaviour
     {
         SaveService.Load(userGameData);
         _deckSystem = new DeckSystem(dataRepository, userGameData);
+        _battleSystem = new BattleSystem();
+
+        TimelineManager.Instance.Initialize(_battleSystem);
 
         Debug.Log("[GameManager] 시스템 초기화 완료");
     }
@@ -58,7 +67,18 @@ public class GameManager : MonoBehaviour
     public void StartNewBattle()
     {
         _currentRound = 0;
+        if (_deckSystem == null)
+        {
+            Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
+            return;
+        }
+        if (_battleSystem == null)
+        {
+            Debug.LogError("[GameManager] 배틀 시스템이 초기화되지 않았습니다");
+            return;
+        }
         _deckSystem.InitializeDeck();
+        _battleSystem.InitializeBattle(_playerMaxHP, _enemyMaxHP);
 
         List<RuntimeBlock> initialHand = new List<RuntimeBlock>();
         _deckSystem.DrawCards(_startHandSize);
