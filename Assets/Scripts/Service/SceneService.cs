@@ -4,21 +4,7 @@ using System.Collections.Generic;
 
 public class SceneService : MonoBehaviour
 {
-    public static SceneService Instance;
-
     private Stack<string> sceneHistory = new Stack<string>();
-
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     /// <summary> 씬 로드 (동기) </summary>
     public void Load(string sceneName)

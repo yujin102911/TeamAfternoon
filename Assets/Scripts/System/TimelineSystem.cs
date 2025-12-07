@@ -1,0 +1,281 @@
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// 타임라인 배치 로직을 처리하는 System
+/// PlacedBlocks 관리, 배치 가능 여부 체크, 틱 처리 등
+/// 직접 실행하지 않고 이벤트로 요청만 함
+/// </summary>
+public class TimelineSystem
+{
+    // 현재 배치된 블록들
+    private List<PlacedBlock> _placedBlocks = new List<PlacedBlock>();
+
+    // 이전 라운드 배치 (잔상용)
+    private List<PlacedBlock> _prevPlacedBlocks = new List<PlacedBlock>();
+
+    // RuntimeBlock 참조 저장 (제거 시 필요)
+    private Dictionary<PlacedBlock, RuntimeBlock> _blockMap = new Dictionary<PlacedBlock, RuntimeBlock>();
+
+    // ========================================
+    // 이벤트 정의 (Director가 구독)
+    // ========================================
+
+    /// <summary>
+    /// 공격 요청 이벤트 (데미지)
+    /// </summary>
+    public event Action<int> OnAttackRequested;
+
+    /// <summary>
+    /// 이동 요청 이벤트 (방향)
+    /// </summary>
+    public event Action<MoveDirection> OnMoveRequested;
+
+    /// <summary>
+    /// 블록 시작 이벤트 (키워드 처리용)
+    /// </summary>
+    public event Action<PlacedBlock, RuntimeBlock, int> OnBlockStarted;
+
+    /// <summary>
+    /// 블록 종료 이벤트 (키워드 처리용)
+    /// </summary>
+    public event Action<PlacedBlock, RuntimeBlock, int> OnBlockEnded;
+
+    /// <summary>
+    /// 틱 이벤트 (키워드 처리용)
+    /// </summary>
+    public event Action<PlacedBlock, RuntimeBlock, int, ActionType> OnBlockTick;
+
+
+    // 외부 접근용 프로퍼티
+    public IReadOnlyList<PlacedBlock> PlacedBlocks => _placedBlocks;
+    public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _prevPlacedBlocks;
+
+    /// <summary>
+    /// 블록을 배치 시도
+    /// </summary>
+    public bool TryPlaceBlock(RuntimeBlock runtimeBlock, int startTick)
+    {
+        if (runtimeBlock == null || runtimeBlock.BaseData == null)
+        {
+            Debug.LogWarning("[TimelineSystem] 잘못된 RuntimeBlock");
+            return false;
+        }
+
+        int length = runtimeBlock.BaseData.BlockLength;
+
+        // 배치 가능 여부 확인
+        if (!CanPlaceBlock(startTick, length))
+        {
+            Debug.LogWarning($"[TimelineSystem] T{startTick}에 배치 불가 (길이: {length})");
+            return false;
+        }
+
+        // PlacedBlock 생성
+        Saved_BlockData savedData = new Saved_BlockData
+        {
+            Owner_blockID = runtimeBlock.BlockID,
+            Attached_Keyword_IDs = runtimeBlock.AttachedKeywords.ConvertAll(k => k.KeywordID)
+        };
+
+        PlacedBlock placedBlock = new PlacedBlock(savedData, startTick);
+        _placedBlocks.Add(placedBlock);
+        _blockMap[placedBlock] = runtimeBlock;
+
+
+        Debug.Log($"[TimelineSystem] 블록 배치: {runtimeBlock.BaseData.BlockName} at T{startTick}-{startTick + length - 1}");
+        return true;
+    }
+
+    /// <summary>
+    /// 배치된 블록 제거
+    /// </summary>
+    public RuntimeBlock RemovePlacedBlock(PlacedBlock placedBlock)
+    {
+        if (!_placedBlocks.Contains(placedBlock))
+        {
+            Debug.LogWarning("[TimelineSystem] 존재하지 않는 PlacedBlock 제거 시도");
+            return null;
+        }
+
+        // RuntimeBlock 참조 가져오기
+        RuntimeBlock runtimeBlock = null;
+        if (_blockMap.TryGetValue(placedBlock, out runtimeBlock))
+        {
+            _blockMap.Remove(placedBlock);
+        }
+
+        _placedBlocks.Remove(placedBlock);
+
+        Debug.Log($"[TimelineSystem] 블록 제거: {placedBlock.GetBlockData()?.BlockName}");
+        return runtimeBlock;
+    }
+
+    /// <summary>
+    /// 특정 위치에 블록 배치 가능한지 확인
+    /// </summary>
+    public bool CanPlaceBlock(int startTick, int length)
+    {
+        // 범위 체크
+        if (startTick < 1 || startTick + length > 9)
+        {
+            return false;
+        }
+
+        // 겹치는 블록 확인
+        for (int tick = startTick; tick < startTick + length; tick++)
+        {
+            if (IsTickOccupied(tick))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 특정 틱이 이미 차지되어 있는지 확인
+    /// </summary>
+    private bool IsTickOccupied(int tick)
+    {
+        foreach (PlacedBlock placed in _placedBlocks)
+        {
+            if (placed.IsActiveAt(tick))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 특정 틱에 활성화된 블록들 가져오기
+    /// </summary>
+    public List<PlacedBlock> GetActiveBlocksAt(int tick)
+    {
+        List<PlacedBlock> activeBlocks = new List<PlacedBlock>();
+
+        foreach (PlacedBlock placed in _placedBlocks)
+        {
+            if (placed.IsActiveAt(tick))
+            {
+                activeBlocks.Add(placed);
+            }
+        }
+
+        return activeBlocks;
+    }
+
+    /// <summary>
+    /// 특정 틱의 액션 처리 (이벤트 발행만)
+    /// </summary>
+    public void ProcessTick(int tick)
+    {
+        List<PlacedBlock> activeBlocks = GetActiveBlocksAt(tick);
+
+        foreach (PlacedBlock placed in activeBlocks)
+        {
+            int cardTickIndex = placed.GetCardTickIndex(tick);
+            BlockData blockData = placed.GetBlockData();
+
+            if (blockData == null) continue;
+
+            RuntimeBlock runtimeBlock = _blockMap.ContainsKey(placed) ? _blockMap[placed] : null;
+            if (runtimeBlock == null) continue;
+
+            // 블록 시작 이벤트
+            if (cardTickIndex == 0)
+            {
+                OnBlockStarted?.Invoke(placed, runtimeBlock, tick);
+            }
+
+            ActionType action = blockData.GetEffectAt(cardTickIndex);
+
+            // 틱 이벤트 (키워드용)
+            OnBlockTick?.Invoke(placed, runtimeBlock, tick, action);
+
+            // 액션 이벤트 발행
+            ExecuteAction(placed, runtimeBlock, action, cardTickIndex);
+
+            // 블록 종료 이벤트
+            if (cardTickIndex == blockData.BlockLength - 1)
+            {
+                OnBlockEnded?.Invoke(placed, runtimeBlock, tick);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 액션 실행 (이벤트 발행만)
+    /// </summary>
+    private void ExecuteAction(PlacedBlock placedBlock, RuntimeBlock runtimeBlock, ActionType action, int cardTickIndex)
+    {
+        BlockData blockData = placedBlock.GetBlockData();
+
+        switch (action)
+        {
+            case ActionType.Attack:
+                int damage = blockData.AttackDamage;
+                Debug.Log($"  → {blockData.BlockName}: 공격 요청 {damage}");
+
+                // 이벤트 발행 (Director가 BattleSystem에 전달)
+                OnAttackRequested?.Invoke(damage);
+                break;
+
+            case ActionType.Move:
+                MoveDirection dir = blockData.MoveDirections[cardTickIndex];
+                Debug.Log($"  → {blockData.BlockName}: 이동 요청 ({dir})");
+
+                // 이벤트 발행 (Director가 BattleSystem에 전달)
+                OnMoveRequested?.Invoke(dir);
+                break;
+
+            case ActionType.None:
+                Debug.Log($"  → {blockData.BlockName}: 대기");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 현재 배치를 이전 배치로 저장 (잔상용)
+    /// </summary>
+    public void SaveCurrentAsPreview()
+    {
+        _prevPlacedBlocks.Clear();
+        _prevPlacedBlocks.AddRange(_placedBlocks);
+
+        _placedBlocks.Clear();
+        _blockMap.Clear();
+
+        Debug.Log("[TimelineSystem] 현재 배치를 잔상으로 저장");
+    }
+
+    /// <summary>
+    /// 모든 배치 초기화 (전투 시작 시)
+    /// </summary>
+    public void ClearAll()
+    {
+        _placedBlocks.Clear();
+        _prevPlacedBlocks.Clear();
+        _blockMap.Clear();
+
+        Debug.Log("[TimelineSystem] 모든 배치 초기화");
+    }
+
+    /// <summary>
+    /// 모든 배치된 블록 가져오기 (라운드 시작/종료 키워드용)
+    /// </summary>
+    public List<(PlacedBlock, RuntimeBlock)> GetAllPlacedBlocksWithRuntime()
+    {
+        List<(PlacedBlock, RuntimeBlock)> result = new List<(PlacedBlock, RuntimeBlock)>();
+
+        foreach (var pair in _blockMap)
+        {
+            result.Add((pair.Key, pair.Value));
+        }
+
+        return result;
+    }
+}

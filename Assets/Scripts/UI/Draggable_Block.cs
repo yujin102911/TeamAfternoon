@@ -11,22 +11,23 @@ public class Draggable_Block : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler,
     IPointerEnterHandler, IPointerExitHandler, IDropHandler
 {
+    public RuntimeBlock runtimeBlock;
+
     [Header("참조")]
-    public BlockData BlockData;
     public Transform tickContainer;          // 틱 효과를 표시할 컨테이너
     public TextMeshProUGUI BlockNameText;
     public TextMeshProUGUI BlockInfoText;
-    [SerializeField]
-    private GameObject _tickCellPrefab;        // 틱 셀 프리팹
+    public GameObject _tickCellPrefab;        // 틱 셀 프리팹
 
     [Header("드래그 설정")]
-    public Canvas canvas;
-    public float tickWidth = 80f;            // 타임라인 1틱의 너비
+    private Canvas canvas;
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Vector2 originalPosition;
     private Transform originalParent;
     private bool isDragging = false;
+
+    public float tickWidth = 80f;            // 타임라인 1틱의 너비
 
     [Header("툴팁 설정")]
     public bool tooltipOnlyForSpecial = true;   // true면 특수 스킬만 툴팁 표시
@@ -38,209 +39,252 @@ public class Draggable_Block : MonoBehaviour,
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-
+        canvas = GetComponentInParent<Canvas>();
         if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
-        // Canvas 찾기
-        if (canvas == null)
-        {
-            canvas = GetComponentInParent<Canvas>();
-        }
     }
 
-    /// <summary>
-    /// 블럭 데이터 설정
-    /// </summary>
-    public void SetCard(BlockData blockData)
+    public void Init(RuntimeBlock rBlock)
     {
-        BlockData = blockData;
-        UpdateVisual();
+        runtimeBlock = rBlock;
+        BlockData data = rBlock.BaseData;
+
+        if (BlockNameText != null) BlockNameText.text = data.BlockName;
+        if (rectTransform)
+        {
+            Vector2 size = rectTransform.sizeDelta;
+            size.x = data.BlockLength * tickWidth;
+            rectTransform.sizeDelta = size;
+        }
+        UpdateTickVisuals(data);
     }
 
-    /// <summary>
-    /// 효과 지우기(추후 수정)
-    /// </summary>
-    public void EffectClear()
+    private void UpdateTickVisuals(BlockData data)
     {
-        //card.specialEffects.Clear();
-        UpdateVisual();
-    }
+        if (tickContainer == null || _tickCellPrefab == null) return;
+        foreach (Transform child in tickContainer) Destroy(child.gameObject);
 
-    /// <summary>
-    /// 카드 비주얼 업데이트
-    /// </summary>
-    private void UpdateVisual()
-    {
-        if (BlockData == null) return;
-
-        // 카드 너비를 틱 길이에 맞춰 자동 조정
-        if (rectTransform != null)
+        for (int i = 0; i < data.BlockLength; i++)
         {
-            Vector2 sizeDelta = rectTransform.sizeDelta;
-            sizeDelta.x = BlockData.blockLength * tickWidth - 10; // 10은 여백
-            rectTransform.sizeDelta = sizeDelta;
-        }
+            GameObject cell = Instantiate(_tickCellPrefab, tickContainer);
+            Image img = cell.GetComponent<Image>();
+            TextMeshProUGUI txt = cell.GetComponentInChildren<TextMeshProUGUI>();
 
-        // 카드 이름
-        if (BlockNameText != null)
-        {
-            BlockNameText.text = BlockData.blockName;
-        }
-
-        // 틱 셀 생성 (각 틱마다 효과 표시)
-        if (tickContainer != null && _tickCellPrefab != null)
-        {
-            // 기존 셀 제거
-            foreach (Transform child in tickContainer)
+            ActionType action = data.GetEffectAt(i);
+            if (txt)
             {
-                Destroy(child.gameObject);
-            }
-
-            // 새로운 셀 생성
-            for (int i = 0; i < BlockData.blockLength; i++)
-            {
-                GameObject cell = Instantiate(_tickCellPrefab, tickContainer);
-
-                Image cellImage = cell.GetComponent<Image>();
-                TextMeshProUGUI cellText = cell.GetComponentInChildren<TextMeshProUGUI>();
-                Image iconImage = cell.transform.Find("Icon")?.GetComponent<Image>(); // ⬅ 자식 Image
-
-                // 기본 초기화
-                if (cellText != null) cellText.text = "";
-                if (iconImage != null)
+                if (action == ActionType.Attack)
                 {
-                    iconImage.enabled = false;
-                    iconImage.sprite = null;
+                    txt.text = "▲";
+                    img.color = new Color(1, 0.5f, 0.5f);
                 }
-
-                ActionType effect = BlockData.actionTypes[i];
-
-                // 효과에 따라 색상 및 아이콘 설정
-                switch (effect)
+                else if(action == ActionType.Move)
                 {
-                    case ActionType.None:
-                        if (cellImage != null) cellImage.color = new Color(0.3f, 0.3f, 0.3f);
-                        if (cellText != null) cellText.text = "-";
-                        break;
-
-                    case ActionType.Attack:
-                        if (cellImage != null) cellImage.color = new Color(1f, 0.3f, 0.3f);
-                        if (cellText != null) cellText.text = "▲";
-                        break;
-
-                    case ActionType.Move:
-                        if (cellImage != null) cellImage.color = new Color(0.3f, 0.7f, 1f);
-                        if (cellText != null) cellText.text = "↻";
-                        break;
-
-                    case ActionType.Parrying:
-                        //if (cellImage != null) cellImage.color = new Color(1f, 0.85f, 0.2f); // 취향대로 바꿔도 됨
-                        //if (iconImage != null && parryIcon != null)
-                        //{
-                        //    iconImage.enabled = true;
-                        //    iconImage.sprite = parryIcon; // ⬅ 스프라이트로 표시
-                        //}
-                        break;
+                    txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
+                    img.color = new Color(0.5f, 0.8f, 1);
+                }
+                else
+                {
+                    txt.text = "-";
+                    img.color = Color.gray;
                 }
             }
         }
-
-        // 카드 정보 (데미지, 이동 등)
-        if (BlockInfoText != null)
-        {
-            List<string> info = new List<string>();
-            //info.Add($"<b>[-EN{card.cardCost}]</b>");
-            //// 이동 횟수 계산
-            //int moveCount = 0;
-            //foreach (EffectType effect in card.actionEffects)
-            //{
-            //    if (effect == EffectType.Move) moveCount++;
-            //}
-            //if (moveCount > 0)
-            //{
-            //    info.Add($"이동: {moveCount}칸");
-            //}
-
-            // 공격이 있으면 데미지 표시
-            if (BlockData.HasAttack())
-            {
-                info.Add($"데미지: {BlockData.attackDamage}");
-            }
-
-
-            //옛날 코드 보관
-            //if (card.attackDamage != null)
-            //{
-            //    info.Add($"데미지: {card.attackDamage}");
-            //}
-
-
-            //특수 효과 설명
-            //if (BlockData.specialEffects != null)
-            //{
-            //    foreach (CardEffect effect in BlockData.specialEffects)
-            //    {
-            //        if (effect != null && string.IsNullOrEmpty(effect.description) == false)
-            //        {
-            //            //info.Add($"● {effect.description}");
-            //            info.Add($"#{effect.effectName}");
-            //        }
-            //    }
-            //}
-
-            BlockInfoText.text = string.Join("\n", info);
-        }
     }
+
+    ///// <summary>
+    ///// 블럭 데이터 설정
+    ///// </summary>
+    //public void SetCard(BlockData blockData)
+    //{
+    //    BlockData = blockData;
+    //    UpdateVisual();
+    //}
+
+    ///// <summary>
+    ///// 효과 지우기(추후 수정)
+    ///// </summary>
+    //public void EffectClear()
+    //{
+    //    //card.specialEffects.Clear();
+    //    UpdateVisual();
+    //}
+
+    ///// <summary>
+    ///// 카드 비주얼 업데이트
+    ///// </summary>
+    //private void UpdateVisual()
+    //{
+    //    if (BlockData == null) return;
+
+    //    // 카드 너비를 틱 길이에 맞춰 자동 조정
+    //    if (rectTransform != null)
+    //    {
+    //        Vector2 sizeDelta = rectTransform.sizeDelta;
+    //        sizeDelta.x = BlockData.blockLength * tickWidth - 10; // 10은 여백
+    //        rectTransform.sizeDelta = sizeDelta;
+    //    }
+
+    //    // 카드 이름
+    //    if (BlockNameText != null)
+    //    {
+    //        BlockNameText.text = BlockData.blockName;
+    //    }
+
+    //    // 틱 셀 생성 (각 틱마다 효과 표시)
+    //    if (tickContainer != null && _tickCellPrefab != null)
+    //    {
+    //        // 기존 셀 제거
+    //        foreach (Transform child in tickContainer)
+    //        {
+    //            Destroy(child.gameObject);
+    //        }
+
+    //        // 새로운 셀 생성
+    //        for (int i = 0; i < BlockData.blockLength; i++)
+    //        {
+    //            GameObject cell = Instantiate(_tickCellPrefab, tickContainer);
+
+    //            Image cellImage = cell.GetComponent<Image>();
+    //            TextMeshProUGUI cellText = cell.GetComponentInChildren<TextMeshProUGUI>();
+    //            Image iconImage = cell.transform.Find("Icon")?.GetComponent<Image>(); // ⬅ 자식 Image
+
+    //            // 기본 초기화
+    //            if (cellText != null) cellText.text = "";
+    //            if (iconImage != null)
+    //            {
+    //                iconImage.enabled = false;
+    //                iconImage.sprite = null;
+    //            }
+
+    //            ActionType effect = BlockData.actionTypes[i];
+
+    //            // 효과에 따라 색상 및 아이콘 설정
+    //            switch (effect)
+    //            {
+    //                case ActionType.None:
+    //                    if (cellImage != null) cellImage.color = new Color(0.3f, 0.3f, 0.3f);
+    //                    if (cellText != null) cellText.text = "-";
+    //                    break;
+
+    //                case ActionType.Attack:
+    //                    if (cellImage != null) cellImage.color = new Color(1f, 0.3f, 0.3f);
+    //                    if (cellText != null) cellText.text = "▲";
+    //                    break;
+
+    //                case ActionType.Move:
+    //                    if (cellImage != null) cellImage.color = new Color(0.3f, 0.7f, 1f);
+    //                    if (cellText != null) cellText.text = "↻";
+    //                    break;
+
+    //                //case ActionType.Parrying:
+    //                    //if (cellImage != null) cellImage.color = new Color(1f, 0.85f, 0.2f); // 취향대로 바꿔도 됨
+    //                    //if (iconImage != null && parryIcon != null)
+    //                    //{
+    //                    //    iconImage.enabled = true;
+    //                    //    iconImage.sprite = parryIcon; // ⬅ 스프라이트로 표시
+    //                    //}
+    //                    //break;
+    //            }
+    //        }
+    //    }
+
+    //    // 카드 정보 (데미지, 이동 등)
+    //    if (BlockInfoText != null)
+    //    {
+    //        List<string> info = new List<string>();
+    //        //info.Add($"<b>[-EN{card.cardCost}]</b>");
+    //        //// 이동 횟수 계산
+    //        //int moveCount = 0;
+    //        //foreach (EffectType effect in card.actionEffects)
+    //        //{
+    //        //    if (effect == EffectType.Move) moveCount++;
+    //        //}
+    //        //if (moveCount > 0)
+    //        //{
+    //        //    info.Add($"이동: {moveCount}칸");
+    //        //}
+
+    //        // 공격이 있으면 데미지 표시
+    //        if (BlockData.HasAttack())
+    //        {
+    //            info.Add($"데미지: {BlockData.attackDamage}");
+    //        }
+
+
+    //        //옛날 코드 보관
+    //        //if (card.attackDamage != null)
+    //        //{
+    //        //    info.Add($"데미지: {card.attackDamage}");
+    //        //}
+
+
+    //        //특수 효과 설명
+    //        //if (BlockData.specialEffects != null)
+    //        //{
+    //        //    foreach (CardEffect effect in BlockData.specialEffects)
+    //        //    {
+    //        //        if (effect != null && string.IsNullOrEmpty(effect.description) == false)
+    //        //        {
+    //        //            //info.Add($"● {effect.description}");
+    //        //            info.Add($"#{effect.effectName}");
+    //        //        }
+    //        //    }
+    //        //}
+
+    //        BlockInfoText.text = string.Join("\n", info);
+    //    }
+    //}
 
     // ========================
     // 호버 → 툴팁
     // ========================
     public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (BlockData == null) return;
-        if (CardTooltip.Instance == null) return;
+    { }
+    //    if (BlockData == null) return;
+    //    if (CardTooltip.Instance == null) return;
 
-        //bool hasSpecial = card.specialEffects != null && card.specialEffects.Count > 0;
-        //if (tooltipOnlyForSpecial && !hasSpecial)
-        //    return;
+        //    //bool hasSpecial = card.specialEffects != null && card.specialEffects.Count > 0;
+        //    //if (tooltipOnlyForSpecial && !hasSpecial)
+        //    //    return;
 
-        string effectTitle = "";
-        //if (card.specialEffects != null && card.specialEffects.Count > 0)
-        //{
-        //    foreach (CardEffect effect in card.specialEffects)
-        //    {
-        //        if (effect == null) continue;
+        //    string effectTitle = "";
+        //    //if (card.specialEffects != null && card.specialEffects.Count > 0)
+        //    //{
+        //    //    foreach (CardEffect effect in card.specialEffects)
+        //    //    {
+        //    //        if (effect == null) continue;
 
-        //        // 이름 나열
-        //        if (!string.IsNullOrEmpty(effect.effectName))
-        //            effectTitle += $"#{effect.effectName} ";
-        //    }
+        //    //        // 이름 나열
+        //    //        if (!string.IsNullOrEmpty(effect.effectName))
+        //    //            effectTitle += $"#{effect.effectName} ";
+        //    //    }
+        //    //}
+
+        //    string body = "";
+        //    //body = BuildTooltipText();
+
+        //    // ✅ 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+        //    Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+        //    // 카드 Rect의 오른쪽 중앙 월드 좌표
+        //    Vector3 worldBottomCenter = rectTransform.TransformPoint(
+        //        new Vector3(rectTransform.rect.width * 0.75f, rectTransform.rect.height * 0.5f, 0f)
+        //    );
+
+        //    // 월드 → 스크린 좌표
+        //    Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+        //    CardTooltip.Instance.Show(
+        //        effectTitle,
+        //        body,
+        //        screenPos,
+        //        cam
+        //    );
         //}
-
-        string body = "";
-        //body = BuildTooltipText();
-
-        // ✅ 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-        Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
-
-        // 카드 Rect의 오른쪽 중앙 월드 좌표
-        Vector3 worldBottomCenter = rectTransform.TransformPoint(
-            new Vector3(rectTransform.rect.width * 0.75f, rectTransform.rect.height * 0.5f, 0f)
-        );
-
-        // 월드 → 스크린 좌표
-        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
-
-        CardTooltip.Instance.Show(
-            effectTitle,
-            body,
-            screenPos,
-            cam
-        );
-    }
 
 
     public void OnPointerExit(PointerEventData eventData)
@@ -359,12 +403,6 @@ public class Draggable_Block : MonoBehaviour,
             //}
 
         }
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
     }
 
     /// <summary>

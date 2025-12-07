@@ -28,6 +28,10 @@ public class TimelineUI : MonoBehaviour
     public Color cursorColor = Color.yellow;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
+    [Header("연결")]
+    public Transform handContainer;
+    public GameObject cardPrefab;
+
     [Header("아이콘 스프라이트")]
     [SerializeField] private Sprite parryIcon;   // 패링 아이콘 스프라이트
 
@@ -43,12 +47,13 @@ public class TimelineUI : MonoBehaviour
     {
         CreateTimelineSlots();
 
-        // 게임 매니저 이벤트 구독
-        //if (GameManager.Instance != null)
-        //{
-        //    GameManager.Instance.OnTickChanged.AddListener(UpdateCursor);
-        //    GameManager.Instance.OnRoundChanged.AddListener(OnRoundChanged);
-        //}
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.OnHandChanged += UpdateHandUI;
+            TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+
+            UpdateHandUI(TimelineManager.Instance.CurrentHand);
+        }
     }
 
     /// <summary>
@@ -119,6 +124,52 @@ public class TimelineUI : MonoBehaviour
             }
 
             playerSlots.Add(slot);
+        }
+    }
+
+    public void UpdateHandUI(List<RuntimeBlock> hand)
+    {
+        if (handContainer == null || cardPrefab == null) return;
+
+        foreach (Transform child in handContainer) Destroy(child.gameObject);
+        foreach(RuntimeBlock block in hand)
+        {
+            GameObject go = Instantiate(cardPrefab,handContainer);
+            Draggable_Block uiBlock = go.GetComponent<Draggable_Block>();
+            if (uiBlock != null) uiBlock.Init(block);
+        }
+    }
+
+    public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
+    {
+        UpdateHandUI(new List<RuntimeBlock>(hand));
+    }
+
+    public void UpdateTimelineUI(IReadOnlyList<PlacedBlock> placedBlocks, IReadOnlyList<PlacedBlock> prevBlocks)
+    {
+        foreach(var slot in playerSlots)
+        {
+            Image img = slot.GetComponent<Image>();
+            img.color = Color.white;
+            slot.GetComponentInChildren<TextMeshProUGUI>().text = "";
+        }
+        foreach (PlacedBlock pb in placedBlocks)
+        {
+            BlockData data = pb.GetBlockData();
+            for (int i = 0; i < data.BlockLength; i++)
+            {
+                int currentTick = pb.startTick + i;
+                if (currentTick > TimelineManager.Instance.TotalTicks) continue;
+
+                GameObject slot = playerSlots[currentTick - 1];
+
+                Image img = slot.GetComponent<Image>();
+                img.color = Color.cyan;
+
+                ActionType action = data.GetEffectAt(i);
+                string icon = action == ActionType.Attack ? "▲" : (action == ActionType.Move ? ">" : "-");
+                slot.GetComponentInChildren<TextMeshProUGUI>().text = icon;
+            }
         }
     }
 
@@ -311,9 +362,9 @@ public class TimelineUI : MonoBehaviour
                 else if (moveDir == MoveDirection.Left)
                     effectText = $"이동: 반시계방향";
                 break;
-            case ActionType.Parrying:
-                effectText = $"패링: 100% 확률로 방어";
-                break;
+            //case ActionType.Parrying:
+                //effectText = $"패링: 100% 확률로 방어";
+                //break;
         }
 
         // 툴팁 텍스트 설정
@@ -364,7 +415,7 @@ public class TimelineUI : MonoBehaviour
     /// <summary>
     /// 플레이어 카드 배치 영역 업데이트 (아래쪽 줄)
     /// </summary>
-    public void UpdatePlayerTimeline(List<PlacedBlock> placedBlocks, List<PlacedBlock> prevBlocks)
+    public void UpdatePlayerTimeline(IReadOnlyList<PlacedBlock> placedBlocks, IReadOnlyList<PlacedBlock> prevBlocks)
     {
         // 모든 슬롯 초기화
         foreach (GameObject slot in playerSlots)
@@ -448,11 +499,11 @@ public class TimelineUI : MonoBehaviour
                                 text = "↻";
                             break;
 
-                        case ActionType.Parrying:
-                            color = new Color(1f, 0.85f, 0.2f, 0.25f); // 패링용 색
-                            showIcon = (parryIcon != null);
-                            iconSprite = parryIcon;
-                            break;
+                        //case ActionType.Parrying:
+                            //color = new Color(1f, 0.85f, 0.2f, 0.25f); // 패링용 색
+                            //showIcon = (parryIcon != null);
+                            //iconSprite = parryIcon;
+                            //break;
                     }
 
                     // 적용
@@ -530,11 +581,11 @@ public class TimelineUI : MonoBehaviour
                                 text = "↻";
                             break;
 
-                        case ActionType.Parrying:
-                            color = new Color(1f, 0.85f, 0.2f); // 패링용 색
-                            showIcon = (parryIcon != null);
-                            iconSprite = parryIcon;
-                            break;
+                        //case ActionType.Parrying:
+                            //color = new Color(1f, 0.85f, 0.2f); // 패링용 색
+                            //showIcon = (parryIcon != null);
+                            //iconSprite = parryIcon;
+                            //break;
                     }
 
                     // 적용
@@ -590,14 +641,13 @@ public class TimelineUI : MonoBehaviour
     /// </summary>
     public bool IsRangeAvailable(int startTick, int length)
     {
-        if (startTick < 1 || startTick + length > 9)
+        if (startTick < 1 || startTick + length - 1 > TimelineManager.Instance.TotalTicks)
             return false;
 
-        // DeckManager에 확인 요청
-        //if (DeckManager.Instance != null)
-        //{
-        //    return DeckManager.Instance.CanPlaceCard(startTick, length);
-        //}
+        if (TimelineManager.Instance != null)
+        {
+            return TimelineManager.Instance.CanPlaceAt(startTick, length);
+        }
 
         return false;
     }
