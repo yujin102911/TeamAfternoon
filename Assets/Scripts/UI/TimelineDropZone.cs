@@ -18,33 +18,6 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         }
     }
 
-    /// <summary>
-    /// 마우스가 드롭존 위에 있을 때 (스냅 미리보기)
-    /// </summary>
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        originalColor = image.color;
-
-        // 드래그 중인 카드가 있으면 하이라이트
-        if (eventData.pointerDrag != null)
-        {
-            Draggable_Block draggable = eventData.pointerDrag.GetComponent<Draggable_Block>();
-            if (draggable != null && image != null)
-            {
-                // 배치 가능한지 확인
-                if (timelineUI != null &&
-                    timelineUI.IsRangeAvailable(tickIndex, draggable.BlockData.blockLength))
-                {
-                    image.color = new Color(0.5f, 1f, 0.5f); // 초록색 하이라이트
-                }
-                else
-                {
-                    image.color = new Color(1f, 0.6f, 0.6f); // 빨간색 하이라이트
-                }
-            }
-        }
-    }
-
     public void OnDrop(PointerEventData eventData)
     {
         // 색상 원래대로
@@ -56,24 +29,34 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         // 드래그 중인 카드 가져오기
         Draggable_Block draggable = eventData.pointerDrag?.GetComponent<Draggable_Block>();
 
-        if (draggable != null)
+        if (draggable != null && TimelineManager.Instance != null)
         {
+            // 배치 시도
+            bool success = TimelineManager.Instance.TryPlaceBlock(draggable.runtimeBlock, tickIndex);
 
-            // 레거시
-            //if (DeckManager.Instance != null)
-            //{
-            //    bool success = DeckManager.Instance.PlaceCard(draggable.card, tickIndex);
-
-            //    if (success)
-            //    {
-            //        // 손패 UI 업데이트
-            //        if (UIManager.Instance != null)
-            //        {
-            //            UIManager.Instance.UpdateHandUI(DeckManager.Instance.Hand);
-            //        }
-            //    }
-            //}
+            if (success)
+            {
+                Destroy(draggable.gameObject);
+            }
         }
+    }
+
+    /// <summary>
+    /// 마우스가 드롭존 위에 있을 때 (스냅 미리보기)
+    /// </summary>
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        originalColor = image.color;
+
+        if (eventData.pointerDrag == null) return;
+        Draggable_Block draggable = eventData.pointerDrag.GetComponent<Draggable_Block> (); 
+
+        if (draggable != null && TimelineManager.Instance != null)
+        {
+            bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, draggable.runtimeBlock.BaseData.BlockLength);
+            if (image) image.color = canPlace ? Color.green : Color.red;
+        }
+
     }
 
     public void OnPointerExit(PointerEventData eventData)
