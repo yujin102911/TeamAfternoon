@@ -404,7 +404,15 @@ public class TimelineUI : MonoBehaviour
 
                         case ActionType.Move:
                             color = new Color(0.5f, 0.8f, 1f, 0.25f); // 연한 파랑
-                            MoveDirection dir = blockData.moveDirections[i];
+                            MoveDirection dir = MoveDirection.None;
+                            if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
+                            {
+                                dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
+                            }
+                            else
+                            {
+                                dir = blockData.moveDirections[i];
+                            }
                             if (dir == MoveDirection.Left)
                                 text = "↺";
                             else if (dir == MoveDirection.Right)
