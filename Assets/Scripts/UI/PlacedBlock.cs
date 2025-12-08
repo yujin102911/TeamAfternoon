@@ -18,6 +18,18 @@ public class PlacedBlock
     }
 
     /// <summary>
+    /// PlacedBlock 클론 생성
+    /// </summary>
+    public PlacedBlock Clone()
+    {
+        return new PlacedBlock(
+            this.startTick,
+            this.linkedRuntimeBlock?.Clone()
+        );
+    }
+
+
+    /// <summary>
     /// 이 카드의 블럭 데이터 가져오기
     /// </summary>
     public BlockData GetBlockData()

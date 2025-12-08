@@ -300,10 +300,8 @@ public class TimelineSystem
         _prevPlacedBlocks.Clear();
         _prevblockMap.Clear();
 
-        foreach (var pCard in _placedBlocks)
-        {
-            _prevPlacedBlocks.Add(pCard); // 이전 라운드 기록용
-        }
+        foreach (var p in _placedBlocks)
+            _prevPlacedBlocks.Add(p.Clone());
 
         _prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>(_blockMap);
 
