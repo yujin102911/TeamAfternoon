@@ -140,6 +140,9 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 직접 인수 받아서 적용하는 경우를 위한 오버라이딩
+    /// </summary>
     public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
     {
         UpdateHandUI(new List<RuntimeBlock>(hand));
