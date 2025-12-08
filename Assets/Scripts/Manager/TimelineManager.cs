@@ -76,7 +76,7 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleAttackRequest(int baseDamage)
     {
-        _battleSystem.DealDamageToEnemy(baseDamage);
+        _battleSystem.DealDamageToCurrentSector(baseDamage);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -110,6 +110,12 @@ public class TimelineManager : MonoBehaviour
             keyword.OnTick(placed, tick, action, _battleSystem);
         }
 
+    }
+
+    private void HandleEnemyDied(RuntimeEnemy deadEnemy)
+    {
+        RefreshCombinedEnemyPattern();
+        RefreshCombinedEnemyPattern();
     }
 
     // ========================================
@@ -193,6 +199,28 @@ public class TimelineManager : MonoBehaviour
             OnHandChanged?.Invoke(_currentHand);
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
+    }
+
+    public void RefreshCombinedEnemyPattern()
+    {
+        if (_battleSystem == null || _battleSystem.Enemies == null) return;
+        EnemyPattern masterPattern = ScriptableObject.CreateInstance<EnemyPattern>();
+        masterPattern.name = "Combined Pattern";
+
+        foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+        {
+            if (enemy.IsDead) continue;
+            if (enemy.CurrentPattern == null) continue;
+            foreach (EnemyAttack attack in enemy.CurrentPattern.attacks)
+            {
+                int realTick = attack.tick + (enemy.StartTick - 1);
+                if (realTick <= _totalTicks)
+                {
+                    masterPattern.attacks.Add(new EnemyAttack(realTick, attack.targetSectors, attack.damage));
+                }
+            }
+        }
+        SetEnemyPattern(masterPattern);
     }
 
     public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
@@ -284,5 +312,6 @@ public class TimelineManager : MonoBehaviour
     public void Initialize(BattleSystem battleSystem)
     {
         _battleSystem = battleSystem;
+        _battleSystem.OnEnemyDied += HandleEnemyDied;
     }
 }

@@ -50,6 +50,7 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+            TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
         }
     }
 

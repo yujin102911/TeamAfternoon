@@ -22,8 +22,10 @@ public class GameManager : MonoBehaviour
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
     [SerializeField] private int _playerMaxHP = 20;
-    [SerializeField] private int _enemyMaxHP = 20;
     [SerializeField] private MapSize _mapSize = MapSize.Sectors_8;
+
+    [Header("테스트용 스테이지 데이터")]
+    [SerializeField] private StageData currentStageData;
 
 
     // System
@@ -58,20 +60,22 @@ public class GameManager : MonoBehaviour
         {
             dataRepository = DataRepository.Instance;
         }
+        Initialize();
 
     }
 
     private void Start()
     {
-        InitializeSystem();
+        LateInitialize();
         SetupGame();
     }
 
-    private void InitializeSystem()
+    #region Initializatioin
+    private void Initialize()
     {
         SaveService.Load(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
-        _timelineManager = TimelineManager.Instance;
+
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
@@ -79,11 +83,26 @@ public class GameManager : MonoBehaviour
         _mapSystem.OnSectorSelected += OnStartingSectorSelected;
         _battleSystem.OnPlayerMoved += HandlePlayerVisualMove;
 
-        if (_timelineManager != null)
-            _timelineManager.Initialize(_battleSystem);
-
-        Debug.Log("[GameManager] 시스템 초기화 완료");
+        Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
+
+    private void LateInitialize()
+    {
+        _timelineManager = TimelineManager.Instance;
+
+        if (_timelineManager != null)
+        {
+            _timelineManager.Initialize(_battleSystem);
+        }
+        else
+        {
+            Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다!");
+        }
+
+        Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
+
+    }
+    #endregion
     public void SetupGame()
     {
         _currentRound = 0;
@@ -104,7 +123,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         _mapSystem.GenerateMap(_mapSize);
-        _battleSystem.InitializeBattle(_playerMaxHP, _enemyMaxHP, _mapSystem.TotalSectors);
         _deckSystem.InitializeDeck();
 
         _mapSystem.EnableSelectionMode();
@@ -112,15 +130,19 @@ public class GameManager : MonoBehaviour
     }
     public void StartNewBattle()
     {
-        List<RuntimeBlock> initialHand = new List<RuntimeBlock>();
+        // 덱 드로우
         _deckSystem.DrawCards(_startHandSize);
-
         if (_timelineManager != null)
         {
             _timelineManager.ReceiveHand(_deckSystem.Hand);
         }
-        LoadEnemyPattern();
+        // 적 배치
+        if (currentStageData != null)
+            SetupEnemiesFromStage(currentStageData);
+        else
+            Debug.LogError("StageData가 없습니다");
         Debug.Log("[GameManager] 전투 시작");
+
     }
 
     private void LoadEnemyPattern()
@@ -131,6 +153,28 @@ public class GameManager : MonoBehaviour
         {
             _timelineManager.SetEnemyPattern(pattern);
         }
+    }
+
+    private void SetupEnemiesFromStage(StageData stage)
+    {
+        List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
+        foreach (StageEnemySetup spawn in stage.EnemySpawns)
+        {
+            if (spawn.enemyData == null) continue;
+            RuntimeEnemy newEnemy = new RuntimeEnemy(
+                spawn.enemyData,
+                spawn.hitSectors,
+                spawn.tickRange.x,
+                spawn.tickRange.y
+                );
+            if (spawn.enemyData.Nomal_Patterns.Count > 0)
+            {
+                newEnemy.SetPattern(spawn.enemyData.Nomal_Patterns[0]);
+            }
+            enemies.Add(newEnemy);
+        }
+        _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
+        _timelineManager.RefreshCombinedEnemyPattern();
     }
 
     public void ExecuteRound()
@@ -190,8 +234,8 @@ public class GameManager : MonoBehaviour
         if (_isExecutingRound) return;
         _mapSystem.DisableSelectionMode();
         SpawnPlayer(sectorNum);
-        _battleSystem.SetPlayerStartPosition(sectorNum);
         StartNewBattle();
+        _battleSystem.SetPlayerStartPosition(sectorNum);
     }
 
     private void SpawnPlayer(int startSectorIndex)
