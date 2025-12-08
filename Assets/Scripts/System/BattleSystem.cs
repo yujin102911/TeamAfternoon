@@ -12,6 +12,8 @@ public class BattleSystem
     private int _playerMaxHP;
     private int _playerCurrentSector; // 현재 위치 (1~8)
 
+    private int _totalSectors;
+
     private int _enemyHP;
     private int _enemyMaxHP;
 
@@ -30,11 +32,13 @@ public class BattleSystem
     public int EnemyHP => _enemyHP; 
     public int EnemyMaxHP => _enemyMaxHP;
 
-    public void InitializeBattle(int playerMaxHP, int enemyMaxHP, int startSector = 1)
+    public void InitializeBattle(int playerMaxHP, int enemyMaxHP, int totalSectors, int startSector = 1)
     {
         _playerHP = playerMaxHP;
         _playerMaxHP = playerMaxHP;
         _playerCurrentSector = startSector;
+
+        _totalSectors = totalSectors;
 
         _enemyHP = enemyMaxHP;
         _enemyMaxHP = enemyMaxHP;
@@ -111,6 +115,21 @@ public class BattleSystem
         return Mathf.Max(0, finalDamage);   
     }
 
+    public void SetPlayerStartPosition(int sector)
+    {
+        int targetSector = sector;
+        while (targetSector > _totalSectors)
+        {
+            targetSector -= _totalSectors;
+        }
+        while (targetSector < 1)
+        {
+            targetSector += _totalSectors;
+        }
+        _playerCurrentSector = targetSector;
+        Debug.Log($"[BattleSystem] 플레이어 시작 위치 갱신됨: {_playerCurrentSector}");
+        OnPlayerMoved?.Invoke(_playerCurrentSector);
+    }
 
     public void MovePlayer(MoveDirection moveDirection) 
     {
@@ -121,6 +140,15 @@ public class BattleSystem
 
         int direction = (moveDirection == MoveDirection.Right) ? 1 : -1;
         int targetSector = _playerCurrentSector + (direction * moveAmount);
+
+        while (targetSector > _totalSectors)
+        {
+            targetSector -= _totalSectors;
+        }
+        while (targetSector < 1)
+        {
+            targetSector += _totalSectors;
+        }
 
         int prevSector = _playerCurrentSector;
         _playerCurrentSector = Mathf.Clamp(targetSector, 1, 8);

@@ -1,19 +1,20 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// 타임라인에 배치된 블럭 인스턴스
 /// </summary>
 public class PlacedBlock
 {
-    public Saved_BlockData block;            // 블럭 데이터
-    public int startTick;             // 시작 틱 (1~8)
-    //public bool isClockwise;          // 이동 방향 (시계방향 true, 반시계 false)
+    //public Saved_BlockData block;             // 블럭 데이터
 
-    public PlacedBlock(Saved_BlockData c, int start, bool clockwise = true)
+    public int startTick;                     // 시작 틱 (1~8)
+    public RuntimeBlock linkedRuntimeBlock;   // 연결된 실체
+
+    public PlacedBlock(int start, RuntimeBlock runtime)
     {
-        block = c;
         startTick = start;
-        //isClockwise = clockwise;
+        linkedRuntimeBlock = runtime;
     }
 
     /// <summary>
@@ -21,7 +22,7 @@ public class PlacedBlock
     /// </summary>
     public BlockData GetBlockData()
     {
-        return DataRepository.Instance.GetBlock(block.Owner_blockID);
+        return linkedRuntimeBlock.BaseData;
     }
 
     /// <summary>
@@ -29,7 +30,7 @@ public class PlacedBlock
     /// </summary>
     public bool IsActiveAt(int tick)
     {
-        return tick >= startTick && tick < startTick + DataRepository.Instance.GetBlock(block.Owner_blockID).blockLength;
+        return tick >= startTick && tick < startTick + linkedRuntimeBlock.BaseData.BlockLength;
     }
 
     /// <summary>
@@ -38,5 +39,18 @@ public class PlacedBlock
     public int GetCardTickIndex(int tick)
     {
         return tick - startTick;
+    }
+
+    public MoveDirection GetDirectionAt(int index)
+    {
+        if (linkedRuntimeBlock.CurrentMoveDirections != null && index >= 0 && index < linkedRuntimeBlock.CurrentMoveDirections.Length)
+            return linkedRuntimeBlock.CurrentMoveDirections[index];
+        return GetBlockData().moveDirections[index];
+    }
+
+    public void ToggleDirection(int tick)
+    {
+        int index = tick - startTick;
+        linkedRuntimeBlock?.ToggleDirections(index);
     }
 }

@@ -66,18 +66,6 @@ public class TimelineUI : MonoBehaviour
 
             // 틱 번호 표시
             TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
-            //if (text != null)
-            //{
-            //    text.text = tick.ToString();
-            //}
-
-            // 클릭 이벤트 추가
-            Button button = slot.GetComponent<Button>();
-            if (button != null)
-            {
-                int currentTick = tick;
-                button.onClick.AddListener(() => OnEnemySlotClicked(currentTick));
-            }
 
             // 마우스 오버 이벤트 추가
             EnemySlotHover hoverHandler = slot.AddComponent<EnemySlotHover>();
@@ -125,34 +113,6 @@ public class TimelineUI : MonoBehaviour
     }
 
     
-
-    public void UpdateTimelineUI(IReadOnlyList<PlacedBlock> placedBlocks, IReadOnlyList<PlacedBlock> prevBlocks)
-    {
-        foreach(var slot in playerSlots)
-        {
-            Image img = slot.GetComponent<Image>();
-            img.color = Color.white;
-            slot.GetComponentInChildren<TextMeshProUGUI>().text = "";
-        }
-        foreach (PlacedBlock pb in placedBlocks)
-        {
-            BlockData data = pb.GetBlockData();
-            for (int i = 0; i < data.BlockLength; i++)
-            {
-                int currentTick = pb.startTick + i;
-                if (currentTick > TimelineManager.Instance.TotalTicks) continue;
-
-                GameObject slot = playerSlots[currentTick - 1];
-
-                Image img = slot.GetComponent<Image>();
-                img.color = Color.cyan;
-
-                ActionType action = data.GetEffectAt(i);
-                string icon = action == ActionType.Attack ? "▲" : (action == ActionType.Move ? ">" : "-");
-                slot.GetComponentInChildren<TextMeshProUGUI>().text = icon;
-            }
-        }
-    }
 
     /// <summary>
     /// 적 시퀀스 표시 (위쪽 줄)
@@ -228,32 +188,6 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 적 슬롯 클릭 시 (상세 정보 표시)
-    /// </summary>
-    private void OnEnemySlotClicked(int tick)
-    {
-        if (_currentPattern == null) return;
-
-        EnemyAttack attack = _currentPattern.GetAttackAt(tick);
-
-        if (attack == null)
-        {
-            Debug.Log($"T{tick}: 적 공격 없음");
-            HideTooltip();
-            return;
-        }
-
-        // 맵에 공격 섹터 표시
-        //if (MapManager.Instance != null)
-        //{
-        //    MapManager.Instance.ShowEnemyAttackSectors(attack.targetSectors);
-        //}
-
-        // 로그 출력
-        string sectors = string.Join(", ", attack.targetSectors);
-        Debug.Log($"T{tick}: 섹터 [{sectors}] 공격 → {attack.damage}");
-    }
 
     /// <summary>
     /// 적 공격 정보 툴팁 표시
@@ -343,9 +277,6 @@ public class TimelineUI : MonoBehaviour
                 else if (moveDir == MoveDirection.Left)
                     effectText = $"이동: 반시계방향";
                 break;
-            //case ActionType.Parrying:
-                //effectText = $"패링: 100% 확률로 방어";
-                //break;
         }
 
         // 툴팁 텍스트 설정
@@ -479,12 +410,6 @@ public class TimelineUI : MonoBehaviour
                             else if (dir == MoveDirection.Right)
                                 text = "↻";
                             break;
-
-                        //case ActionType.Parrying:
-                            //color = new Color(1f, 0.85f, 0.2f, 0.25f); // 패링용 색
-                            //showIcon = (parryIcon != null);
-                            //iconSprite = parryIcon;
-                            //break;
                     }
 
                     // 적용
@@ -555,18 +480,21 @@ public class TimelineUI : MonoBehaviour
 
                         case ActionType.Move:
                             color = new Color(0.3f, 0.7f, 1f); // 연한 파랑
-                            MoveDirection dir = blockData.moveDirections[i];
+                            MoveDirection dir = MoveDirection.None;
+                            if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
+                            {
+                                dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
+                            }
+                            else
+                            {
+                                dir = blockData.moveDirections[i];
+                            }
                             if (dir == MoveDirection.Left)
                                 text = "↺";
                             else if (dir == MoveDirection.Right)
                                 text = "↻";
                             break;
 
-                        //case ActionType.Parrying:
-                            //color = new Color(1f, 0.85f, 0.2f); // 패링용 색
-                            //showIcon = (parryIcon != null);
-                            //iconSprite = parryIcon;
-                            //break;
                     }
 
                     // 적용
@@ -600,21 +528,6 @@ public class TimelineUI : MonoBehaviour
                 }
             }
         }
-    }
-
-
-    /// <summary>
-    /// 라운드 변경 시
-    /// </summary>
-    private void OnRoundChanged(int round)
-    {
-        // 적 시퀀스 다시 로드
-        //if (GameManager.Instance != null)
-        //{
-        //    // GameManager에서 현재 시퀀스를 가져올 수 있도록 프로퍼티 추가 필요
-        //}
-
-        UpdateCursor(0);
     }
 
     /// <summary>

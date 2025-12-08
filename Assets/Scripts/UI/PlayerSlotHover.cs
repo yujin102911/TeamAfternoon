@@ -30,13 +30,40 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 놓여진 카드가 없으면 조작 불가
-        if (placedBlock == null) return;
+        // 놓여진 카드가 없으면 조작 불가 && 잔상이어도 조작 불가
+        if (placedBlock == null || Is_prev) return;
 
-        // 타임라인 실행 중에는 조작 불가
-        //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound) return;
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound)
+        {
+            Debug.Log("전투 실행 중에는 카드를 수정할 수 없습니다");
+            return;
+        } 
 
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            if (TimelineManager.Instance != null)
+            {
+                TimelineManager.Instance.RemovePlacedBlock(placedBlock);
+                
+            }
+        }
+        else if(eventData.button == PointerEventData.InputButton.Left)
+        {
+            BlockData data = placedBlock.GetBlockData();
+            int index = tick - placedBlock.startTick;
 
+            if (data.GetEffectAt(index) == ActionType.Move)
+            {
+                if (TimelineManager.Instance != null)
+                {
+                    TimelineManager.Instance.ToggleBlockDirection(placedBlock, tick);
+                    if (timelineUI != null)
+                    {
+                        timelineUI.ShowPlayerCardTooltip(tick, placedBlock, transform.position, Is_prev);
+                    }
+                }
+            }
+        }
         // 이 아래는 시스템이 더 나와야 제작가능
         // 우클릭으로 카드 제거
         //if (eventData.button == PointerEventData.InputButton.Right && placedBlock != null)

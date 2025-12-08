@@ -1,10 +1,19 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+
+    [Header("맵 구성")]
+    [SerializeField] private MapConfiguration mapConfig;
+    [SerializeField] private Transform mapRootTransform;
+
+    [Header("플레이어")]
+    [SerializeField] private GameObject playerPrefab;
+    private GameObject _currentPlayerVisual;
 
     [Header("데이터 참조")]
     [SerializeField] private DataRepository dataRepository;
@@ -14,11 +23,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _startHandSize = 5;
     [SerializeField] private int _playerMaxHP = 20;
     [SerializeField] private int _enemyMaxHP = 20;
+    [SerializeField] private MapSize _mapSize = MapSize.Sectors_8;
 
 
     // System
     private DeckSystem _deckSystem;
     private BattleSystem _battleSystem;
+    private MapSystem _mapSystem;
 
     private TimelineManager _timelineManager;
 
@@ -29,6 +40,10 @@ public class GameManager : MonoBehaviour
     public BattleSystem BattleSystem => _battleSystem;
     public int CurrentRound => _currentRound;
     public bool IsExecutingRound => _isExecutingRound;
+
+    // Events
+    public event Action<int> OnRoundChanged;
+    
 
     private void Awake()
     {
@@ -48,25 +63,31 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        _timelineManager = TimelineManager.Instance;
         InitializeSystem();
-        StartNewBattle();
+        SetupGame();
     }
 
     private void InitializeSystem()
     {
         SaveService.Load(userGameData);
+        if (mapRootTransform == null) mapRootTransform = this.transform;
+        _timelineManager = TimelineManager.Instance;
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
+        _mapSystem = new MapSystem(mapConfig, mapRootTransform);
 
-        TimelineManager.Instance.Initialize(_battleSystem);
+        _mapSystem.OnSectorSelected += OnStartingSectorSelected;
+        _battleSystem.OnPlayerMoved += HandlePlayerVisualMove;
+
+        if (_timelineManager != null)
+            _timelineManager.Initialize(_battleSystem);
 
         Debug.Log("[GameManager] 시스템 초기화 완료");
     }
-
-    public void StartNewBattle()
+    public void SetupGame()
     {
         _currentRound = 0;
+        _isExecutingRound = false;
         if (_deckSystem == null)
         {
             Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
@@ -77,9 +98,20 @@ public class GameManager : MonoBehaviour
             Debug.LogError("[GameManager] 배틀 시스템이 초기화되지 않았습니다");
             return;
         }
+        if (_mapSystem == null)
+        {
+            Debug.LogError("[GameManager] 맵 시스템이 초기화되지 않았습니다");
+            return;
+        }
+        _mapSystem.GenerateMap(_mapSize);
+        _battleSystem.InitializeBattle(_playerMaxHP, _enemyMaxHP, _mapSystem.TotalSectors);
         _deckSystem.InitializeDeck();
-        _battleSystem.InitializeBattle(_playerMaxHP, _enemyMaxHP);
 
+        _mapSystem.EnableSelectionMode();
+
+    }
+    public void StartNewBattle()
+    {
         List<RuntimeBlock> initialHand = new List<RuntimeBlock>();
         _deckSystem.DrawCards(_startHandSize);
 
@@ -151,6 +183,34 @@ public class GameManager : MonoBehaviour
             // TODO: 보상 처리
         }
         SaveService.Save(userGameData);
+    }
+
+    private void OnStartingSectorSelected(int sectorNum)
+    {
+        if (_isExecutingRound) return;
+        _mapSystem.DisableSelectionMode();
+        SpawnPlayer(sectorNum);
+        _battleSystem.SetPlayerStartPosition(sectorNum);
+        StartNewBattle();
+    }
+
+    private void SpawnPlayer(int startSectorIndex)
+    {
+        Vector3 startPos = _mapSystem.GetSectorPosition(startSectorIndex);
+
+        if (playerPrefab != null)
+        {
+            _currentPlayerVisual = Instantiate(playerPrefab, startPos, Quaternion.identity);
+        }
+    }
+
+    private void HandlePlayerVisualMove(int newSectorIndex)
+    {
+        Vector3 targetPos = _mapSystem.GetSectorPosition(newSectorIndex);
+        if (_currentPlayerVisual != null)
+        {
+            _currentPlayerVisual.transform.position = targetPos;
+        }
     }
 
 }
