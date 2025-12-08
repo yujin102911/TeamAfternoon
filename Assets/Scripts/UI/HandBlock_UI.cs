@@ -12,6 +12,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Header("참조")]
     public TextMeshProUGUI BlockNameText;
     public TextMeshProUGUI BlockInfoText;
+    public TextMeshProUGUI BlockDamageText;
     public GameObject[] _tickCells;        // 틱 셀 프리팹
 
     [Header("드래그 복제본")]
@@ -21,12 +22,22 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private CanvasGroup canvasGroup;
 
     private ScrollRect parentScroll;
+    private RectTransform rectTransform;
 
     private void Awake()
     {
+        rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
         parentScroll = GetComponentInParent<ScrollRect>();
+    }
+
+    private void OnDisable()
+    {
+        Destroy(ghost);
+        ghost = null;
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 1f;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -49,6 +60,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         //블럭 이름 설정
         if (BlockNameText != null) BlockNameText.text = data.BlockName;
+
+        BlockDamageText.text = "데미지: " + data.attackDamage.ToString();
 
         //틱 정보 설정
         UpdateTickVisuals(data);
@@ -109,7 +122,66 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     // 호버 → 툴팁
     // ========================
     public void OnPointerEnter(PointerEventData eventData)
-    { }
+    {
+        if (runtimeBlock == null) return;
+        if (CardTooltip.Instance == null) return;
+        if (eventData.pointerDrag != null) return;
+
+        bool hasSpecial = runtimeBlock.AttachedKeywords != null && runtimeBlock.AttachedKeywords.Count > 0;
+        if (!hasSpecial)
+            return;
+
+        string effectTitle = "";
+        foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
+        {
+            if (keyword == null) continue;
+
+            // 이름 나열
+            if (!string.IsNullOrEmpty(keyword.KeywordName))
+                effectTitle += $"#{keyword.KeywordName} ";
+        }
+
+        string body = BuildTooltipText();
+
+        // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+        Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+        // 카드 Rect의 오른쪽 중앙 월드 좌표
+        Vector3 worldBottomCenter = rectTransform.TransformPoint(
+            new Vector3(rectTransform.rect.width * 0.5f, rectTransform.rect.height * 0.5f, 0f)
+        );
+
+        // 월드 → 스크린 좌표
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+        CardTooltip.Instance.Show(
+            effectTitle,
+            body,
+            screenPos,
+            cam
+        );
+    }
+
+    private string BuildTooltipText()
+    {
+        List<string> lines = new List<string>();
+
+        if (runtimeBlock.AttachedKeywords != null)
+        {
+            int index = 1;
+            foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
+            {
+                if (keyword == null) continue;
+
+                // 이름 제외 → 설명만
+                if (!string.IsNullOrEmpty(keyword.KeywordDescription))
+                    lines.Add($"{index}. {keyword.KeywordDescription}");
+                index++;
+            }
+        }
+
+        return string.Join("\n", lines);
+    }
 
     public void OnPointerExit(PointerEventData eventData)
     {
@@ -121,10 +193,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log("드래그 시작");
-        
         // 드래그용 복제 생성
-        ghost = Draggable_Block.Instance.gameObject;
+        ghost = Instantiate(dragGhostPrefab, canvas.transform);
         ghost.transform.position = transform.position;
 
         // 드래그 복제본 초기화 세팅
@@ -133,6 +203,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -143,7 +214,10 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Draggable_Block.Instance.Hide();
+        // 드래그 종료
+        Destroy(ghost);
+        ghost = null;
+        canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
     }
 

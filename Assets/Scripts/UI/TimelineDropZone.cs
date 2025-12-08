@@ -37,7 +37,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
             if (success)
             {
                 //블록 배치 성공 시 드래그 블록 숨기기
-                Draggable_Block.Instance.Hide();
+                //Draggable_Block.Instance.Hide();
             }
         }
     }

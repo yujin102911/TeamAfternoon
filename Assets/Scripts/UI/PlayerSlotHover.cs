@@ -14,7 +14,7 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (timelineUI != null && placedBlock != null)
+        if (timelineUI != null && placedBlock != null && eventData.pointerDrag == null)
         {
             timelineUI.ShowPlayerCardTooltip(tick, placedBlock, transform.position, Is_prev);
         }
