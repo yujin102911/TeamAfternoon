@@ -49,10 +49,7 @@ public class TimelineUI : MonoBehaviour
 
         if (TimelineManager.Instance != null)
         {
-            TimelineManager.Instance.OnHandChanged += UpdateHandUI;
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
-
-            UpdateHandUI(TimelineManager.Instance.CurrentHand);
         }
     }
 
@@ -115,26 +112,7 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
-    public void UpdateHandUI(List<RuntimeBlock> hand)
-    {
-        if (handContainer == null || cardPrefab == null) return;
-
-        foreach (Transform child in handContainer) Destroy(child.gameObject);
-        foreach(RuntimeBlock block in hand)
-        {
-            GameObject go = Instantiate(cardPrefab,handContainer);
-            Draggable_Block uiBlock = go.GetComponent<Draggable_Block>();
-            if (uiBlock != null) uiBlock.Init(block);
-        }
-    }
-
-    /// <summary>
-    /// 직접 인수 받아서 적용하는 경우를 위한 오버라이딩
-    /// </summary>
-    public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
-    {
-        UpdateHandUI(new List<RuntimeBlock>(hand));
-    }
+    
 
     /// <summary>
     /// 적 시퀀스 표시 (위쪽 줄)
