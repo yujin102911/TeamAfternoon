@@ -7,17 +7,12 @@ using UnityEngine.UI;
 // ========================================
 // 드래그 가능한 카드 UI
 // ========================================
-public class Draggable_Block : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler,
-    IPointerEnterHandler, IPointerExitHandler, IDropHandler
+public class Draggable_Block : MonoBehaviour
 {
     public RuntimeBlock runtimeBlock;
 
     [Header("참조")]
-    public Transform tickContainer;          // 틱 효과를 표시할 컨테이너
-    public TextMeshProUGUI BlockNameText;
-    public TextMeshProUGUI BlockInfoText;
-    public GameObject _tickCellPrefab;        // 틱 셀 프리팹
+    public GameObject[] _tickCells;        // 틱 셀 프리팹
 
     [Header("드래그 설정")]
     private Canvas canvas;
@@ -52,24 +47,23 @@ public class Draggable_Block : MonoBehaviour,
         runtimeBlock = rBlock;
         BlockData data = rBlock.BaseData;
 
-        if (BlockNameText != null) BlockNameText.text = data.BlockName;
-        if (rectTransform)
-        {
-            Vector2 size = rectTransform.sizeDelta;
-            size.x = data.BlockLength * tickWidth;
-            rectTransform.sizeDelta = size;
-        }
-        UpdateTickVisuals(data);
+        //틱 정보 설정
+        Set_TickVisuals(data);
     }
 
-    private void UpdateTickVisuals(BlockData data)
+    private void Set_TickVisuals(BlockData data)
     {
-        if (tickContainer == null || _tickCellPrefab == null) return;
-        foreach (Transform child in tickContainer) Destroy(child.gameObject);
+        if (_tickCells == null) return;
 
-        for (int i = 0; i < data.BlockLength; i++)
+        // 기존 틱 셀 비활성화
+        foreach (GameObject tickcell in _tickCells) tickcell.SetActive(false);
+
+        for (int i = 0; i < data.blockLength; i++)
         {
-            GameObject cell = Instantiate(_tickCellPrefab, tickContainer);
+            GameObject cell = _tickCells[i];
+
+            if (!cell.activeSelf) cell.SetActive(true);
+
             Image img = cell.GetComponent<Image>();
             TextMeshProUGUI txt = cell.GetComponentInChildren<TextMeshProUGUI>();
 
@@ -79,17 +73,17 @@ public class Draggable_Block : MonoBehaviour,
                 if (action == ActionType.Attack)
                 {
                     txt.text = "▲";
-                    img.color = new Color(1, 0.5f, 0.5f);
+                    img.color = new Color(1f, 0.3f, 0.3f);
                 }
-                else if(action == ActionType.Move)
+                else if (action == ActionType.Move)
                 {
                     txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
-                    img.color = new Color(0.5f, 0.8f, 1);
+                    img.color = new Color(0.3f, 0.7f, 1f);
                 }
                 else
                 {
                     txt.text = "-";
-                    img.color = Color.gray;
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
                 }
             }
         }
@@ -242,188 +236,188 @@ public class Draggable_Block : MonoBehaviour,
     // ========================
     // 호버 → 툴팁
     // ========================
-    public void OnPointerEnter(PointerEventData eventData)
-    { }
-    //    if (BlockData == null) return;
-    //    if (CardTooltip.Instance == null) return;
+    //public void OnPointerEnter(PointerEventData eventData)
+    //{ }
+    ////    if (BlockData == null) return;
+    ////    if (CardTooltip.Instance == null) return;
 
-        //    //bool hasSpecial = card.specialEffects != null && card.specialEffects.Count > 0;
-        //    //if (tooltipOnlyForSpecial && !hasSpecial)
-        //    //    return;
+    //    //    //bool hasSpecial = card.specialEffects != null && card.specialEffects.Count > 0;
+    //    //    //if (tooltipOnlyForSpecial && !hasSpecial)
+    //    //    //    return;
 
-        //    string effectTitle = "";
-        //    //if (card.specialEffects != null && card.specialEffects.Count > 0)
-        //    //{
-        //    //    foreach (CardEffect effect in card.specialEffects)
-        //    //    {
-        //    //        if (effect == null) continue;
+    //    //    string effectTitle = "";
+    //    //    //if (card.specialEffects != null && card.specialEffects.Count > 0)
+    //    //    //{
+    //    //    //    foreach (CardEffect effect in card.specialEffects)
+    //    //    //    {
+    //    //    //        if (effect == null) continue;
 
-        //    //        // 이름 나열
-        //    //        if (!string.IsNullOrEmpty(effect.effectName))
-        //    //            effectTitle += $"#{effect.effectName} ";
-        //    //    }
-        //    //}
+    //    //    //        // 이름 나열
+    //    //    //        if (!string.IsNullOrEmpty(effect.effectName))
+    //    //    //            effectTitle += $"#{effect.effectName} ";
+    //    //    //    }
+    //    //    //}
 
-        //    string body = "";
-        //    //body = BuildTooltipText();
+    //    //    string body = "";
+    //    //    //body = BuildTooltipText();
 
-        //    // ✅ 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-        //    Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+    //    //    // ✅ 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+    //    //    Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
 
-        //    // 카드 Rect의 오른쪽 중앙 월드 좌표
-        //    Vector3 worldBottomCenter = rectTransform.TransformPoint(
-        //        new Vector3(rectTransform.rect.width * 0.75f, rectTransform.rect.height * 0.5f, 0f)
-        //    );
+    //    //    // 카드 Rect의 오른쪽 중앙 월드 좌표
+    //    //    Vector3 worldBottomCenter = rectTransform.TransformPoint(
+    //    //        new Vector3(rectTransform.rect.width * 0.75f, rectTransform.rect.height * 0.5f, 0f)
+    //    //    );
 
-        //    // 월드 → 스크린 좌표
-        //    Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+    //    //    // 월드 → 스크린 좌표
+    //    //    Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
 
-        //    CardTooltip.Instance.Show(
-        //        effectTitle,
-        //        body,
-        //        screenPos,
-        //        cam
-        //    );
-        //}
+    //    //    CardTooltip.Instance.Show(
+    //    //        effectTitle,
+    //    //        body,
+    //    //        screenPos,
+    //    //        cam
+    //    //    );
+    //    //}
 
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (CardTooltip.Instance != null)
-        {
-            CardTooltip.Instance.Hide();
-        }
-    }
+    //public void OnPointerExit(PointerEventData eventData)
+    //{
+    //    if (CardTooltip.Instance != null)
+    //    {
+    //        CardTooltip.Instance.Hide();
+    //    }
+    //}
 
-    private string BuildTooltipText()
-    {
-        List<string> lines = new List<string>();
+    //private string BuildTooltipText()
+    //{
+    //    List<string> lines = new List<string>();
 
-        //if (card.specialEffects != null)
-        //{
-        //    int index = 1;
-        //    foreach (CardEffect effect in card.specialEffects)
-        //    {
-        //        if (effect == null) continue;
+    //    //if (card.specialEffects != null)
+    //    //{
+    //    //    int index = 1;
+    //    //    foreach (CardEffect effect in card.specialEffects)
+    //    //    {
+    //    //        if (effect == null) continue;
 
-        //        // 이름 제외 → 설명만
-        //        if (!string.IsNullOrEmpty(effect.description))
-        //            lines.Add($"{index}. {effect.description}");
-        //        index++;
-        //    }
-        //}
+    //    //        // 이름 제외 → 설명만
+    //    //        if (!string.IsNullOrEmpty(effect.description))
+    //    //            lines.Add($"{index}. {effect.description}");
+    //    //        index++;
+    //    //    }
+    //    //}
 
-        return string.Join("\n", lines);
-    }
+    //    return string.Join("\n", lines);
+    //}
 
-    /// <summary>
-    /// 드래그 시작
-    /// </summary>
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        // 좌클릭만 허용
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
+    ///// <summary>
+    ///// 드래그 시작
+    ///// </summary>
+    //public void OnBeginDrag(PointerEventData eventData)
+    //{
+    //    // 좌클릭만 허용
+    //    if (eventData.button != PointerEventData.InputButton.Left)
+    //        return;
 
-        // 타임라인 실행 중에는 드래그 불가
-        //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
-        //    return;
+    //    // 타임라인 실행 중에는 드래그 불가
+    //    //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
+    //    //    return;
 
-        isDragging = true;
-        originalPosition = rectTransform.anchoredPosition;
-        originalParent = transform.parent;
+    //    isDragging = true;
+    //    originalPosition = rectTransform.anchoredPosition;
+    //    originalParent = transform.parent;
 
-        // 드래그 중에는 반투명하게
-        canvasGroup.alpha = 0.6f;
-        canvasGroup.blocksRaycasts = false;
+    //    // 드래그 중에는 반투명하게
+    //    canvasGroup.alpha = 0.6f;
+    //    canvasGroup.blocksRaycasts = false;
 
-        // 최상위로 이동 (다른 UI 위에 표시)
-        transform.SetParent(canvas.transform);
+    //    // 최상위로 이동 (다른 UI 위에 표시)
+    //    transform.SetParent(canvas.transform);
 
-        // 드래그 시작하면 툴팁은 숨김
-        if (CardTooltip.Instance != null)
-        {
-            CardTooltip.Instance.Hide();
-        }
-    }
+    //    // 드래그 시작하면 툴팁은 숨김
+    //    if (CardTooltip.Instance != null)
+    //    {
+    //        CardTooltip.Instance.Hide();
+    //    }
+    //}
 
-    /// <summary>
-    /// 드래그 중
-    /// </summary>
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
+    ///// <summary>
+    ///// 드래그 중
+    ///// </summary>
+    //public void OnDrag(PointerEventData eventData)
+    //{
+    //    if (eventData.button != PointerEventData.InputButton.Left)
+    //        return;
 
-        // 타임라인 실행 중에는 드래그 불가
-        //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
-        //    return;
+    //    // 타임라인 실행 중에는 드래그 불가
+    //    //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
+    //    //    return;
 
-        // 마우스 위치로 이동
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-    }
+    //    // 마우스 위치로 이동
+    //    rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+    //}
 
-    /// <summary>
-    /// 드래그 종료
-    /// </summary>
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
+    ///// <summary>
+    ///// 드래그 종료
+    ///// </summary>
+    //public void OnEndDrag(PointerEventData eventData)
+    //{
+    //    if (eventData.button != PointerEventData.InputButton.Left)
+    //        return;
 
-        // 타임라인 실행 중에는 드래그 불가
-        //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
-        //    return;
+    //    // 타임라인 실행 중에는 드래그 불가
+    //    //if (TimeLine_Manager.Instance != null && TimeLine_Manager.Instance.IsExecutingRound)
+    //    //    return;
 
-        isDragging = false;
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
+    //    isDragging = false;
+    //    canvasGroup.alpha = 1f;
+    //    canvasGroup.blocksRaycasts = true;
 
-        // 드롭 성공 여부 확인은 TimelineDropZone에서 처리
+    //    // 드롭 성공 여부 확인은 TimelineDropZone에서 처리
 
-        // 원래 위치로 복귀
-        transform.SetParent(originalParent);
-        rectTransform.anchoredPosition = originalPosition;
-    }
+    //    // 원래 위치로 복귀
+    //    transform.SetParent(originalParent);
+    //    rectTransform.anchoredPosition = originalPosition;
+    //}
 
-    public void OnDrop(PointerEventData eventData)
-    {
-        // 드래그 중인 카드가 있으면 하이라이트
-        if (eventData.pointerDrag != null)
-        {
-            //DraggableEffect draggable = eventData.pointerDrag.GetComponent<DraggableEffect>();
+    //public void OnDrop(PointerEventData eventData)
+    //{
+    //    // 드래그 중인 카드가 있으면 하이라이트
+    //    if (eventData.pointerDrag != null)
+    //    {
+    //        //DraggableEffect draggable = eventData.pointerDrag.GetComponent<DraggableEffect>();
 
-            //// 빌딩 페이즈이고 드래그된 게 효과면 카드에 효과 추가
-            //if (draggable != null && isBuildingPhase)
-            //{
-            //    //효과 추가
-            //    card.specialEffects.Add(draggable.Effect);
-            //    //이미지 업데이트
-            //    UpdateVisual();
-            //}
+    //        //// 빌딩 페이즈이고 드래그된 게 효과면 카드에 효과 추가
+    //        //if (draggable != null && isBuildingPhase)
+    //        //{
+    //        //    //효과 추가
+    //        //    card.specialEffects.Add(draggable.Effect);
+    //        //    //이미지 업데이트
+    //        //    UpdateVisual();
+    //        //}
 
-        }
-    }
+    //    }
+    //}
 
-    /// <summary>
-    /// 우클릭 시 취소
-    /// </summary>
-    void Update()
-    {
-        // 이 카드가 드래그 중이고 우클릭하면 취소
-        if (isDragging && Input.GetMouseButtonDown(1))
-        {
-            // 드래그 취소
-            transform.SetParent(originalParent);
-            rectTransform.anchoredPosition = originalPosition;
-            canvasGroup.alpha = 1f;
-            canvasGroup.blocksRaycasts = true;
-            isDragging = false;
+    ///// <summary>
+    ///// 우클릭 시 취소
+    ///// </summary>
+    //void Update()
+    //{
+    //    // 이 카드가 드래그 중이고 우클릭하면 취소
+    //    if (isDragging && Input.GetMouseButtonDown(1))
+    //    {
+    //        // 드래그 취소
+    //        transform.SetParent(originalParent);
+    //        rectTransform.anchoredPosition = originalPosition;
+    //        canvasGroup.alpha = 1f;
+    //        canvasGroup.blocksRaycasts = true;
+    //        isDragging = false;
 
-            if (CardTooltip.Instance != null)
-            {
-                CardTooltip.Instance.Hide();
-            }
-        }
-    }
+    //        if (CardTooltip.Instance != null)
+    //        {
+    //            CardTooltip.Instance.Hide();
+    //        }
+    //    }
+    //}
 }
