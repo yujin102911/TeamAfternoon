@@ -302,8 +302,9 @@ public class TimelineSystem
 
         foreach (var p in _placedBlocks)
         {
-            _prevPlacedBlocks.Add(p.Clone());
-            _prevblockMap.Add(p.Clone(), _blockMap[p]);
+            PlacedBlock placedBlock = p.Clone();
+            _prevPlacedBlocks.Add(placedBlock);
+            _prevblockMap.Add(placedBlock, _blockMap[p].Clone());
         }
             
 
