@@ -79,7 +79,7 @@ public class TimelineSystem
             Attached_Keyword_IDs = runtimeBlock.AttachedKeywords.ConvertAll(k => k.KeywordID)
         };
 
-        PlacedBlock placedBlock = new PlacedBlock(savedData, startTick);
+        PlacedBlock placedBlock = new PlacedBlock(startTick, runtimeBlock);
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
@@ -225,7 +225,7 @@ public class TimelineSystem
                 break;
 
             case ActionType.Move:
-                MoveDirection dir = blockData.MoveDirections[cardTickIndex];
+                MoveDirection dir = runtimeBlock.CurrentMoveDirections[cardTickIndex];
                 Debug.Log($"  → {blockData.BlockName}: 이동 요청 ({dir})");
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)

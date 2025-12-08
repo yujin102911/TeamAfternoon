@@ -10,10 +10,14 @@ public class RuntimeBlock
     public BlockData BaseData { get; private set; }
     public List<KeywordData> AttachedKeywords { get; private set; } = new List<KeywordData>();
 
+    public MoveDirection[] CurrentMoveDirections { get; private set; }
+
     public RuntimeBlock(BlockData baseData)
     {
         BlockID = baseData.BlockID;
         BaseData = baseData;
+
+        InitializeDirections();
 
     }
 
@@ -26,4 +30,19 @@ public class RuntimeBlock
         }
     }
 
+    public void InitializeDirections()
+    {
+        if (BaseData.MoveDirections != null)
+            CurrentMoveDirections = (MoveDirection[])BaseData.MoveDirections.Clone();
+    }
+
+    public void ToggleDirections(int index)
+    {
+        if (CurrentMoveDirections == null || index < 0 || index >= CurrentMoveDirections.Length) return;
+        
+        if (CurrentMoveDirections[index] == MoveDirection.Left)
+            CurrentMoveDirections[index] = MoveDirection.Right;
+        else if (CurrentMoveDirections[index] == MoveDirection.Right)
+            CurrentMoveDirections[index] = MoveDirection.Left;
+    }
 }
