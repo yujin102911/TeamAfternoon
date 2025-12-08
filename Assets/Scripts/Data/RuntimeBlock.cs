@@ -21,6 +21,25 @@ public class RuntimeBlock
 
     }
 
+    /// <summary>
+    /// 클론 생성
+    /// </summary>
+    public RuntimeBlock Clone()
+    {
+        // BaseData는 ScriptableObject라 원본 공유가 일반적으로 맞음(원본 데이터 변경 방지)
+        RuntimeBlock copy = new RuntimeBlock(this.BaseData);
+
+        // CurrentMoveDirections 깊은 복사
+        if (this.CurrentMoveDirections != null)
+            copy.CurrentMoveDirections = (MoveDirection[])this.CurrentMoveDirections.Clone();
+
+        // Keyword 리스트 복사 (KeywordData도 ScriptableObject면 참조복사로 충분)
+        copy.AttachedKeywords = new List<KeywordData>(this.AttachedKeywords);
+
+        return copy;
+    }
+
+
     public void ApplySavedData(Saved_BlockData saved, DataRepository repo)
     {
         foreach (int keywordId in saved.Attached_Keyword_IDs)
