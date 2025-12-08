@@ -1,10 +1,11 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
-    IDragHandler, IEndDragHandler
+     IDragHandler, IEndDragHandler
 {
     public RuntimeBlock runtimeBlock;
 
@@ -42,6 +43,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void Init(RuntimeBlock rBlock)
     {
+        canvasGroup.alpha = 1f;
         runtimeBlock = rBlock;
         BlockData data = rBlock.BaseData;
 
@@ -122,11 +124,12 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         Debug.Log("드래그 시작");
         
         // 드래그용 복제 생성
-        ghost = Instantiate(dragGhostPrefab, canvas.transform);
+        ghost = Draggable_Block.Instance.gameObject;
         ghost.transform.position = transform.position;
 
         // 드래그 복제본 초기화 세팅
-        ghost.GetComponent<Draggable_Block>().Init(runtimeBlock);
+        ghost.GetComponent<Draggable_Block>().Show(runtimeBlock.BaseData);
+
 
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
@@ -140,24 +143,22 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        bool dropSuccess = CheckDrop(eventData);
-
-        if (dropSuccess)
-        {
-            // 🟢 성공 → ghost만 남기고 원본 제거
-            Destroy(gameObject);
-        }
-        else
-        {
-            // 🔴 실패 → ghost 삭제, 원본 되돌리기
-            Destroy(ghost);
-            canvasGroup.alpha = 1f;
-        }
+        Draggable_Block.Instance.Hide();
+        canvasGroup.alpha = 1f;
     }
 
     private bool CheckDrop(PointerEventData eventData)
     {
         // 드랍 성공 여부 계산 (슬롯 태그/존 충돌/레이트레이캐스트 등)
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (var hit in results)
+        {
+            // 원하는 컴포넌트가 붙어있다면 성공
+            if (hit.gameObject.GetComponent<TimelineDropZone>() != null)
+                return true;
+        }
         // 지금은 테스트용
         return false;
     }

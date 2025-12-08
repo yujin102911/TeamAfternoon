@@ -18,6 +18,9 @@ public class TimelineSystem
     // RuntimeBlock 참조 저장 (제거 시 필요)
     private Dictionary<PlacedBlock, RuntimeBlock> _blockMap = new Dictionary<PlacedBlock, RuntimeBlock>();
 
+    // 과거 RuntimeBlock 검증용
+    private Dictionary<PlacedBlock, RuntimeBlock> _prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>();
+
     // ========================================
     // 이벤트 정의 (Director가 구독)
     // ========================================
@@ -157,15 +160,55 @@ public class TimelineSystem
     {
         List<PlacedBlock> activeBlocks = new List<PlacedBlock>();
 
-        foreach (PlacedBlock placed in _placedBlocks)
-        {
-            if (placed.IsActiveAt(tick))
-            {
-                activeBlocks.Add(placed);
-            }
-        }
+        // 잔상과 현재중 실행할 액션 하나만 반환하도록 수정
+        PlacedBlock placed = FindFirstAction(tick);
+        activeBlocks.Add(placed);
+
+        //foreach (PlacedBlock placed in _placedBlocks)
+        //{
+        //    if (placed.IsActiveAt(tick))
+        //    {
+        //        activeBlocks.Add(placed);
+        //    }
+        //}
 
         return activeBlocks;
+    }
+
+    /// <summary>
+    /// 실행할 액션 선정
+    /// </summary>
+    public PlacedBlock FindFirstAction(int tick)
+    {
+        int indexA = _placedBlocks.FindIndex(x => x.IsActiveAt(tick));
+        int indexB = _prevPlacedBlocks.FindIndex(x => x.IsActiveAt(tick));
+
+        bool foundA = indexA != -1;
+        bool foundB = indexB != -1;
+
+        // A만 찾음
+        if (foundA && !foundB)
+        {
+            return _placedBlocks[indexA];
+        }
+            
+
+        // B만 찾음
+        if (!foundA && foundB)
+        {
+            return _prevPlacedBlocks[indexB];
+        }
+            
+
+        // 둘 다 찾음 → 무조건 listA 우선
+        if (foundA && foundB)
+        {
+            return _placedBlocks[indexA];
+        }
+            
+
+        // 아무것도 없음
+        return null;
     }
 
     /// <summary>
@@ -173,37 +216,47 @@ public class TimelineSystem
     /// </summary>
     public void ProcessTick(int tick)
     {
-        List<PlacedBlock> activeBlocks = GetActiveBlocksAt(tick);
+        PlacedBlock placed = FindFirstAction(tick);
 
-        foreach (PlacedBlock placed in activeBlocks)
+        if (placed == null) return;
+
+        int cardTickIndex = placed.GetCardTickIndex(tick);
+        BlockData blockData = placed.GetBlockData();
+
+        if (blockData == null) return;
+
+        RuntimeBlock runtimeBlock = null;
+
+        // RuntimeBlock 참조 찾기 (잔상 포함)
+        if (_blockMap.ContainsKey(placed))
         {
-            int cardTickIndex = placed.GetCardTickIndex(tick);
-            BlockData blockData = placed.GetBlockData();
+            runtimeBlock = _blockMap[placed];
+        }
+        else if(_prevblockMap.ContainsKey(placed))
+        {
+            runtimeBlock = _prevblockMap[placed];
+        }
 
-            if (blockData == null) continue;
+        if (runtimeBlock == null) return;
 
-            RuntimeBlock runtimeBlock = _blockMap.ContainsKey(placed) ? _blockMap[placed] : null;
-            if (runtimeBlock == null) continue;
+        // 블록 시작 이벤트
+        if (cardTickIndex == 0)
+        {
+            OnBlockStarted?.Invoke(placed, runtimeBlock, tick);
+        }
 
-            // 블록 시작 이벤트
-            if (cardTickIndex == 0)
-            {
-                OnBlockStarted?.Invoke(placed, runtimeBlock, tick);
-            }
+        ActionType action = blockData.GetEffectAt(cardTickIndex);
 
-            ActionType action = blockData.GetEffectAt(cardTickIndex);
+        // 틱 이벤트 (키워드용)
+        OnBlockTick?.Invoke(placed, runtimeBlock, tick, action);
 
-            // 틱 이벤트 (키워드용)
-            OnBlockTick?.Invoke(placed, runtimeBlock, tick, action);
+        // 액션 이벤트 발행
+        ExecuteAction(placed, runtimeBlock, action, cardTickIndex);
 
-            // 액션 이벤트 발행
-            ExecuteAction(placed, runtimeBlock, action, cardTickIndex);
-
-            // 블록 종료 이벤트
-            if (cardTickIndex == blockData.BlockLength - 1)
-            {
-                OnBlockEnded?.Invoke(placed, runtimeBlock, tick);
-            }
+        // 블록 종료 이벤트
+        if (cardTickIndex == blockData.BlockLength - 1)
+        {
+            OnBlockEnded?.Invoke(placed, runtimeBlock, tick);
         }
     }
 
@@ -243,8 +296,16 @@ public class TimelineSystem
     /// </summary>
     public void SaveCurrentAsPreview()
     {
+        //과거 정보 복사
         _prevPlacedBlocks.Clear();
-        _prevPlacedBlocks.AddRange(_placedBlocks);
+        _prevblockMap.Clear();
+
+        foreach (var pCard in _placedBlocks)
+        {
+            _prevPlacedBlocks.Add(pCard); // 이전 라운드 기록용
+        }
+
+        _prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>(_blockMap);
 
         _placedBlocks.Clear();
         _blockMap.Clear();
@@ -260,6 +321,7 @@ public class TimelineSystem
         _placedBlocks.Clear();
         _prevPlacedBlocks.Clear();
         _blockMap.Clear();
+        _prevblockMap.Clear();
 
         Debug.Log("[TimelineSystem] 모든 배치 초기화");
     }

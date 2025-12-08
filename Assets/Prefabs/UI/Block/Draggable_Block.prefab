@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3144375903653578015}
   - component: {fileID: 7544625523044398219}
   - component: {fileID: -2752603245811862150}
+  - component: {fileID: -786412385571117315}
   m_Layer: 5
   m_Name: Draggable_Block
   m_TagString: Untagged
@@ -150,6 +151,18 @@ MonoBehaviour:
   tickWidth: 80
   tooltipOnlyForSpecial: 1
   isBuildingPhase: 0
+--- !u!225 &-786412385571117315
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4394573347416189982}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1204423077987107023
 PrefabInstance:
   m_ObjectHideFlags: 0
