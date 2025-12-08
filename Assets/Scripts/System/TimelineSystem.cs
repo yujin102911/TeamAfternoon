@@ -79,7 +79,7 @@ public class TimelineSystem
             Attached_Keyword_IDs = runtimeBlock.AttachedKeywords.ConvertAll(k => k.KeywordID)
         };
 
-        PlacedBlock placedBlock = new PlacedBlock(savedData, startTick, runtimeBlock);
+        PlacedBlock placedBlock = new PlacedBlock(startTick, runtimeBlock);
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
