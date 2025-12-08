@@ -301,9 +301,13 @@ public class TimelineSystem
         _prevblockMap.Clear();
 
         foreach (var p in _placedBlocks)
+        {
             _prevPlacedBlocks.Add(p.Clone());
+            _prevblockMap.Add(p.Clone(), _blockMap[p]);
+        }
+            
 
-        _prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>(_blockMap);
+        //_prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>(_blockMap);
 
         _placedBlocks.Clear();
         _blockMap.Clear();
