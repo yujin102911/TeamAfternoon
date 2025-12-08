@@ -49,10 +49,7 @@ public class TimelineUI : MonoBehaviour
 
         if (TimelineManager.Instance != null)
         {
-            TimelineManager.Instance.OnHandChanged += UpdateHandUI;
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
-
-            UpdateHandUI(TimelineManager.Instance.CurrentHand);
         }
     }
 
@@ -127,23 +124,7 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
-    public void UpdateHandUI(List<RuntimeBlock> hand)
-    {
-        if (handContainer == null || cardPrefab == null) return;
-
-        foreach (Transform child in handContainer) Destroy(child.gameObject);
-        foreach(RuntimeBlock block in hand)
-        {
-            GameObject go = Instantiate(cardPrefab,handContainer);
-            Draggable_Block uiBlock = go.GetComponent<Draggable_Block>();
-            if (uiBlock != null) uiBlock.Init(block);
-        }
-    }
-
-    public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
-    {
-        UpdateHandUI(new List<RuntimeBlock>(hand));
-    }
+    
 
     public void UpdateTimelineUI(IReadOnlyList<PlacedBlock> placedBlocks, IReadOnlyList<PlacedBlock> prevBlocks)
     {
