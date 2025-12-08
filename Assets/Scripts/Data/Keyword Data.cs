@@ -3,6 +3,8 @@
 /// <summary>
 /// 키워드 베이스 클래스 - 상속받아서 구체적인 효과 구현
 /// </summary>
+/// 
+[CreateAssetMenu(fileName = "New KeywordData", menuName = "Data/Keyword Data")]
 public class KeywordData : ScriptableObject
 {
     [Header("키워드 아이디")]
