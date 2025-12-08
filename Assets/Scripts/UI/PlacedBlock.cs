@@ -5,15 +5,15 @@
 /// </summary>
 public class PlacedBlock
 {
-    public Saved_BlockData block;            // 블럭 데이터
-    public int startTick;             // 시작 틱 (1~8)
-    //public bool isClockwise;          // 이동 방향 (시계방향 true, 반시계 false)
+    public Saved_BlockData block;             // 블럭 데이터
+    public int startTick;                     // 시작 틱 (1~8)
+    public RuntimeBlock linkedRuntimeBlock;   // 연결된 실체
 
-    public PlacedBlock(Saved_BlockData c, int start, bool clockwise = true)
+    public PlacedBlock(Saved_BlockData c, int start, RuntimeBlock runtime)
     {
         block = c;
         startTick = start;
-        //isClockwise = clockwise;
+        linkedRuntimeBlock = runtime;
     }
 
     /// <summary>
@@ -38,5 +38,18 @@ public class PlacedBlock
     public int GetCardTickIndex(int tick)
     {
         return tick - startTick;
+    }
+
+    public MoveDirection GetDirectionAt(int tick)
+    {
+        if (linkedRuntimeBlock != null && linkedRuntimeBlock.CurrentMoveDirections != null)
+            return linkedRuntimeBlock.CurrentMoveDirections[tick];
+        return GetBlockData().moveDirections[tick];
+    }
+
+    public void ToggleDirection(int tick)
+    {
+        int index = tick - startTick;
+        linkedRuntimeBlock?.ToggleDirections(index);
     }
 }

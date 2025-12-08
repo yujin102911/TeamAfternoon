@@ -181,6 +181,9 @@ public class TimelineManager : MonoBehaviour
 
         if (runtimeBlock != null)
         {
+            // 손패로 복귀 전 방향 초기화
+            runtimeBlock.InitializeDirections();
+
             // 손패로 복귀
             _currentHand.Add(runtimeBlock);
 
@@ -190,6 +193,15 @@ public class TimelineManager : MonoBehaviour
             OnHandChanged?.Invoke(_currentHand);
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
+    }
+
+    public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
+    {
+        if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
+        int index = tick - placedBlock.startTick;
+        placedBlock.linkedRuntimeBlock.ToggleDirections(index);
+        Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     /// <summary>
