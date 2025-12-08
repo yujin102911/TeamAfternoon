@@ -9,7 +9,7 @@ using UnityEngine.UI;
 // ========================================
 public class Draggable_Block : MonoBehaviour
 {
-    public RuntimeBlock runtimeBlock;
+    public static Draggable_Block Instance;
 
     [Header("참조")]
     public GameObject[] _tickCells;        // 틱 셀 프리팹
@@ -22,16 +22,21 @@ public class Draggable_Block : MonoBehaviour
     private Transform originalParent;
     private bool isDragging = false;
 
-    public float tickWidth = 80f;            // 타임라인 1틱의 너비
-
-    [Header("툴팁 설정")]
-    public bool tooltipOnlyForSpecial = true;   // true면 특수 스킬만 툴팁 표시
-
     [Header("빌딩인지 체크")]
     public bool isBuildingPhase = false; // 빌딩 페이즈인지 여부
 
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
@@ -40,12 +45,12 @@ public class Draggable_Block : MonoBehaviour
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
+        Hide();
     }
 
-    public void Init(RuntimeBlock rBlock)
+    public void Show(BlockData data)
     {
-        runtimeBlock = rBlock;
-        BlockData data = rBlock.BaseData;
+        gameObject.SetActive(true);
 
         //틱 정보 설정
         Set_TickVisuals(data);
@@ -87,6 +92,11 @@ public class Draggable_Block : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
     }
 
     ///// <summary>

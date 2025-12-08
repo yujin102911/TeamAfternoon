@@ -27,16 +27,17 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         }
 
         // 드래그 중인 카드 가져오기
-        Draggable_Block draggable = eventData.pointerDrag?.GetComponent<Draggable_Block>();
+        RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
 
-        if (draggable != null && TimelineManager.Instance != null)
+        if (block_info != null && TimelineManager.Instance != null)
         {
             // 배치 시도
-            bool success = TimelineManager.Instance.TryPlaceBlock(draggable.runtimeBlock, tickIndex);
+            bool success = TimelineManager.Instance.TryPlaceBlock(block_info, tickIndex);
 
             if (success)
             {
-                Destroy(draggable.gameObject);
+                //블록 배치 성공 시 드래그 블록 숨기기
+                Draggable_Block.Instance.Hide();
             }
         }
     }
@@ -47,14 +48,15 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         originalColor = image.color;
-
         if (eventData.pointerDrag == null) return;
-        Draggable_Block draggable = eventData.pointerDrag.GetComponent<Draggable_Block> (); 
 
-        if (draggable != null && TimelineManager.Instance != null)
+        RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+
+        if (block_info != null && TimelineManager.Instance != null)
         {
-            bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, draggable.runtimeBlock.BaseData.BlockLength);
-            if (image) image.color = canPlace ? Color.green : Color.red;
+            // 배치 가능한지 확인
+            bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength);
+            if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
         }
 
     }
