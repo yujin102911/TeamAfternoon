@@ -107,6 +107,7 @@ public class BattleSystem
             if (target.IsDead)
             {
                 Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 사망");
+                HandleEnemyDeathSectorInheritance(target);
                 OnEnemyDied?.Invoke(target);
             }
         }
@@ -325,6 +326,25 @@ public class BattleSystem
                 buffs.Remove(key);
                 OnBuffChanged?.Invoke(key, 0, isPlayer); 
             }
+        }
+    }
+
+    /// <summary>
+    /// 죽은 적의 섹터를 살아있는 적에게 넘겨주는 함수
+    /// </summary>
+    private void HandleEnemyDeathSectorInheritance(RuntimeEnemy deadEnemy)
+    {
+        List<RuntimeEnemy> survivors = new List<RuntimeEnemy>();
+        foreach(RuntimeEnemy enemy in _enemies)
+        {
+            if (!enemy.IsDead && enemy != deadEnemy)
+                survivors.Add(enemy);
+        }
+        if (survivors.Count > 0)
+        {
+            List<int> inheritanceSectors = deadEnemy.AttackableSectors;
+            foreach (RuntimeEnemy survivor in survivors)
+                survivor.AddHitSectors(inheritanceSectors);
         }
     }
 }

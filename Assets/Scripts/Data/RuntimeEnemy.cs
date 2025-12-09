@@ -58,6 +58,21 @@ public class RuntimeEnemy
         CurrentPattern = pattern;
     }
 
+    public void AddHitSectors(List<int> newSectors)
+    {
+        if (newSectors == null) return;
+        foreach (int sector in newSectors)
+        {
+            if (!AttackableSectors.Contains(sector))
+            {
+                AttackableSectors.Add(sector);
+            }
+        }
+        AttackableSectors.Sort();
+        Debug.Log($"[{Data.Enemy_Name}] 피격 범위 확장됨! 현재 범위: {string.Join(", ", AttackableSectors)}");
+    }
+
+
     /// <summary>
     /// 외부에서 페이즈를 강제로 변경할 때 호출
     /// </summary>
