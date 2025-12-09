@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DataRepository dataRepository;
     [SerializeField] private UserGameData userGameData;
 
+    [Header("UI 참조")]
+    [SerializeField] private TimelineUI _timelineUI;
+
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
     [SerializeField] private int _playerMaxHP = 20;
@@ -40,6 +43,7 @@ public class GameManager : MonoBehaviour
 
     public DeckSystem DeckSystem => _deckSystem;
     public BattleSystem BattleSystem => _battleSystem;
+    public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
     public bool IsExecutingRound => _isExecutingRound;
 
@@ -71,6 +75,9 @@ public class GameManager : MonoBehaviour
     }
 
     #region Initializatioin
+    /// <summary>
+    /// 내부 변수 초기화 (시스템 초기화 등)
+    /// </summary>
     private void Initialize()
     {
         SaveService.Load(userGameData);
@@ -86,6 +93,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
 
+    /// <summary>
+    /// 외부 연결 초기화
+    /// </summary>
     private void LateInitialize()
     {
         _timelineManager = TimelineManager.Instance;
@@ -98,7 +108,11 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다!");
         }
-
+        if (_timelineUI != null && _mapSystem != null)
+        {
+            _timelineUI.OnRequestClearHighlight += _mapSystem.ResetHighlight;
+            _timelineUI.OnRequestHighlight += _mapSystem.HighlightAttackSectors;
+        }
         Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
 
     }

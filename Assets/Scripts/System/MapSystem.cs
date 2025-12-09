@@ -162,5 +162,25 @@ public class MapSystem
         }
     }
 
+    /// <summary>
+    /// 공격 섹터 표시용 함수
+    /// </summary>
+    public void HighlightAttackSectors(List<int> sectorIndices)
+    {
+        ResetAllSectorColors();
+        foreach (int index in sectorIndices)
+        {
+            if (_sectors.ContainsKey(index))
+            {
+                UpdateSectorColor(index, _config.attackColor);
+            }
+        }
+    }
+    public void ResetHighlight()
+    {
+        ResetAllSectorColors();
+    }
+   
+
 
 }
