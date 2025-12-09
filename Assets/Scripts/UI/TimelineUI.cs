@@ -28,13 +28,6 @@ public class TimelineUI : MonoBehaviour
     public Color cursorColor = Color.yellow;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
-    [Header("연결")]
-    public Transform handContainer;
-    public GameObject cardPrefab;
-
-    [Header("아이콘 스프라이트")]
-    [SerializeField] private Sprite parryIcon;   // 패링 아이콘 스프라이트
-
     // 슬롯 저장 (틱 1~18)
     private List<GameObject> enemySlots = new List<GameObject>();
     private List<GameObject> cursorSlots = new List<GameObject>();
@@ -131,7 +124,7 @@ public class TimelineUI : MonoBehaviour
         foreach (GameObject slot in enemySlots)
         {
 
-            UnityEngine.UI.Image image = slot.GetComponent<Image>();
+            Image image = slot.GetComponent<Image>();
             TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
             if (image != null)
             {

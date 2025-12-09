@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private bool _isExecutingRound = false;
+    private int _globalTurnIndex = 0;
 
     public DeckSystem DeckSystem => _deckSystem;
     public BattleSystem BattleSystem => _battleSystem;
@@ -169,16 +170,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void LoadEnemyPattern()
-    {
-        EnemyPattern pattern = ScriptableObject.CreateInstance<EnemyPattern>();
-        // TODO: 스테이지 데이터에서 로드할 수 있도록 추가
-        if (_timelineManager != null)
-        {
-            _timelineManager.SetEnemyPattern(pattern);
-        }
-    }
-
     /// <summary>
     /// 일반 패턴 중에 랜덤으로 적 패턴 가져오는 로직
     /// </summary>
@@ -191,9 +182,7 @@ public class GameManager : MonoBehaviour
             if (spawn.enemyData == null) continue;
             RuntimeEnemy newEnemy = new RuntimeEnemy(
                 spawn.enemyData,
-                spawn.hitSectors,
-                spawn.tickRange.x,
-                spawn.tickRange.y
+                spawn.hitSectors
                 );
             enemies.Add(newEnemy);
         }
@@ -204,20 +193,71 @@ public class GameManager : MonoBehaviour
     private void UpdateEnemyPatterns()
     {
         if (_battleSystem == null || _battleSystem.Enemies == null) return;
-        foreach(RuntimeEnemy enemy in _battleSystem.Enemies)
+        if (currentStageData == null) return;
+
+        List<RuntimeEnemy> aliveEnemies = new List<RuntimeEnemy>();
+        foreach (RuntimeEnemy e in _battleSystem.Enemies)
         {
-            if (enemy.IsDead) continue;
-            if (enemy.Data.Nomal_Patterns.Count > 0)
+            if (!e.IsDead) aliveEnemies.Add(e);
+        }
+
+        if (aliveEnemies.Count == 0) return;
+
+        // 페이즈를 넘겨야 하는지 검사
+        CheckAndApplyPhaseTransition(aliveEnemies);
+
+        foreach (RuntimeEnemy e in aliveEnemies) e.SetPattern(null);
+
+        int activeEnemyIndex = _globalTurnIndex % aliveEnemies.Count;
+        RuntimeEnemy activeEnemy = aliveEnemies[activeEnemyIndex];
+
+        EnemyPattern nextPattern = activeEnemy.GetNextPattern();
+        if (nextPattern != null)
+        {
+            activeEnemy.SetPattern(nextPattern);
+            Debug.Log($"[GameManager] 이번 턴 행동: {activeEnemy.Data.Enemy_Name} / {nextPattern.Pattern_Name}");
+        }
+        _globalTurnIndex++;
+
+        if (_timelineManager !=  null) 
+            _timelineManager.RefreshCombinedEnemyPattern();
+
+        Debug.Log("[GameManager] 적 패턴 갱신 로직 완료");
+
+    }
+
+    private void CheckAndApplyPhaseTransition(List<RuntimeEnemy> enemies)
+    {
+        if (currentStageData.PhaseConditions == null) return;
+
+        for (int i = 0; i < currentStageData.PhaseConditions.Count; i++)
+        {
+            PhaseTransitionData condition = currentStageData.PhaseConditions[i];
+            bool isMet = false;
+
+            if (condition.ConditionType == PhaseConditionType.EnemyCount)
             {
-                int randomIndex = UnityEngine.Random.Range(0, enemy.Data.Nomal_Patterns.Count);
-                enemy.SetPattern(enemy.Data.Nomal_Patterns[randomIndex]);
+                if (enemies.Count <= condition.ConditionValue) isMet = true;
+            }
+            else if(condition.ConditionType == PhaseConditionType.HpThreshold)
+            {
+                float totalMax = 0;
+                float totalCur = 0;
+                foreach (RuntimeEnemy e in _battleSystem.Enemies)
+                {
+                    totalMax += e.MaxHP;
+                    totalCur += e.CurrentHP;
+                }
+                if (totalMax > 0 && (totalCur / totalMax) <= condition.ConditionValue) 
+                    isMet = true;
+            }
+            if (isMet)
+            {
+                int targetPhaseIndex = i + 1;
+                foreach (RuntimeEnemy e in enemies)
+                    e.ForceChangePhase(targetPhaseIndex);
             }
         }
-        if (_timelineManager != null)
-        {
-            _timelineManager.RefreshCombinedEnemyPattern();
-        }
-        Debug.Log("[GameManager] 적 패턴 갱신 완료");
     }
 
     public void ExecuteRound()
@@ -285,6 +325,7 @@ public class GameManager : MonoBehaviour
         _mapSystem.DisableSelectionMode();
         if (_playerVisualController != null)
             _playerVisualController.SpawnPlayer(sectorNum);
+        _globalTurnIndex = 0;
         StartNewBattle();
         _battleSystem.SetPlayerStartPosition(sectorNum);
     }

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de4d75918fa12964f975bc78eea7ee02, type: 3}
+  m_Name: Ant
+  m_EditorClassIdentifier: 
+  _maxEnemyHp: 15
+  _enemyName: Ant
+  _enemySprite: {fileID: 0}
+  PhaseGroups:
+  - PhaseName: 1
+    Patterns:
+    - {fileID: 11400000, guid: 84f9718449985d742be8a74f294b8971, type: 2}
+    - {fileID: 11400000, guid: 8da008c8433b4c741a45fcc8be89769c, type: 2}
+    - {fileID: 11400000, guid: e0b69211edeae2d48af910a454674859, type: 2}
+    IsLoop: 0
+  - PhaseName: 2
+    Patterns:
+    - {fileID: 11400000, guid: aacbfe1c349f8914f879e8c1a2ba559e, type: 2}
+    - {fileID: 11400000, guid: f3adef5f102abf34f8732c3ab1c43bb9, type: 2}
+    - {fileID: 11400000, guid: 965d27730ea8f6f42bd55304db41b51a, type: 2}
+    - {fileID: 11400000, guid: 086cee4acb2712b4686e861f33f42aaa, type: 2}
+    IsLoop: 0
+  - PhaseName: 3
+    Patterns:
+    - {fileID: 11400000, guid: 73b816aff9d14fb46864a33298558969, type: 2}
+    IsLoop: 1
+  _enemyAbilities: []

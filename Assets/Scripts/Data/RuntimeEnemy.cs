@@ -14,23 +14,23 @@ public class RuntimeEnemy
     public int MaxHP { get; private set; }
     public bool IsDead => CurrentHP <= 0;
 
-    // 이 적이 점유할 Tick (startTick: 1, endTick:7 -> 1~7틱까지 내꺼)
-    public int StartTick { get; private set; }
-    public int EndTick { get; private set; }
-
     public List<int> AttackableSectors { get; private set; }
 
     public EnemyPattern CurrentPattern { get; private set; }
 
-    public RuntimeEnemy(EnemyData data, List<int> attackableSectors, int startTick, int endTick)
+    private int _currentPhaseIndex = 0;      // (_currentPhaseIndex + 1) 페이즈
+    private int _patternSequenceIndex = 0;   // 현재 리스트의 몇 번째 패턴인지
+
+    public RuntimeEnemy(EnemyData data, List<int> attackableSectors)
     {
         Data = data;
         MaxHP = data.Max_EnemyHp;
         CurrentHP = MaxHP;
 
         AttackableSectors = attackableSectors;
-        StartTick = startTick;
-        EndTick = endTick;
+
+        _currentPhaseIndex = 0;
+        _patternSequenceIndex = 0;
     }
 
     /// <summary>
@@ -56,6 +56,45 @@ public class RuntimeEnemy
     public void SetPattern(EnemyPattern pattern)
     {
         CurrentPattern = pattern;
+    }
+
+    /// <summary>
+    /// 외부에서 페이즈를 강제로 변경할 때 호출
+    /// </summary>
+    public void ForceChangePhase(int newPhaseIndex)
+    {
+        if (newPhaseIndex <= _currentPhaseIndex) return;
+        if (newPhaseIndex >= Data.PhaseGroups.Count) return;
+
+        _currentPhaseIndex = newPhaseIndex;
+        _patternSequenceIndex = 0;
+        Debug.Log($"[{Data.Enemy_Name}] 페이즈 {_currentPhaseIndex + 1}로 전환!");
+    }
+
+    public EnemyPattern GetNextPattern()
+    {
+        if (Data.PhaseGroups.Count == 0) return null;
+
+        EnemyPhaseGroup currentPhaseGroup = Data.PhaseGroups[_currentPhaseIndex];
+
+        if (currentPhaseGroup.Patterns.Count == 0) return null;
+
+        if (_patternSequenceIndex >= currentPhaseGroup.Patterns.Count)
+        {
+            if (currentPhaseGroup.IsLoop)
+                _patternSequenceIndex = 0;
+            else
+            {
+                Debug.Log($"[{Data.Enemy_Name}] 현재 페이즈 패턴 고갈! 3페이즈(마지막)로 강제 진입");
+                _currentPhaseIndex = Data.PhaseGroups.Count - 1;
+                _patternSequenceIndex = 0;
+
+                return GetNextPattern();
+            }
+        }
+        EnemyPattern pattern = currentPhaseGroup.Patterns[_patternSequenceIndex];
+        _patternSequenceIndex++;
+        return pattern;
     }
 
 }
