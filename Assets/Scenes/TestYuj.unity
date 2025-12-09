@@ -825,6 +825,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 963562555}
     m_Modifications:
+    - target: {fileID: 1435213859394347654, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5489077725204061661, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
       propertyPath: m_Name
       value: TimelineTooltipPanel
@@ -918,6 +922,65 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
+--- !u!1 &1730251891
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1730251893}
+  - component: {fileID: 1730251892}
+  - component: {fileID: 1730251894}
+  m_Layer: 0
+  m_Name: VisualController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1730251892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730251891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9586faabfad954a499c81c18307285bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1730251893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730251891}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.9543873, y: 0.2075958, z: 0.030571729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1730251894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730251891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9e77ede1d911d438b2a42554ee20d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerPrefab: {fileID: 3652769322740185573, guid: 06faf5bec4959384687341467e0ef737, type: 3}
+  _moveDuration: 0.4
 --- !u!114 &1756795424 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3391965971820004265, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
@@ -1080,9 +1143,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapConfig: {fileID: 11400000, guid: b575a3f158785754e9d4700861016f04, type: 2}
   mapRootTransform: {fileID: 2146667629}
-  playerPrefab: {fileID: 3652769322740185573, guid: 06faf5bec4959384687341467e0ef737, type: 3}
   dataRepository: {fileID: 11400000, guid: e7849bdabae762d48a088fbf961abf75, type: 2}
   userGameData: {fileID: 11400000, guid: 398f3104986151c47927406663178d38, type: 2}
+  _timelineUI: {fileID: 2053024756}
+  _mapVisualController: {fileID: 1730251892}
+  _playerVisualController: {fileID: 1730251894}
   _startHandSize: 5
   _playerMaxHP: 20
   _mapSize: 0
@@ -1130,6 +1195,17 @@ MonoBehaviour:
   _playerStatusUI: {fileID: 1206323074}
   _enemyStatusPrefab: {fileID: 2714568068089599078, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   _enemyUIContainer: {fileID: 38265765}
+--- !u!114 &2053024756 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7946865704098076851, guid: 9b40a5e7c3d054342affa4b8754141bc, type: 3}
+  m_PrefabInstance: {fileID: 1763630084}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0fa29819f12ab94991a24dc8db6ed62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &2081388874 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4110042637896030118, guid: 2abfeb6eb878be14fba48cc68cabf11c, type: 3}
@@ -1313,3 +1389,4 @@ SceneRoots:
   - {fileID: 1593606974}
   - {fileID: 1994000752}
   - {fileID: 2146667629}
+  - {fileID: 1730251893}

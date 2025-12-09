@@ -62,10 +62,7 @@ public class BattleUIManager : MonoBehaviour
         if (_playerStatusUI != null)
         {
             _playerStatusUI.UpdateHP(current, max);
-            Debug.Log("있긴있는데 업데이트 안됨");
         }
-        else
-            Debug.Log("PlayerHPSliderBar 없다");
     }
 
     private void HandleEnemyHPChanged(RuntimeEnemy enemy)

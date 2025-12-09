@@ -12,6 +12,8 @@ public class BattleSystem
     private int _playerMaxHP;
     private int _playerCurrentSector; // 현재 위치 (1~8)
 
+    private float _vulnerableAmount = 1.5f;
+
     private int _totalSectors;
 
     private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>();
@@ -25,6 +27,7 @@ public class BattleSystem
     public event Action<int> OnPlayerMoved;
     public event Action<string, int, bool> OnBuffChanged;
     public event Action OnBattleInitialized;
+    public event Action<List<int>> OnEnemyAttackExecute;
 
     public int PlayerHP => _playerHP;
     public int PlayerMaxHP => _playerMaxHP;
@@ -119,11 +122,10 @@ public class BattleSystem
             int power = GetBuffValue("Power", true);
             finalDamage += power;
 
-            int enemyWeaken = GetBuffValue("Weaken", false);
-            if (enemyWeaken > 0)
+            if (GetBuffValue("Vulnerable", false) > 0)
             {
-                finalDamage += enemyWeaken;
-                Debug.Log($"[BattleSystem] 적 약화({enemyWeaken})로 추가 피해 적용!");
+                finalDamage = Mathf.FloorToInt(finalDamage * _vulnerableAmount);
+                Debug.Log($"[BattleSystem] 적 취약 상태! 데미지 {_vulnerableAmount}배 적용");
             }
 
         }
@@ -198,7 +200,10 @@ public class BattleSystem
     {
         if (attack == null) return;
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
-        
+        if (attack.targetSectors != null && attack.targetSectors.Count > 0)
+        {
+            OnEnemyAttackExecute?.Invoke(attack.targetSectors);
+        }
         if (IsPlayerHitByAttack(attack))
         {
             DealDamageToPlayer(attack.damage);
@@ -275,25 +280,32 @@ public class BattleSystem
         DecayBuffsForTarget(_enemyBuffs, false);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void DecayBuffsForTarget(Dictionary<string, int> buffs, bool isPlayer)
     {
+        List<string> keys = new List<string>(buffs.Keys);
         List<string> toRemove = new List<string>();
 
-        foreach (var pair in buffs)
+        foreach (string key in keys)
         {
-            if (pair.Value > 0)
+            if (!buffs.ContainsKey(key)) continue;
+            if (buffs[key] > 0)
             {
-                buffs[pair.Key]--;
-                OnBuffChanged?.Invoke(pair.Key, buffs[pair.Key], isPlayer);
-
-                if (buffs[pair.Key] <= 0)
-                    toRemove.Add(pair.Key);
+                buffs[key]--;
+                OnBuffChanged?.Invoke(key, buffs[key], isPlayer);
+                if (buffs[key] <= 0)
+                    toRemove.Add(key);
             }
         }
-
         foreach (string key in toRemove)
         {
-            buffs.Remove(key);
+            if (buffs.ContainsKey(key))
+            {
+                buffs.Remove(key);
+                OnBuffChanged?.Invoke(key, 0, isPlayer); 
+            }
         }
     }
 }

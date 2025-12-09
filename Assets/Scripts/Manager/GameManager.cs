@@ -11,16 +11,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MapConfiguration mapConfig;
     [SerializeField] private Transform mapRootTransform;
 
-    [Header("플레이어")]
-    [SerializeField] private GameObject playerPrefab;
-    private GameObject _currentPlayerVisual;
-
     [Header("데이터 참조")]
     [SerializeField] private DataRepository dataRepository;
     [SerializeField] private UserGameData userGameData;
 
-    [Header("UI 참조")]
+    [Header("비주얼 컨트롤러")]
     [SerializeField] private TimelineUI _timelineUI;
+    [SerializeField] private MapVisualController _mapVisualController;
+    [SerializeField] private PlayerVisualController _playerVisualController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -80,7 +78,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Load(userGameData);
+        SaveService.Save(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
@@ -88,7 +86,6 @@ public class GameManager : MonoBehaviour
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
 
         _mapSystem.OnSectorSelected += OnStartingSectorSelected;
-        _battleSystem.OnPlayerMoved += HandlePlayerVisualMove;
 
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
@@ -99,19 +96,32 @@ public class GameManager : MonoBehaviour
     private void LateInitialize()
     {
         _timelineManager = TimelineManager.Instance;
+        // 타임라인 매니저한테 배틀 시스템 전달
+        if (_timelineManager != null) _timelineManager.Initialize(_battleSystem);
+        else Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다!");
 
-        if (_timelineManager != null)
+        // MapVisualController 연결
+        if (_mapVisualController != null)
         {
-            _timelineManager.Initialize(_battleSystem);
+            _mapVisualController.Initialize(_mapSystem);
         }
         else
         {
-            Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다!");
+            _mapVisualController = FindAnyObjectByType<MapVisualController>();
+            if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem);
         }
-        if (_timelineUI != null && _mapSystem != null)
+        if (_timelineUI != null && _mapVisualController != null)
         {
-            _timelineUI.OnRequestClearHighlight += _mapSystem.ResetHighlight;
-            _timelineUI.OnRequestHighlight += _mapSystem.HighlightAttackSectors;
+            _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
+            _timelineUI.OnRequestClearHighlight += _mapVisualController.OnRequestClearHighlight;
+            _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
+        }
+
+        // PlayerVisualController 연결
+        if (_playerVisualController != null)
+        {
+            _playerVisualController.Initialize(_mapSystem);
+            _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
         }
         Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
 
@@ -169,6 +179,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 일반 패턴 중에 랜덤으로 적 패턴 가져오는 로직
+    /// </summary>
+    /// <param name="stage"></param>
     private void SetupEnemiesFromStage(StageData stage)
     {
         List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
@@ -181,14 +195,29 @@ public class GameManager : MonoBehaviour
                 spawn.tickRange.x,
                 spawn.tickRange.y
                 );
-            if (spawn.enemyData.Nomal_Patterns.Count > 0)
-            {
-                newEnemy.SetPattern(spawn.enemyData.Nomal_Patterns[0]);
-            }
             enemies.Add(newEnemy);
         }
         _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
-        _timelineManager.RefreshCombinedEnemyPattern();
+        UpdateEnemyPatterns();
+    }
+
+    private void UpdateEnemyPatterns()
+    {
+        if (_battleSystem == null || _battleSystem.Enemies == null) return;
+        foreach(RuntimeEnemy enemy in _battleSystem.Enemies)
+        {
+            if (enemy.IsDead) continue;
+            if (enemy.Data.Nomal_Patterns.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, enemy.Data.Nomal_Patterns.Count);
+                enemy.SetPattern(enemy.Data.Nomal_Patterns[randomIndex]);
+            }
+        }
+        if (_timelineManager != null)
+        {
+            _timelineManager.RefreshCombinedEnemyPattern();
+        }
+        Debug.Log("[GameManager] 적 패턴 갱신 완료");
     }
 
     public void ExecuteRound()
@@ -224,6 +253,13 @@ public class GameManager : MonoBehaviour
         {
             _timelineManager.OnRoundEnded();
         }
+        if (_battleSystem != null)
+        {
+            _battleSystem.DecayBuffs();
+        }
+
+        UpdateEnemyPatterns();
+
         _deckSystem.DiscardHand();
         _deckSystem.DrawCards(_startHandSize);
 
@@ -247,28 +283,11 @@ public class GameManager : MonoBehaviour
     {
         if (_isExecutingRound) return;
         _mapSystem.DisableSelectionMode();
-        SpawnPlayer(sectorNum);
+        if (_playerVisualController != null)
+            _playerVisualController.SpawnPlayer(sectorNum);
         StartNewBattle();
         _battleSystem.SetPlayerStartPosition(sectorNum);
     }
 
-    private void SpawnPlayer(int startSectorIndex)
-    {
-        Vector3 startPos = _mapSystem.GetSectorPosition(startSectorIndex);
-
-        if (playerPrefab != null)
-        {
-            _currentPlayerVisual = Instantiate(playerPrefab, startPos, Quaternion.identity);
-        }
-    }
-
-    private void HandlePlayerVisualMove(int newSectorIndex)
-    {
-        Vector3 targetPos = _mapSystem.GetSectorPosition(newSectorIndex);
-        if (_currentPlayerVisual != null)
-        {
-            _currentPlayerVisual.transform.position = targetPos;
-        }
-    }
 
 }
