@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+[System.Serializable]
+public struct StageEnemySetup
+{
+    [Tooltip("배치할 적 데이터 원본")]
+    public EnemyData enemyData;
+    [Tooltip("타임라인 점유 범위")]
+    public Vector2Int tickRange;
+    [Tooltip("피격 판정 섹터(플레이어가 여기서 공격하면 맞음)")]
+    public List<int> hitSectors;
+}
 
 [CreateAssetMenu(fileName = "New StageData", menuName = "Data/Stage Data")]
 public class StageData : ScriptableObject
@@ -15,7 +27,7 @@ public class StageData : ScriptableObject
 
     [Header("적 정보")]
     [SerializeField]
-    private EnemyData _enemyData;
+    private List<StageEnemySetup> _enemySpawns = new List<StageEnemySetup>();
 
     [Header("체력 설정")]
     [SerializeField]
@@ -28,7 +40,7 @@ public class StageData : ScriptableObject
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
     public string StageDescription => _stageDescription;
-    public EnemyData Enemy_Data => _enemyData;
+    public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
 
