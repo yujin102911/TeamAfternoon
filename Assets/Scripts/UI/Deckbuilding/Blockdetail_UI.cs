@@ -12,10 +12,17 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
     private Draggable_Block _tickInfo; // 틱 정보 출력 담당
     [SerializeField]
     private TextMeshProUGUI _damageTxt; // 데미지 텍스트 UI
+
+    [Header("키워드 UI")]
     [SerializeField]
     private Keyword_UI[] _keywordUIs;    // 키워드 UI 배열
+    [Header("키워드 반납")]
+    [SerializeField]
+    private ReturnKeyword[] _returnKeywords; // 키워드 반납 데이터 배열
+    [Header("키워드 상세 UI")]
     [SerializeField]
     private KeywordDetail_UI[] _keywordDetailUIs;    // 키워드 상세 UI 배열
+
 
     private Image _image;
     private Color _highlightColor = new Color(1f, 1f, 0f, 0.5f); // 강조 색상 (노란색 반투명)
@@ -77,6 +84,12 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
             {
                 KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
 
+                // 반납용 데이터 설정
+                if (_returnKeywords[index] != null)
+                {
+                    _returnKeywords[index].Keyword_Data = keyword;
+                }
+
                 if (_keywordUIs[index] != null)
                 {
                     _keywordUIs[index].SetAndShow(keyword.KeywordName);
@@ -128,6 +141,12 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
             foreach (int keyword_id in keywords)
             {
                 KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
+
+                // 반납용 데이터 설정
+                if (_returnKeywords[index] != null)
+                {
+                    _returnKeywords[index].Keyword_Data = keyword;
+                }
 
                 if (_keywordUIs[index] != null)
                 {
