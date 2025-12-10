@@ -14,13 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stageNumber: 1
   _stageName: 1
-  _stageDescription: 11
+  _stageDescription: "\uAC1C\uBBF8\uC640 \uBCA0\uC9F1\uC774\uAC00 \uB098\uC634"
   _enemySpawns:
-  - enemyData: {fileID: 11400000, guid: 7eecccf9d4e67bf42b37aa5a27f46005, type: 2}
-    tickRange: {x: 1, y: 4}
-    hitSectors: 040000000500000006000000
-  - enemyData: {fileID: 11400000, guid: 6e8d2298ea4c57b4396c731a75441a2c, type: 2}
-    tickRange: {x: 5, y: 8}
-    hitSectors: 010000000200000003000000
+  - enemyData: {fileID: 11400000, guid: 720fde7a9687dd3408b3426012cda93e, type: 2}
+    hitSectors: 01000000020000000700000008000000
+  - enemyData: {fileID: 11400000, guid: 3837f1b0b59f08a42ade185bc2a0486e, type: 2}
+    hitSectors: 0100000002000000030000000400000005000000060000000700000008000000
+  _phaseConditions:
+  - PhaseName: "\uD55C\uB9C8\uB9AC \uC8FD\uC73C\uBA74 2\uD398\uC774\uC988"
+    ConditionType: 2
+    ConditionValue: 1
   _playerMaxHP: 20
   _isCleared: 0

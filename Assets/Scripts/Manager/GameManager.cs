@@ -104,17 +104,17 @@ public class GameManager : MonoBehaviour
         // MapVisualController 연결
         if (_mapVisualController != null)
         {
-            _mapVisualController.Initialize(_mapSystem);
+            _mapVisualController.Initialize(_mapSystem, _battleSystem);
         }
         else
         {
             _mapVisualController = FindAnyObjectByType<MapVisualController>();
-            if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem);
+            if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem);
         }
         if (_timelineUI != null && _mapVisualController != null)
         {
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
-            _timelineUI.OnRequestClearHighlight += _mapVisualController.OnRequestClearHighlight;
+            _timelineUI.OnRequestClearHighlight += () => _mapVisualController.RefreshSectorColors();
             _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
         }
 
@@ -167,6 +167,10 @@ public class GameManager : MonoBehaviour
         else
             Debug.LogError("StageData가 없습니다");
         Debug.Log("[GameManager] 전투 시작");
+        if (_mapVisualController != null)
+        {
+            _mapVisualController.RefreshSectorColors();
+        }
 
     }
 

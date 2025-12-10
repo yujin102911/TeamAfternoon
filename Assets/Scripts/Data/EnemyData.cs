@@ -28,6 +28,9 @@ public class EnemyData : ScriptableObject
     [Tooltip("Index0 : 1페이즈, Index1: 2페이즈 ...")]
     public List<EnemyPhaseGroup> PhaseGroups = new List<EnemyPhaseGroup>();
 
+    [Header("비주얼 설정")]
+    [SerializeField]
+    private Color _assignedColor = Color.white; // 기본값 흰색
 
     [Header("적 능력")]
     [SerializeField]
@@ -37,5 +40,6 @@ public class EnemyData : ScriptableObject
     public string Enemy_Name => _enemyName;
     public Sprite Enemy_Sprite => _enemySprite;
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
+    public Color AssignedColor => _assignedColor;
 
 }

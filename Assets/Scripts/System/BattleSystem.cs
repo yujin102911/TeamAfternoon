@@ -300,6 +300,18 @@ public class BattleSystem
         DecayBuffsForTarget(_enemyBuffs, false);
     }
 
+    public RuntimeEnemy GetEnemyAtSector(int sectorIndex)
+    {
+        if (_enemies == null) return null;
+        foreach (RuntimeEnemy enemy in _enemies)
+        {
+            if (enemy.IsDead) continue;
+            if (enemy.AttackableSectors.Contains(sectorIndex))
+                return enemy;
+        }
+        return null;
+    }
+
     /// <summary>
     /// 
     /// </summary>
