@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de4d75918fa12964f975bc78eea7ee02, type: 3}
+  m_Name: Grasshopper
+  m_EditorClassIdentifier: 
+  _maxEnemyHp: 45
+  _enemyName: Grasshopper
+  _enemySprite: {fileID: 0}
+  PhaseGroups:
+  - PhaseName: 1
+    Patterns:
+    - {fileID: 11400000, guid: 414b427a7da2f6842a69472e153b750c, type: 2}
+    - {fileID: 11400000, guid: 43cd033161a4ef84c909af715c2fe738, type: 2}
+    - {fileID: 11400000, guid: fb6fc559e37d80d4d8f1d8b57736992e, type: 2}
+    IsLoop: 0
+  - PhaseName: 2
+    Patterns:
+    - {fileID: 11400000, guid: aff8a7607a0b4664f93027d680461339, type: 2}
+    - {fileID: 11400000, guid: b995285fb7f145b41ba1b5ecf2bf9fd1, type: 2}
+    - {fileID: 11400000, guid: 11b3f758b62eacc4780152abcf00cdda, type: 2}
+    - {fileID: 11400000, guid: 3c597f02751254949b71859f5c2b9688, type: 2}
+    IsLoop: 0
+  - PhaseName: 3
+    Patterns:
+    - {fileID: 11400000, guid: 1b5c3f3e92f0788438f4ab72badf2881, type: 2}
+    IsLoop: 1
+  _assignedColor: {r: 0.55051094, g: 0.8301887, b: 0.4816661, a: 1}
+  _enemyAbilities: []

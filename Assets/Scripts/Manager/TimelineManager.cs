@@ -75,9 +75,9 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleAttackRequest(int baseDamage)
+    private void HandleAttackRequest(int baseDamage, int currentTick)
     {
-        _battleSystem.DealDamageToCurrentSector(baseDamage);
+        _battleSystem.DealDamageToCurrentSector(baseDamage, currentTick);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -214,10 +214,18 @@ public class TimelineManager : MonoBehaviour
             if (enemy.CurrentPattern == null) continue;
             foreach (EnemyAttack attack in enemy.CurrentPattern.attacks)
             {
-                int realTick = attack.tick + (enemy.StartTick - 1);
+                int realTick = attack.tick;
                 if (realTick <= _totalTicks)
                 {
                     masterPattern.attacks.Add(new EnemyAttack(realTick, attack.targetSectors, attack.damage));
+                }
+            }
+            foreach (EnemyParrying parry in enemy.CurrentPattern.parryings)
+            {
+                int realTick = parry.tick; 
+                if (realTick <= _totalTicks)
+                {
+                    masterPattern.parryings.Add(new EnemyParrying(realTick, parry.damageMultiplier));
                 }
             }
         }

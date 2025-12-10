@@ -105,7 +105,7 @@ public class MapSystem
         UpdateSectorColor(sectorNum, isEnter ? _config.hoverColor : _config.selectableColor);
     }
 
-    private void UpdateSectorColor(int sectorNum, Color color)
+    public void UpdateSectorColor(int sectorNum, Color color)
     {
         if (_sectors.TryGetValue(sectorNum, out GameObject obj))
         {
@@ -167,7 +167,6 @@ public class MapSystem
     /// </summary>
     public void HighlightAttackSectors(List<int> sectorIndices)
     {
-        ResetAllSectorColors();
         foreach (int index in sectorIndices)
         {
             if (_sectors.ContainsKey(index))

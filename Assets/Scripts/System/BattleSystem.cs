@@ -60,13 +60,15 @@ public class BattleSystem
         OnPlayerMoved?.Invoke(_playerCurrentSector);
     }
 
-    public void DealDamageToCurrentSector(int damage)
+    public void DealDamageToCurrentSector(int damage, int currentTick)
     {
         if (damage <= 0) return;
 
         int attackPos = PlayerCurrentSector;
 
         RuntimeEnemy target = null;
+
+        // 공격 위치에 있는 적 찾기
         foreach (RuntimeEnemy enemy in _enemies)
         {
             if (enemy.IsHitByAttackFrom(attackPos))
@@ -78,6 +80,23 @@ public class BattleSystem
 
         if (target != null)
         {
+
+            if (target.CurrentPattern != null)
+            {
+                // 적이 현재 틱에 패링 중인지 확인
+                EnemyParrying parry = target.CurrentPattern.GetParryingAt(currentTick);
+
+                if (parry != null)
+                {
+                    // 패링 성공! (적은 데미지 안 입고, 플레이어가 데미지 입음)
+                    Debug.Log($"[BattleSystem] 패링 발생: {target.Data.Enemy_Name}가 공격을 튕겨냈습니다");
+                    int reflectDamage = Mathf.CeilToInt(damage * parry.damageMultiplier);
+
+                    DealDamageToPlayer(reflectDamage);
+
+                    return;
+                }
+            }
             int finalDamage = CalculateDamage(damage, true);
 
             target.TakeDamage(finalDamage);
@@ -88,6 +107,7 @@ public class BattleSystem
             if (target.IsDead)
             {
                 Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 사망");
+                HandleEnemyDeathSectorInheritance(target);
                 OnEnemyDied?.Invoke(target);
             }
         }
@@ -280,6 +300,18 @@ public class BattleSystem
         DecayBuffsForTarget(_enemyBuffs, false);
     }
 
+    public RuntimeEnemy GetEnemyAtSector(int sectorIndex)
+    {
+        if (_enemies == null) return null;
+        foreach (RuntimeEnemy enemy in _enemies)
+        {
+            if (enemy.IsDead) continue;
+            if (enemy.AttackableSectors.Contains(sectorIndex))
+                return enemy;
+        }
+        return null;
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -306,6 +338,25 @@ public class BattleSystem
                 buffs.Remove(key);
                 OnBuffChanged?.Invoke(key, 0, isPlayer); 
             }
+        }
+    }
+
+    /// <summary>
+    /// 죽은 적의 섹터를 살아있는 적에게 넘겨주는 함수
+    /// </summary>
+    private void HandleEnemyDeathSectorInheritance(RuntimeEnemy deadEnemy)
+    {
+        List<RuntimeEnemy> survivors = new List<RuntimeEnemy>();
+        foreach(RuntimeEnemy enemy in _enemies)
+        {
+            if (!enemy.IsDead && enemy != deadEnemy)
+                survivors.Add(enemy);
+        }
+        if (survivors.Count > 0)
+        {
+            List<int> inheritanceSectors = deadEnemy.AttackableSectors;
+            foreach (RuntimeEnemy survivor in survivors)
+                survivor.AddHitSectors(inheritanceSectors);
         }
     }
 }
