@@ -9,8 +9,6 @@ using UnityEngine.UI;
 // ========================================
 public class Draggable_Block : MonoBehaviour
 {
-    public static Draggable_Block Instance;
-
     [Header("참조")]
     public GameObject[] _tickCells;        // 틱 셀 프리팹
 
@@ -27,16 +25,6 @@ public class Draggable_Block : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();

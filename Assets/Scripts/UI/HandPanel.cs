@@ -25,6 +25,14 @@ public class HandPanel : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.OnHandChanged -= UpdateHandUI;
+        }
+    }
+
     private void InitializePool()
     {
         for (int i = 0; i < _initialSize; i++)
