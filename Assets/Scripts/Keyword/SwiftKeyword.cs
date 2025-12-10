@@ -31,4 +31,9 @@ public class SwiftKeyword : KeywordData
         }
     }
 
+    public override int GetSpeedBonus()
+    {
+        return speedAmount;
+    }
+
 }

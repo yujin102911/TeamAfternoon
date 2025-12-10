@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,8 +35,10 @@ public class TimelineUI : MonoBehaviour
     private List<GameObject> playerSlots = new List<GameObject>();
 
     // events
-    public event System.Action<List<int>> OnRequestHighlight;
-    public event System.Action OnRequestClearHighlight;
+    public event Action<List<int>> OnRequestHighlight;
+    public event Action OnRequestClearHighlight;
+    public event Action<int> OnRequestPreviewPlayer;
+    public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
     private EnemyPattern _currentPattern;
@@ -316,6 +319,29 @@ public class TimelineUI : MonoBehaviour
                 image.color = cursorColor;
             }
         }
+    }
+
+    public void OnCursorEnter(int tick)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound)
+        {
+            return;
+        }
+        if (TimelineManager.Instance != null)
+        {
+            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(tick);
+            OnRequestPreviewPlayer?.Invoke(predictedSector);
+
+            List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(tick);
+            if (attackSectors != null && attackSectors.Count > 0) 
+                OnRequestHighlight?.Invoke(attackSectors);
+        }
+    }
+
+    public void OnCursorExit()
+    {
+        OnRequestHidePreview?.Invoke();
+        OnRequestClearHighlight?.Invoke();
     }
 
     /// <summary>

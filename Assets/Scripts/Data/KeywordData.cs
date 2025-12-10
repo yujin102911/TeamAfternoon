@@ -49,5 +49,10 @@ public class KeywordData : ScriptableObject
     /// </summary>
     public virtual void OnRoundEnded(PlacedBlock placed) { }
 
-
+    #region 시뮬레이션 용 속도 올려주는지 체크용 함수
+    public virtual int GetSpeedBonus()
+    {
+        return 0;
+    }
+    #endregion
 }
