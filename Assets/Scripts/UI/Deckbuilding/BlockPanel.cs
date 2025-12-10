@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Localization.Settings;
 
-public class HandPanel : MonoBehaviour
+public class DeckPanel : MonoBehaviour
 {
     [SerializeField] private GameObject _blockPrefab;  // 풀링할 대상
     [SerializeField] private Transform _spawnPoint;   // 블록이 생성될 위치
     [SerializeField] private int _initialSize = 10;
 
-    private Queue<GameObject> _handPool = new Queue<GameObject>();
+    private Queue<GameObject> _blockPool = new Queue<GameObject>();
 
     private void Awake()
     {
@@ -17,20 +17,14 @@ public class HandPanel : MonoBehaviour
 
     void Start()
     {
-
-        if (TimelineManager.Instance != null)
-        {
-            TimelineManager.Instance.OnHandChanged += UpdateHandUI;
-            UpdateHandUI(TimelineManager.Instance.CurrentHand);
-        }
+        // 일단 한번 생성
+        DeckBuildingManager.Instance.OnDeckChanged += UpdateDeckBlockUI;
+        UpdateDeckBlockUI(DeckBuildingManager.Instance.UserGameData.Deck_Block_IDs);
     }
 
     private void OnDestroy()
     {
-        if (TimelineManager.Instance != null)
-        {
-            TimelineManager.Instance.OnHandChanged -= UpdateHandUI;
-        }
+        DeckBuildingManager.Instance.OnDeckChanged -= UpdateDeckBlockUI;
     }
 
     private void InitializePool()
@@ -39,15 +33,15 @@ public class HandPanel : MonoBehaviour
         {
             GameObject obj = Instantiate(_blockPrefab, _spawnPoint);
             obj.SetActive(false);
-            _handPool.Enqueue(obj);
+            _blockPool.Enqueue(obj);
         }
     }
 
     public GameObject Get()
     {
-        if (_handPool.Count > 0)
+        if (_blockPool.Count > 0)
         {
-            GameObject obj = _handPool.Dequeue();
+            GameObject obj = _blockPool.Dequeue();
             obj.SetActive(true);
             return obj;
         }
@@ -60,10 +54,11 @@ public class HandPanel : MonoBehaviour
     public void Return(GameObject obj)
     {
         obj.SetActive(false);
-        _handPool.Enqueue(obj);
+        _blockPool.Enqueue(obj);
     }
 
-    public void UpdateHandUI(List<RuntimeBlock> hand)
+    // 덱 UI 업데이트
+    public void UpdateDeckBlockUI(List<int> block_IDs)
     {
         if (_spawnPoint == null) return;
 
@@ -73,16 +68,25 @@ public class HandPanel : MonoBehaviour
             Return(_spawnPoint.GetChild(i).gameObject);
         }
 
-        foreach (RuntimeBlock block in hand)
+        foreach (int id in block_IDs)
         {
             GameObject go = Get();
-            HandBlock_UI uiBlock = go.GetComponent<HandBlock_UI>();
-            if (uiBlock != null) uiBlock.Init(block);
+            Deck_UI uiBlock = go.GetComponent<Deck_UI>();
+            RuntimeBlock block = new RuntimeBlock(DataRepository.Instance.GetBlock(id));
+            
+            if (uiBlock != null)
+            {
+
+                uiBlock.R_Block = block;
+                uiBlock.Init(block);
+            }
         }
     }
 
+    //TODO: 칸수에 맞는 블럭만 보여주기
+
     public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
     {
-        UpdateHandUI(new List<RuntimeBlock>(hand));
+        //UpdateHandUI(new List<RuntimeBlock>(hand));
     }
 }
