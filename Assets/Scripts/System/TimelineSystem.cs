@@ -28,7 +28,7 @@ public class TimelineSystem
     /// <summary>
     /// 공격 요청 이벤트 (데미지)
     /// </summary>
-    public event Action<int> OnAttackRequested;
+    public event Action<int, int> OnAttackRequested;
 
     /// <summary>
     /// 이동 요청 이벤트 (방향)
@@ -251,7 +251,7 @@ public class TimelineSystem
         OnBlockTick?.Invoke(placed, runtimeBlock, tick, action);
 
         // 액션 이벤트 발행
-        ExecuteAction(placed, runtimeBlock, action, cardTickIndex);
+        ExecuteAction(placed, runtimeBlock, action, cardTickIndex, tick);
 
         // 블록 종료 이벤트
         if (cardTickIndex == blockData.BlockLength - 1)
@@ -263,7 +263,7 @@ public class TimelineSystem
     /// <summary>
     /// 액션 실행 (이벤트 발행만)
     /// </summary>
-    private void ExecuteAction(PlacedBlock placedBlock, RuntimeBlock runtimeBlock, ActionType action, int cardTickIndex)
+    private void ExecuteAction(PlacedBlock placedBlock, RuntimeBlock runtimeBlock, ActionType action, int cardTickIndex, int currentTick)
     {
         BlockData blockData = placedBlock.GetBlockData();
 
@@ -274,7 +274,7 @@ public class TimelineSystem
                 Debug.Log($"  → {blockData.BlockName}: 공격 요청 {damage}");
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
-                OnAttackRequested?.Invoke(damage);
+                OnAttackRequested?.Invoke(damage, currentTick);
                 break;
 
             case ActionType.Move:

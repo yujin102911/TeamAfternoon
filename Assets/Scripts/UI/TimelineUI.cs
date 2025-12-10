@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,21 +29,16 @@ public class TimelineUI : MonoBehaviour
     public Color cursorColor = Color.yellow;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
-    [Header("연결")]
-    public Transform handContainer;
-    public GameObject cardPrefab;
-
-    [Header("아이콘 스프라이트")]
-    [SerializeField] private Sprite parryIcon;   // 패링 아이콘 스프라이트
-
     // 슬롯 저장 (틱 1~18)
     private List<GameObject> enemySlots = new List<GameObject>();
     private List<GameObject> cursorSlots = new List<GameObject>();
     private List<GameObject> playerSlots = new List<GameObject>();
 
     // events
-    public event System.Action<List<int>> OnRequestHighlight;
-    public event System.Action OnRequestClearHighlight;
+    public event Action<List<int>> OnRequestHighlight;
+    public event Action OnRequestClearHighlight;
+    public event Action<int> OnRequestPreviewPlayer;
+    public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
     private EnemyPattern _currentPattern;
@@ -131,7 +127,7 @@ public class TimelineUI : MonoBehaviour
         foreach (GameObject slot in enemySlots)
         {
 
-            UnityEngine.UI.Image image = slot.GetComponent<Image>();
+            Image image = slot.GetComponent<Image>();
             TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
             if (image != null)
             {
@@ -323,6 +319,29 @@ public class TimelineUI : MonoBehaviour
                 image.color = cursorColor;
             }
         }
+    }
+
+    public void OnCursorEnter(int tick)
+    {
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound)
+        {
+            return;
+        }
+        if (TimelineManager.Instance != null)
+        {
+            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(tick);
+            OnRequestPreviewPlayer?.Invoke(predictedSector);
+
+            List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(tick);
+            if (attackSectors != null && attackSectors.Count > 0) 
+                OnRequestHighlight?.Invoke(attackSectors);
+        }
+    }
+
+    public void OnCursorExit()
+    {
+        OnRequestHidePreview?.Invoke();
+        OnRequestClearHighlight?.Invoke();
     }
 
     /// <summary>

@@ -75,9 +75,9 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleAttackRequest(int baseDamage)
+    private void HandleAttackRequest(int baseDamage, int currentTick)
     {
-        _battleSystem.DealDamageToCurrentSector(baseDamage);
+        _battleSystem.DealDamageToCurrentSector(baseDamage, currentTick);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -214,10 +214,18 @@ public class TimelineManager : MonoBehaviour
             if (enemy.CurrentPattern == null) continue;
             foreach (EnemyAttack attack in enemy.CurrentPattern.attacks)
             {
-                int realTick = attack.tick + (enemy.StartTick - 1);
+                int realTick = attack.tick;
                 if (realTick <= _totalTicks)
                 {
                     masterPattern.attacks.Add(new EnemyAttack(realTick, attack.targetSectors, attack.damage));
+                }
+            }
+            foreach (EnemyParrying parry in enemy.CurrentPattern.parryings)
+            {
+                int realTick = parry.tick; 
+                if (realTick <= _totalTicks)
+                {
+                    masterPattern.parryings.Add(new EnemyParrying(realTick, parry.damageMultiplier));
                 }
             }
         }
@@ -321,4 +329,69 @@ public class TimelineManager : MonoBehaviour
         _battleSystem = battleSystem;
         _battleSystem.OnEnemyDied += HandleEnemyDied;
     }
+
+    #region Preview Methods - public
+    /// <summary>
+    /// 특정 틱의 플레이어의 위치를 시뮬레이션해 반환하는 함수
+    /// </summary>
+    public int SimulatePlayerPosition(int targetTick)
+    {
+        if (_battleSystem == null) return 1;
+        int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
+
+        int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
+
+        for (int t = 1; t <= targetTick; t++)
+        {
+            PlacedBlock placed = _timelineSystem.FindFirstAction(t);
+
+            if (placed != null)
+            {
+                int cardIndex = placed.GetCardTickIndex(t);
+                BlockData data = placed.GetBlockData();
+
+                // 이번 틱의 속도 계산
+                int currentTickSpeed = 1 + baseBuffSpeed;
+                if (placed.linkedRuntimeBlock != null)
+                {
+                    foreach (var keyword in placed.linkedRuntimeBlock.AttachedKeywords)
+                    {
+                        currentTickSpeed += keyword.GetSpeedBonus();
+                    }
+                }
+
+                // 이동 액션일 경우 시뮬레이션
+                if (data.GetEffectAt(cardIndex) == ActionType.Move)
+                {
+                    MoveDirection dir = placed.GetDirectionAt(cardIndex);
+
+                    if (dir != MoveDirection.None)
+                    {
+                        int direction = (dir == MoveDirection.Right) ? 1 : -1;
+
+                        currentSimulatedSector += (direction * currentTickSpeed);
+
+                        int totalSectors = 8; // _mapSystem.TotalSectors 접근 가능하면 사용
+                        while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
+                        while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
+                    }
+                }
+            }
+        }
+
+        return currentSimulatedSector;
+    }
+
+    public List<int> GetEnemyAttackSectors(int tick)
+    {
+        List<int> sectors = new List<int>();
+        if (_currentEnemyPattern != null)
+        {
+            EnemyAttack attack = _currentEnemyPattern.GetAttackAt(tick);
+            if (attack != null && attack.targetSectors != null)
+                sectors.AddRange(attack.targetSectors);
+        }
+        return sectors;
+    }
+    #endregion
 }
