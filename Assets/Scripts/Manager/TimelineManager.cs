@@ -27,6 +27,7 @@ public class TimelineManager : MonoBehaviour
     public event Action<List<RuntimeBlock>> OnHandChanged;
     public event Action<IReadOnlyList<PlacedBlock>, IReadOnlyList<PlacedBlock>> OnTimelineChanged;
     public event Action<EnemyPattern> OnEnemyPatternChanged;
+    public event Action<int> OnCurrentTickChanged;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
@@ -76,7 +77,7 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleAttackRequest(int baseDamage)
     {
-        _battleSystem.DealDamageToEnemy(baseDamage);
+        _battleSystem.DealDamageToCurrentSector(baseDamage);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -110,6 +111,12 @@ public class TimelineManager : MonoBehaviour
             keyword.OnTick(placed, tick, action, _battleSystem);
         }
 
+    }
+
+    private void HandleEnemyDied(RuntimeEnemy deadEnemy)
+    {
+        RefreshCombinedEnemyPattern();
+        RefreshCombinedEnemyPattern();
     }
 
     // ========================================
@@ -195,6 +202,28 @@ public class TimelineManager : MonoBehaviour
         }
     }
 
+    public void RefreshCombinedEnemyPattern()
+    {
+        if (_battleSystem == null || _battleSystem.Enemies == null) return;
+        EnemyPattern masterPattern = ScriptableObject.CreateInstance<EnemyPattern>();
+        masterPattern.name = "Combined Pattern";
+
+        foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+        {
+            if (enemy.IsDead) continue;
+            if (enemy.CurrentPattern == null) continue;
+            foreach (EnemyAttack attack in enemy.CurrentPattern.attacks)
+            {
+                int realTick = attack.tick + (enemy.StartTick - 1);
+                if (realTick <= _totalTicks)
+                {
+                    masterPattern.attacks.Add(new EnemyAttack(realTick, attack.targetSectors, attack.damage));
+                }
+            }
+        }
+        SetEnemyPattern(masterPattern);
+    }
+
     public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
     {
         if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
@@ -223,10 +252,14 @@ public class TimelineManager : MonoBehaviour
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
+            OnCurrentTickChanged?.Invoke(tick);
+
             Debug.Log($"[TimelineDirector] --- 틱 {tick} ---");
 
             // 1. 플레이어 블록 처리 (TimelineSystem이 이벤트 발행 → Director가 BattleSystem 호출)
             _timelineSystem.ProcessTick(tick);
+
+            yield return new WaitForSeconds(0.4f);
 
             // 2. 적 공격 처리
             if (_currentEnemyPattern != null && _battleSystem != null)
@@ -239,7 +272,9 @@ public class TimelineManager : MonoBehaviour
             }
 
             // 연출 대기
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
+            // 모든 틱 끝나면 0 으로 신호 보내서 하이라이트 끄기
+            OnCurrentTickChanged?.Invoke(0);
         }
 
         // 라운드 종료 키워드 호출
@@ -284,5 +319,6 @@ public class TimelineManager : MonoBehaviour
     public void Initialize(BattleSystem battleSystem)
     {
         _battleSystem = battleSystem;
+        _battleSystem.OnEnemyDied += HandleEnemyDied;
     }
 }

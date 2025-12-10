@@ -40,6 +40,10 @@ public class TimelineUI : MonoBehaviour
     private List<GameObject> cursorSlots = new List<GameObject>();
     private List<GameObject> playerSlots = new List<GameObject>();
 
+    // events
+    public event System.Action<List<int>> OnRequestHighlight;
+    public event System.Action OnRequestClearHighlight;
+
     // 현재 적 시퀀스
     private EnemyPattern _currentPattern;
 
@@ -50,6 +54,8 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+            TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
+            TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
         }
     }
 
@@ -224,11 +230,10 @@ public class TimelineUI : MonoBehaviour
         tooltipPanel.SetActive(true);
 
         // 맵에 공격 섹터 표시
-        //if (MapManager.Instance != null)
-        //{
-        //    if (attack != null)
-        //        MapManager.Instance.ShowEnemyAttackSectors(attack.targetSectors);
-        //}
+        if (attack != null && attack.targetSectors != null)
+        {
+            OnRequestHighlight?.Invoke(attack.targetSectors);
+        }
     }
 
     /// <summary>
@@ -241,11 +246,7 @@ public class TimelineUI : MonoBehaviour
             tooltipPanel.SetActive(false);
         }
 
-        // 맵 색상 초기화
-        //if (MapManager.Instance != null)
-        //{
-        //    MapManager.Instance.ResetAllSectors();
-        //}
+        OnRequestClearHighlight?.Invoke();
     }
 
     /// <summary>

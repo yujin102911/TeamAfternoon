@@ -12,27 +12,29 @@ public class BattleSystem
     private int _playerMaxHP;
     private int _playerCurrentSector; // 현재 위치 (1~8)
 
+    private float _vulnerableAmount = 1.5f;
+
     private int _totalSectors;
 
-    private int _enemyHP;
-    private int _enemyMaxHP;
+    private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>();
 
     private Dictionary<string, int> _playerBuffs = new Dictionary<string, int>();
     private Dictionary<string, int> _enemyBuffs = new Dictionary<string, int>();
 
     public event Action<int, int> OnPlayerHPChanged;
-    public event Action<int, int> OnEnemyHPChanged;
+    public event Action<RuntimeEnemy> OnEnemyHPChanged;
+    public event Action<RuntimeEnemy> OnEnemyDied;
     public event Action<int> OnPlayerMoved;
-    public event Action<int, int> OnDamageDealt; // (target, damage) 0: player 1: enemy
     public event Action<string, int, bool> OnBuffChanged;
+    public event Action OnBattleInitialized;
+    public event Action<List<int>> OnEnemyAttackExecute;
 
     public int PlayerHP => _playerHP;
     public int PlayerMaxHP => _playerMaxHP;
     public int PlayerCurrentSector => _playerCurrentSector;
-    public int EnemyHP => _enemyHP; 
-    public int EnemyMaxHP => _enemyMaxHP;
+    public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
 
-    public void InitializeBattle(int playerMaxHP, int enemyMaxHP, int totalSectors, int startSector = 1)
+    public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, int startSector = 1)
     {
         _playerHP = playerMaxHP;
         _playerMaxHP = playerMaxHP;
@@ -40,35 +42,58 @@ public class BattleSystem
 
         _totalSectors = totalSectors;
 
-        _enemyHP = enemyMaxHP;
-        _enemyMaxHP = enemyMaxHP;
+        _enemies = enemies;
 
         _playerBuffs.Clear();
         _enemyBuffs.Clear();
 
-        Debug.Log($"[BattleSystem] 전투 초기화 - 플레이어 HP: {_playerHP}/{playerMaxHP}, 적 HP: {_enemyHP}/{_enemyMaxHP}");
+        OnBattleInitialized?.Invoke();
 
+        Debug.Log($"[BattleSystem] 전투 초기화 - 플레이어 HP: {_playerHP}/{playerMaxHP}");
+        Debug.Log($"[BattleSystem] 전투 초기화 - 적 {_enemies.Count} 마리 배치됨");
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
-        OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
-        OnPlayerMoved?.Invoke(_playerCurrentSector);
+        foreach (RuntimeEnemy enemy in _enemies)
+        {
+            OnEnemyHPChanged?.Invoke(enemy);
+        }
 
+        OnPlayerMoved?.Invoke(_playerCurrentSector);
     }
 
-    public void DealDamageToEnemy(int damage)
+    public void DealDamageToCurrentSector(int damage)
     {
         if (damage <= 0) return;
 
-        int finalDamage = CalculateDamage(damage, true);
+        int attackPos = PlayerCurrentSector;
 
-        _enemyHP = Mathf.Max(0, _enemyHP - finalDamage);
-        Debug.Log($"[BattleSystem] 적에게 {finalDamage} 데미지! 남은 HP: {_enemyHP}/{_enemyMaxHP}");
-
-        OnDamageDealt?.Invoke(1, finalDamage);
-        OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
-
-        if (_enemyHP <= 0)
+        RuntimeEnemy target = null;
+        foreach (RuntimeEnemy enemy in _enemies)
         {
-            OnEnemyDefeated();
+            if (enemy.IsHitByAttackFrom(attackPos))
+            {
+                target = enemy;
+                break; // 한명만
+            }
+        }
+
+        if (target != null)
+        {
+            int finalDamage = CalculateDamage(damage, true);
+
+            target.TakeDamage(finalDamage);
+            Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 피격! ({finalDamage} 피해)");
+
+            OnEnemyHPChanged?.Invoke(target);
+
+            if (target.IsDead)
+            {
+                Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 사망");
+                OnEnemyDied?.Invoke(target);
+            }
+        }
+        else
+        {
+            Debug.Log($"[BattleSystem] 공격 빗나감 (섹터 {attackPos}에 적 없음");
         }
     }
 
@@ -81,7 +106,6 @@ public class BattleSystem
         _playerHP = Mathf.Max(0, _playerHP - finalDamage);
         Debug.Log($"[BattleSystem] 플레이어가 {finalDamage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
-        OnDamageDealt?.Invoke(0, finalDamage);
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
 
         if (_playerHP <= 0)
@@ -98,11 +122,10 @@ public class BattleSystem
             int power = GetBuffValue("Power", true);
             finalDamage += power;
 
-            int enemyWeaken = GetBuffValue("Weaken", false);
-            if (enemyWeaken > 0)
+            if (GetBuffValue("Vulnerable", false) > 0)
             {
-                finalDamage += enemyWeaken;
-                Debug.Log($"[BattleSystem] 적 약화({enemyWeaken})로 추가 피해 적용!");
+                finalDamage = Mathf.FloorToInt(finalDamage * _vulnerableAmount);
+                Debug.Log($"[BattleSystem] 적 취약 상태! 데미지 {_vulnerableAmount}배 적용");
             }
 
         }
@@ -117,6 +140,13 @@ public class BattleSystem
 
     public void SetPlayerStartPosition(int sector)
     {
+        if (_totalSectors <= 0)
+        {
+            _playerCurrentSector = sector;
+            Debug.LogWarning("[BattleSystem] 맵 크기(_totalSectors)가 0입니다! 초기화 순서를 확인하세요.");
+            OnPlayerMoved?.Invoke(_playerCurrentSector);
+            return;
+        }   
         int targetSector = sector;
         while (targetSector > _totalSectors)
         {
@@ -170,7 +200,10 @@ public class BattleSystem
     {
         if (attack == null) return;
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
-        
+        if (attack.targetSectors != null && attack.targetSectors.Count > 0)
+        {
+            OnEnemyAttackExecute?.Invoke(attack.targetSectors);
+        }
         if (IsPlayerHitByAttack(attack))
         {
             DealDamageToPlayer(attack.damage);
@@ -197,6 +230,7 @@ public class BattleSystem
         Debug.Log("[BattleSystem] 적 처치!");
         GameManager.Instance?.EndBattle(true);
     }
+
     private void OnPlayerDefeated()
     {
         Debug.Log("[BattleSystem] 플레이어 사망...");
@@ -209,7 +243,6 @@ public class BattleSystem
     {
         Debug.Log($"=== 전투 상태 ===");
         Debug.Log($"플레이어: HP {_playerHP}/{_playerMaxHP}, 위치 섹터 {_playerCurrentSector}");
-        Debug.Log($"적: HP {_enemyHP}/{_enemyMaxHP}");
     }
 
     public void SetBuff(string buffName, int amount, bool isPlayer)
@@ -247,25 +280,32 @@ public class BattleSystem
         DecayBuffsForTarget(_enemyBuffs, false);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void DecayBuffsForTarget(Dictionary<string, int> buffs, bool isPlayer)
     {
+        List<string> keys = new List<string>(buffs.Keys);
         List<string> toRemove = new List<string>();
 
-        foreach (var pair in buffs)
+        foreach (string key in keys)
         {
-            if (pair.Value > 0)
+            if (!buffs.ContainsKey(key)) continue;
+            if (buffs[key] > 0)
             {
-                buffs[pair.Key]--;
-                OnBuffChanged?.Invoke(pair.Key, buffs[pair.Key], isPlayer);
-
-                if (buffs[pair.Key] <= 0)
-                    toRemove.Add(pair.Key);
+                buffs[key]--;
+                OnBuffChanged?.Invoke(key, buffs[key], isPlayer);
+                if (buffs[key] <= 0)
+                    toRemove.Add(key);
             }
         }
-
         foreach (string key in toRemove)
         {
-            buffs.Remove(key);
+            if (buffs.ContainsKey(key))
+            {
+                buffs.Remove(key);
+                OnBuffChanged?.Invoke(key, 0, isPlayer); 
+            }
         }
     }
 }
