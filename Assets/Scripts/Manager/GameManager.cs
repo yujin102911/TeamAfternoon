@@ -116,6 +116,8 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.RefreshSectorColors();
             _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
+            _timelineUI.OnRequestPreviewPlayer += _mapVisualController.ShowPlayerPreview;
+            _timelineUI.OnRequestHidePreview += _mapVisualController.HidePlayerPreview;
         }
 
         // PlayerVisualController 연결

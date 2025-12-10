@@ -8,9 +8,14 @@ using System.Collections.Generic;
 /// </summary>
 public class MapVisualController : MonoBehaviour
 {
+    [Header("프리뷰 설정")]
+    [SerializeField] private GameObject _playerGhostPrefab;
+    private GameObject _currentGhost;
+
     private MapSystem _mapSystem;
     private BattleSystem _battleSystem;
 
+    #region Initialize Methods
     /// <summary>
     /// 외부에서 MapSystem을 꽂아주는 함수
     /// GameManager가 호출
@@ -20,7 +25,9 @@ public class MapVisualController : MonoBehaviour
         _mapSystem = mapSystem;
         _battleSystem = battleSystem;
     }
+    #endregion
 
+    #region Attack Visual Methods - public
     /// <summary>
     /// 적 공격 시 비주얼
     /// </summary>
@@ -64,8 +71,36 @@ public class MapVisualController : MonoBehaviour
             _mapSystem.UpdateSectorColor(i, targetColor);
         }
     }
-    
+    #endregion
 
+    #region Preview Visual Methods - public
+    /// <summary>
+    /// 고스트 위치 표시
+    /// </summary>
+    public void ShowPlayerPreview(int sectorIndex)
+    {
+        if (_mapSystem == null) return;
+
+        if (_currentGhost == null && _playerGhostPrefab != null) 
+            _currentGhost = Instantiate(_playerGhostPrefab);
+        if (_currentGhost != null)
+        {
+            Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            _currentGhost.transform.position = targetPos;
+            _currentGhost.SetActive(true);
+        }
+    }
+    /// <summary>
+    /// 고스트 숨기기
+    /// </summary>
+    public void HidePlayerPreview()
+    {
+        if (_currentGhost != null)
+            _currentGhost.SetActive(false);
+    }
+    #endregion
+
+    #region Private Methods
     private IEnumerator FlashAttackSectorsRoutine(List<int> sectors)
     {
         if (_mapSystem == null) yield break;
@@ -81,5 +116,5 @@ public class MapVisualController : MonoBehaviour
             yield return new WaitForSeconds(0.1f);  // 0.1초 동안 꺼짐 (간격)
         }
     }
-
+    #endregion
 }
