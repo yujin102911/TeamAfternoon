@@ -127,6 +127,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (CardTooltip.Instance == null) return;
         if (eventData.pointerDrag != null) return;
 
+        
+
         bool hasSpecial = runtimeBlock.AttachedKeywords != null && runtimeBlock.AttachedKeywords.Count > 0;
         if (!hasSpecial)
             return;
@@ -193,6 +195,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (GameManager.Instance.IsExecutingRound) return;
+
         // 드래그용 복제 생성
         ghost = Instantiate(dragGhostPrefab, canvas.transform);
         ghost.transform.position = transform.position;
