@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using static Unity.Collections.AllocatorManager;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
@@ -12,6 +13,10 @@ public class DeckBuildingManager : MonoBehaviour
     [Header("데이터 참조")]
     [SerializeField] private DataRepository _repo;
     [SerializeField] private UserGameData _user;
+
+    [Header("돌아기가 버튼")]
+    [SerializeField]
+    private Button _backBtn;
 
     [Header("책 패널들")]
     [SerializeField]
@@ -54,6 +59,9 @@ public class DeckBuildingManager : MonoBehaviour
         _currentPanel = _panels[0];
         if (_currentPanel != null)
             _currentPanel.SetActive(true);
+
+        if(_backBtn != null && ServiceLocator.Instance != null)
+            _backBtn.onClick.AddListener(() => ServiceLocator.Instance.Scene.Back());
     }
 
     // Update is called once per frame
