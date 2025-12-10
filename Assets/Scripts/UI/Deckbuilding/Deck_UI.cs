@@ -31,7 +31,6 @@ public class Deck_UI : MonoBehaviour
 
     private void OnDisable()
     {
-        Debug.Log($"{this.gameObject.name} OnDisable called");
         _image.color = _originColor;
         _isSelected = false;
     }

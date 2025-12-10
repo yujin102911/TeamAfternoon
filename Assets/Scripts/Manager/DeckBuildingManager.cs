@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using static Unity.Collections.AllocatorManager;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class DeckBuildingManager : MonoBehaviour
@@ -12,6 +14,10 @@ public class DeckBuildingManager : MonoBehaviour
     [SerializeField] private DataRepository _repo;
     [SerializeField] private UserGameData _user;
 
+    [Header("돌아기가 버튼")]
+    [SerializeField]
+    private Button _backBtn;
+
     [Header("책 패널들")]
     [SerializeField]
     private GameObject[] _panels;
@@ -20,6 +26,7 @@ public class DeckBuildingManager : MonoBehaviour
     [Header("블럭 정보창")]
     [SerializeField] private Blockdetail_UI detailUI;
     private Deck_UI current;
+    private BlockData _seleckedBlock;
 
     public int Number_buffer = 0;
     public int? SelectedBlockID = null;
@@ -52,6 +59,9 @@ public class DeckBuildingManager : MonoBehaviour
         _currentPanel = _panels[0];
         if (_currentPanel != null)
             _currentPanel.SetActive(true);
+
+        if(_backBtn != null && ServiceLocator.Instance != null)
+            _backBtn.onClick.AddListener(() => ServiceLocator.Instance.Scene.Back());
     }
 
     // Update is called once per frame
@@ -118,6 +128,7 @@ public class DeckBuildingManager : MonoBehaviour
             current.SetSelected(false);
             current = null;
             detailUI.Hide();
+            _seleckedBlock = null;
             SelectedBlockID = -1;
             return;
         }
@@ -130,6 +141,7 @@ public class DeckBuildingManager : MonoBehaviour
         current = slot;
         current.SetSelected(true);
         detailUI.Show(slot.R_Block);
+        _seleckedBlock = slot.R_Block.BaseData;
     }
 
     public void SwitchPanel(int panelIndex)
@@ -203,4 +215,29 @@ public class DeckBuildingManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// 블록에서 키워드 제거 시도
+    /// </summary>
+    public bool TryRemove_Keyword(int keywordId)
+    {
+        if (_seleckedBlock == null)
+            return false;
+
+        var owned_keyword = UserGameData.Owned_Keywords.Find(k => k.Owned_KeywordID == keywordId);
+        var target_block = UserGameData.Unlocked_Blocks.Find(b => b.Owner_blockID == _seleckedBlock.blockID);
+
+        // 타겟 블럭에 키워드가 없으면 실패
+        if (target_block == null || !target_block.Attached_Keyword_IDs.Contains(keywordId))
+            return false;
+
+        // 키워드 제거
+        target_block.Attached_Keyword_IDs.Remove(keywordId);
+        owned_keyword.Keyword_Num += 1;
+
+        // 이벤트 호출 → UI에게 업데이트 요청
+        OnKeywordChanged?.Invoke(UserGameData.Owned_Keywords);
+        OnBlockDetailChanged?.Invoke();
+        OnDeckChanged?.Invoke(UserGameData.Deck_Block_IDs);
+        return true;
+    }
 }
