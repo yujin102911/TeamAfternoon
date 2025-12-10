@@ -118,6 +118,7 @@ public class DeckBuildingManager : MonoBehaviour
             current.SetSelected(false);
             current = null;
             detailUI.Hide();
+            SelectedBlockID = -1;
             return;
         }
 
