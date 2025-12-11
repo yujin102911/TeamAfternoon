@@ -11,6 +11,10 @@ public class TimelineUI : MonoBehaviour
     public GameObject cursorSlotPrefab;     // 실행 커서 슬롯
     public GameObject playerSlotPrefab;     // 플레이어 배치 슬롯
 
+    [Header("타임라인 슬롯 스프라이트")]
+    public Sprite Set_SlotSprite;         // 장착 시 슬롯 스프라이트
+    public Sprite Empty_SlotSprite;       // 빈 슬롯 스프라이트
+
     [Header("타임라인 패널 (3줄)")]
     public Transform enemyTimelinePanel;    // 위쪽: 적 전조
     public Transform cursorTimelinePanel;   // 중간: 실행 커서
@@ -356,6 +360,17 @@ public class TimelineUI : MonoBehaviour
             TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
             Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
 
+            var images = slot.GetComponentsInChildren<Image>(true);
+            foreach (var img in images)
+            {
+                if (img.gameObject != slot)   // 자기 자신 제외
+                {
+                    img.gameObject.SetActive(true);
+                }
+            }
+
+            image.sprite = Empty_SlotSprite;
+
             // 기본 색상 초기화
             if (image != null)
             {
@@ -400,6 +415,17 @@ public class TimelineUI : MonoBehaviour
                     Image image = slot.GetComponent<Image>();
                     TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
                     Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
+
+                    var images = slot.GetComponentsInChildren<Image>(true);
+                    foreach (var img in images)
+                    {
+                        if (img.gameObject != slot)   // 자기 자신 제외
+                        {
+                            img.gameObject.SetActive(false);
+                        }
+                    }
+
+                    image.sprite = Set_SlotSprite;
 
                     // 기본값
                     Color color = occupiedColor;
@@ -484,6 +510,17 @@ public class TimelineUI : MonoBehaviour
                     Image image = slot.GetComponent<Image>();
                     TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
                     Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
+
+                    var images = slot.GetComponentsInChildren<Image>(true);
+                    foreach (var img in images)
+                    {
+                        if (img.gameObject != slot)   // 자기 자신 제외
+                        {
+                            img.gameObject.SetActive(false);
+                        }
+                    }
+
+                    image.sprite = Set_SlotSprite;
 
                     // 기본값
                     Color color = occupiedColor;

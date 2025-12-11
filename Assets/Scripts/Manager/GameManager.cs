@@ -111,6 +111,7 @@ public class GameManager : MonoBehaviour
             _mapVisualController = FindAnyObjectByType<MapVisualController>();
             if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem);
         }
+
         if (_timelineUI != null && _mapVisualController != null)
         {
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
