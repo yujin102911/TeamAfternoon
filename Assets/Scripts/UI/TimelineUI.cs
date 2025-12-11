@@ -10,6 +10,7 @@ public class TimelineUI : MonoBehaviour
     public GameObject enemySlotPrefab;      // 적 전조 슬롯
     public GameObject cursorSlotPrefab;     // 실행 커서 슬롯
     public GameObject playerSlotPrefab;     // 플레이어 배치 슬롯
+    public GameObject descriptionSlotPrefab; // 설명 슬롯
 
     [Header("타임라인 슬롯 스프라이트")]
     public Sprite Set_SlotSprite;         // 장착 시 슬롯 스프라이트
@@ -19,6 +20,11 @@ public class TimelineUI : MonoBehaviour
     public Transform enemyTimelinePanel;    // 위쪽: 적 전조
     public Transform cursorTimelinePanel;   // 중간: 실행 커서
     public Transform playerTimelinePanel;   // 아래쪽: 플레이어 배치
+    public Transform descriptionPanel;
+
+    [Header("플레이어 슬롯 설정")]
+    public float playerSlotSpacing = 5f;    // 플레이어 슬롯 간격
+    public float playerSlotWidth = 60f;     // 플레이어 슬롯 너비
 
     [Header("툴팁 UI")]
     public GameObject tooltipPanel;          // 툴팁 패널
@@ -37,6 +43,7 @@ public class TimelineUI : MonoBehaviour
     private List<GameObject> enemySlots = new List<GameObject>();
     private List<GameObject> cursorSlots = new List<GameObject>();
     private List<GameObject> playerSlots = new List<GameObject>();
+    private List<GameObject> descriptionSlots = new List<GameObject>();
 
     // events
     public event Action<List<int>> OnRequestHighlight;
@@ -161,7 +168,7 @@ public class TimelineUI : MonoBehaviour
                 {
                     // 데미지 수치를 문자열로 표시
                     text.text = attack.damage.ToString();
-                    text.color = Color.white;
+                    //text.color = Color.white;
                 }
             }
             else
@@ -184,7 +191,7 @@ public class TimelineUI : MonoBehaviour
                 if (text != null)
                 {
                     text.text = "P";
-                    text.color = Color.white;
+                    //text.color = Color.white;
                 }
             }
             else
@@ -353,6 +360,16 @@ public class TimelineUI : MonoBehaviour
     /// </summary>
     public void UpdatePlayerTimeline(IReadOnlyList<PlacedBlock> placedBlocks, IReadOnlyList<PlacedBlock> prevBlocks)
     {
+        // 설명 슬롯 제거
+        foreach (var go in descriptionSlots)
+        {
+            if (go != null)
+                Destroy(go);
+        }
+
+        descriptionSlots.Clear();
+
+
         // 모든 슬롯 초기화
         foreach (GameObject slot in playerSlots)
         {
@@ -416,14 +433,6 @@ public class TimelineUI : MonoBehaviour
                     TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
                     Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
 
-                    var images = slot.GetComponentsInChildren<Image>(true);
-                    foreach (var img in images)
-                    {
-                        if (img.gameObject != slot)   // 자기 자신 제외
-                        {
-                            img.gameObject.SetActive(false);
-                        }
-                    }
 
                     image.sprite = Set_SlotSprite;
 
@@ -500,6 +509,11 @@ public class TimelineUI : MonoBehaviour
         {
             // 놓인 블럭 정보
             BlockData blockData = placed.GetBlockData();
+
+            GameObject descriptionSlot = Instantiate(descriptionSlotPrefab, descriptionPanel);
+            descriptionSlot.name = $"{placed.startTick}. DescriptionSlot";
+            descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
+            descriptionSlots.Add(descriptionSlot);
 
             for (int i = 0; i < blockData.blockLength; i++)
             {

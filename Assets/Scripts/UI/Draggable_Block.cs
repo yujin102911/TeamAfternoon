@@ -12,6 +12,12 @@ public class Draggable_Block : MonoBehaviour
     [Header("참조")]
     public GameObject[] _tickCells;        // 틱 셀 프리팹
 
+    [Header("설명창")]
+    [SerializeField]
+    private TextMeshProUGUI _blockNameText;
+    [SerializeField]
+    private TextMeshProUGUI _keywordNameText;
+
     [Header("드래그 설정")]
     private Canvas canvas;
     private RectTransform rectTransform;
@@ -42,6 +48,16 @@ public class Draggable_Block : MonoBehaviour
 
         //틱 정보 설정
         Set_TickVisuals(data);
+    }
+
+    public void Show(RuntimeBlock r_block)
+    {
+        gameObject.SetActive(true);
+
+        //틱 정보 설정
+        Set_TickVisuals(r_block.BaseData);
+
+        SetText(r_block);
     }
 
     private void Set_TickVisuals(BlockData data)
@@ -79,6 +95,26 @@ public class Draggable_Block : MonoBehaviour
                     img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
                 }
             }
+        }
+    }
+
+    private void SetText(RuntimeBlock r_block)
+    {
+        // 이름 설정
+        _blockNameText.text = r_block.BaseData.blockName;
+
+        _keywordNameText.text = "";
+        // 키워드 설정
+        if (r_block.AttachedKeywords.Count > 0)
+        {
+            for (int i = 0; i < r_block.AttachedKeywords.Count; i++)
+            {
+                _keywordNameText.text += $"#{r_block.AttachedKeywords[i].KeywordName} ";
+            }
+        }
+        else
+        {
+            _keywordNameText.text = "";
         }
     }
 

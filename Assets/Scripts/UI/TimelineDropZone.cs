@@ -48,7 +48,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         originalColor = image.color;
-        if (eventData.pointerDrag == null) return;
+        if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
 
         RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
 
