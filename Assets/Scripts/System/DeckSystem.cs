@@ -87,7 +87,6 @@ public class DeckSystem
 
     /// <summary>
     /// 손패의 카드를 사용하는 함수
-    /// TODO: discardPile로 바로 옮기는 것보다는 Placed를 추후 새로 만드는게 좋을듯. 지금은 DeckSystem밖에 없어서 일단은 DiscardPile로 옮기도록 만들어둠
     /// </summary>
     public bool UseCard(RuntimeBlock runtimeBlock)
     {
@@ -108,7 +107,6 @@ public class DeckSystem
 
     /// <summary>
     /// 배치된 카드를 손패로 되돌리는 함수
-    /// TODO: discardPile에서 배치된 카드도 관리하는데 이렇게 하지말고 배치된 리스트를 새로 만들거임 추후. 그래서 그거 추가하고 수정해야됨
     /// </summary>
     public void ReturnCardToHand(RuntimeBlock runtimeBlock)
     {

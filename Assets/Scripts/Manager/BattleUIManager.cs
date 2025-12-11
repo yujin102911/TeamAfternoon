@@ -20,7 +20,7 @@ public class BattleUIManager : MonoBehaviour
 
             battle.OnPlayerHPChanged += HandlePlayerHPChanged;
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
-            // TODO: Enemy죽었을 때 UI처리 로직
+            battle.OnEnemyDied += HandleEnemyDied;
 
             battle.OnBattleInitialized += HandleBattleInitialized;
 
@@ -70,6 +70,16 @@ public class BattleUIManager : MonoBehaviour
         if (_enemyUIMap.TryGetValue(enemy, out UnitStatusUI ui))
         {
             ui.UpdateHP(enemy.CurrentHP, enemy.MaxHP);
+        }
+    }
+
+    private void HandleEnemyDied(RuntimeEnemy enemy)
+    {
+        if (_enemyUIMap.TryGetValue(enemy, out UnitStatusUI ui))
+        {
+            if (ui != null) 
+                Destroy(ui.gameObject);
+            _enemyUIMap.Remove(enemy);
         }
     }
 

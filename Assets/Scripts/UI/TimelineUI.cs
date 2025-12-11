@@ -351,6 +351,10 @@ public class TimelineUI : MonoBehaviour
 
     public void OnCursorExit()
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound)
+        {
+            return;
+        }
         OnRequestHidePreview?.Invoke();
         OnRequestClearHighlight?.Invoke();
     }
