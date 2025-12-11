@@ -22,6 +22,8 @@ public class TimelineTickHoverHandler : MonoBehaviour,
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (GameManager.Instance.IsExecutingRound) return;
+
         Show();
 
         if (_timelineUI != null)
@@ -31,6 +33,8 @@ public class TimelineTickHoverHandler : MonoBehaviour,
     }
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (GameManager.Instance.IsExecutingRound) return;
+
         Hide();
 
         if (_timelineUI != null)
