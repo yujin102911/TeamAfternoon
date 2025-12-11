@@ -11,8 +11,15 @@ public class PlayerVisualController : MonoBehaviour
     [Header("설정")]
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private float _moveDuration = 0.35f;
+    [SerializeField] private float _yOffset = 0.8f;
+
+    [Header("프리뷰 설정")]
+    [SerializeField] private GameObject _playerGhostPrefab;
+    [SerializeField] private float _ghostYOffset = 0.8f;
 
     private GameObject _playerInstance;
+    private GameObject _currentGhost;
+
     private Coroutine _moveCoroutine;
     private MapSystem _mapSystem;
 
@@ -33,6 +40,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_mapSystem != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            targetPos.y += _yOffset;
             MoveTo(targetPos);
         }
     }
@@ -46,6 +54,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_mapSystem != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            targetPos.y += _yOffset;
             if (_playerInstance != null)
                 Destroy(_playerInstance);
             if (_playerPrefab != null)
@@ -53,6 +62,35 @@ public class PlayerVisualController : MonoBehaviour
         }
     }
 
+    #region Preview Visual Methods - public
+    /// <summary>
+    /// 고스트 위치 표시
+    /// </summary>
+    public void ShowPlayerPreview(int sectorIndex)
+    {
+        if (_mapSystem == null) return;
+
+        if (_currentGhost == null && _playerGhostPrefab != null)
+            _currentGhost = Instantiate(_playerGhostPrefab);
+        if (_currentGhost != null)
+        {
+            Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            targetPos.y += _ghostYOffset;
+            _currentGhost.transform.position = targetPos;
+            _currentGhost.SetActive(true);
+        }
+    }
+    /// <summary>
+    /// 고스트 숨기기
+    /// </summary>
+    public void HidePlayerPreview()
+    {
+        if (_currentGhost != null)
+            _currentGhost.SetActive(false);
+    }
+    #endregion
+
+    #region Private Methods
     /// <summary>
     /// 내부 이동 함수
     /// </summary>
@@ -85,8 +123,8 @@ public class PlayerVisualController : MonoBehaviour
         _playerInstance.transform.position = target;
         _moveCoroutine = null;
     }
-            
-                
-               
+    #endregion
+
+
 
 }
