@@ -202,7 +202,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         ghost.transform.position = transform.position;
 
         // 드래그 복제본 초기화 세팅
-        ghost.GetComponent<Draggable_Block>().Show(runtimeBlock.BaseData);
+        ghost.GetComponent<Draggable_Block>().Show(runtimeBlock);
 
 
         // 원본은 숨기기 or 투명화
