@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
-public class SceneService : MonoBehaviour
+public class SceneService
 {
     private Stack<string> sceneHistory = new Stack<string>();
 
