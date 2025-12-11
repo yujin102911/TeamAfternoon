@@ -25,6 +25,8 @@ public class BattleSystem
     public event Action<RuntimeEnemy> OnEnemyHPChanged;
     public event Action<RuntimeEnemy> OnEnemyDied;
     public event Action<int> OnPlayerMoved;
+    public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
+    public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
     public event Action<string, int, bool> OnBuffChanged;
     public event Action OnBattleInitialized;
     public event Action<List<int>> OnEnemyAttackExecute;
@@ -78,7 +80,7 @@ public class BattleSystem
 
         if (target != null)
         {
-
+            OnPlayerAttack?.Invoke();
             if (target.CurrentPattern != null)
             {
                 // 적이 현재 틱에 패링 중인지 확인
@@ -125,7 +127,7 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {finalDamage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
-
+        OnPlayerHit?.Invoke();
         if (_playerHP <= 0)
         {
             OnPlayerDefeated();

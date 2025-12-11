@@ -17,10 +17,20 @@ public class PlayerVisualController : MonoBehaviour
     [SerializeField] private GameObject _playerGhostPrefab;
     [SerializeField] private float _ghostYOffset = 0.8f;
 
+    [Header("연출 설정")]
+    [SerializeField] private float _hitFlashDuration = 0.2f;
+    [SerializeField] private Color _hitColor = Color.red;
+    [SerializeField] private float _shakeDuration = 0.3f;
+    [SerializeField] private float _shakeAngle = 15f;
+    [SerializeField] private int _shakeCount = 3;
+
+
     private GameObject _playerInstance;
+    private SpriteRenderer _playerRenderer;
     private GameObject _currentGhost;
 
     private Coroutine _moveCoroutine;
+    private Coroutine _effectCoroutine;
     private MapSystem _mapSystem;
 
     /// <summary>
@@ -58,9 +68,65 @@ public class PlayerVisualController : MonoBehaviour
             if (_playerInstance != null)
                 Destroy(_playerInstance);
             if (_playerPrefab != null)
+            {
                 _playerInstance = Instantiate(_playerPrefab, targetPos, Quaternion.identity);
+                _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
+                if (_playerRenderer == null) _playerRenderer = _playerInstance.GetComponent<SpriteRenderer>();
+            }
         }
     }
+
+    #region Visual Effects Methods - public
+    public void PlayAttackShake()
+    {
+        if (_playerInstance == null) return;
+        StartCoroutine(ShakeRoutine());
+    }
+
+    public void PlayHitEffect()
+    {
+        if (_playerRenderer == null) return;
+        StartCoroutine(HitFlashRoutine());
+    }
+    #endregion
+
+    #region Private Effect Routines
+    private IEnumerator ShakeRoutine()
+    {
+        Quaternion originalRot = Quaternion.identity;
+
+        float speed = _shakeDuration / _shakeCount;
+
+        for (int i = 0; i < _shakeCount; i++)
+        {
+            float t = 0;
+            while (t < speed / 2)
+            {
+                t += Time.deltaTime;
+                float z = Mathf.Lerp(0, -_shakeAngle, t / (speed / 2));
+                _playerInstance.transform.rotation = Quaternion.Euler(0, 0, z);
+                yield return null;
+            }
+            t = 0;
+            while (t < speed)
+            {
+                t += Time.deltaTime;
+                float z = Mathf.Lerp(-_shakeAngle, _shakeAngle, t / speed);
+                _playerInstance.transform.rotation = Quaternion.Euler(0, 0, z);
+                yield return null;
+            }
+        }
+        _playerInstance.transform.rotation = originalRot;
+    }
+
+    private IEnumerator HitFlashRoutine()
+    {
+        Color originalColor = Color.white;
+        _playerRenderer.color = _hitColor;
+        yield return new WaitForSeconds(_hitFlashDuration);
+        _playerRenderer.color = originalColor;
+    }
+    #endregion
 
     #region Preview Visual Methods - public
     /// <summary>

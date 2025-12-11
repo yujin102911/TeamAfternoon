@@ -160,6 +160,8 @@ public class GameManager : MonoBehaviour
         if (_timelineUI != null && _playerVisualController != null)
         {
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
         }
@@ -169,6 +171,11 @@ public class GameManager : MonoBehaviour
         {
             _enemyVisualController.Initialize(_battleSystem);
         }
+    }
+
+    private void _battleSystem_OnPlayerHit()
+    {
+        throw new NotImplementedException();
     }
     #endregion
 
