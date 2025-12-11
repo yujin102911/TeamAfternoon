@@ -334,6 +334,7 @@ public class GameManager : MonoBehaviour
         {
             activeEnemy.SetPattern(nextPattern);
             Debug.Log($"[GameManager] 이번 턴 행동: {activeEnemy.Data.Enemy_Name} / {nextPattern.Pattern_Name}");
+            _timelineUI.OnPatternChanged(nextPattern);
         }
         _globalTurnIndex++;
 
