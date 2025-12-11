@@ -86,7 +86,17 @@ public class MapSystem
     public void EnableSelectionMode()
     {
         _isSelectionEnabled = true;
-        foreach (var key in _sectors.Keys) UpdateSectorColor(key, _config.selectableColor);
+        foreach (var key in _sectors.Keys)
+        {
+            if (_sectorOwnerColors.TryGetValue(key, out Color ownerColor))
+            {
+                UpdateSectorColor(key, ownerColor);
+            }
+            else
+            {
+                UpdateSectorColor(key, _config.selectableColor);
+            }
+        }
     }
 
     public void DisableSelectionMode()
