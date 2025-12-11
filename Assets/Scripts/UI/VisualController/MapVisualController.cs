@@ -8,9 +8,6 @@ using System.Collections.Generic;
 /// </summary>
 public class MapVisualController : MonoBehaviour
 {
-    [Header("프리뷰 설정")]
-    [SerializeField] private GameObject _playerGhostPrefab;
-    private GameObject _currentGhost;
 
     private MapSystem _mapSystem;
     private BattleSystem _battleSystem;
@@ -73,32 +70,6 @@ public class MapVisualController : MonoBehaviour
     }
     #endregion
 
-    #region Preview Visual Methods - public
-    /// <summary>
-    /// 고스트 위치 표시
-    /// </summary>
-    public void ShowPlayerPreview(int sectorIndex)
-    {
-        if (_mapSystem == null) return;
-
-        if (_currentGhost == null && _playerGhostPrefab != null) 
-            _currentGhost = Instantiate(_playerGhostPrefab);
-        if (_currentGhost != null)
-        {
-            Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
-            _currentGhost.transform.position = targetPos;
-            _currentGhost.SetActive(true);
-        }
-    }
-    /// <summary>
-    /// 고스트 숨기기
-    /// </summary>
-    public void HidePlayerPreview()
-    {
-        if (_currentGhost != null)
-            _currentGhost.SetActive(false);
-    }
-    #endregion
 
     #region Private Methods
     private IEnumerator FlashAttackSectorsRoutine(List<int> sectors)

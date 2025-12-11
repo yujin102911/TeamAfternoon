@@ -23,6 +23,8 @@ public class EnemyData : ScriptableObject
     [Header("적 이미지")]
     [SerializeField]
     private Sprite _enemySprite;
+    [SerializeField]
+    private Sprite _enemyDeadSprite;
 
     [Header("페이즈 별 패턴 구성")]
     [Tooltip("Index0 : 1페이즈, Index1: 2페이즈 ...")]
@@ -39,6 +41,7 @@ public class EnemyData : ScriptableObject
     public int Max_EnemyHp => _maxEnemyHp;
     public string Enemy_Name => _enemyName;
     public Sprite Enemy_Sprite => _enemySprite;
+    public Sprite EnemyDeadSprite => _enemyDeadSprite;
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
     public Color AssignedColor => _assignedColor;
 

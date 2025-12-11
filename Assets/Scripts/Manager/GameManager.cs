@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TimelineUI _timelineUI;
     [SerializeField] private MapVisualController _mapVisualController;
     [SerializeField] private PlayerVisualController _playerVisualController;
+    [SerializeField] private EnemyVisualController _enemyVisualController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -117,15 +118,21 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.RefreshSectorColors();
             _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
-            _timelineUI.OnRequestPreviewPlayer += _mapVisualController.ShowPlayerPreview;
-            _timelineUI.OnRequestHidePreview += _mapVisualController.HidePlayerPreview;
         }
 
         // PlayerVisualController 연결
-        if (_playerVisualController != null)
+        if (_timelineUI != null && _playerVisualController != null)
         {
             _playerVisualController.Initialize(_mapSystem);
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
+            _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
+            _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
+        }
+
+        // EnemyVisualController 연결
+        if (_enemyVisualController != null)
+        {
+            _enemyVisualController.Initialize(_battleSystem);
         }
         Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
 
