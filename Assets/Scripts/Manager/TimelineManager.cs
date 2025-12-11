@@ -260,7 +260,8 @@ public class TimelineManager : MonoBehaviour
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
-            OnCurrentTickChanged?.Invoke(tick);
+            //틱이 분리됨에 따른 틱 쪼개기
+            OnCurrentTickChanged?.Invoke(2*tick - 1);
 
             Debug.Log($"[TimelineDirector] --- 틱 {tick} ---");
 
@@ -268,6 +269,9 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.ProcessTick(tick);
 
             yield return new WaitForSeconds(0.4f);
+
+            //틱이 분리됨에 따른 틱 쪼개기
+            OnCurrentTickChanged?.Invoke(2 * tick);
 
             // 2. 적 공격 처리
             if (_currentEnemyPattern != null && _battleSystem != null)
