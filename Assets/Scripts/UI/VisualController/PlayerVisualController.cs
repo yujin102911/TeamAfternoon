@@ -11,6 +11,7 @@ public class PlayerVisualController : MonoBehaviour
     [Header("설정")]
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private float _moveDuration = 0.35f;
+    [SerializeField] private float _yOffset = 0.8f;
 
     private GameObject _playerInstance;
     private Coroutine _moveCoroutine;
@@ -33,6 +34,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_mapSystem != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            targetPos.y += _yOffset;
             MoveTo(targetPos);
         }
     }
@@ -46,6 +48,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_mapSystem != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
+            targetPos.y += _yOffset;
             if (_playerInstance != null)
                 Destroy(_playerInstance);
             if (_playerPrefab != null)
