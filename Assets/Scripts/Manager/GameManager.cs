@@ -228,6 +228,10 @@ public class GameManager : MonoBehaviour
             Debug.LogError("StageData가 없습니다");
 
         _mapSystem.EnableSelectionMode();
+        if (_mapVisualController != null)
+        {
+            _mapVisualController.RefreshSectorColors();
+        }
     }
 
     /// <summary>
