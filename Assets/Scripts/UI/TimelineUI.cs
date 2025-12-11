@@ -313,21 +313,27 @@ public class TimelineUI : MonoBehaviour
         // 모든 커서 슬롯 초기화
         foreach (GameObject slot in cursorSlots)
         {
-            Image image = slot.GetComponent<Image>();
-            if (image != null)
-            {
-                image.color = normalColor;
-            }
+            TimelineTickHoverHandler hoverHandler = slot.GetComponent<TimelineTickHoverHandler>();
+            hoverHandler.Hide();
+
+            //Image image = slot.GetComponent<Image>();
+            //if (image != null)
+            //{
+            //    image.color = normalColor;
+            //}
         }
 
         // 현재 틱 하이라이트
-        if (currentTick >= 1 && currentTick <= 8)
+        if (currentTick >= 1 && currentTick <= TimelineManager.Instance.TotalTicks * 2)
         {
-            Image image = cursorSlots[currentTick - 1].GetComponent<Image>();
-            if (image != null)
-            {
-                image.color = cursorColor;
-            }
+            TimelineTickHoverHandler hoverHandler = cursorSlots[currentTick - 1].GetComponent<TimelineTickHoverHandler>();
+            hoverHandler.Show();
+
+            //Image image = cursorSlots[currentTick - 1].GetComponent<Image>();
+            //if (image != null)
+            //{
+            //    image.color = cursorColor;
+            //}
         }
     }
 
