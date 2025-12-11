@@ -43,8 +43,10 @@ public class GameManager : MonoBehaviour
     private TimelineManager _timelineManager;
 
     private int _currentRound = 0;
-    private bool _isExecutingRound = false;
     private int _globalTurnIndex = 0;
+    // 게임 상태 변수
+    private bool _isSectorSelected = false;
+    private bool _isExecutingRound = false;
     #endregion
 
     #region Properties
@@ -52,12 +54,26 @@ public class GameManager : MonoBehaviour
     public BattleSystem BattleSystem => _battleSystem;
     public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
-    public bool IsExecutingRound => _isExecutingRound;
+    public bool IsExecutingRound
+    {
+        get => _isExecutingRound;
+        private set
+        {
+            if (_isExecutingRound != value)
+            {
+                _isExecutingRound = value;
+                OnGameStateChanged?.Invoke(); // 값이 바뀌면 알림!
+            }
+        }
+    }
+    public bool IsSectorSelected => _isSectorSelected;
     #endregion
 
     #region Events
 
-    public event Action<int> OnRoundChanged;
+    public event Action OnGameStateChanged;
+
+
 
     #endregion
 
@@ -164,7 +180,7 @@ public class GameManager : MonoBehaviour
     public void SetupGame()
     {
         _currentRound = 0;
-        _isExecutingRound = false;
+        IsExecutingRound = false;
 
         if (_deckSystem == null)
         {
@@ -197,6 +213,8 @@ public class GameManager : MonoBehaviour
     {
         if (_isExecutingRound) return;
         _mapSystem.DisableSelectionMode();
+        _isSectorSelected = true;
+        OnGameStateChanged?.Invoke();
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
         _globalTurnIndex = 0;
@@ -240,7 +258,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ExecuteRoundCoroutine()
     {
-        _isExecutingRound = true;
+        IsExecutingRound = true;
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
@@ -251,7 +269,7 @@ public class GameManager : MonoBehaviour
 
         EndRound();
 
-        _isExecutingRound = false;
+        IsExecutingRound = false;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 종료 ====");
     }
 
@@ -334,6 +352,7 @@ public class GameManager : MonoBehaviour
         {
             activeEnemy.SetPattern(nextPattern);
             Debug.Log($"[GameManager] 이번 턴 행동: {activeEnemy.Data.Enemy_Name} / {nextPattern.Pattern_Name}");
+            _timelineUI.OnPatternChanged(nextPattern);
         }
         _globalTurnIndex++;
 

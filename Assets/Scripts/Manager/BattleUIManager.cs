@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class BattleUIManager : MonoBehaviour
 {
+    [Header("스테이지 UI")]
+    [SerializeField] private Button _startButton;
+
     [Header("플레이어 UI")]
     [SerializeField] private UnitStatusUI _playerStatusUI;
 
@@ -23,7 +27,16 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyDied += HandleEnemyDied;
 
             battle.OnBattleInitialized += HandleBattleInitialized;
+        }
+        GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
+        RefreshStartButtonState();
+    }
 
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
         }
     }
 
@@ -31,6 +44,7 @@ public class BattleUIManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
             InitializeUI(GameManager.Instance.BattleSystem);
+        if (_startButton != null) _startButton.interactable = true;
     }
 
     public void InitializeUI(BattleSystem battle)
@@ -82,5 +96,18 @@ public class BattleUIManager : MonoBehaviour
             _enemyUIMap.Remove(enemy);
         }
     }
+
+    private void RefreshStartButtonState()
+    {
+        if (_startButton == null || GameManager.Instance == null) return;
+
+        bool isRoundRunning = GameManager.Instance.IsExecutingRound;
+        bool isSectorSelected = GameManager.Instance.IsSectorSelected;
+
+        bool interactable = !isRoundRunning && isSectorSelected;
+
+        _startButton.interactable = interactable;
+    }
+    
 
 }

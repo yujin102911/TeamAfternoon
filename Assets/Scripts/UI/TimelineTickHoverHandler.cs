@@ -22,17 +22,19 @@ public class TimelineTickHoverHandler : MonoBehaviour,
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!GameManager.Instance.IsSectorSelected) return;
         if (GameManager.Instance.IsExecutingRound) return;
 
         Show();
 
-        if (_timelineUI != null)
+        if (_timelineUI != null && GameManager.Instance.IsSectorSelected)
         {
             _timelineUI.OnCursorEnter(tickIndex);
         }
     }
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!GameManager.Instance.IsSectorSelected) return;
         if (GameManager.Instance.IsExecutingRound) return;
 
         Hide();

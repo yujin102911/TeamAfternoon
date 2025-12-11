@@ -8,7 +8,7 @@ public class EnemyVisualController : MonoBehaviour
     [SerializeField] private Transform _enemyContainer;
 
     [Header("정렬 설정")]
-    [SerializeField] private float _spacing = 2.0f;
+    [SerializeField] private float _spacing = 2.5f;
 
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private BattleSystem _battleSystem;

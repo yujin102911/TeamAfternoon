@@ -11,6 +11,7 @@ public class EnemySlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (GameManager.Instance != null && !GameManager.Instance.IsSectorSelected) return;
         if (timelineUI != null)
         {
             timelineUI.ShowEnemyAttackTooltip(tick, transform.position);
@@ -19,6 +20,7 @@ public class EnemySlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (GameManager.Instance != null && !GameManager.Instance.IsSectorSelected) return;
         if (timelineUI != null)
         {
             timelineUI.HideTooltip();

@@ -41,6 +41,12 @@ public class EnemyParrying
 public class EnemyPattern : ScriptableObject
 {
     public string Pattern_Name;
+
+    [Header("패턴 대사")]
+    [TextArea(2, 5)]
+    public string Sentence;
+
+
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
     public List<EnemyParrying> parryings = new List<EnemyParrying>();
 

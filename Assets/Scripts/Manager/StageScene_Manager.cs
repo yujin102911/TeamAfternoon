@@ -15,17 +15,10 @@ public class StageScene_Manager : MonoBehaviour
     [SerializeField]
     private Button _deckBtn;    // 덱 버튼
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         SetStage_btn();
         _deckBtn.onClick.AddListener(OnClick_DeckBtn);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private void SetStage_btn()

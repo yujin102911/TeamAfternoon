@@ -22,6 +22,9 @@ public class TimelineUI : MonoBehaviour
     public Transform playerTimelinePanel;   // 아래쪽: 플레이어 배치
     public Transform descriptionPanel;
 
+    [Header("패턴 대사 UI")]
+    public TextMeshProUGUI sentenceText;
+
     [Header("플레이어 슬롯 설정")]
     public float playerSlotSpacing = 5f;    // 플레이어 슬롯 간격
     public float playerSlotWidth = 60f;     // 플레이어 슬롯 너비
@@ -372,6 +375,18 @@ public class TimelineUI : MonoBehaviour
         }
         OnRequestHidePreview?.Invoke();
         OnRequestClearHighlight?.Invoke();
+    }
+
+    public void OnPatternChanged(EnemyPattern pattern)
+    {
+        if (sentenceText == null) return;
+        if (pattern != null)
+            sentenceText.text = pattern.Sentence;
+        else
+        {
+            sentenceText.text = "";
+
+        }
     }
 
     /// <summary>
