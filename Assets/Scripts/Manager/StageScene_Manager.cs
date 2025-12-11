@@ -33,6 +33,7 @@ public class StageScene_Manager : MonoBehaviour
     public void OnClick_StageBtn(int stageIndex)
     {
         Debug.Log($"StageScene_Manager: OnClick_StageBtn - Stage {stageIndex} 버튼 클릭됨");
+        GameManager.SelectedStageID = stageIndex + 1; // (스테이지 ID는 1부터 시작하므로 +1)
         // 씬 전환
         ServiceLocator.Instance.Scene.Load(BattleScene_Name);
     }

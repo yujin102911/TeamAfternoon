@@ -9,6 +9,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public static int SelectedStageID = 0;
 
     #region Serialize Fields
     [Header("맵 구성")]
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MapVisualController _mapVisualController;
     [SerializeField] private PlayerVisualController _playerVisualController;
     [SerializeField] private EnemyVisualController _enemyVisualController;
+    [SerializeField] private SceneIntroController _sceneIntroController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -110,7 +112,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Save(userGameData);
+        SaveService.Load(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
@@ -198,9 +200,28 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
+        if (SelectedStageID > 0)
+        {
+            StageData selectedStage = dataRepository.GetStage(SelectedStageID);
+            if (selectedStage != null)
+            {
+                currentStageData = selectedStage;
+                Debug.Log($"[GameManager] 스테이지 {SelectedStageID} 데이터를 로드했습니다");
+            }
+            else
+            {
+                Debug.LogError($"[GameManager] 스테이지 ID에 해당하는 데이터가 없습니다");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
+        }
+        // 맵 생성
         _mapSystem.GenerateMap(_mapSize);
+        // UserData 기반 덱 생성
         _deckSystem.InitializeDeck();
-
         _mapSystem.EnableSelectionMode();
 
     }
