@@ -24,6 +24,8 @@ public class MapSystem
     private bool _isSelectionEnabled = false;
     private int _totalSectors;
 
+    private Dictionary<int, Color> _sectorOwnerColors = new Dictionary<int, Color>();
+
     public event Action<int> OnSectorSelected;
 
     public int TotalSectors => _totalSectors;
@@ -84,7 +86,17 @@ public class MapSystem
     public void EnableSelectionMode()
     {
         _isSelectionEnabled = true;
-        foreach (var key in _sectors.Keys) UpdateSectorColor(key, _config.selectableColor);
+        foreach (var key in _sectors.Keys)
+        {
+            if (_sectorOwnerColors.TryGetValue(key, out Color ownerColor))
+            {
+                UpdateSectorColor(key, ownerColor);
+            }
+            else
+            {
+                UpdateSectorColor(key, _config.selectableColor);
+            }
+        }
     }
 
     public void DisableSelectionMode()
@@ -102,7 +114,25 @@ public class MapSystem
     public void HandleSectorHover(int sectorNum, bool isEnter)
     {
         if (!_isSelectionEnabled) return;
-        UpdateSectorColor(sectorNum, isEnter ? _config.hoverColor : _config.selectableColor);
+
+        if (isEnter)
+        {
+            // 들어올 땐 하이라이트 색
+            UpdateSectorColor(sectorNum, _config.hoverColor);
+        }
+        else
+        {
+            // ★ [수정] 나갈 땐 "기억해둔 주인 색"으로 복구!
+            if (_sectorOwnerColors.TryGetValue(sectorNum, out Color ownerColor))
+            {
+                UpdateSectorColor(sectorNum, ownerColor);
+            }
+            else
+            {
+                // 기억된 게 없으면 기본 색(설정값)으로
+                UpdateSectorColor(sectorNum, _config.selectableColor);
+            }
+        }
     }
 
     public void UpdateSectorColor(int sectorNum, Color color)
@@ -177,9 +207,24 @@ public class MapSystem
     }
     public void ResetHighlight()
     {
-        ResetAllSectorColors();
+        foreach (var key in _sectors.Keys)
+        {
+            // 주인 색이 있으면 그걸로, 없으면 기본 색으로 리셋
+            if (_sectorOwnerColors.TryGetValue(key, out Color ownerColor))
+                UpdateSectorColor(key, ownerColor);
+            else
+                UpdateSectorColor(key, _config.normalColor);
+        }
     }
-   
+    public void SetSectorOwnerColor(int sectorNum, Color color)
+    {
+        if (_sectorOwnerColors.ContainsKey(sectorNum))
+            _sectorOwnerColors[sectorNum] = color;
+        else
+            _sectorOwnerColors.Add(sectorNum, color);
+
+        UpdateSectorColor(sectorNum, color);
+    }
 
 
 }

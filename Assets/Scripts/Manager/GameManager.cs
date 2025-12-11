@@ -9,6 +9,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public static int SelectedStageID = 0;
 
     #region Serialize Fields
     [Header("맵 구성")]
@@ -110,14 +111,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Save(userGameData);
+        SaveService.Load(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
-
-        _mapSystem.OnSectorSelected += OnStartingSectorSelected;
 
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
@@ -140,7 +139,7 @@ public class GameManager : MonoBehaviour
         if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
 
-            Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
+        Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
 
     }
 
@@ -149,6 +148,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void SubscribeEvents()
     {
+        _mapSystem.OnSectorSelected += OnStartingSectorSelected;
         if (_timelineUI != null && _mapVisualController != null)
         {
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
@@ -160,6 +160,8 @@ public class GameManager : MonoBehaviour
         if (_timelineUI != null && _playerVisualController != null)
         {
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
         }
@@ -169,6 +171,11 @@ public class GameManager : MonoBehaviour
         {
             _enemyVisualController.Initialize(_battleSystem);
         }
+    }
+
+    private void _battleSystem_OnPlayerHit()
+    {
+        throw new NotImplementedException();
     }
     #endregion
 
@@ -198,11 +205,40 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
+        if (SelectedStageID > 0)
+        {
+            StageData selectedStage = dataRepository.GetStage(SelectedStageID);
+            if (selectedStage != null)
+            {
+                currentStageData = selectedStage;
+                Debug.Log($"[GameManager] 스테이지 {SelectedStageID} 데이터를 로드했습니다");
+            }
+            else
+            {
+                Debug.LogError($"[GameManager] 스테이지 ID에 해당하는 데이터가 없습니다");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
+        }
+        // 맵 생성
         _mapSystem.GenerateMap(_mapSize);
+        // UserData 기반 덱 생성
         _deckSystem.InitializeDeck();
 
-        _mapSystem.EnableSelectionMode();
+        // 적 배치
+        if (currentStageData != null)
+            SetupEnemiesFromStage(currentStageData);
+        else
+            Debug.LogError("StageData가 없습니다");
 
+        _mapSystem.EnableSelectionMode();
+        if (_mapVisualController != null)
+        {
+            _mapVisualController.RefreshSectorColors();
+        }
     }
 
     /// <summary>
@@ -218,8 +254,9 @@ public class GameManager : MonoBehaviour
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
         _globalTurnIndex = 0;
-        StartNewBattle();
         _battleSystem.SetPlayerStartPosition(sectorNum);
+
+        StartNewBattle();
     }
 
     /// <summary>
@@ -234,11 +271,7 @@ public class GameManager : MonoBehaviour
         {
             _timelineManager.ReceiveHand(_deckSystem.Hand);
         }
-        // 적 배치
-        if (currentStageData != null)
-            SetupEnemiesFromStage(currentStageData);
-        else
-            Debug.LogError("StageData가 없습니다");
+        
         Debug.Log("[GameManager] 전투 시작");
         if (_mapVisualController != null)
         {
