@@ -66,6 +66,7 @@ public class MapVisualController : MonoBehaviour
                 targetColor = enemyColor;
             }
             _mapSystem.UpdateSectorColor(i, targetColor);
+            _mapSystem.SetSectorOwnerColor(i, targetColor);
         }
     }
     #endregion

@@ -38,7 +38,6 @@ public class BattleSystem
     {
         _playerHP = playerMaxHP;
         _playerMaxHP = playerMaxHP;
-        _playerCurrentSector = startSector;
 
         _totalSectors = totalSectors;
 
@@ -52,12 +51,11 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 전투 초기화 - 플레이어 HP: {_playerHP}/{playerMaxHP}");
         Debug.Log($"[BattleSystem] 전투 초기화 - 적 {_enemies.Count} 마리 배치됨");
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+
         foreach (RuntimeEnemy enemy in _enemies)
         {
             OnEnemyHPChanged?.Invoke(enemy);
         }
-
-        OnPlayerMoved?.Invoke(_playerCurrentSector);
     }
 
     public void DealDamageToCurrentSector(int damage, int currentTick)
