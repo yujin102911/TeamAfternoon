@@ -89,19 +89,15 @@ public class TimelineUI : MonoBehaviour
         }
 
         // 2줄: 실행 커서 (중간)
-        for (int tick = 1; tick <= 8; tick++)
+        for (int tick = 1; tick <= 16; tick++)
         {
             GameObject slot = Instantiate(cursorSlotPrefab, cursorTimelinePanel);
             slot.name = $"CursorSlot_{tick}";
 
-            TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null)
-            {
-                text.text = tick.ToString();
-            }
-            TimelineTickHoverHandler hoverHandler = slot.AddComponent<TimelineTickHoverHandler>();
+            TimelineTickHoverHandler hoverHandler = slot.GetComponent<TimelineTickHoverHandler>();
             hoverHandler.tickIndex = tick;
             cursorSlots.Add(slot);
+            hoverHandler.Hide();
         }
 
         // 3줄: 플레이어 배치 (아래쪽)
@@ -338,14 +334,27 @@ public class TimelineUI : MonoBehaviour
         {
             return;
         }
+
         if (TimelineManager.Instance != null)
         {
-            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(tick);
-            OnRequestPreviewPlayer?.Invoke(predictedSector);
+            int new_tick = (tick - 1) / 2 + 1;
 
-            List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(tick);
-            if (attackSectors != null && attackSectors.Count > 0) 
-                OnRequestHighlight?.Invoke(attackSectors);
+            if (tick % 2 == 1)
+            {
+                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+                OnRequestPreviewPlayer?.Invoke(predictedSector);
+            }
+            else
+            {
+                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+                OnRequestPreviewPlayer?.Invoke(predictedSector);
+
+                List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
+                if (attackSectors != null && attackSectors.Count > 0)
+                    OnRequestHighlight?.Invoke(attackSectors);
+            }
+
+                
         }
     }
 
