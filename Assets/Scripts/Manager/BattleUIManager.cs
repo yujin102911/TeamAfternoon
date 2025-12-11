@@ -6,6 +6,7 @@ public class BattleUIManager : MonoBehaviour
 {
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
+    [SerializeField] private GameObject _sectorSelectionPanel;
 
     [Header("플레이어 UI")]
     [SerializeField] private UnitStatusUI _playerStatusUI;
@@ -30,7 +31,9 @@ public class BattleUIManager : MonoBehaviour
         }
         GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
         RefreshStartButtonState();
+        RefreshSectorSelectionPanel();
     }
+
 
     private void OnDestroy()
     {
@@ -44,7 +47,6 @@ public class BattleUIManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
             InitializeUI(GameManager.Instance.BattleSystem);
-        if (_startButton != null) _startButton.interactable = true;
     }
 
     public void InitializeUI(BattleSystem battle)
@@ -100,14 +102,22 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState()
     {
         if (_startButton == null || GameManager.Instance == null) return;
-
+        
         bool isRoundRunning = GameManager.Instance.IsExecutingRound;
         bool isSectorSelected = GameManager.Instance.IsSectorSelected;
 
         bool interactable = !isRoundRunning && isSectorSelected;
 
         _startButton.interactable = interactable;
+
+        RefreshSectorSelectionPanel();
     }
     
+    private void RefreshSectorSelectionPanel()
+    {
+        if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
+        bool showPanel = !GameManager.Instance.IsSectorSelected;
+        _sectorSelectionPanel.SetActive(showPanel);
+    }
 
 }
