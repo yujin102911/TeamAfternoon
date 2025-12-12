@@ -3,29 +3,17 @@ using UnityEngine.EventSystems;
 
 public class Stage_BookBtn : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public int Stage_ID = 0;
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (StageScene_UIManager.Instance != null)
-            StageScene_UIManager.Instance.Light_On();
+            StageScene_UIManager.Instance.BookHoverEnter(Stage_ID);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (StageScene_UIManager.Instance != null)
-            StageScene_UIManager.Instance.Light_Off();
+            StageScene_UIManager.Instance.BookHoverExit();
     }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
 }
