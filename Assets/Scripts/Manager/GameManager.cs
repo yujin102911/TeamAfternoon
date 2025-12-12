@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
     // 게임 상태 변수
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
+    private bool _isBattleEnded = false;
     #endregion
 
     #region Properties
@@ -55,6 +56,7 @@ public class GameManager : MonoBehaviour
     public BattleSystem BattleSystem => _battleSystem;
     public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
+    public StageData CurrentStageData => currentStageData;
     public bool IsExecutingRound
     {
         get => _isExecutingRound;
@@ -63,11 +65,12 @@ public class GameManager : MonoBehaviour
             if (_isExecutingRound != value)
             {
                 _isExecutingRound = value;
-                OnGameStateChanged?.Invoke(); // 값이 바뀌면 알림!
+                OnGameStateChanged?.Invoke(); // 값이 바뀌면 알림
             }
         }
     }
     public bool IsSectorSelected => _isSectorSelected;
+    public bool IsBattleEnded => _isBattleEnded;
     #endregion
 
     #region Events
@@ -81,6 +84,7 @@ public class GameManager : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
+        // 싱글톤 설정
         if (Instance == null) 
             Instance = this;
         else
@@ -103,6 +107,20 @@ public class GameManager : MonoBehaviour
         SetupGame();
     }
 
+    private void OnDestroy()
+    {
+        if (_battleSystem != null)
+        {
+            _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
+        }
+        if (_mapSystem != null)
+        {
+            _mapSystem.OnSectorSelected -= OnStartingSectorSelected;
+        }
+    }
+
     #endregion
 
     #region Initializatioin
@@ -111,99 +129,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Load(userGameData);
+        SaveService.Save(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
-
-        Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
-    }
-
-    /// <summary>
-    /// 외부 연결 초기화
-    /// </summary>
-    private void LateInitialize()
-    {
-        // 타임라인 매니저
-        _timelineManager = TimelineManager.Instance;
-        if (_timelineManager != null) _timelineManager.Initialize(_battleSystem);
-        else Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다");
-
-        // MapVisualController 연결
-        if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem);
-        else Debug.LogError("[GameManager] MapVisualController를 찾을 수 없습니다");
-
-        // PlayerVisualController 연결
-        if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
-        else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
-
-        Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
-
-    }
-
-    /// <summary>
-    /// 이벤트 구독 관리 함수
-    /// </summary>
-    private void SubscribeEvents()
-    {
-        _mapSystem.OnSectorSelected += OnStartingSectorSelected;
-        if (_timelineUI != null && _mapVisualController != null)
-        {
-            _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
-            _timelineUI.OnRequestClearHighlight += () => _mapVisualController.RefreshSectorColors();
-            _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
-        }
-
-        // PlayerVisualController 연결
-        if (_timelineUI != null && _playerVisualController != null)
-        {
-            _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
-            _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
-            _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
-            _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
-        }
-
-        // EnemyVisualController 연결
-        if (_enemyVisualController != null)
-        {
-            _enemyVisualController.Initialize(_battleSystem);
-        }
-    }
-
-    private void _battleSystem_OnPlayerHit()
-    {
-        throw new NotImplementedException();
-    }
-    #endregion
-
-    #region Game Flow Methods
-    /// <summary>
-    /// 게임 초기화 함수
-    /// EnableSelectionMode -> OnStartingSectorSelected
-    /// </summary>
-    public void SetupGame()
-    {
-        _currentRound = 0;
-        IsExecutingRound = false;
-
-        if (_deckSystem == null)
-        {
-            Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
-            return;
-        }
-        if (_battleSystem == null)
-        {
-            Debug.LogError("[GameManager] 배틀 시스템이 초기화되지 않았습니다");
-            return;
-        }
-        if (_mapSystem == null)
-        {
-            Debug.LogError("[GameManager] 맵 시스템이 초기화되지 않았습니다");
-            return;
-        }
 
         // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
         if (SelectedStageID > 0)
@@ -223,6 +154,93 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
         }
+
+        Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
+    }
+
+    /// <summary>
+    /// 외부 연결 초기화
+    /// </summary>
+    private void LateInitialize()
+    {
+        // 타임라인 매니저
+        _timelineManager = TimelineManager.Instance;
+        if (_timelineManager != null) _timelineManager.Initialize(_battleSystem);
+        else Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다");
+
+        // MapVisualController 연결
+        if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem, mapConfig);
+        else Debug.LogError("[GameManager] MapVisualController를 찾을 수 없습니다");
+
+        // PlayerVisualController 연결
+        if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
+        else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
+
+        Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
+
+    }
+
+    /// <summary>
+    /// 이벤트 구독 관리 함수
+    /// </summary>
+    private void SubscribeEvents()
+    {
+        _mapSystem.OnSectorSelected += OnStartingSectorSelected;
+        if (_timelineUI != null && _mapVisualController != null)
+        {
+            _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
+            _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
+            _battleSystem.OnEnemyAttack += _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyDied += (e) => _mapVisualController.RefreshMapOwnershipVisuals();
+        }
+
+        // PlayerVisualController 연결
+        if (_timelineUI != null && _playerVisualController != null)
+        {
+            _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
+            _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
+            _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
+        }
+
+        // EnemyVisualController 연결
+        if (_enemyVisualController != null)
+        {
+            _enemyVisualController.Initialize(_battleSystem);
+        }
+    }
+
+    #endregion
+
+    #region Game Flow Methods
+    /// <summary>
+    /// 게임 초기화 함수
+    /// EnableSelectionMode -> OnStartingSectorSelected
+    /// </summary>
+    public void SetupGame()
+    {
+        _currentRound = 0;
+        IsExecutingRound = false;
+        _isBattleEnded = false;
+
+        if (_deckSystem == null)
+        {
+            Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
+            return;
+        }
+        if (_battleSystem == null)
+        {
+            Debug.LogError("[GameManager] 배틀 시스템이 초기화되지 않았습니다");
+            return;
+        }
+        if (_mapSystem == null)
+        {
+            Debug.LogError("[GameManager] 맵 시스템이 초기화되지 않았습니다");
+            return;
+        }
+
+        
         // 맵 생성
         _mapSystem.GenerateMap(_mapSize);
         // UserData 기반 덱 생성
@@ -237,7 +255,7 @@ public class GameManager : MonoBehaviour
         _mapSystem.EnableSelectionMode();
         if (_mapVisualController != null)
         {
-            _mapVisualController.RefreshSectorColors();
+            _mapVisualController.RefreshMapOwnershipVisuals();
         }
     }
 
@@ -265,6 +283,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void StartNewBattle()
     {
+        _isBattleEnded = false;
         // 덱 드로우
         _deckSystem.DrawCards(_startHandSize);
         if (_timelineManager != null)
@@ -275,7 +294,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] 전투 시작");
         if (_mapVisualController != null)
         {
-            _mapVisualController.RefreshSectorColors();
+            _mapVisualController.RefreshMapOwnershipVisuals();
         }
     }
 
@@ -330,18 +349,30 @@ public class GameManager : MonoBehaviour
 
     public void EndBattle(bool victory)
     {
+        if (_isBattleEnded) return;
+        _isBattleEnded = true;
+        IsExecutingRound = false;
+
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
+
+        // 현재 돌아가고 있는 모든 코루틴 종료
+        StopAllCoroutines();
+
         if (victory)
         {
-            // TODO: 보상 처리
+            // TODO: 보상 처리 및 승리 UI
         }
-        SaveService.Save(userGameData);
+        else
+        {
+            // TODO: 게임 오버 UI
+        }
+            SaveService.Save(userGameData);
     }
     #endregion
 
     #region Enemy Pattern Methods
     /// <summary>
-    /// 있는 적 순서대로 번갈아가며 패턴 뽑아오는 함수
+    /// 적 세팅하는 함수
     /// </summary>
     private void SetupEnemiesFromStage(StageData stage)
     {
@@ -351,14 +382,16 @@ public class GameManager : MonoBehaviour
             if (spawn.enemyData == null) continue;
             RuntimeEnemy newEnemy = new RuntimeEnemy(
                 spawn.enemyData,
-                spawn.hitSectors
+                new List<int>(spawn.hitSectors)
                 );
             enemies.Add(newEnemy);
         }
         _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
         UpdateEnemyPatterns();
     }
-
+    /// <summary>
+    /// 있는 적 중 패턴 번갈아가며 뽑아오는 함수
+    /// </summary>
     private void UpdateEnemyPatterns()
     {
         if (_battleSystem == null || _battleSystem.Enemies == null) return;
@@ -395,7 +428,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] 적 패턴 갱신 로직 완료");
 
     }
-
+    /// <summary>
+    /// 페이즈 검사
+    /// </summary>
     private void CheckAndApplyPhaseTransition(List<RuntimeEnemy> enemies)
     {
         if (currentStageData.PhaseConditions == null) return;
