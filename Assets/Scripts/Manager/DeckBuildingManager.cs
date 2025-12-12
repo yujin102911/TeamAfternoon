@@ -14,9 +14,23 @@ public class DeckBuildingManager : MonoBehaviour
     [SerializeField] private DataRepository _repo;
     [SerializeField] private UserGameData _user;
 
-    [Header("돌아기가 버튼")]
+    [Header("뒷 배경")]
+    [SerializeField]
+    private GameObject _backgroundPanel;
+
+    [Header("태그 버튼")]
+    [SerializeField]
+    private Button _deckTagBtn;
+    [SerializeField]
+    private Button _keywordTagBtn;
+
+    [Header("돌아가기 버튼")]
     [SerializeField]
     private Button _backBtn;
+
+    [Header("책")]
+    [SerializeField]
+    private BookMove _book;
 
     [Header("책 패널들")]
     [SerializeField]
@@ -24,6 +38,8 @@ public class DeckBuildingManager : MonoBehaviour
     private GameObject _currentPanel;
 
     [Header("블럭 정보창")]
+    [SerializeField]
+    private GameObject _inhancePanel;
     [SerializeField] private Blockdetail_UI detailUI;
     private Deck_UI current;
     private BlockData _seleckedBlock;
@@ -60,8 +76,14 @@ public class DeckBuildingManager : MonoBehaviour
         if (_currentPanel != null)
             _currentPanel.SetActive(true);
 
-        if(_backBtn != null && ServiceLocator.Instance != null)
-            _backBtn.onClick.AddListener(() => ServiceLocator.Instance.Scene.Back());
+        if(_backBtn != null)
+            _backBtn.onClick.AddListener(() => CloseBook());
+
+        if(_deckTagBtn != null)
+            _deckTagBtn.onClick.AddListener(()=> OpenBook(0));
+
+        if(_keywordTagBtn != null)
+            _keywordTagBtn.onClick.AddListener(()=>OpenBook(1));
     }
 
     // Update is called once per frame
@@ -144,6 +166,16 @@ public class DeckBuildingManager : MonoBehaviour
         _seleckedBlock = slot.R_Block.BaseData;
     }
 
+    private void Reset_detail()
+    {
+        current.SetSelected(false);
+        current = null;
+        detailUI.Hide();
+        _seleckedBlock = null;
+        SelectedBlockID = -1;
+    }
+
+    // 책속의 패널 교체(패널의 버튼들로 작동)
     public void SwitchPanel(int panelIndex)
     {
         if (_currentPanel != null)
@@ -154,6 +186,84 @@ public class DeckBuildingManager : MonoBehaviour
         // 변경사항 반영
         OnKeywordChanged?.Invoke(UserGameData.Owned_Keywords);
         OnDeckChanged?.Invoke(UserGameData.Deck_Block_IDs);
+    }
+
+    // 책 열기
+    public void OpenBook(int panelIndex)
+    {
+        // 버튼들 끄기
+        Off_Tags();
+
+        // 뒷배경 켜기
+        On_Background();
+
+        // 책 움직이기
+        if (!_book.gameObject.activeSelf) 
+        {
+            _book.gameObject.SetActive(true);
+        }
+        _book.MoveAction(true);
+
+        // 페이지 맞게 변경하기
+        SwitchPanel(panelIndex);
+    }
+
+    // 책 열기
+    public void CloseBook()
+    {
+        // 돌아가기 버튼 끄기
+        Off_BackBtn();
+
+        if(current != null)
+            Reset_detail();
+
+        // 강화창 끄기
+        Off_Inhance();
+
+        // 책 움직이기
+        _book.MoveAction(false);
+    }
+
+    public void On_Inhance()
+    {
+        _inhancePanel.SetActive(true);
+    }
+
+    public void Off_Inhance()
+    {
+        _inhancePanel.SetActive(false);
+    }
+
+    public void On_Tags()
+    {
+        _deckTagBtn.gameObject.SetActive(true);
+        _keywordTagBtn.gameObject.SetActive(true);
+    }
+
+    public void Off_Tags()
+    {
+        _deckTagBtn.gameObject.SetActive(false);
+        _keywordTagBtn.gameObject.SetActive(false);
+    }
+
+    public void On_Background()
+    {
+        _backgroundPanel.SetActive(true);
+    }
+
+    public void Off_Background()
+    {
+        _backgroundPanel.SetActive(false);
+    }
+
+    public void On_BackBtn()
+    {
+        _backBtn.gameObject.SetActive(true);
+    }
+
+    public void Off_BackBtn()
+    {
+        _backBtn.gameObject.SetActive(false);
     }
 
     /// <summary>
