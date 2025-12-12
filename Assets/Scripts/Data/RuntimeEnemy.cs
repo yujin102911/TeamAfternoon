@@ -18,6 +18,9 @@ public class RuntimeEnemy
 
     public EnemyPattern CurrentPattern { get; private set; }
 
+    public int CurrentPhaseIndex => _currentPhaseIndex;
+    public int PatternSequenceIndex => _patternSequenceIndex;
+
     private int _currentPhaseIndex = 0;      // (_currentPhaseIndex + 1) 페이즈
     private int _patternSequenceIndex = 0;   // 현재 리스트의 몇 번째 패턴인지
 

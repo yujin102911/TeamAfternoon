@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private int _globalTurnIndex = 0;
+    private int _completePhaseIndex = -1;
+
     // 게임 상태 변수
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
@@ -76,7 +78,7 @@ public class GameManager : MonoBehaviour
     #region Events
 
     public event Action OnGameStateChanged;
-
+    public event Action<int, int> OnRoundChanged;
 
 
     #endregion
@@ -220,7 +222,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetupGame()
     {
-        _currentRound = 0;
+        _currentRound = 0; 
+        _globalTurnIndex = 0;
         IsExecutingRound = false;
         _isBattleEnded = false;
 
@@ -271,7 +274,6 @@ public class GameManager : MonoBehaviour
         OnGameStateChanged?.Invoke();
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
-        _globalTurnIndex = 0;
         _battleSystem.SetPlayerStartPosition(sectorNum);
 
         StartNewBattle();
@@ -337,6 +339,7 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateEnemyPatterns();
+        NotifyRoundChanged();
 
         _deckSystem.DiscardHand();
         _deckSystem.DrawCards(_startHandSize);
@@ -388,6 +391,7 @@ public class GameManager : MonoBehaviour
         }
         _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
         UpdateEnemyPatterns();
+        NotifyRoundChanged();
     }
     /// <summary>
     /// 있는 적 중 패턴 번갈아가며 뽑아오는 함수
@@ -465,6 +469,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void NotifyRoundChanged()
+    {
+        int currentPhase = 1;
+        int currentPatternIndex = 0;
+        if (_battleSystem != null && _battleSystem.Enemies != null)
+        {
+            List<RuntimeEnemy> alivesEnemies = new List<RuntimeEnemy>();
+            foreach(RuntimeEnemy e in _battleSystem.Enemies) 
+                if (!e.IsDead) alivesEnemies.Add(e);
+            if (alivesEnemies.Count > 0)
+            {
+                int targetIndex = Mathf.Max(0, _globalTurnIndex - 1);
+                int activeEnemyIndex = targetIndex % alivesEnemies.Count;
+
+                RuntimeEnemy activeEnemy = alivesEnemies[activeEnemyIndex];
+
+                currentPhase = activeEnemy.CurrentPhaseIndex;
+                currentPatternIndex = activeEnemy.PatternSequenceIndex;
+            }
+        }
+        OnRoundChanged?.Invoke(currentPhase, currentPatternIndex);
+    }
     #endregion
 
 }
