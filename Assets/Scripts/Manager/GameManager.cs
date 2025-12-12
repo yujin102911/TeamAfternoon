@@ -252,8 +252,8 @@ public class GameManager : MonoBehaviour
         {
             _mapSystem.GenerateMap(_mapSize);
         }
-            // UserData 기반 덱 생성
-            _deckSystem.InitializeDeck();
+        // UserData 기반 덱 생성
+        _deckSystem.InitializeDeck();
 
         // 적 배치
         if (currentStageData != null)
@@ -261,11 +261,19 @@ public class GameManager : MonoBehaviour
         else
             Debug.LogError("StageData가 없습니다");
 
-        _mapSystem.EnableSelectionMode();
         if (_mapVisualController != null)
         {
             _mapVisualController.RefreshMapOwnershipVisuals();
         }
+        // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
+        if (FindAnyObjectByType<SceneIntroController>() == null)
+            OnIntroCompleted();
+    }
+
+    public void OnIntroCompleted()
+    {
+        Debug.Log("[GameManager] 인트로 종료. 맵 선택 활성화");
+        _mapSystem.EnableSelectionMode();
     }
 
     /// <summary>

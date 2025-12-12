@@ -62,6 +62,9 @@ public class SceneIntroController : MonoBehaviour
         }
         _panelCanvasGroup.blocksRaycasts = false;
         _introPanel.SetActive(false);
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnIntroCompleted();
     }
 
 }
