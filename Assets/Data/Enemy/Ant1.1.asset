@@ -10,23 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021e2050029ab3c42aa4571c60d42650, type: 3}
-  m_Name: Grasshopper2- 4
+  m_Name: Ant1.1
   m_EditorClassIdentifier: 
-  Pattern_Name: grasshopper2-4
-  Sentence: "\uB9C9\uC744 \uC774\uAC00 \uC5C6\uC5B4\uC9C4 \uBCA0\uC9F1\uC774\uB294
-    \uB9C8\uCE58 \uB4E4\uD310 \uC804\uCCB4\uAC00 \uC790\uC2E0\uC758 \uBB34\uB300\uB77C\uB3C4
-    \uB418\uB294 \uB4EF \uB354 \uD06C\uAC8C \uC6B8\uB838\uB2E4."
+  Pattern_Name: ant1-1
+  Sentence: "\uAC1C\uBBF8\uB294 \uC77C\uC190\uC744 \uBA48\uCD94\uACE0, \uBCA0\uC9F1\uC774\uC758
+    \uB178\uB798\uB97C \uD749\uB0B4 \uB0B4\uB4EF \uB9AC\uB4EC\uC744 \uBC1F\uC558\uB2E4. "
   attacks:
-  - tick: 6
-    targetSectors: 0600000007000000080000000100000002000000
-    damage: 4
   - tick: 8
-    targetSectors: 08000000040000000200000006000000
+    targetSectors: 01000000020000000300000004000000050000000600000008000000
     damage: 4
   parryings:
-  - tick: 2
-    damageMultiplier: 1
-  - tick: 4
+  - tick: 1
     damageMultiplier: 1
   - tick: 3
+    damageMultiplier: 1
+  - tick: 5
+    damageMultiplier: 1
+  - tick: 7
     damageMultiplier: 1
