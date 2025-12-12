@@ -243,11 +243,17 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        
         // 맵 생성
-        _mapSystem.GenerateMap(_mapSize);
-        // UserData 기반 덱 생성
-        _deckSystem.InitializeDeck();
+        if (currentStageData != null)
+        {
+            _mapSystem.GenerateMap(currentStageData.MapSize, currentStageData.SectorPoints);
+        }
+        else
+        {
+            _mapSystem.GenerateMap(_mapSize);
+        }
+            // UserData 기반 덱 생성
+            _deckSystem.InitializeDeck();
 
         // 적 배치
         if (currentStageData != null)

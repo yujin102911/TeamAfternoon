@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// 맵 크기 열거형
@@ -9,6 +9,7 @@ public enum MapSize
 {
     Sectors_8,    // 3x3
     Sectors_12,   // 4x3
+    Custom,       // 맵에 설치한 포인트들 기준
 }
 
 
@@ -40,9 +41,24 @@ public class MapSystem
     /// <summary>
     /// 맵 생성
     /// </summary>
-    public void GenerateMap(MapSize mapSize)
+    public void GenerateMap(MapSize mapSize, List<Vector3> customPositions = null)
     {
         ClearMap();
+
+        if (mapSize == MapSize.Custom)
+        {
+            if (customPositions != null && customPositions.Count > 0)
+            {
+                GenerateCustomMap(customPositions);
+                return;
+            }
+            else
+            {
+                // 설정된게 없으면 sector8 을 기본으로 걍 설정
+                Debug.LogError("[MapSystem] Custom모드지만 배치 포인트 리스트가 비어있음");
+                mapSize = MapSize.Sectors_8;
+            }
+        }
 
         List<Vector2Int> gridPositions = new List<Vector2Int>();
         Vector2 gridDimensions = Vector2.zero;
@@ -73,6 +89,37 @@ public class MapSystem
         CreateSectorObjects(gridPositions, gridDimensions, currentSectorSize);
         Debug.Log($"[MapSystem] 맵 생성 완료: {mapSize} ({_totalSectors} 섹터)");
     }
+
+    private void GenerateCustomMap(List<Vector3> localPositions)
+    {
+        _totalSectors = localPositions.Count;
+        float size = _config.baseSectorSize;
+
+        for (int i = 0; i < _totalSectors; i++)
+        {
+            int sectorNum = i + 1;
+            Vector3 localPos = localPositions[i];
+
+            GameObject sectorObj;
+            if (_config.sectorPrefab != null)
+            {
+                sectorObj = UnityEngine.Object.Instantiate(_config.sectorPrefab, _rootTransform);
+                
+                sectorObj.transform.localPosition = localPos;
+
+                sectorObj.name = $"Sector_{sectorNum}";
+                sectorObj.transform.localScale = new Vector3(size * 0.9f, size * 0.9f, 1);
+
+                MapSectorHandler handler = sectorObj.AddComponent<MapSectorHandler>();
+                handler.Initialize(sectorNum, this);
+
+                _sectors.Add(sectorNum, sectorObj);
+                SetSectorBaseColor(sectorNum, _config.normalColor);
+            }
+        }
+        Debug.Log($"[MapSystem] Custom 맵 생성 완료 ({_totalSectors} 섹터)");
+    }
+
     /// <summary>
     /// 맵 생성 시 혹시 모를 오류를 방지하기 위해 맵 클리어함수
     /// </summary>
