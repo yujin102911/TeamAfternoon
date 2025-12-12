@@ -23,6 +23,10 @@ public class SceneIntroController : MonoBehaviour
 
     private void Start()
     {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentStageData  != null)
+        {
+            _message = GameManager.Instance.CurrentStageData.IntroMessage;
+        }
         StartCoroutine(PlayIntroSequence());
     }
 

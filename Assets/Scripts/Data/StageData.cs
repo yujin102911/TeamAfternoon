@@ -37,6 +37,9 @@ public class StageData : ScriptableObject
     [TextArea(3, 10)]
     [SerializeField]
     private string _stageDescription; //스테이지 설명
+    [TextArea(3, 10)]
+    [SerializeField]
+    private string _introMessage = "옛날에";
 
     [Header("적 정보")]
     [SerializeField]
@@ -57,6 +60,7 @@ public class StageData : ScriptableObject
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
     public string StageDescription => _stageDescription;
+    public string IntroMessage => _introMessage;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public List<PhaseTransitionData> PhaseConditions => _phaseConditions;
     public int PlayerMaxHP => _playerMaxHP;

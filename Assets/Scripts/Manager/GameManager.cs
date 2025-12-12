@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
     public BattleSystem BattleSystem => _battleSystem;
     public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
+    public StageData CurrentStageData => currentStageData;
     public bool IsExecutingRound
     {
         get => _isExecutingRound;
@@ -134,6 +135,25 @@ public class GameManager : MonoBehaviour
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
+
+        // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
+        if (SelectedStageID > 0)
+        {
+            StageData selectedStage = dataRepository.GetStage(SelectedStageID);
+            if (selectedStage != null)
+            {
+                currentStageData = selectedStage;
+                Debug.Log($"[GameManager] 스테이지 {SelectedStageID} 데이터를 로드했습니다");
+            }
+            else
+            {
+                Debug.LogError($"[GameManager] 스테이지 ID에 해당하는 데이터가 없습니다");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
+        }
 
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
@@ -220,24 +240,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
-        if (SelectedStageID > 0)
-        {
-            StageData selectedStage = dataRepository.GetStage(SelectedStageID);
-            if (selectedStage != null)
-            {
-                currentStageData = selectedStage;
-                Debug.Log($"[GameManager] 스테이지 {SelectedStageID} 데이터를 로드했습니다");
-            }
-            else
-            {
-                Debug.LogError($"[GameManager] 스테이지 ID에 해당하는 데이터가 없습니다");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
-        }
+        
         // 맵 생성
         _mapSystem.GenerateMap(_mapSize);
         // UserData 기반 덱 생성
