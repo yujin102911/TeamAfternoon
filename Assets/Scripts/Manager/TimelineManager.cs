@@ -116,7 +116,6 @@ public class TimelineManager : MonoBehaviour
     private void HandleEnemyDied(RuntimeEnemy deadEnemy)
     {
         RefreshCombinedEnemyPattern();
-        RefreshCombinedEnemyPattern();
     }
 
     // ========================================
@@ -269,6 +268,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.ProcessTick(tick);
 
             yield return new WaitForSeconds(0.4f);
+            if (GameManager.Instance.IsBattleEnded) yield break;
 
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);

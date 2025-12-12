@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 
 /// <summary>
 /// 전투 로직을 처리하는 System
@@ -8,6 +9,7 @@ using System;
 /// </summary>
 public class BattleSystem 
 {
+    #region Private Fields
     private int _playerHP;
     private int _playerMaxHP;
     private int _playerCurrentSector; // 현재 위치 (1~8)
@@ -20,22 +22,30 @@ public class BattleSystem
 
     private Dictionary<string, int> _playerBuffs = new Dictionary<string, int>();
     private Dictionary<string, int> _enemyBuffs = new Dictionary<string, int>();
+    #endregion
 
-    public event Action<int, int> OnPlayerHPChanged;
-    public event Action<RuntimeEnemy> OnEnemyHPChanged;
-    public event Action<RuntimeEnemy> OnEnemyDied;
+    #region Events
+    public event Action<int, int> OnPlayerHPChanged;          // 플레이어 HP 변화 시 발행되는 이벤트(UI용)
+    public event Action<RuntimeEnemy> OnEnemyHPChanged;       // 적 HP 변화 시 발행되는 이벤트(UI용)
+    public event Action<RuntimeEnemy> OnEnemyDied;            // 적 죽으면 발행되는 이벤트
     public event Action<int> OnPlayerMoved;
     public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
+    public event Action<List<int>> OnEnemyAttack;             // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
     public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
     public event Action<string, int, bool> OnBuffChanged;
     public event Action OnBattleInitialized;
-    public event Action<List<int>> OnEnemyAttackExecute;
+    #endregion
 
+    #region Properties
     public int PlayerHP => _playerHP;
     public int PlayerMaxHP => _playerMaxHP;
     public int PlayerCurrentSector => _playerCurrentSector;
     public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
+    #endregion
 
+    /// <summary>
+    /// 체력, 적, 버프 초기화 미리 설정
+    /// </summary>
     public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, int startSector = 1)
     {
         _playerHP = playerMaxHP;
@@ -109,6 +119,7 @@ public class BattleSystem
                 Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 사망");
                 HandleEnemyDeathSectorInheritance(target);
                 OnEnemyDied?.Invoke(target);
+                CheckVictoryCondition();
             }
         }
         else
@@ -222,7 +233,7 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
         if (attack.targetSectors != null && attack.targetSectors.Count > 0)
         {
-            OnEnemyAttackExecute?.Invoke(attack.targetSectors);
+            OnEnemyAttack?.Invoke(attack.targetSectors);
         }
         if (IsPlayerHitByAttack(attack))
         {
@@ -243,6 +254,20 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어 {amount} 회복! (현재 HP: {_playerHP}/{_playerMaxHP})");
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+    }
+
+    private void CheckVictoryCondition()
+    {
+        bool allDead = true;
+        foreach(RuntimeEnemy enemy in _enemies)
+        {
+            if (!enemy.IsDead)
+            {
+                allDead = false; break;
+            }
+        }
+        if (allDead)
+            OnEnemyDefeated();
     }
 
     private void OnEnemyDefeated()

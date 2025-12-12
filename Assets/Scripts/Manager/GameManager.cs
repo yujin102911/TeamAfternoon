@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
     // 게임 상태 변수
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
+    private bool _isBattleEnded = false;
     #endregion
 
     #region Properties
@@ -63,11 +64,12 @@ public class GameManager : MonoBehaviour
             if (_isExecutingRound != value)
             {
                 _isExecutingRound = value;
-                OnGameStateChanged?.Invoke(); // 값이 바뀌면 알림!
+                OnGameStateChanged?.Invoke(); // 값이 바뀌면 알림
             }
         }
     }
     public bool IsSectorSelected => _isSectorSelected;
+    public bool IsBattleEnded => _isBattleEnded;
     #endregion
 
     #region Events
@@ -81,6 +83,7 @@ public class GameManager : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
+        // 싱글톤 설정
         if (Instance == null) 
             Instance = this;
         else
@@ -101,6 +104,20 @@ public class GameManager : MonoBehaviour
         LateInitialize();
         SubscribeEvents();
         SetupGame();
+    }
+
+    private void OnDestroy()
+    {
+        if (_battleSystem != null)
+        {
+            _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
+        }
+        if (_mapSystem != null)
+        {
+            _mapSystem.OnSectorSelected -= OnStartingSectorSelected;
+        }
     }
 
     #endregion
@@ -132,7 +149,7 @@ public class GameManager : MonoBehaviour
         else Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다");
 
         // MapVisualController 연결
-        if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem);
+        if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem, mapConfig);
         else Debug.LogError("[GameManager] MapVisualController를 찾을 수 없습니다");
 
         // PlayerVisualController 연결
@@ -152,8 +169,9 @@ public class GameManager : MonoBehaviour
         if (_timelineUI != null && _mapVisualController != null)
         {
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
-            _timelineUI.OnRequestClearHighlight += () => _mapVisualController.RefreshSectorColors();
-            _battleSystem.OnEnemyAttackExecute += _mapVisualController.OnEnemyAttackVisual;
+            _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
+            _battleSystem.OnEnemyAttack += _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyDied += (e) => _mapVisualController.RefreshMapOwnershipVisuals();
         }
 
         // PlayerVisualController 연결
@@ -173,10 +191,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void _battleSystem_OnPlayerHit()
-    {
-        throw new NotImplementedException();
-    }
     #endregion
 
     #region Game Flow Methods
@@ -188,6 +202,7 @@ public class GameManager : MonoBehaviour
     {
         _currentRound = 0;
         IsExecutingRound = false;
+        _isBattleEnded = false;
 
         if (_deckSystem == null)
         {
@@ -237,7 +252,7 @@ public class GameManager : MonoBehaviour
         _mapSystem.EnableSelectionMode();
         if (_mapVisualController != null)
         {
-            _mapVisualController.RefreshSectorColors();
+            _mapVisualController.RefreshMapOwnershipVisuals();
         }
     }
 
@@ -265,6 +280,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void StartNewBattle()
     {
+        _isBattleEnded = false;
         // 덱 드로우
         _deckSystem.DrawCards(_startHandSize);
         if (_timelineManager != null)
@@ -275,7 +291,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] 전투 시작");
         if (_mapVisualController != null)
         {
-            _mapVisualController.RefreshSectorColors();
+            _mapVisualController.RefreshMapOwnershipVisuals();
         }
     }
 
@@ -330,18 +346,30 @@ public class GameManager : MonoBehaviour
 
     public void EndBattle(bool victory)
     {
+        if (_isBattleEnded) return;
+        _isBattleEnded = true;
+        IsExecutingRound = false;
+
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
+
+        // 현재 돌아가고 있는 모든 코루틴 종료
+        StopAllCoroutines();
+
         if (victory)
         {
-            // TODO: 보상 처리
+            // TODO: 보상 처리 및 승리 UI
         }
-        SaveService.Save(userGameData);
+        else
+        {
+            // TODO: 게임 오버 UI
+        }
+            SaveService.Save(userGameData);
     }
     #endregion
 
     #region Enemy Pattern Methods
     /// <summary>
-    /// 있는 적 순서대로 번갈아가며 패턴 뽑아오는 함수
+    /// 적 세팅하는 함수
     /// </summary>
     private void SetupEnemiesFromStage(StageData stage)
     {
@@ -351,14 +379,16 @@ public class GameManager : MonoBehaviour
             if (spawn.enemyData == null) continue;
             RuntimeEnemy newEnemy = new RuntimeEnemy(
                 spawn.enemyData,
-                spawn.hitSectors
+                new List<int>(spawn.hitSectors)
                 );
             enemies.Add(newEnemy);
         }
         _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
         UpdateEnemyPatterns();
     }
-
+    /// <summary>
+    /// 있는 적 중 패턴 번갈아가며 뽑아오는 함수
+    /// </summary>
     private void UpdateEnemyPatterns()
     {
         if (_battleSystem == null || _battleSystem.Enemies == null) return;
@@ -395,7 +425,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] 적 패턴 갱신 로직 완료");
 
     }
-
+    /// <summary>
+    /// 페이즈 검사
+    /// </summary>
     private void CheckAndApplyPhaseTransition(List<RuntimeEnemy> enemies)
     {
         if (currentStageData.PhaseConditions == null) return;
