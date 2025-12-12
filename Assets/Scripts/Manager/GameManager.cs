@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Load(userGameData);
+        SaveService.Save(userGameData);
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
