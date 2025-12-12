@@ -13,18 +13,18 @@ public enum MapSize
 
 
 /// <summary>
-/// 맵을 생성하는 시스템이다.
+/// 맵 생성, 섹터 객체 관리, 입력 감지
 /// </summary>
 public class MapSystem
 {
     private readonly MapConfiguration _config;
     private readonly Transform _rootTransform;
 
-    private Dictionary<int, GameObject> _sectors = new Dictionary<int, GameObject>();
     private bool _isSelectionEnabled = false;
     private int _totalSectors;
 
-    private Dictionary<int, Color> _sectorOwnerColors = new Dictionary<int, Color>();
+    private Dictionary<int, GameObject> _sectors = new Dictionary<int, GameObject>();
+    private Dictionary<int, Color> _sectorBaseColors = new Dictionary<int, Color>();
 
     public event Action<int> OnSectorSelected;
 
@@ -36,6 +36,7 @@ public class MapSystem
         _rootTransform = rootTransform;
     }
 
+    #region Map Generation Methods
     /// <summary>
     /// 맵 생성
     /// </summary>
@@ -72,90 +73,19 @@ public class MapSystem
         CreateSectorObjects(gridPositions, gridDimensions, currentSectorSize);
         Debug.Log($"[MapSystem] 맵 생성 완료: {mapSize} ({_totalSectors} 섹터)");
     }
-
-    public Vector3 GetSectorPosition(int sectorIndex)
-    {
-        if (_sectors.TryGetValue(sectorIndex, out GameObject obj))
-        {
-            return obj.transform.position;
-        }
-        Debug.LogWarning($"[MapSystem] 존재하지 않는 섹터 {sectorIndex}의 위치를 요청했습니다");
-        return Vector3.zero;
-    }
-
-    public void EnableSelectionMode()
-    {
-        _isSelectionEnabled = true;
-        foreach (var key in _sectors.Keys)
-        {
-            if (_sectorOwnerColors.TryGetValue(key, out Color ownerColor))
-            {
-                UpdateSectorColor(key, ownerColor);
-            }
-            else
-            {
-                UpdateSectorColor(key, _config.selectableColor);
-            }
-        }
-    }
-
-    public void DisableSelectionMode()
-    {
-        _isSelectionEnabled = false;
-        ResetAllSectorColors();
-    }
-
-    public void HandleSectorClick(int sectorNum)
-    {
-        if (_isSelectionEnabled) 
-            OnSectorSelected?.Invoke(sectorNum);
-    }
-
-    public void HandleSectorHover(int sectorNum, bool isEnter)
-    {
-        if (!_isSelectionEnabled) return;
-
-        if (isEnter)
-        {
-            // 들어올 땐 하이라이트 색
-            UpdateSectorColor(sectorNum, _config.hoverColor);
-        }
-        else
-        {
-            // ★ [수정] 나갈 땐 "기억해둔 주인 색"으로 복구!
-            if (_sectorOwnerColors.TryGetValue(sectorNum, out Color ownerColor))
-            {
-                UpdateSectorColor(sectorNum, ownerColor);
-            }
-            else
-            {
-                // 기억된 게 없으면 기본 색(설정값)으로
-                UpdateSectorColor(sectorNum, _config.selectableColor);
-            }
-        }
-    }
-
-    public void UpdateSectorColor(int sectorNum, Color color)
-    {
-        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
-        {
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-            if (sr != null) sr.color = color;
-        }
-    }
-
-    private void ResetAllSectorColors()
-    {
-        foreach (var key in _sectors.Keys) UpdateSectorColor(key, _config.normalColor);
-    }
-
+    /// <summary>
+    /// 맵 생성 시 혹시 모를 오류를 방지하기 위해 맵 클리어함수
+    /// </summary>
     private void ClearMap()
     {
         foreach (GameObject sector in _sectors.Values)
             if (sector != null) UnityEngine.Object.Destroy(sector);
         _sectors.Clear();
+        _sectorBaseColors.Clear();
     }
-
+    /// <summary>
+    /// 섹터 프리팹 생성 함수 (GenerateMap 함수에서 사용)
+    /// </summary>
     private void CreateSectorObjects(List<Vector2Int> positions, Vector2 dimensions, float size)
     {
         float totalSpacing = size + _config.sectorSpacing;
@@ -183,7 +113,7 @@ public class MapSystem
                 handler.Initialize(sectorNum, this);
 
                 _sectors.Add(sectorNum, sectorObj);
-                UpdateSectorColor(sectorNum, _config.normalColor);
+                SetSectorBaseColor(sectorNum, _config.normalColor);
             }
             else
             {
@@ -191,40 +121,91 @@ public class MapSystem
             }
         }
     }
+    #endregion
 
+    #region 외부 참조용 함수
+    public Vector3 GetSectorPosition(int sectorIndex)
+    {
+        if (_sectors.TryGetValue(sectorIndex, out GameObject obj))
+        {
+            return obj.transform.position;
+        }
+        Debug.LogWarning($"[MapSystem] 존재하지 않는 섹터 {sectorIndex}의 위치를 요청했습니다");
+        return Vector3.zero;
+    }
+    #endregion
+
+    #region Visual State API
     /// <summary>
-    /// 공격 섹터 표시용 함수
+    /// 섹터의 기본 색상을 변경
+    /// 이 함수 호출 시 즉시 색상 바뀜
     /// </summary>
-    public void HighlightAttackSectors(List<int> sectorIndices)
+    public void SetSectorBaseColor(int sectorNum, Color color)
     {
-        foreach (int index in sectorIndices)
-        {
-            if (_sectors.ContainsKey(index))
-            {
-                UpdateSectorColor(index, _config.attackColor);
-            }
-        }
-    }
-    public void ResetHighlight()
-    {
-        foreach (var key in _sectors.Keys)
-        {
-            // 주인 색이 있으면 그걸로, 없으면 기본 색으로 리셋
-            if (_sectorOwnerColors.TryGetValue(key, out Color ownerColor))
-                UpdateSectorColor(key, ownerColor);
-            else
-                UpdateSectorColor(key, _config.normalColor);
-        }
-    }
-    public void SetSectorOwnerColor(int sectorNum, Color color)
-    {
-        if (_sectorOwnerColors.ContainsKey(sectorNum))
-            _sectorOwnerColors[sectorNum] = color;
+        if (_sectorBaseColors.ContainsKey(sectorNum))
+            _sectorBaseColors[sectorNum] = color;
         else
-            _sectorOwnerColors.Add(sectorNum, color);
-
+            _sectorBaseColors.Add(sectorNum, color);
+        // 즉시 반영
         UpdateSectorColor(sectorNum, color);
     }
 
+    // 일시적인 색상으로 설정하는 함수(공격 이펙트, 마우스 오버 등)
+    public void SetSectorTempColor(int sectorNum, Color color)
+    {
+        UpdateSectorColor(sectorNum, color);
+    }
+    // 일시적인 색상 지우는 함수
+    public void ResetSectorColor(int sectorNum)
+    {
+        if (_sectorBaseColors.TryGetValue(sectorNum, out Color baseColor))
+            UpdateSectorColor(sectorNum, baseColor);
+        else
+            UpdateSectorColor(sectorNum, _config.normalColor);
+    }
+
+
+    private void UpdateSectorColor(int sectorNum, Color color)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+        {
+            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            if (sr != null) sr.color = color;
+        }
+    }
+    #endregion
+
+    #region Input Logic
+    public void EnableSelectionMode()
+    {
+        _isSelectionEnabled = true;
+    }
+
+    public void DisableSelectionMode()
+    {
+        _isSelectionEnabled = false;
+        foreach(int key in _sectors.Keys) ResetSectorColor(key);
+    }
+
+    public void HandleSectorClick(int sectorNum)
+    {
+        if (_isSelectionEnabled) 
+            OnSectorSelected?.Invoke(sectorNum);
+    }
+
+    public void HandleSectorHover(int sectorNum, bool isEnter)
+    {
+        if (!_isSelectionEnabled) return;
+
+        if (isEnter)
+        {
+            SetSectorTempColor(sectorNum, _config.hoverColor);
+        }
+        else
+        {
+            ResetSectorColor(sectorNum);
+        }
+    }
+    #endregion
 
 }
