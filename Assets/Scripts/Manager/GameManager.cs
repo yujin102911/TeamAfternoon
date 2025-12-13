@@ -297,12 +297,13 @@ public class GameManager : MonoBehaviour
     {
         if (_isExecutingRound) return;
         _mapSystem.DisableSelectionMode();
+        _battleSequenceController.TurnOffSectorSelectText();
         _isSectorSelected = true;
         OnGameStateChanged?.Invoke();
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
         _battleSystem.SetPlayerStartPosition(sectorNum);
-
+       
         StartNewBattle();
     }
 

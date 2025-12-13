@@ -9,6 +9,7 @@ public class BattleSequenceController : MonoBehaviour
     [Header("UI 연결")]
     [SerializeField] private GameObject _storyLine;      // 스토리라인 텍스트
     [SerializeField] private GameObject _timelinePanel;  // 타임라인 패널
+    [SerializeField] private GameObject _sectorSelectText; // 섹터 선택하세요 텍스트
 
     [Header("연출 설정")]
     [SerializeField] private float _storyLineDuration = 1.5f;
@@ -38,8 +39,16 @@ public class BattleSequenceController : MonoBehaviour
         StartCoroutine(CoSequence(onComplete));
     }
 
-    public void TimelineEndSequence()
+    private void TurnOnSectorSelectText()
     {
+        if (_sectorSelectText != null && !GameManager.Instance.IsSectorSelected)
+            _sectorSelectText.SetActive(true);
+    }
+
+    public void TurnOffSectorSelectText()
+    {
+        if (_sectorSelectText != null)
+            _sectorSelectText.SetActive(false);
     }
 
     private IEnumerator CoSequence(Action onComplete)
@@ -50,6 +59,8 @@ public class BattleSequenceController : MonoBehaviour
         yield return StartCoroutine(AnimateExpand());
 
         yield return StartCoroutine(ScrollDown());
+
+        TurnOnSectorSelectText();
 
         onComplete?.Invoke();
     }
@@ -88,12 +99,13 @@ public class BattleSequenceController : MonoBehaviour
             yield return null;
         }
         _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, targetHeight);
-
     }
 
     // 두루마기 올라가는 연출
     private IEnumerator ScrollUp()
     {
+        if (_timelineRect.sizeDelta.y == 0) yield break;
+
         float timer = 0f;
         while (timer < _timelineUpDuration)
         {
