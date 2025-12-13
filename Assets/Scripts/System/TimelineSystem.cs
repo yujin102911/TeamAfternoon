@@ -164,14 +164,6 @@ public class TimelineSystem
         PlacedBlock placed = FindFirstAction(tick);
         activeBlocks.Add(placed);
 
-        //foreach (PlacedBlock placed in _placedBlocks)
-        //{
-        //    if (placed.IsActiveAt(tick))
-        //    {
-        //        activeBlocks.Add(placed);
-        //    }
-        //}
-
         return activeBlocks;
     }
 

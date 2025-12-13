@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MapVisualController _mapVisualController;
     [SerializeField] private PlayerVisualController _playerVisualController;
     [SerializeField] private EnemyVisualController _enemyVisualController;
+    [SerializeField] private BattleSequenceController _battleSequenceController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -280,8 +281,12 @@ public class GameManager : MonoBehaviour
 
     public void OnIntroCompleted()
     {
-        Debug.Log("[GameManager] 인트로 종료. 맵 선택 활성화");
-        _mapSystem.EnableSelectionMode();
+        Debug.Log("[GameManager] 인트로 종료. 턴 시작 연출 재생");
+        _battleSequenceController.PlayerTurnStartSequence(() =>
+        {
+            Debug.Log("[GameManager] 연출 종료. 맵 선택 활성화");
+            _mapSystem.EnableSelectionMode();
+        });
     }
 
     /// <summary>
@@ -292,12 +297,13 @@ public class GameManager : MonoBehaviour
     {
         if (_isExecutingRound) return;
         _mapSystem.DisableSelectionMode();
+        _battleSequenceController.TurnOffSectorSelectText();
         _isSectorSelected = true;
         OnGameStateChanged?.Invoke();
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
         _battleSystem.SetPlayerStartPosition(sectorNum);
-
+       
         StartNewBattle();
     }
 
@@ -366,10 +372,14 @@ public class GameManager : MonoBehaviour
         _deckSystem.DiscardHand();
         _deckSystem.DrawCards(_startHandSize);
 
-        if (_timelineManager != null)
+        _battleSequenceController.PlayerTurnStartSequence(() =>
         {
-            _timelineManager.ReceiveHand(_deckSystem.Hand);
-        }
+            if (_timelineManager != null)
+            {
+                _timelineManager.ReceiveHand(_deckSystem.Hand);
+            }
+        });
+        
     }
 
     public void EndBattle(bool victory)

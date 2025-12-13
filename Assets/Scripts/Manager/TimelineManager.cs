@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -87,6 +88,9 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
     {
+        // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
+        if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
+
         // 키워드 OnBlockStart 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
@@ -96,6 +100,9 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleBlockEnded(PlacedBlock placed, RuntimeBlock runtime, int tick)
     {
+        // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
+        if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
+
         // 키워드 OnBlockEnded 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
@@ -105,6 +112,9 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleBlockTick(PlacedBlock placed, RuntimeBlock runtime, int tick, ActionType action)
     {
+        // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
+        if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
+
         // 키워드 OnTick 호출
         foreach (KeywordData keyword in runtime.AttachedKeywords)
         {
@@ -248,7 +258,7 @@ public class TimelineManager : MonoBehaviour
         Debug.Log("[TimelineDirector] 타임라인 실행 시작");
 
         // 라운드 시작 키워드 호출
-        var allBlocks = _timelineSystem.GetAllPlacedBlocksWithRuntime();
+        List<(PlacedBlock, RuntimeBlock)> allBlocks = _timelineSystem.GetAllPlacedBlocksWithRuntime();
         foreach (var (placed, runtime) in allBlocks)
         {
             foreach (KeywordData keyword in runtime.AttachedKeywords)
