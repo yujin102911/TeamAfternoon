@@ -21,6 +21,14 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private Canvas canvas;
     private CanvasGroup canvasGroup;
 
+    [Header("색상 설정")]
+    [SerializeField]
+    private Color _attackColor;
+    [SerializeField]
+    private Color _moveColor;
+    [SerializeField]
+    private Color _noneColor;
+
     private ScrollRect parentScroll;
     private RectTransform rectTransform;
 
@@ -92,17 +100,17 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
                 if (action == ActionType.Attack)
                 {
                     txt.text = "▲";
-                    img.color = new Color(1f, 0.3f, 0.3f);
+                    img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);
                 }
                 else if (action == ActionType.Move)
                 {
                     txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
-                    img.color = new Color(0.3f, 0.7f, 1f);
+                    img.color = new Color(_moveColor.r, _moveColor.g, _moveColor.b, 1.0f);
                 }
                 else
                 {
                     txt.text = "-";
-                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    img.color = new Color(_noneColor.r, _noneColor.g, _noneColor.b, 1.0f);
                 }
             }
         }
@@ -134,14 +142,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             return;
 
         string effectTitle = "";
-        foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
-        {
-            if (keyword == null) continue;
-
-            // 이름 나열
-            if (!string.IsNullOrEmpty(keyword.KeywordName))
-                effectTitle += $"#{keyword.KeywordName} ";
-        }
+        
 
         string body = BuildTooltipText();
 
@@ -150,18 +151,34 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         // 카드 Rect의 오른쪽 중앙 월드 좌표
         Vector3 worldBottomCenter = rectTransform.TransformPoint(
-            new Vector3(rectTransform.rect.width * 0.5f, rectTransform.rect.height * 0.5f, 0f)
+            new Vector3(rectTransform.rect.width * 0.6f, rectTransform.rect.height * 0.5f, 0f)
         );
 
         // 월드 → 스크린 좌표
         Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
 
-        CardTooltip.Instance.Show(
+        int index = 0;
+
+        foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
+        {
+            if (keyword == null) continue;
+
+            // 이름 세팅
+            effectTitle = $"#{keyword.KeywordName}";
+            body = $"- {keyword.KeywordDescription}";
+
+            CardTooltip.Instance.Show(
             effectTitle,
             body,
             screenPos,
-            cam
-        );
+            cam,
+            index
+            );
+
+            index++;
+        }
+
+        
     }
 
     private string BuildTooltipText()

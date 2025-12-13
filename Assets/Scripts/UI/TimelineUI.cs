@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VInspector;
 
 public class TimelineUI : MonoBehaviour
 {
@@ -37,9 +39,13 @@ public class TimelineUI : MonoBehaviour
 
     [Header("색상 설정")]
     public Color normalColor = Color.white;
+    public Color cursorColor = Color.yellow;
+    [Header("적 색상")]
     public Color attackColor = new Color(1f, 0.3f, 0.3f);
     public Color parryingColor = new Color(1f, 1f, 0.3f);
-    public Color cursorColor = Color.yellow;
+    [Header("플레이어 색상")]
+    public Color Player_attackColor;
+    public Color Player_moveColor;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
     // 슬롯 저장 (틱 1~18)
@@ -81,7 +87,7 @@ public class TimelineUI : MonoBehaviour
             slot.name = $"EnemySlot_{tick}";
 
             // 틱 번호 표시
-            TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
+            //TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
 
             // 마우스 오버 이벤트 추가
             EnemySlotHover hoverHandler = slot.AddComponent<EnemySlotHover>();
@@ -136,17 +142,18 @@ public class TimelineUI : MonoBehaviour
         // 모든 슬롯 초기화
         foreach (GameObject slot in enemySlots)
         {
+            slot.GetComponent<Enemy_slot>().Hide();
 
-            Image image = slot.GetComponent<Image>();
-            TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
-            if (image != null)
-            {
-                image.color = normalColor;
-            }
-            if (text != null)
-            {
-                text.text = " "; // 데미지가 없으면 공백 표시
-            }
+            //Image image = slot.GetComponent<Image>();
+            //TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
+            //if (image != null)
+            //{
+            //    image.color = normalColor;
+            //}
+            //if (text != null)
+            //{
+            //    text.text = " "; // 데미지가 없으면 공백 표시
+            //}
         }
 
         if (sequence == null) return;
@@ -156,19 +163,21 @@ public class TimelineUI : MonoBehaviour
         {
             if (attack.tick >= 1 && attack.tick <= enemySlots.Count)
             {
-                Image image = enemySlots[attack.tick - 1].GetComponent<Image>();
-                TextMeshProUGUI text = enemySlots[attack.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
+                //Image image = enemySlots[attack.tick - 1].GetComponent<Image>();
+                //TextMeshProUGUI text = enemySlots[attack.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
 
-                if (image != null)
-                {
-                    image.color = attackColor;
-                }
-                if (text != null)
-                {
-                    // 데미지 수치를 문자열로 표시
-                    text.text = attack.damage.ToString();
-                    //text.color = Color.white;
-                }
+                //if (image != null)
+                //{
+                //    image.color = attackColor;
+                //}
+                //if (text != null)
+                //{
+                //    // 데미지 수치를 문자열로 표시
+                //    text.text = attack.damage.ToString();
+                //    //text.color = Color.white;
+                //}
+
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString());
             }
             else
             {
@@ -180,18 +189,20 @@ public class TimelineUI : MonoBehaviour
         {
             if (parrying.tick >= 1 && parrying.tick <= enemySlots.Count)
             {
-                Image image = enemySlots[parrying.tick - 1].GetComponent<Image>();
-                TextMeshProUGUI text = enemySlots[parrying.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
+                //Image image = enemySlots[parrying.tick - 1].GetComponent<Image>();
+                //TextMeshProUGUI text = enemySlots[parrying.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
 
-                if (image != null)
-                {
-                    image.color = parryingColor;
-                }
-                if (text != null)
-                {
-                    text.text = "P";
-                    //text.color = Color.white;
-                }
+                //if (image != null)
+                //{
+                //    image.color = parryingColor;
+                //}
+                //if (text != null)
+                //{
+                //    text.text = "P";
+                //    //text.color = Color.white;
+                //}
+
+                enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(parryingColor, "P");
             }
             else
             {
@@ -482,17 +493,23 @@ public class TimelineUI : MonoBehaviour
                     switch (effect)
                     {
                         case ActionType.None:
-                            color = new Color(occupiedColor.r, occupiedColor.g, occupiedColor.b, 0.25f); // 회색
+                            //color = new Color(occupiedColor.r, occupiedColor.g, occupiedColor.b, 0.25f); // 회색
+                            color = occupiedColor;
+                            color.a = 0.25f;
                             text = "-";
                             break;
 
                         case ActionType.Attack:
-                            color = new Color(1f, 0.5f, 0.5f, 0.25f); // 연한 빨강
+                            //color = new Color(1f, 0.5f, 0.5f, 0.25f); // 연한 빨강
+                            color = Player_attackColor;
+                            color.a = 0.25f;
                             text = "▲";
                             break;
 
                         case ActionType.Move:
-                            color = new Color(0.5f, 0.8f, 1f, 0.25f); // 연한 파랑
+                            //color = new Color(0.5f, 0.8f, 1f, 0.25f); // 연한 파랑
+                            color = Player_moveColor;
+                            color.a = 0.25f;
                             MoveDirection dir = MoveDirection.None;
                             if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
                             {
@@ -503,9 +520,9 @@ public class TimelineUI : MonoBehaviour
                                 dir = blockData.moveDirections[i];
                             }
                             if (dir == MoveDirection.Left)
-                                text = "↺";
+                                text = "<";
                             else if (dir == MoveDirection.Right)
-                                text = "↻";
+                                text = ">";
                             break;
                     }
 
@@ -587,12 +604,14 @@ public class TimelineUI : MonoBehaviour
                             break;
 
                         case ActionType.Attack:
-                            color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
+                            //color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
+                            color = Player_attackColor;
                             text = "▲";
                             break;
 
                         case ActionType.Move:
-                            color = new Color(0.3f, 0.7f, 1f); // 연한 파랑
+                            //color = new Color(0.3f, 0.7f, 1f); // 연한 파랑
+                            color = Player_moveColor;
                             MoveDirection dir = MoveDirection.None;
                             if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
                             {
@@ -603,16 +622,16 @@ public class TimelineUI : MonoBehaviour
                                 dir = blockData.moveDirections[i];
                             }
                             if (dir == MoveDirection.Left)
-                                text = "↺";
+                                text = "<";
                             else if (dir == MoveDirection.Right)
-                                text = "↻";
+                                text = ">";
                             break;
 
                     }
 
                     // 적용
                     if (image != null)
-                        image.color = color;
+                        image.color = new Color(color.r, color.g, color.b, 1.0f);
 
                     if (cellText != null)
                         cellText.text = text;

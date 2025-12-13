@@ -9,6 +9,10 @@ public class CardTooltip : MonoBehaviour
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text bodyText;
 
+    [Header("키워드 상세 설명창")]
+    [SerializeField]
+    private Keyword_tooltip[] keywords;
+
     [Header("위치 오프셋")]
     [SerializeField] private Vector2 offset = new Vector2(0f, -10f); // ← 오른쪽으로 안 밀리게 X=0
 
@@ -36,13 +40,16 @@ public class CardTooltip : MonoBehaviour
     }
 
     // ✅ 카메라를 같이 받도록 변경
-    public void Show(string title, string body, Vector2 screenPos, Camera cam)
+    public void Show(string title, string body, Vector2 screenPos, Camera cam, int index)
     {
-        if (titleText != null)
-            titleText.text = title;
+        if (keywords[index] != null)
+            keywords[index].Show(title, body);
 
-        if (bodyText != null)
-            bodyText.text = body;
+        //if (titleText != null)
+        //    titleText.text = title;
+
+        //if (bodyText != null)
+        //    bodyText.text = body;
 
         root.SetActive(true);
 
@@ -79,6 +86,12 @@ public class CardTooltip : MonoBehaviour
 
     public void Hide()
     {
+        for (int i = 0; i < keywords.Length; i++) 
+        {
+            if (keywords[i] != null)
+                keywords[i].Hide();
+        }
+
         if (root != null)
             root.SetActive(false);
     }
