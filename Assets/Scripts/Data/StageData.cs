@@ -31,7 +31,6 @@ public class StageData : ScriptableObject
     [Header("기본 설정")]
     [SerializeField]
     private int _stageNumber;
-    //public MapSize mapSize = MapSize.Sectors_8; //기본적으로 8섹터 게임으로 설정
     [SerializeField]
     private string _stageName; //스테이지 이름
     [TextArea(3, 10)]
@@ -40,6 +39,12 @@ public class StageData : ScriptableObject
     [TextArea(3, 10)]
     [SerializeField]
     private string _introMessage = "옛날에";
+
+    [Header("맵 정보")]
+    [SerializeField]
+    private MapSize _mapSize = MapSize.Sectors_8;
+    [SerializeField]
+    private List<Vector3> _sectorTransform = new List<Vector3>(); // 만약 _mapSize가 Custom인 경우에는 위치 정보가 담긴 리스트가 채워져있어야함
 
     [Header("적 정보")]
     [SerializeField]
@@ -63,6 +68,8 @@ public class StageData : ScriptableObject
     public string IntroMessage => _introMessage;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public List<PhaseTransitionData> PhaseConditions => _phaseConditions;
+    public MapSize MapSize => _mapSize;
+    public List<Vector3> SectorPoints => _sectorTransform;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
 

@@ -51,6 +51,10 @@ public class GameManager : MonoBehaviour
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
     private bool _isBattleEnded = false;
+
+    // UI 용 변수
+    private int _currentPhase = 1; // 기본 1
+    private int _phaseTurnCount = 0;
     #endregion
 
     #region Properties
@@ -224,8 +228,12 @@ public class GameManager : MonoBehaviour
     {
         _currentRound = 0; 
         _globalTurnIndex = 0;
+
         IsExecutingRound = false;
         _isBattleEnded = false;
+
+        _currentPhase = 1;
+        _phaseTurnCount = 0;
 
         if (_deckSystem == null)
         {
@@ -243,9 +251,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        
         // 맵 생성
-        _mapSystem.GenerateMap(_mapSize);
+        if (currentStageData != null)
+        {
+            _mapSystem.GenerateMap(currentStageData.MapSize, currentStageData.SectorPoints);
+        }
+        else
+        {
+            _mapSystem.GenerateMap(_mapSize);
+        }
         // UserData 기반 덱 생성
         _deckSystem.InitializeDeck();
 
@@ -255,11 +269,19 @@ public class GameManager : MonoBehaviour
         else
             Debug.LogError("StageData가 없습니다");
 
-        _mapSystem.EnableSelectionMode();
         if (_mapVisualController != null)
         {
             _mapVisualController.RefreshMapOwnershipVisuals();
         }
+        // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
+        if (FindAnyObjectByType<SceneIntroController>() == null)
+            OnIntroCompleted();
+    }
+
+    public void OnIntroCompleted()
+    {
+        Debug.Log("[GameManager] 인트로 종료. 맵 선택 활성화");
+        _mapSystem.EnableSelectionMode();
     }
 
     /// <summary>
@@ -418,6 +440,13 @@ public class GameManager : MonoBehaviour
         RuntimeEnemy activeEnemy = aliveEnemies[activeEnemyIndex];
 
         EnemyPattern nextPattern = activeEnemy.GetNextPattern();
+        int enemyCurrentPhase = activeEnemy.CurrentPhaseIndex + 1;
+        if (enemyCurrentPhase > _currentPhase)
+        {
+            _currentPhase = enemyCurrentPhase;
+            _phaseTurnCount = 0;
+            Debug.Log($"[GameManager] 패턴 고갈로 인한 {_currentPhase} 페이즈 강제 진입");
+        }
         if (nextPattern != null)
         {
             activeEnemy.SetPattern(nextPattern);
@@ -425,6 +454,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnPatternChanged(nextPattern);
         }
         _globalTurnIndex++;
+        _phaseTurnCount++;
 
         if (_timelineManager !=  null) 
             _timelineManager.RefreshCombinedEnemyPattern();
@@ -438,6 +468,9 @@ public class GameManager : MonoBehaviour
     private void CheckAndApplyPhaseTransition(List<RuntimeEnemy> enemies)
     {
         if (currentStageData.PhaseConditions == null) return;
+
+        int currentPhaseIndex = _currentPhase - 1;
+        int nextPhaseIndex = currentPhaseIndex;
 
         for (int i = 0; i < currentStageData.PhaseConditions.Count; i++)
         {
@@ -462,34 +495,30 @@ public class GameManager : MonoBehaviour
             }
             if (isMet)
             {
-                int targetPhaseIndex = i + 1;
-                foreach (RuntimeEnemy e in enemies)
-                    e.ForceChangePhase(targetPhaseIndex);
+                int targetIndex = i + 1;
+                if (targetIndex > currentPhaseIndex)
+                {
+                    if (targetIndex == currentPhaseIndex + 1)
+                    {
+                        nextPhaseIndex = targetIndex;
+                    }
+                }
             }
+        }
+        if (nextPhaseIndex > currentPhaseIndex)
+        {
+            _currentPhase = nextPhaseIndex + 1;
+            _phaseTurnCount = 0;
+            Debug.Log($"[GameManager] {_currentPhase} 페이즈 진입");
+
+            foreach (RuntimeEnemy e in enemies)
+                e.ForceChangePhase(nextPhaseIndex);
         }
     }
 
     private void NotifyRoundChanged()
     {
-        int currentPhase = 1;
-        int currentPatternIndex = 0;
-        if (_battleSystem != null && _battleSystem.Enemies != null)
-        {
-            List<RuntimeEnemy> alivesEnemies = new List<RuntimeEnemy>();
-            foreach(RuntimeEnemy e in _battleSystem.Enemies) 
-                if (!e.IsDead) alivesEnemies.Add(e);
-            if (alivesEnemies.Count > 0)
-            {
-                int targetIndex = Mathf.Max(0, _globalTurnIndex - 1);
-                int activeEnemyIndex = targetIndex % alivesEnemies.Count;
-
-                RuntimeEnemy activeEnemy = alivesEnemies[activeEnemyIndex];
-
-                currentPhase = activeEnemy.CurrentPhaseIndex;
-                currentPatternIndex = activeEnemy.PatternSequenceIndex;
-            }
-        }
-        OnRoundChanged?.Invoke(currentPhase, currentPatternIndex);
+        OnRoundChanged?.Invoke(_currentPhase, _phaseTurnCount);
     }
     #endregion
 
