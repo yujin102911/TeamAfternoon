@@ -116,16 +116,7 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_battleSystem != null)
-        {
-            _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
-            _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
-        }
-        if (_mapSystem != null)
-        {
-            _mapSystem.OnSectorSelected -= OnStartingSectorSelected;
-        }
+        UnSubscribeEvents();
     }
 
     #endregion
@@ -179,6 +170,12 @@ public class GameManager : MonoBehaviour
         if (_mapVisualController != null) _mapVisualController.Initialize(_mapSystem, _battleSystem, mapConfig);
         else Debug.LogError("[GameManager] MapVisualController를 찾을 수 없습니다");
 
+        // EnemyVisualController 연결
+        if (_enemyVisualController != null)
+        {
+            _enemyVisualController.Initialize(_battleSystem);
+        }
+
         // PlayerVisualController 연결
         if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
@@ -201,7 +198,6 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnEnemyDied += (e) => _mapVisualController.RefreshMapOwnershipVisuals();
         }
 
-        // PlayerVisualController 연결
         if (_timelineUI != null && _playerVisualController != null)
         {
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
@@ -211,10 +207,26 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
         }
 
-        // EnemyVisualController 연결
-        if (_enemyVisualController != null)
+    }
+
+    private void UnSubscribeEvents()
+    {
+        _mapSystem.OnSectorSelected -= OnStartingSectorSelected;
+        if (_timelineUI != null && _mapVisualController != null)
         {
-            _enemyVisualController.Initialize(_battleSystem);
+            _timelineUI.OnRequestHighlight -= _mapVisualController.OnRequestHighlight;
+            _timelineUI.OnRequestClearHighlight -= () => _mapVisualController.OnRequestClearHighlight();
+            _battleSystem.OnEnemyAttack -= _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyDied -= (e) => _mapVisualController.RefreshMapOwnershipVisuals();
+        }
+
+        if (_timelineUI != null && _playerVisualController != null)
+        {
+            _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
+            _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
+            _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
+            _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
+            _timelineUI.OnRequestHidePreview -= _playerVisualController.HidePlayerPreview;
         }
     }
 

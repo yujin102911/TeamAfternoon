@@ -82,6 +82,16 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.OnTimelineChanged -= UpdatePlayerTimeline;
+            TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
+            TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
+        }
+    }
+
     /// <summary>
     /// 타임라인 슬롯 생성 (3줄 - 8틱)
     /// </summary>
