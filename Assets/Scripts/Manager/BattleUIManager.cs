@@ -29,23 +29,30 @@ public class BattleUIManager : MonoBehaviour
             battle.OnPlayerHPChanged += HandlePlayerHPChanged;
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
             battle.OnEnemyDied += HandleEnemyDied;
-
             battle.OnBattleInitialized += HandleBattleInitialized;
-        }
-        GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
-        GameManager.Instance.OnRoundChanged += HandleRoundChanged;
-        RefreshStartButtonState();
-        RefreshSectorSelectionPanel();
-    }
 
+            GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
+            GameManager.Instance.OnRoundChanged += HandleRoundChanged;
+            GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
+        }
+        RefreshStartButtonState();
+        //RefreshSectorSelectionPanel();
+    }
 
     private void OnDestroy()
     {
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
+            BattleSystem battle = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
+            GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
+            battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
+            battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
+            battle.OnEnemyDied -= HandleEnemyDied;
+            battle.OnBattleInitialized -= HandleBattleInitialized;
         }
     }
+
 
     private void HandleBattleInitialized()
     {
@@ -112,22 +119,29 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState()
     {
         if (_startButton == null || GameManager.Instance == null) return;
-        
         bool isRoundRunning = GameManager.Instance.IsExecutingRound;
         bool isSectorSelected = GameManager.Instance.IsSectorSelected;
+        bool isGameOver = GameManager.Instance.IsBattleEnded;
 
-        bool interactable = !isRoundRunning && isSectorSelected;
+        bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
 
-        RefreshSectorSelectionPanel();
+        //RefreshSectorSelectionPanel();
     }
-    
-    private void RefreshSectorSelectionPanel()
+
+    private void RefreshStartButtonState(bool isVictory)
     {
-        if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
-        bool showPanel = !GameManager.Instance.IsSectorSelected;
-        _sectorSelectionPanel.SetActive(showPanel);
+        _startButton.interactable = false;
     }
+
+    //private void RefreshSectorSelectionPanel()
+    //{
+    //    if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
+    //    bool showPanel = !GameManager.Instance.IsSectorSelected;
+    //    _sectorSelectionPanel.SetActive(showPanel);
+    //}
+
+
 
 }
