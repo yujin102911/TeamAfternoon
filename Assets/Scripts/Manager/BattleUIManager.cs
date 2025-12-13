@@ -105,8 +105,7 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleRoundChanged(int chapter, int page)
     {
-        _pageText.text = $"<size=27pt>Page\n</size>{0+page.ToString()}";
-        chapter++;
+        _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
 
     }
