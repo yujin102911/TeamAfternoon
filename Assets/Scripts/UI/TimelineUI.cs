@@ -33,7 +33,14 @@ public class TimelineUI : MonoBehaviour
 
     [Header("툴팁 UI")]
     public GameObject tooltipPanel;          // 툴팁 패널
-    public TextMeshProUGUI tooltipText;      // 툴팁 텍스트
+    public TextMeshProUGUI tooltipTitleText;      // 툴팁 제목
+    public TextMeshProUGUI tooltipDetailText;      // 툴팁 설명
+
+    [Header("플레이어 툴팁 UI")]
+    public GameObject Player_tooltipPanel;          // 툴팁 패널
+    public TextMeshProUGUI Player_tooltipTitleText;      // 툴팁 제목
+    public TextMeshProUGUI Player_tooltipDetailText;      // 툴팁 설명
+
     [SerializeField]
     private Vector3 tooltipOffset = new Vector3(10f, 10f, 0f);
 
@@ -228,17 +235,22 @@ public class TimelineUI : MonoBehaviour
             return;
         }
 
+        if(tooltipTitleText != null)
+        {
+            tooltipTitleText.text = $"틱 {tick}";
+        }
+
         // 툴팁 텍스트 설정
-        if (tooltipText != null)
+        if (tooltipDetailText != null)
         {
             if (attack != null)
             {
                 string sectors = string.Join(", ", attack.targetSectors);
-                tooltipText.text = $"틱 {tick}\n섹터: {sectors}\n데미지: {attack.damage}";
+                tooltipDetailText.text = $"섹터: {sectors}\n데미지: {attack.damage}";
             }
             if (parrying != null)
             {
-                tooltipText.text = $"틱 {tick}\n공격 튕겨내기";
+                tooltipDetailText.text = $"공격 튕겨내기";
             }
         }
 
@@ -266,12 +278,22 @@ public class TimelineUI : MonoBehaviour
         OnRequestClearHighlight?.Invoke();
     }
 
+    public void HidePlayerTooltip()
+    {
+        if (Player_tooltipPanel != null)
+        {
+            Player_tooltipPanel.SetActive(false);
+        }
+
+        OnRequestClearHighlight?.Invoke();
+    }
+
     /// <summary>
     /// 플레이어 카드 정보 툴팁 표시
     /// </summary>
     public void ShowPlayerCardTooltip(int tick, PlacedBlock placedBlock, Vector3 position, bool is_prev = false)
     {
-        if (tooltipPanel == null || placedBlock == null) return;
+        if (Player_tooltipPanel == null || placedBlock == null) return;
 
         // 이 틱에서의 효과 확인
         int cardTickIndex = tick - placedBlock.startTick;
@@ -298,22 +320,24 @@ public class TimelineUI : MonoBehaviour
         }
 
         // 툴팁 텍스트 설정
-        if (tooltipText != null)
+        if (Player_tooltipPanel != null)
         {
             if (is_prev)
             {
-                tooltipText.text = $"과거의 {blockData.blockName} - 틱 {tick} ({cardTickIndex + 1}/{blockData.blockLength})\n{effectText}\n";
+                Player_tooltipTitleText.text = $"과거의 {blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
+                Player_tooltipDetailText.text = $"{effectText}\n";
             }
             else
             {
-                tooltipText.text = $"{blockData.blockName} - 틱 {tick} ({cardTickIndex + 1}/{blockData.blockLength})\n{effectText}\n\n우클릭: 제거";
+                Player_tooltipTitleText.text = $"{blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
+                Player_tooltipDetailText.text = $"{effectText}\n우클릭: 제거";
             }
 
         }
 
         // 툴팁 위치 설정
-        tooltipPanel.transform.position = position + tooltipOffset;
-        tooltipPanel.SetActive(true);
+        Player_tooltipPanel.transform.position = position + tooltipOffset;
+        Player_tooltipPanel.SetActive(true);
     }
 
     /// <summary>
