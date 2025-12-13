@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
 
 /// <summary>
 /// 전투 로직을 처리하는 System
