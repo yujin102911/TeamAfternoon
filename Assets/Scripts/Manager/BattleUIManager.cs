@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 
 public class BattleUIManager : MonoBehaviour
 {
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
+    [SerializeField] private TextMeshProUGUI _pageText;
+    [SerializeField] private TextMeshProUGUI _chapterText;
 
     [Header("플레이어 UI")]
     [SerializeField] private UnitStatusUI _playerStatusUI;
@@ -30,6 +33,7 @@ public class BattleUIManager : MonoBehaviour
             battle.OnBattleInitialized += HandleBattleInitialized;
         }
         GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
+        GameManager.Instance.OnRoundChanged += HandleRoundChanged;
         RefreshStartButtonState();
         RefreshSectorSelectionPanel();
     }
@@ -99,6 +103,13 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
+    private void HandleRoundChanged(int chapter, int page)
+    {
+        _pageText.text = $"<size=27pt>Page\n</size>{0+page.ToString()}";
+        chapter++;
+        _chapterText.text = $"Chapter {chapter.ToString()}.";
+
+    }
     private void RefreshStartButtonState()
     {
         if (_startButton == null || GameManager.Instance == null) return;
