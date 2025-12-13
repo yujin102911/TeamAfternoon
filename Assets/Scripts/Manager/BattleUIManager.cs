@@ -29,23 +29,29 @@ public class BattleUIManager : MonoBehaviour
             battle.OnPlayerHPChanged += HandlePlayerHPChanged;
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
             battle.OnEnemyDied += HandleEnemyDied;
-
             battle.OnBattleInitialized += HandleBattleInitialized;
+
+            GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
+            GameManager.Instance.OnRoundChanged += HandleRoundChanged;
         }
-        GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
-        GameManager.Instance.OnRoundChanged += HandleRoundChanged;
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
     }
 
-
     private void OnDestroy()
     {
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
+            BattleSystem battle = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
+            GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
+            battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
+            battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
+            battle.OnEnemyDied -= HandleEnemyDied;
+            battle.OnBattleInitialized -= HandleBattleInitialized;
         }
     }
+
 
     private void HandleBattleInitialized()
     {
