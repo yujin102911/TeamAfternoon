@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,11 @@ using UnityEngine.UI;
 public class Deck_UI : MonoBehaviour
 {
     public RuntimeBlock R_Block;
+
+    [Header("참조")]
+    public TextMeshProUGUI BlockNameText;
+    public TextMeshProUGUI BlockInfoText;
+    public TextMeshProUGUI BlockDamageText;
 
     [SerializeField]
     private Draggable_Block _tickInfo; // 틱 정보 출력 담당
@@ -63,8 +69,17 @@ public class Deck_UI : MonoBehaviour
             _image.color = _originColor;
         }
 
+        //블럭 이름 설정
+        if (BlockNameText != null) 
+            BlockNameText.text = rBlock.BaseData.BlockName;
+
+        if(BlockDamageText != null)
+            BlockDamageText.text = "데미지: " + rBlock.BaseData.attackDamage.ToString();
+
         // 틱 정보 출력
         _tickInfo.Show(rBlock.BaseData);
+
+        BlockInfoText.text = "";
 
         // 키워드 ID 리스트 가져오기
         List<int> keywords = DeckBuildingManager.Instance.GetKeywords(rBlock.BlockID);
@@ -83,6 +98,8 @@ public class Deck_UI : MonoBehaviour
             foreach (int keyword_id in keywords)
             {
                 KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
+
+                BlockInfoText.text += $"#{keyword.KeywordName}\n";
 
                 if (_keywordUIs[index] != null)
                 {

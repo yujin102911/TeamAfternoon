@@ -23,6 +23,8 @@ public class DeckBuildingManager : MonoBehaviour
     private Button _deckTagBtn;
     [SerializeField]
     private Button _keywordTagBtn;
+    private Vector2 _deckOrigin;
+    private Vector2 _keywordOrigin;
 
     [Header("돌아가기 버튼")]
     [SerializeField]
@@ -80,10 +82,18 @@ public class DeckBuildingManager : MonoBehaviour
             _backBtn.onClick.AddListener(() => CloseBook());
 
         if(_deckTagBtn != null)
-            _deckTagBtn.onClick.AddListener(()=> OpenBook(0));
+        {
+            _deckOrigin = _deckTagBtn.gameObject.GetComponent<RectTransform>().anchoredPosition;
+            _deckTagBtn.onClick.AddListener(() => OpenBook(0));
+        }
+            
 
         if(_keywordTagBtn != null)
-            _keywordTagBtn.onClick.AddListener(()=>OpenBook(1));
+        {
+            _keywordOrigin = _keywordTagBtn.gameObject.GetComponent<RectTransform>().anchoredPosition;
+            _keywordTagBtn.onClick.AddListener(() => OpenBook(1));
+        }
+            
     }
 
     // Update is called once per frame
@@ -242,6 +252,9 @@ public class DeckBuildingManager : MonoBehaviour
 
     public void Off_Tags()
     {
+        _deckTagBtn.gameObject.GetComponent<RectTransform>().anchoredPosition = _deckOrigin;
+        _keywordTagBtn.gameObject.GetComponent<RectTransform>().anchoredPosition = _keywordOrigin;
+
         _deckTagBtn.gameObject.SetActive(false);
         _keywordTagBtn.gameObject.SetActive(false);
     }

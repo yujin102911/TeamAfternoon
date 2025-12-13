@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static Unity.Collections.AllocatorManager;
 
 public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -11,7 +12,7 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
     [SerializeField]
     private Draggable_Block _tickInfo; // 틱 정보 출력 담당
     [SerializeField]
-    private TextMeshProUGUI _damageTxt; // 데미지 텍스트 UI
+    private TextMeshProUGUI _nameTxt; // 이름 텍스트 UI
 
     [Header("키워드 UI")]
     [SerializeField]
@@ -58,8 +59,8 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
         // 틱 정보 출력
         _tickInfo.Show(_runtimeBlock.BaseData);
 
-        // 데미지 텍스트 설정
-        _damageTxt.text = "데미지: " + _runtimeBlock.BaseData.attackDamage.ToString();
+        // 이름 텍스트 설정
+        _nameTxt.text = _runtimeBlock.BaseData.blockName;
 
         // 키워드 ID 리스트 가져오기
         List<int> keywords = DeckBuildingManager.Instance.GetKeywords(_runtimeBlock.BlockID);
@@ -116,8 +117,8 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
         // 틱 정보 출력
         _tickInfo.Show(rBlock.BaseData);
 
-        // 데미지 텍스트 설정
-        _damageTxt.text = "데미지: " + rBlock.BaseData.attackDamage.ToString();
+        // 이름 텍스트 설정
+        _nameTxt.text = rBlock.BaseData.blockName;
 
         // 키워드 ID 리스트 가져오기
         List<int> keywords = DeckBuildingManager.Instance.GetKeywords(rBlock.BlockID);
