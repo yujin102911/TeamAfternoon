@@ -26,6 +26,14 @@ public class Draggable_Block : MonoBehaviour
     private Transform originalParent;
     private bool isDragging = false;
 
+    [Header("색상 설정")]
+    [SerializeField]
+    private Color _attackColor;
+    [SerializeField]
+    private Color _moveColor;
+    [SerializeField]
+    private Color _noneColor;
+
     [Header("빌딩인지 체크")]
     public bool isBuildingPhase = false; // 빌딩 페이즈인지 여부
 
@@ -82,17 +90,17 @@ public class Draggable_Block : MonoBehaviour
                 if (action == ActionType.Attack)
                 {
                     txt.text = "▲";
-                    img.color = new Color(1f, 0.3f, 0.3f);
+                    img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);
                 }
                 else if (action == ActionType.Move)
                 {
                     txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
-                    img.color = new Color(0.3f, 0.7f, 1f);
+                    img.color = new Color(_moveColor.r, _moveColor.g, _moveColor.b, 1.0f);
                 }
                 else
                 {
                     txt.text = "-";
-                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    img.color = new Color(_noneColor.r, _noneColor.g, _noneColor.b, 1.0f);
                 }
             }
         }
