@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
 
     public event Action OnGameStateChanged;
     public event Action<int, int> OnRoundChanged;
-
+    public event Action<bool> OnBattleEnded; // True: 승리 False: 패배
 
     #endregion
 
@@ -405,15 +405,9 @@ public class GameManager : MonoBehaviour
         // 현재 돌아가고 있는 모든 코루틴 종료
         StopAllCoroutines();
 
-        if (victory)
-        {
-            // TODO: 보상 처리 및 승리 UI
-        }
-        else
-        {
-            // TODO: 게임 오버 UI
-        }
-            SaveService.Save(userGameData);
+         SaveService.Save(userGameData);
+
+        OnBattleEnded?.Invoke(victory);
     }
     #endregion
 

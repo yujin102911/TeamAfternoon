@@ -33,6 +33,7 @@ public class BattleUIManager : MonoBehaviour
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged += HandleRoundChanged;
+            GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -118,17 +119,22 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState()
     {
         if (_startButton == null || GameManager.Instance == null) return;
-        
         bool isRoundRunning = GameManager.Instance.IsExecutingRound;
         bool isSectorSelected = GameManager.Instance.IsSectorSelected;
+        bool isGameOver = GameManager.Instance.IsBattleEnded;
 
-        bool interactable = !isRoundRunning && isSectorSelected;
+        bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
 
         //RefreshSectorSelectionPanel();
     }
-    
+
+    private void RefreshStartButtonState(bool isVictory)
+    {
+        _startButton.interactable = false;
+    }
+
     //private void RefreshSectorSelectionPanel()
     //{
     //    if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
@@ -136,6 +142,6 @@ public class BattleUIManager : MonoBehaviour
     //    _sectorSelectionPanel.SetActive(showPanel);
     //}
 
-    
+
 
 }
