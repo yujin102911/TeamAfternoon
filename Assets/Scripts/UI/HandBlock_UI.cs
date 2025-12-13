@@ -165,7 +165,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
             // 이름 세팅
             effectTitle = $"#{keyword.KeywordName}";
-            body = $"- {keyword.KeywordDescription}";
+            body = $"{keyword.KeywordDescription}";
 
             CardTooltip.Instance.Show(
             effectTitle,

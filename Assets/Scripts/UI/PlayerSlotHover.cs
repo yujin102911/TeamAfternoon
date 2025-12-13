@@ -24,7 +24,7 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         if (timelineUI != null)
         {
-            timelineUI.HideTooltip();
+            timelineUI.HidePlayerTooltip();
         }
     }
 
