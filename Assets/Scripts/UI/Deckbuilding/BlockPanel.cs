@@ -47,7 +47,7 @@ public class DeckPanel : MonoBehaviour
         }
 
         // 풀링 오브젝트 부족 시 자동 확장
-        GameObject newObj = Instantiate(_blockPrefab, transform);
+        GameObject newObj = Instantiate(_blockPrefab, _spawnPoint);
         return newObj;
     }
 
