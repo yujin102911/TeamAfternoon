@@ -284,7 +284,7 @@ public class CardBurnEffect : MonoBehaviour
     /// 불타는 애니메이션을 실행하는 코루틴입니다.
     /// Dissolve 값을 시간에 따라 증가시켜 카드가 불타는 효과를 만듭니다.
     /// </summary>
-    private IEnumerator BurnAnimationCoroutine(Action onComplete)
+    public IEnumerator BurnAnimationCoroutine(Action onComplete)
     {
         if (enableDebugLog)
         {

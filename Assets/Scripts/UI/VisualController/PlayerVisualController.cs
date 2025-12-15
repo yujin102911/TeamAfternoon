@@ -23,6 +23,9 @@ public class PlayerVisualController : MonoBehaviour
     [SerializeField] private float _shakeAngle = 15f;
     [SerializeField] private int _shakeCount = 3;
 
+    [Header("베기 이펙트 설정")]
+    // 1. Hierarchy에 있는 SlashEffect 오브젝트를 여기에 드래그하여 연결합니다.
+    public GameObject trailEffectPrefab;
 
     private GameObject _playerInstance;
     private SpriteRenderer _playerRenderer;
@@ -100,6 +103,16 @@ public class PlayerVisualController : MonoBehaviour
     #region Private Effect Routines
     private IEnumerator ShakeRoutine()
     {
+        //트레일 렌더러 코드    
+        if (trailEffectPrefab != null)
+        {
+            GameObject newTrail = Instantiate(
+                trailEffectPrefab,
+                Vector3.zero,
+                Quaternion.identity
+            );
+        }
+
         Quaternion originalRot = _playerInstance.transform.localRotation;
 
         float speed = _shakeDuration / _shakeCount;
