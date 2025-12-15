@@ -39,6 +39,8 @@ public class BattleSystem
     public int PlayerHP => _playerHP;
     public int PlayerMaxHP => _playerMaxHP;
     public int PlayerCurrentSector => _playerCurrentSector;
+
+    public int TotalDamage;
     public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
     #endregion
 
@@ -107,6 +109,8 @@ public class BattleSystem
                 }
             }
             int finalDamage = CalculateDamage(damage, true);
+
+            TotalDamage = finalDamage;
 
             target.TakeDamage(finalDamage);
             Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 피격! ({finalDamage} 피해)");

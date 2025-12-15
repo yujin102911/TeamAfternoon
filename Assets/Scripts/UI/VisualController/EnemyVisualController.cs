@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 public class EnemyVisualController : MonoBehaviour
 {
@@ -10,8 +12,24 @@ public class EnemyVisualController : MonoBehaviour
     [Header("정렬 설정")]
     [SerializeField] private float _spacing = 2.5f;
 
+    public GameObject textPrefab; // 생성될 프리팹
+    public Vector3 Offset;
+
+    [Header("점멸 설정")]
+    public float blinkDuration = 0.3f;
+    public Color EnemyHitColor = Color.red;
+
+    [Header("텍스트 설정")]
+    public float textLifetime = 1.0f;
+    public float floatUpSpeed = 1.0f;
+
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private BattleSystem _battleSystem;
+
+    private void Awake()
+    {
+
+    }
 
     public void Initialize(BattleSystem battleSystem)
     {
@@ -90,6 +108,8 @@ public class EnemyVisualController : MonoBehaviour
     {
         if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
             visual.PlayerHitAnimation();
+
+        StartCoroutine(ShowEnemyDamage(_battleSystem.TotalDamage));
     }
 
     private void HandleEnemyDead(RuntimeEnemy enemy)
@@ -98,6 +118,41 @@ public class EnemyVisualController : MonoBehaviour
         {
             visual.EnemyDeadColor(enemy);
         }
+    }
+
+    public IEnumerator ShowEnemyDamage(int damage)
+    {
+        
+
+        SpawnDamageText(damage);
+
+        yield return new WaitForSeconds(blinkDuration);
+    }
+
+    private void SpawnDamageText(int damage)
+    {
+        if (textPrefab == null) return;
+        GameObject go = Instantiate(textPrefab, transform.position + Offset, Quaternion.identity);
+
+        TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        if (tmp != null)
+        {
+            tmp.text = damage.ToString();
+        }
+        StartCoroutine(DestroyDamageText(go));
+    }
+
+    private IEnumerator DestroyDamageText(GameObject go)
+    {
+        float timer = 0f;
+        while (timer < textLifetime)
+        {
+            timer += Time.deltaTime;
+            go.transform.position += Vector3.up * floatUpSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+        Destroy(go);
     }
 
 }

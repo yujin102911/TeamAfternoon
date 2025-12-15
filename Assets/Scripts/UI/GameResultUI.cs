@@ -24,6 +24,17 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private float _delaySeconds = 1.0f;
     [SerializeField] private float _fadeDuration = 1.0f;
 
+    [Header("수정 연출")]
+    [SerializeField]
+    private NoiseTextureGenerator _noiseTextureGenerator;
+    [SerializeField] 
+    private RectTransform _crystalTransform;
+    [SerializeField]
+    private Vector3 _startPos;
+    public float moveY = 0;
+    [SerializeField]
+    private float duration = 1.0f;
+
     private void Start()
     {
         _victoryPanel.SetActive(false);
@@ -59,6 +70,9 @@ public class GameResultUI : MonoBehaviour
     {
         CanvasGroup cg = targetPanel.GetComponent<CanvasGroup>();
         if (cg == null) cg = targetPanel.AddComponent<CanvasGroup>();
+
+        // 수정 연출 추가
+        yield return StartCoroutine(MoveUpByY_Ease(_startPos, moveY, duration));
 
         if (isVictory)
         {
@@ -115,6 +129,39 @@ public class GameResultUI : MonoBehaviour
     {
         Debug.Log("고투 라이브러리");
         ServiceLocator.Instance.Scene.Load(_librarySceneName);
+    }
+
+    IEnumerator MoveUpByY_Ease(Vector3 startPos, float moveY, float duration)
+    {
+        Vector3 endPos = startPos + Vector3.up * moveY;
+
+        float elapsed = 0f;
+
+        if (_noiseTextureGenerator != null)
+            _noiseTextureGenerator.GenerateNoiseTexture();
+
+        CardBurnEffect cardBurnEffect = _crystalTransform.GetComponent<CardBurnEffect>();
+
+        if(!_crystalTransform.gameObject.activeSelf)
+            _crystalTransform.gameObject.SetActive(true);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Ease Out
+            t = 1f - Mathf.Pow(1f - t, 3f);
+
+            _crystalTransform.anchoredPosition = Vector3.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+
+        _crystalTransform.anchoredPosition = endPos;
+
+        cardBurnEffect.Initialize();
+        
+        yield return StartCoroutine(cardBurnEffect.BurnAnimationCoroutine(null));
     }
 
 }
