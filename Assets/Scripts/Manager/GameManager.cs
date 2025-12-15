@@ -56,6 +56,10 @@ public class GameManager : MonoBehaviour
     // UI 용 변수
     private int _currentPhase = 1; // 기본 1
     private int _phaseTurnCount = 0;
+
+    // 통계용 변수
+    private int _statPlayerAttackCount = 0;
+    private int _statPlayerHitCount = 0;
     #endregion
 
     #region Properties
@@ -84,7 +88,7 @@ public class GameManager : MonoBehaviour
 
     public event Action OnGameStateChanged;
     public event Action<int, int> OnRoundChanged;
-    public event Action<bool> OnBattleEnded; // True: 승리 False: 패배
+    public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
 
     #endregion
 
@@ -207,6 +211,12 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
         }
 
+        if (_battleSystem != null)
+        {
+            _battleSystem.OnPlayerAttack += CountPlayerAttack;
+            _battleSystem.OnPlayerHit += CountPlayerHit;
+        }
+
     }
 
     private void UnSubscribeEvents()
@@ -227,6 +237,12 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview -= _playerVisualController.HidePlayerPreview;
+        }
+        
+        if (_battleSystem != null)
+        {
+            _battleSystem.OnPlayerAttack -= CountPlayerAttack;
+            _battleSystem.OnPlayerHit -= CountPlayerHit;
         }
     }
 
@@ -326,6 +342,10 @@ public class GameManager : MonoBehaviour
     public void StartNewBattle()
     {
         _isBattleEnded = false;
+        // 통계 초기화
+        _statPlayerAttackCount = 0;
+        _statPlayerHitCount = 0;
+
         // 덱 드로우
         _deckSystem.DrawCards(_startHandSize);
         if (_timelineManager != null)
@@ -340,6 +360,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 버튼과 연결
     public void ExecuteRound()
     {
         if (_isExecutingRound)
@@ -399,7 +420,7 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _isBattleEnded = true;
         IsExecutingRound = false;
-
+        int _leftPlayerHP = _battleSystem.PlayerHP;
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
 
         // 현재 돌아가고 있는 모든 코루틴 종료
@@ -407,7 +428,7 @@ public class GameManager : MonoBehaviour
 
          SaveService.Save(userGameData);
 
-        OnBattleEnded?.Invoke(victory);
+        OnBattleEnded?.Invoke(victory, _currentRound, _statPlayerHitCount, _statPlayerAttackCount, _leftPlayerHP);
     }
     #endregion
 
@@ -535,6 +556,20 @@ public class GameManager : MonoBehaviour
     private void NotifyRoundChanged()
     {
         OnRoundChanged?.Invoke(_currentPhase, _phaseTurnCount);
+    }
+    #endregion
+
+    #region Counting Helper Methods
+    private void CountPlayerAttack()
+    {
+        if (_isBattleEnded) return;
+        _statPlayerAttackCount++;
+    }
+
+    private void CountPlayerHit()
+    {
+        if (_isBattleEnded) return;
+        _statPlayerHitCount++;
     }
     #endregion
 
