@@ -4841,15 +4841,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e1e4df17d18c8428c5613ba6c9b57e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fadeLayers:
-  - {fileID: 1989983586}
-  - {fileID: 452978701}
-  - {fileID: 86100542}
-  - {fileID: 1328318665}
-  - {fileID: 466193881}
-  - {fileID: 1933166474}
+  _introLayers:
+  - Group: {fileID: 1989983586}
+    Duration: 1.5
+  - Group: {fileID: 452978701}
+    Duration: 1.5
+  - Group: {fileID: 86100542}
+    Duration: 1.5
+  - Group: {fileID: 1328318665}
+    Duration: 1.5
+  - Group: {fileID: 466193881}
+    Duration: 2.5
+  - Group: {fileID: 1933166474}
+    Duration: 1.5
   _startDelay: 0.5
-  _fadeDuration: 1.5
 --- !u!224 &7356480051528924633
 RectTransform:
   m_ObjectHideFlags: 0

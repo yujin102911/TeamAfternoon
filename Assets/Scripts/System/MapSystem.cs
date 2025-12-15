@@ -235,6 +235,18 @@ public class MapSystem
             if (sr != null) sr.color = color;
         }
     }
+
+    public void PlaySectorParticle(int sectorNum)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+        {
+            ParticleSystem ps = obj.GetComponentInChildren<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Play();
+            }
+        }
+    }
     #endregion
 
     #region Input Logic

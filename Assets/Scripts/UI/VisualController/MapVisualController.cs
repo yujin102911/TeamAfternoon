@@ -85,7 +85,13 @@ public class MapVisualController : MonoBehaviour
         {
             // 빨간색 켜기
             foreach (int index in sectors)
+            {
                 _mapSystem.SetSectorTempColor(index, flashColor);
+                if (i == 0)
+                {
+                    _mapSystem.PlaySectorParticle(index);
+                }
+            }
             yield return new WaitForSeconds(0.1f);
             // 빨간색 끄기
             foreach (int index in sectors)
