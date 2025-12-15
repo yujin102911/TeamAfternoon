@@ -130,7 +130,7 @@ public class BattleUIManager : MonoBehaviour
         //RefreshSectorSelectionPanel();
     }
 
-    private void RefreshStartButtonState(bool isVictory)
+    private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
     {
         _startButton.interactable = false;
     }

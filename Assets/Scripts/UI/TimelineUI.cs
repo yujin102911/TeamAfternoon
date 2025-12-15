@@ -307,12 +307,22 @@ public class TimelineUI : MonoBehaviour
 
         // 이 틱에서의 효과 확인
         int cardTickIndex = tick - placedBlock.startTick;
-        // 놓인 블럭 정보
+        // 놓인 블럭 정보 (기본 데이터)
         BlockData blockData = placedBlock.GetBlockData();
 
         ActionType effect = blockData.GetEffectAt(cardTickIndex);
-        MoveDirection moveDir = blockData.moveDirections[cardTickIndex];
-        string effectText = "";
+        MoveDirection moveDir = MoveDirection.None;
+
+        if (placedBlock.linkedRuntimeBlock != null && placedBlock.linkedRuntimeBlock.CurrentMoveDirections != null)
+        {
+            moveDir = placedBlock.linkedRuntimeBlock.CurrentMoveDirections[cardTickIndex];
+        }
+        else
+        {
+            moveDir = blockData.moveDirections[cardTickIndex];
+        }
+
+            string effectText = "";
         switch (effect)
         {
             case ActionType.None:
@@ -323,9 +333,9 @@ public class TimelineUI : MonoBehaviour
                 break;
             case ActionType.Move:
                 if (moveDir == MoveDirection.Right)
-                    effectText = $"이동: 시계방향";
+                    effectText = $"이동: 시계방향\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Left)
-                    effectText = $"이동: 반시계방향";
+                    effectText = $"이동: 반시계방향\n좌클릭: 방향 변경";
                 break;
         }
 

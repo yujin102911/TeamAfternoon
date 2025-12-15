@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,10 @@ public class GameResultUI : MonoBehaviour
     [Header("패널")]
     [SerializeField] private GameObject _victoryPanel;
     [SerializeField] private GameObject _defeatPanel;
+
+    [Header("텍스트")]
+    [SerializeField] private TextMeshProUGUI _victoryText;
+    [SerializeField] private TextMeshProUGUI _defeatText;
 
     [Header("버튼")]
     [SerializeField] private Button _goToMainBtn;
@@ -38,22 +43,52 @@ public class GameResultUI : MonoBehaviour
         }
     }
 
-    private void HandleBattleEnded(bool isVictory)
+    private void HandleBattleEnded(bool isVictory, int totalRound, int hitCount, int attackCount, int leftHP)
     {
         if (isVictory)
         {
-            StartCoroutine(ShowPanelCoroutine(_victoryPanel));
+            StartCoroutine(ShowPanelCoroutine(isVictory, totalRound, hitCount, attackCount, leftHP, _victoryPanel, _victoryText));
         }
         else
         {
-            StartCoroutine(ShowPanelCoroutine(_defeatPanel));
+            StartCoroutine(ShowPanelCoroutine(isVictory, totalRound, hitCount, attackCount, leftHP, _defeatPanel, _defeatText));
         }
     }
 
-    private IEnumerator ShowPanelCoroutine(GameObject targetPanel)
+    private IEnumerator ShowPanelCoroutine(bool isVictory, int totalRound, int hitCount, int attackCount, int leftHP, GameObject targetPanel, TextMeshProUGUI targetText)
     {
         CanvasGroup cg = targetPanel.GetComponent<CanvasGroup>();
         if (cg == null) cg = targetPanel.AddComponent<CanvasGroup>();
+
+        if (isVictory)
+        {
+            if (targetText != null)
+            {
+                targetText.text =
+                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐 진행되었으며,\n" +
+                    $"전투 중 사역마는 <size=72><color=#626262> {hitCount}</size></color>회의 피격을 받았으며\n" +
+                    $"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을 수행하였습니다.\n" +
+                    $"전투 종료 시점 기준 잔존 체력은 <size=72><color=#626262> {leftHP}</size></color>로 확인되었습니다.\n\n" +
+                    $"이상으로 본 전투 성과 보고를 마치겠습니다.";
+
+            }
+        }
+        else
+        {
+            if (targetText != null)
+            {
+                targetText.text = 
+                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>에 걸쳐\n"
+                    +$"진행되었으나, 전투 중 사역마는\n"
+                    +$"<size=72><color=#626262>{hitCount}</size></color>회의 피격을 받았으며\n"
+                    +$"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을\n"
+                    +$"수행하였습니다.\n"
+                    +$"전투 종료 시점 기준,\n"
+                    +$"사역마의 전투 지속은 불가능한\n"
+                    +$"상태로 확인되었습니다.";
+
+            }
+        }
 
         cg.alpha = 0f;
         cg.interactable = false;
