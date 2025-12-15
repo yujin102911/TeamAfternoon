@@ -12,7 +12,7 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _chapterText;
 
     [Header("플레이어 UI")]
-    [SerializeField] private UnitStatusUI _playerStatusUI;
+    [SerializeField] private PlayerHeartUI _playerStatusUI;
 
     [Header("적 UI 설정")]
     [SerializeField] private GameObject _enemyStatusPrefab;
@@ -34,6 +34,7 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged += HandleRoundChanged;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
+            GameManager.Instance.OnGameStateChanged += TryBindPlayerUI;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -46,6 +47,7 @@ public class BattleUIManager : MonoBehaviour
             BattleSystem battle = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
+            GameManager.Instance.OnGameStateChanged -= TryBindPlayerUI;
             battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
             battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
             battle.OnEnemyDied -= HandleEnemyDied;
@@ -65,8 +67,7 @@ public class BattleUIManager : MonoBehaviour
         // 플레이어 UI초기화
         if (_playerStatusUI != null)
         {
-            _playerStatusUI.Init("Player", battle.PlayerHP, battle.PlayerMaxHP);
-            _playerStatusUI.UpdateHP(battle.PlayerHP, battle.PlayerMaxHP);
+            _playerStatusUI.Init(battle.PlayerHP, battle.PlayerMaxHP);
         }
         foreach (Transform child in _enemyUIContainer) Destroy(child.gameObject);
         _enemyUIMap.Clear();
@@ -88,7 +89,7 @@ public class BattleUIManager : MonoBehaviour
     {
         if (_playerStatusUI != null)
         {
-            _playerStatusUI.UpdateHP(current, max);
+            _playerStatusUI.UpdateHearts(current, max);
         }
     }
 
@@ -135,12 +136,19 @@ public class BattleUIManager : MonoBehaviour
         _startButton.interactable = false;
     }
 
-    //private void RefreshSectorSelectionPanel()
-    //{
-    //    if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
-    //    bool showPanel = !GameManager.Instance.IsSectorSelected;
-    //    _sectorSelectionPanel.SetActive(showPanel);
-    //}
+    private void TryBindPlayerUI()
+    {
+        var visualController = FindAnyObjectByType<PlayerVisualController>();
+
+        if (visualController != null && _playerStatusUI != null)
+        {
+            Transform playerTr = visualController.CurrentPlayerTransform;
+            if (playerTr != null)
+            {
+                _playerStatusUI.SetFollowTarget(playerTr);
+            }
+        } 
+    }
 
 
 
