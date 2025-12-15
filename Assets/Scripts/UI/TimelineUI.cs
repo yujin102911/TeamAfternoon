@@ -52,7 +52,10 @@ public class TimelineUI : MonoBehaviour
     public Color parryingColor = new Color(1f, 1f, 0.3f);
     [Header("플레이어 색상")]
     public Color Player_attackColor;
+    public Sprite Sword_icon;
     public Color Player_moveColor;
+    public Sprite CW_icon;
+    public Sprite CCW_icon;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
     // 슬롯 저장 (틱 1~18)
@@ -548,6 +551,7 @@ public class TimelineUI : MonoBehaviour
                             color = Player_attackColor;
                             color.a = 0.25f;
                             text = "▲";
+                            iconSprite = Sword_icon;
                             break;
 
                         case ActionType.Move:
@@ -563,10 +567,18 @@ public class TimelineUI : MonoBehaviour
                             {
                                 dir = blockData.moveDirections[i];
                             }
+
                             if (dir == MoveDirection.Left)
+                            {
                                 text = "<";
+                                iconSprite = CCW_icon;
+                            }
                             else if (dir == MoveDirection.Right)
+                            {
                                 text = ">";
+                                iconSprite = CW_icon;
+                            }
+                                
                             break;
                     }
 
@@ -580,6 +592,14 @@ public class TimelineUI : MonoBehaviour
                     if (iconImage != null)
                     {
                         iconImage.enabled = showIcon;
+                        iconImage.sprite = iconSprite;
+                    }
+
+                    // 아이콘 있으면 적용
+                    if(iconSprite != null)
+                    {
+                        cellText.text = "";
+                        iconImage.enabled = true;
                         iconImage.sprite = iconSprite;
                     }
 
@@ -630,6 +650,8 @@ public class TimelineUI : MonoBehaviour
                         }
                     }
 
+                    iconImage.gameObject.SetActive(true);
+
                     image.sprite = Set_SlotSprite;
 
                     // 기본값
@@ -652,6 +674,7 @@ public class TimelineUI : MonoBehaviour
                             //color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
                             color = Player_attackColor;
                             text = "▲";
+                            iconSprite = Sword_icon;
                             break;
 
                         case ActionType.Move:
@@ -666,10 +689,18 @@ public class TimelineUI : MonoBehaviour
                             {
                                 dir = blockData.moveDirections[i];
                             }
+
                             if (dir == MoveDirection.Left)
+                            {
                                 text = "<";
+                                iconSprite = CCW_icon;
+                            }
                             else if (dir == MoveDirection.Right)
+                            {
                                 text = ">";
+                                iconSprite = CW_icon;
+                            }
+
                             break;
 
                     }
@@ -684,6 +715,14 @@ public class TimelineUI : MonoBehaviour
                     if (iconImage != null)
                     {
                         iconImage.enabled = showIcon;
+                        iconImage.sprite = iconSprite;
+                    }
+
+                    // 아이콘 있으면 적용
+                    if (iconSprite != null)
+                    {
+                        cellText.text = "";
+                        iconImage.enabled = true;
                         iconImage.sprite = iconSprite;
                     }
 
