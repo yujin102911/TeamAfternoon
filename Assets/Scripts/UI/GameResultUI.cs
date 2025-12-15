@@ -72,10 +72,11 @@ public class GameResultUI : MonoBehaviour
         if (cg == null) cg = targetPanel.AddComponent<CanvasGroup>();
 
         // 수정 연출 추가
-        yield return StartCoroutine(MoveUpByY_Ease(_startPos, moveY, duration));
 
         if (isVictory)
         {
+            yield return StartCoroutine(MoveUpByY_Ease(_startPos, moveY, duration));
+
             if (targetText != null)
             {
                 targetText.text =

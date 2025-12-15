@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 ///  씬 시작시 타닥타닥 연출
@@ -9,62 +10,47 @@ using System.Collections;
 public class SceneIntroController : MonoBehaviour
 {
     [Header("UI 연결")]
-    [SerializeField] private GameObject _introPanel;
-    [SerializeField] private TextMeshProUGUI _introText;
-    [SerializeField] private CanvasGroup _panelCanvasGroup;
+    [SerializeField] private List<CanvasGroup> _fadeLayers;
 
     [Header("연출 설정")]
-    [TextArea(3, 10)]
-    [SerializeField] private string _message = "옛날 옛적에~~";
-    [SerializeField] private float _typingSpeed = 0.05f;
     [SerializeField] private float _startDelay = 0.5f;
-    [SerializeField] private float _endDelay = 1f;
     [SerializeField] private float _fadeDuration = 1f;
 
     private void Start()
     {
-        if (GameManager.Instance != null && GameManager.Instance.CurrentStageData  != null)
-        {
-            _message = GameManager.Instance.CurrentStageData.IntroMessage;
-        }
         StartCoroutine(PlayIntroSequence());
-    }
-
-    public void SetMessage(string message)
-    {
-        _message = message;
     }
 
     private IEnumerator PlayIntroSequence()
     {
-        _introPanel.SetActive(true);
-        _panelCanvasGroup.alpha = 1;
-        _panelCanvasGroup.blocksRaycasts = true;
-        _introText.text = "";
-
+        foreach(CanvasGroup group in _fadeLayers)
+        {
+            if (group != null)
+            {
+                group.gameObject.SetActive(true);
+                group.alpha = 1f;
+                group.blocksRaycasts = true;
+            }
+        }
         yield return new WaitForSeconds(_startDelay);
 
-        foreach(char letter in _message.ToCharArray())
+        foreach (CanvasGroup group in _fadeLayers)
         {
-            _introText.text += letter;
-            // 사운드 추가 시 여기 삽입
-            yield return new WaitForSeconds(_typingSpeed);
+            if (group == null) continue;
+            float elapsedTime = 0f;
+            while (elapsedTime < _fadeDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                group.alpha = Mathf.Lerp(1f, 0f, elapsedTime / _fadeDuration);
+                yield return null;
+            }
+            group.alpha = 0f;
+            group.blocksRaycasts = false;
+            group.gameObject.SetActive(false);
         }
-
-        yield return new WaitForSeconds(_endDelay);
-
-        float elapsedTime = 0f;
-        while (elapsedTime < _fadeDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            _panelCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsedTime / _fadeDuration);
-            yield return null;
-        }
-        _panelCanvasGroup.blocksRaycasts = false;
-        _introPanel.SetActive(false);
-
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null) 
             GameManager.Instance.OnIntroCompleted();
+
     }
 
 }
