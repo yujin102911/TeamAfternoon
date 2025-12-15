@@ -1,20 +1,40 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+﻿using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary>
-///  씬 시작시 타닥타닥 연출
+///  씬 패널 교체용 스크립트
 /// </summary>
 public class SceneIntroController : MonoBehaviour
 {
-    [Header("UI 연결")]
-    [SerializeField] private List<CanvasGroup> _fadeLayers;
+    [System.Serializable]
+    public class IntroLayer
+    {
+        [HorizontalGroup("Row")]
+        [HideLabel]
+        [Required("CanvasGroup을 넣어주세요")]
+        public CanvasGroup Group;
 
-    [Header("연출 설정")]
-    [SerializeField] private float _startDelay = 0.5f;
-    [SerializeField] private float _fadeDuration = 1f;
+        [HorizontalGroup("Row", Width = 150)]
+        [LabelText("Duration")]
+        [SuffixLabel("sec", Overlay = true)]
+        public float Duration = 1.5f;
+    }
+
+    [Title("Intro Sequence")]
+    [ListDrawerSettings(ShowIndexLabels = true, AddCopiesLastElement = true)] // 번호 표시, 복사 기능
+    [LabelText("Fade Out Layers")]
+    public List<IntroLayer> _introLayers;
+
+    [PropertySpace(15)]
+    [Title("Global Settings")]
+    [LabelText("Start Delay (sec)")]
+    [SerializeField] private float _startDelay = 0.5f; // 시작 전 대기 시간
+
 
     private void Start()
     {
@@ -23,30 +43,36 @@ public class SceneIntroController : MonoBehaviour
 
     private IEnumerator PlayIntroSequence()
     {
-        foreach(CanvasGroup group in _fadeLayers)
+        foreach(var layer in _introLayers)
         {
-            if (group != null)
+            if (layer.Group != null)
             {
-                group.gameObject.SetActive(true);
-                group.alpha = 1f;
-                group.blocksRaycasts = true;
+                layer.Group.gameObject.SetActive(true);
+                layer.Group.alpha = 1f;
+                layer.Group.blocksRaycasts = true; 
             }
         }
         yield return new WaitForSeconds(_startDelay);
 
-        foreach (CanvasGroup group in _fadeLayers)
+        foreach (var layer in _introLayers)
         {
-            if (group == null) continue;
-            float elapsedTime = 0f;
-            while (elapsedTime < _fadeDuration)
+            if (layer.Group == null) continue;
+
+            float duration = layer.Duration;
+
+            if (duration > 0f)
             {
-                elapsedTime += Time.deltaTime;
-                group.alpha = Mathf.Lerp(1f, 0f, elapsedTime / _fadeDuration);
-                yield return null;
+                float elapsedTime = 0f;
+                while (elapsedTime < duration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    layer.Group.alpha = Mathf.Lerp(1f, 0f, elapsedTime / duration);
+                    yield return null;
+                }
             }
-            group.alpha = 0f;
-            group.blocksRaycasts = false;
-            group.gameObject.SetActive(false);
+            layer.Group.alpha = 0f;
+            layer.Group.blocksRaycasts = false;
+            layer.Group.gameObject.SetActive(false);
         }
         if (GameManager.Instance != null) 
             GameManager.Instance.OnIntroCompleted();
