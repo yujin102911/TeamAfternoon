@@ -188,6 +188,22 @@ public class TimelineManager : MonoBehaviour
         return false;
     }
 
+    public bool TryMoveBlock_OnTimeline(RuntimeBlock runtimeBlock, int startTick) 
+    {
+        // TimelineSystem에 배치 요청
+        bool success = _timelineSystem.TryPlaceBlock(runtimeBlock, startTick);
+
+        if (success)
+        {
+            // UI 업데이트
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// 타임라인에서 블록 제거
     /// </summary>
@@ -204,6 +220,32 @@ public class TimelineManager : MonoBehaviour
             _currentHand.Add(runtimeBlock);
 
             Debug.Log($"[TimelineDirector] 블록 제거: {runtimeBlock.BaseData.BlockName}");
+
+            // UI 업데이트
+            OnHandChanged?.Invoke(_currentHand);
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+        }
+    }
+
+    public void RemovePlacedBlock_OnTimeline(PlacedBlock placedBlock)
+    {
+        RuntimeBlock runtimeBlock = _timelineSystem.RemovePlacedBlock(placedBlock);
+        
+        // UI 업데이트
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+
+    public void ReturnToHand(RuntimeBlock runtimeBlock)
+    {
+        if (runtimeBlock != null)
+        {
+            // 손패로 복귀 전 방향 초기화
+            runtimeBlock.InitializeDirections();
+
+            // 손패로 복귀
+            _currentHand.Add(runtimeBlock);
+
+            Debug.Log($"[TimelineDirector] 손패로 복귀: {runtimeBlock.BaseData.BlockName}");
 
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
