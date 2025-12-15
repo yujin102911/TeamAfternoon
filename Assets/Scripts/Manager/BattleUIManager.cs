@@ -9,6 +9,7 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
     [SerializeField] private TextMeshProUGUI _pageText;
+    [SerializeField] private TextMeshProUGUI _totalPageText;
     [SerializeField] private TextMeshProUGUI _chapterText;
 
     [Header("플레이어 UI")]
@@ -111,9 +112,10 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void HandleRoundChanged(int chapter, int page)
+    private void HandleRoundChanged(int chapter, int page, int totalPage)
     {
         _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
+        _totalPageText.text = $"/{totalPage}";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
 
     }
@@ -149,7 +151,5 @@ public class BattleUIManager : MonoBehaviour
             }
         } 
     }
-
-
 
 }
