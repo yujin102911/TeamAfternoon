@@ -18,8 +18,9 @@ public class StageInfo_Panel : MonoBehaviour
         {
             _back.onClick.AddListener(Hide);
 
-            if (DeckBuildingManager.Instance != null)
-                _back.onClick.AddListener(DeckBuildingManager.Instance.On_Tags);
+            // TODO: 나중에 꼭 살려라 수현아
+            //if (DeckBuildingManager.Instance != null)
+                //_back.onClick.AddListener(DeckBuildingManager.Instance.On_Tags);
         }
             
     }

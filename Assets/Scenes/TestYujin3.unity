@@ -2993,6 +2993,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9586faabfad954a499c81c18307285bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2007249491 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1782644105926750430, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
+  m_PrefabInstance: {fileID: 2007249486}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ef3b5121ae2d549944681408f0bb7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2008549453 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 226099884252029159, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
@@ -3858,7 +3869,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 3
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -3883,7 +3894,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2007249491}
         m_TargetAssemblyTypeName: GameResultUI, Assembly-CSharp
         m_MethodName: GoToLibrary
         m_Mode: 1
@@ -4040,6 +4051,7 @@ GameObject:
   - component: {fileID: 8030562300102605644}
   - component: {fileID: 952228363145013668}
   - component: {fileID: 7731838144705704538}
+  - component: {fileID: 8030562300102605645}
   m_Layer: 5
   m_Name: GoToLibraryBtn
   m_TagString: Untagged
@@ -4516,6 +4528,7 @@ GameObject:
   - component: {fileID: 8111713687416978472}
   - component: {fileID: 5542439823107681302}
   - component: {fileID: 3260109200440959183}
+  - component: {fileID: 8925336118131492335}
   m_Layer: 5
   m_Name: GoToLibraryBtn
   m_TagString: Untagged
@@ -4827,7 +4840,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 3
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -4852,7 +4865,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2007249491}
         m_TargetAssemblyTypeName: GameResultUI, Assembly-CSharp
         m_MethodName: GoToLibrary
         m_Mode: 1
@@ -4946,6 +4959,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4102125922186978099}
   m_CullTransparentMesh: 1
+--- !u!95 &8030562300102605645
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102125922186978099}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b19bcbd3aad50a94a8502cad0eac0900, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8051467533068620747
 GameObject:
   m_ObjectHideFlags: 0
@@ -5240,6 +5275,28 @@ RectTransform:
   m_AnchoredPosition: {x: 751.2353, y: -361.3852}
   m_SizeDelta: {x: 317.3381, y: 59.4529}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!95 &8925336118131492335
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5932941165779141807}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b19bcbd3aad50a94a8502cad0eac0900, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!222 &9110532478634109638
 CanvasRenderer:
   m_ObjectHideFlags: 0
