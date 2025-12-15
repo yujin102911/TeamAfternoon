@@ -152,7 +152,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -450, y: -249.43262}
+  m_AnchoredPosition: {x: -450, y: -173.32}
   m_SizeDelta: {x: 900, y: 261.1347}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &38265766
@@ -311,7 +311,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &361251245
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2198,6 +2198,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8414444124638552879, guid: 4eaf6cc56e669de429023fcacea46d21, type: 3}
+      propertyPath: m_fontSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8414444124638552879, guid: 4eaf6cc56e669de429023fcacea46d21, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2284,7 +2292,7 @@ MonoBehaviour:
   _startHandSize: 5
   _playerMaxHP: 3
   _mapSize: 0
-  currentStageData: {fileID: 11400000, guid: e63d1aac10a9c744e84196b14d3c7a35, type: 2}
+  currentStageData: {fileID: 11400000, guid: 394b6cbd74efb4a4ebff79ac2bbbce39, type: 2}
 --- !u!114 &1994000751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2433,11 +2441,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4760210407263096162, guid: 106989d0f93b2c24095c33326ba3e556, type: 3}
       propertyPath: m_fontSize
-      value: 26
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 4760210407263096162, guid: 106989d0f93b2c24095c33326ba3e556, type: 3}
       propertyPath: m_fontSizeBase
-      value: 26
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 6231515979245212551, guid: 106989d0f93b2c24095c33326ba3e556, type: 3}
       propertyPath: m_Name
