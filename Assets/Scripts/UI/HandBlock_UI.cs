@@ -32,8 +32,18 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private ScrollRect parentScroll;
     private RectTransform rectTransform;
 
+    [Header("마우스 호버 설정")]
+    [SerializeField] 
+    private Image _image;
+    private Color _originColor;
+
     private void Awake()
     {
+        if (_image == null)
+            _image = GetComponent<Image>();
+
+        _originColor = _image.color;
+
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
@@ -135,7 +145,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (CardTooltip.Instance == null) return;
         if (eventData.pointerDrag != null) return;
 
-        
+        // 색상 변경
+        _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
 
         bool hasSpecial = runtimeBlock.AttachedKeywords != null && runtimeBlock.AttachedKeywords.Count > 0;
         if (!hasSpecial)
@@ -204,6 +215,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        _image.color = _originColor;
+
         if (CardTooltip.Instance != null)
         {
             CardTooltip.Instance.Hide();

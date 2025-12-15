@@ -597,7 +597,8 @@ public class TimelineUI : MonoBehaviour
 
             GameObject descriptionSlot = Instantiate(descriptionSlotPrefab, descriptionPanel);
             descriptionSlot.name = $"{placed.startTick}. DescriptionSlot";
-            descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
+            //descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
+            descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed);
             descriptionSlots.Add(descriptionSlot);
 
             for (int i = 0; i < blockData.blockLength; i++)
