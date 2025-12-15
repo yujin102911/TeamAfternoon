@@ -45,6 +45,7 @@ public class HandPanel : MonoBehaviour
 
     public GameObject Get()
     {
+        Debug.Log($"{_handPool.Count}. 블럭 풀 크기");
         if (_handPool.Count > 0)
         {
             GameObject obj = _handPool.Dequeue();
@@ -59,7 +60,10 @@ public class HandPanel : MonoBehaviour
 
     public void Return(GameObject obj)
     {
+        if (_handPool.Contains(obj)) return; // ⭐ 중복 방지
+
         obj.SetActive(false);
+        obj.transform.SetParent(_spawnPoint); // 부모 정리 (선택)
         _handPool.Enqueue(obj);
     }
 
@@ -73,11 +77,14 @@ public class HandPanel : MonoBehaviour
             Return(_spawnPoint.GetChild(i).gameObject);
         }
 
+        int ix = 0;
         foreach (RuntimeBlock block in hand)
         {
+            
             GameObject go = Get();
             HandBlock_UI uiBlock = go.GetComponent<HandBlock_UI>();
             if (uiBlock != null) uiBlock.Init(block);
+            ix++;
         }
     }
 
