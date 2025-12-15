@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// 플레이어 이동 비주얼을 담당하는 스크립트
@@ -31,6 +30,8 @@ public class PlayerVisualController : MonoBehaviour
 
     private Coroutine _moveCoroutine;
     private MapSystem _mapSystem;
+
+    public Transform CurrentPlayerTransform => _playerInstance != null ? _playerInstance.transform : null;
 
     /// <summary>
     /// GameManager 가 호출

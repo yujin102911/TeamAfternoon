@@ -78,7 +78,7 @@ public class GameResultUI : MonoBehaviour
             if (targetText != null)
             {
                 targetText.text = 
-                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>에 걸쳐\n"
+                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐\n"
                     +$"진행되었으나, 전투 중 사역마는\n"
                     +$"<size=72><color=#626262>{hitCount}</size></color>회의 피격을 받았으며\n"
                     +$"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을\n"

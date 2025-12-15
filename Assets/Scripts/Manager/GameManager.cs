@@ -327,12 +327,14 @@ public class GameManager : MonoBehaviour
         _mapSystem.DisableSelectionMode();
         _battleSequenceController.TurnOffSectorSelectText();
         _isSectorSelected = true;
-        OnGameStateChanged?.Invoke();
 
         if (_playerVisualController != null) _playerVisualController.SpawnPlayer(sectorNum);
         _battleSystem.SetPlayerStartPosition(sectorNum);
        
         StartNewBattle();
+
+        OnGameStateChanged?.Invoke();
+
     }
 
     /// <summary>
