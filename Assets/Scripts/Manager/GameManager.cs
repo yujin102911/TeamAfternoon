@@ -46,7 +46,6 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private int _globalTurnIndex = 0;
-    private int _completePhaseIndex = -1;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
@@ -87,7 +86,7 @@ public class GameManager : MonoBehaviour
     #region Events
 
     public event Action OnGameStateChanged;
-    public event Action<int, int> OnRoundChanged;
+    public event Action<int, int, int> OnRoundChanged;
     public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
 
     #endregion
@@ -557,7 +556,21 @@ public class GameManager : MonoBehaviour
 
     private void NotifyRoundChanged()
     {
-        OnRoundChanged?.Invoke(_currentPhase, _phaseTurnCount);
+        int totalPhasePages = 0;
+        int targetPhaseIndex = _currentPhase - 1;
+        if (_battleSystem != null && _battleSystem.Enemies != null)
+        {
+            foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+            {
+                if (enemy.IsDead) continue;
+                int phaseIndex = _currentPhase - 1;
+                if (enemy.Data != null && targetPhaseIndex < enemy.Data.PhaseGroups.Count)
+                {
+                    totalPhasePages += enemy.Data.PhaseGroups[targetPhaseIndex].Patterns.Count;
+                }
+            } 
+        }
+        OnRoundChanged?.Invoke(_currentPhase, _phaseTurnCount, totalPhasePages);
     }
     #endregion
 
