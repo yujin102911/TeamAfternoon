@@ -359,8 +359,22 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public void OnRoundEnded()
     {
+        // 방향 전환할 블록들 보관하는 리스트
+        List<RuntimeBlock> blocksToReset = new List<RuntimeBlock>();
+        foreach (PlacedBlock placed in _timelineSystem.PlacedBlocks)
+        {
+            if (placed.linkedRuntimeBlock != null)
+            {
+                blocksToReset.Add(placed.linkedRuntimeBlock);
+            }
+        }
         // 현재 배치를 이전 배치로 이동 (잔상용)
         _timelineSystem.SaveCurrentAsPreview();
+
+        foreach (RuntimeBlock rb in blocksToReset)
+        {
+            rb.InitializeDirections();
+        }
 
         // 손패 클리어 (GameDirector가 새로 줄 예정)
         _currentHand.Clear();
