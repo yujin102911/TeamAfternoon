@@ -1450,17 +1450,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2318157039028727859, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   m_PrefabInstance: {fileID: 562232794}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1206323074 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4117377257286800874, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
-  m_PrefabInstance: {fileID: 562232794}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a4fbdb4fe1f9cd4e95e8e122773f93a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1209081775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1657,10 +1646,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6219826096738924948, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
-      propertyPath: m_Color.a
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6750012193289430172, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
       propertyPath: m_Name
       value: TimelinePanel
@@ -1748,10 +1733,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7647220046987379153, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2008549455}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
 --- !u!224 &1209081776 stripped
 RectTransform:
@@ -1942,11 +1924,6 @@ PrefabInstance:
 --- !u!1 &1310371801 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2439102772950223151, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
-  m_PrefabInstance: {fileID: 1209081775}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1316974410 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7647220046987379153, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
   m_PrefabInstance: {fileID: 1209081775}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1341406121 stripped
@@ -2293,6 +2270,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _victoryPanel: {fileID: 1572528264}
   _defeatPanel: {fileID: 797886842}
+  _victoryText: {fileID: 0}
+  _defeatText: {fileID: 0}
   _goToMainBtn: {fileID: 0}
   _librarySceneName: Stage Scene
   _delaySeconds: 1
@@ -2524,7 +2503,7 @@ MonoBehaviour:
   _sectorSelectionPanel: {fileID: 0}
   _pageText: {fileID: 2137121192}
   _chapterText: {fileID: 343748529}
-  _playerStatusUI: {fileID: 1206323074}
+  _playerStatusUI: {fileID: 0}
   _enemyStatusPrefab: {fileID: 2714568068089599078, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   _enemyUIContainer: {fileID: 38265765}
 --- !u!114 &2008549453 stripped
@@ -2532,26 +2511,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 226099884252029159, guid: 8c065d10f08ae404aa7757aeadc7e4c5, type: 3}
   m_PrefabInstance: {fileID: 1209081775}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316974410}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0fa29819f12ab94991a24dc8db6ed62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2008549455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316974410}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9241ee604b9286e4e88a889c5a93d893, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _ghostPrefab: {fileID: 4394573347416189982, guid: 3333543f4f7c3cb4bbe5f65e464d7d48, type: 3}
-  isDragging: 0
 --- !u!1001 &2019473175
 PrefabInstance:
   m_ObjectHideFlags: 0
