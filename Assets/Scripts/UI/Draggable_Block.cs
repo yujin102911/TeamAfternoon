@@ -34,6 +34,10 @@ public class Draggable_Block : MonoBehaviour
     [SerializeField]
     private Color _noneColor;
 
+    public Sprite Sword_icon;
+    public Sprite CW_icon;
+    public Sprite CCW_icon;
+
     [Header("빌딩인지 체크")]
     public bool isBuildingPhase = false; // 빌딩 페이즈인지 여부
 
@@ -83,6 +87,9 @@ public class Draggable_Block : MonoBehaviour
 
             Image img = cell.GetComponent<Image>();
             TextMeshProUGUI txt = cell.GetComponentInChildren<TextMeshProUGUI>();
+            Image iconImage = cell.transform.Find("Icon")?.GetComponent<Image>();
+
+            Sprite iconSprite = null;
 
             ActionType action = data.GetEffectAt(i);
             if (txt)
@@ -91,17 +98,30 @@ public class Draggable_Block : MonoBehaviour
                 {
                     txt.text = "▲";
                     img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);
+                    iconSprite = Sword_icon;
                 }
                 else if (action == ActionType.Move)
                 {
                     txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
                     img.color = new Color(_moveColor.r, _moveColor.g, _moveColor.b, 1.0f);
+                    iconSprite = CW_icon;
                 }
                 else
                 {
                     txt.text = "-";
                     img.color = new Color(_noneColor.r, _noneColor.g, _noneColor.b, 1.0f);
                 }
+            }
+
+            if (iconSprite != null)
+            {
+                txt.text = "";
+                iconImage.sprite = iconSprite;
+                iconImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                iconImage.gameObject.SetActive(false);
             }
         }
     }
