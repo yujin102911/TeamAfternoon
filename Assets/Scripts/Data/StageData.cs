@@ -17,6 +17,15 @@ public class PhaseTransitionData
 }
 
 [System.Serializable]
+public class BookPage
+{
+    public string ChapterTitle;
+    public bool IsChapterStart;
+    [TextArea(5, 20)]
+    public string BodyText;
+}
+
+[System.Serializable]
 public struct StageEnemySetup
 {
     [Tooltip("배치할 적 데이터 원본")]
@@ -32,13 +41,23 @@ public class StageData : ScriptableObject
     [SerializeField]
     private int _stageNumber;
     [SerializeField]
+    [TextArea(3, 20)]
     private string _stageName; //스테이지 이름
-    [TextArea(3, 10)]
+
+    [Header("책 표지/타이틀 정보")]
+    [TextArea(4,20)]
+    public string BookCredit = "2025 by Team Afternoon";
+
+    [Header("타이틀 페이지 오염 ID")]
+    public int TitlePollutionID = 0;
+
+    [Header("펼침면 별 오염 ID 리스트")]
+    [Tooltip("순서대로 1번째 펼침면 (0,1).,..")]
+    [SerializeField] private List<int> _spreadPollutionIDs = new List<int>();
+
+    [Header("책 본문 내용(인덱스 순서대로 2페이지씩 배치)")]
     [SerializeField]
-    private string _stageDescription; //스테이지 설명
-    [TextArea(3, 10)]
-    [SerializeField]
-    private string _introMessage = "옛날에";
+    private List<BookPage> _bookPages = new List<BookPage>();
 
     [Header("맵 정보")]
     [SerializeField]
@@ -64,8 +83,8 @@ public class StageData : ScriptableObject
 
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
-    public string StageDescription => _stageDescription;
-    public string IntroMessage => _introMessage;
+    public List<BookPage > BookPages => _bookPages;
+    public List<int> SpreadPollutionIDs => _spreadPollutionIDs;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public List<PhaseTransitionData> PhaseConditions => _phaseConditions;
     public MapSize MapSize => _mapSize;
