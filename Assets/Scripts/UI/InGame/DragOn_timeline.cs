@@ -15,6 +15,10 @@ public class DragOn_timeline : MonoBehaviour
 {
     public static DragOn_timeline instance;
 
+    [Header("새로운 레이아웃 전용")]
+    public bool New_Layout = false;
+    public GameObject New_Layout_ghost; // 설명 슬롯
+
     [SerializeField]
     private GameObject _ghostPrefab;
 
@@ -46,7 +50,10 @@ public class DragOn_timeline : MonoBehaviour
         draggingBlock = e.block;
         canvas = e.canvas;
 
-        ghost = Instantiate(_ghostPrefab, canvas.transform);
+        // 레이아웃에 따른 프리펩 선정
+        GameObject prefab = New_Layout ? New_Layout_ghost : _ghostPrefab;
+
+        ghost = Instantiate(prefab, canvas.transform);
         ghost.transform.position = e.startWorldPos;
         ghost.GetComponent<Draggable_Block>().Show(draggingBlock);
     }
