@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,7 +81,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged += (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged += (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
         }
     }
@@ -90,7 +93,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged -= UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged -= (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
         }
     }
@@ -760,5 +765,27 @@ public class TimelineUI : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void UpdateDangerIndicators()
+    {
+        if (TimelineManager.Instance == null) return;
+        foreach(GameObject slot in cursorSlots)
+        {
+            TimelineTickHoverHandler handler = slot.GetComponent<TimelineTickHoverHandler>();
+            if (handler != null)
+                handler.SetCautionStatus(false);
+        }
+        List<int> dangerTicks = TimelineManager.Instance.GetProjectedDangerTicks();
+        foreach (int tick in dangerTicks)
+        {
+            int slotIndex = (tick * 2) - 1;
+            if (slotIndex >= 0 && slotIndex < cursorSlots.Count)
+            {
+                TimelineTickHoverHandler handler = cursorSlots[slotIndex].GetComponent<TimelineTickHoverHandler>();
+                if (handler != null)
+                    handler.SetCautionStatus(true);
+            }
+        }
     }
 }

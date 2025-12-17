@@ -463,5 +463,54 @@ public class TimelineManager : MonoBehaviour
         }
         return sectors;
     }
+
+    public List<int> GetProjectedDangerTicks()
+    {
+        List<int> dangerTicks = new List<int>();
+        if (_battleSystem == null || _currentEnemyPattern == null) return dangerTicks;
+
+        int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
+        int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
+        int totalSectors = 8;  // _mapSystem.TotalSectors 접근 가능하면 사용
+
+        for (int t = 1; t <= _totalTicks; t++)
+        {
+            PlacedBlock placed = _timelineSystem.FindFirstAction(t);
+            if (placed != null)
+            {
+                int cardIndex = placed.GetCardTickIndex(t);
+                BlockData data = placed.GetBlockData();
+                if (data.GetEffectAt(cardIndex) == ActionType.Move)
+                {
+                    int currentTickSpeed = 1 + baseBuffSpeed;
+                    if (placed.linkedRuntimeBlock != null)
+                    {
+                        foreach (var keyword in placed.linkedRuntimeBlock.AttachedKeywords)
+                        {
+                            currentTickSpeed += keyword.GetSpeedBonus();
+                        }
+                    }
+                    MoveDirection dir = placed.GetDirectionAt(cardIndex);
+                    if (dir != MoveDirection.None)
+                    {
+                        int direction = (dir == MoveDirection.Right ? 1 : -1);
+                        currentSimulatedSector += (direction * currentTickSpeed);
+
+                        while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
+                        while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
+                    } 
+                }
+
+            }
+            EnemyAttack attack = _currentEnemyPattern.GetAttackAt(t);
+            if (attack != null && attack.targetSectors != null)
+            {
+                if (attack.targetSectors.Contains(currentSimulatedSector))
+                    dangerTicks.Add(t);
+            }
+        }
+        return dangerTicks;
+
+    }
     #endregion
 }
