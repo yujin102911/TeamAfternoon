@@ -12,6 +12,10 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _totalPageText;
     [SerializeField] private TextMeshProUGUI _chapterText;
 
+    [Header("정화 게이지 UI")]
+    [SerializeField]
+    private UnitStatusUI _cureUI;
+
     [Header("플레이어 UI")]
     [SerializeField] private PlayerHeartUI _playerStatusUI;
 
@@ -31,6 +35,7 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
             battle.OnEnemyDied += HandleEnemyDied;
             battle.OnBattleInitialized += HandleBattleInitialized;
+            battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged += HandleRoundChanged;
@@ -53,6 +58,7 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
             battle.OnEnemyDied -= HandleEnemyDied;
             battle.OnBattleInitialized -= HandleBattleInitialized;
+            battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
 
@@ -83,6 +89,14 @@ public class BattleUIManager : MonoBehaviour
                 ui.Init(enemy.Data.Enemy_Name, enemy.CurrentHP, enemy.MaxHP);
                 _enemyUIMap.Add(enemy, ui);
             }
+        }
+    }
+
+    private void HandleCureChanged(int current, int max)
+    {
+        if (_cureUI != null)
+        {
+            _cureUI.UpdateHP(current, max);
         }
     }
 
