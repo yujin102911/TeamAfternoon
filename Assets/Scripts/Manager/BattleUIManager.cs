@@ -90,6 +90,8 @@ public class BattleUIManager : MonoBehaviour
                 _enemyUIMap.Add(enemy, ui);
             }
         }
+
+        Show_startBtn();
     }
 
     private void HandleCureChanged(int current, int max)
@@ -131,7 +133,6 @@ public class BattleUIManager : MonoBehaviour
         _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
         _totalPageText.text = $"/{totalPage}";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
-
     }
     private void RefreshStartButtonState()
     {
@@ -143,6 +144,7 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
+        _startButton.gameObject.SetActive(interactable);
 
         //RefreshSectorSelectionPanel();
     }
@@ -150,6 +152,7 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
     {
         _startButton.interactable = false;
+        Hide_startBtn();
     }
 
     private void TryBindPlayerUI()
@@ -166,4 +169,13 @@ public class BattleUIManager : MonoBehaviour
         } 
     }
 
+    public void Show_startBtn()
+    {
+        _startButton.gameObject.SetActive(true);
+    }
+
+    public void Hide_startBtn()
+    {
+        _startButton.gameObject.SetActive(false);
+    }
 }

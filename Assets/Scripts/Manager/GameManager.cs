@@ -379,7 +379,9 @@ public class GameManager : MonoBehaviour
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
+        _battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
+        yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
 
         if (_timelineManager != null)
         {
