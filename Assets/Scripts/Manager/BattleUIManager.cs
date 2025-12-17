@@ -12,6 +12,10 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _totalPageText;
     [SerializeField] private TextMeshProUGUI _chapterText;
 
+    [Header("정화 게이지 UI")]
+    [SerializeField]
+    private UnitStatusUI _cureUI;
+
     [Header("플레이어 UI")]
     [SerializeField] private PlayerHeartUI _playerStatusUI;
 
@@ -31,6 +35,7 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
             battle.OnEnemyDied += HandleEnemyDied;
             battle.OnBattleInitialized += HandleBattleInitialized;
+            battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged += HandleRoundChanged;
@@ -53,6 +58,7 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
             battle.OnEnemyDied -= HandleEnemyDied;
             battle.OnBattleInitialized -= HandleBattleInitialized;
+            battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
 
@@ -83,6 +89,16 @@ public class BattleUIManager : MonoBehaviour
                 ui.Init(enemy.Data.Enemy_Name, enemy.CurrentHP, enemy.MaxHP);
                 _enemyUIMap.Add(enemy, ui);
             }
+        }
+
+        Show_startBtn();
+    }
+
+    private void HandleCureChanged(int current, int max)
+    {
+        if (_cureUI != null)
+        {
+            _cureUI.UpdateHP(current, max);
         }
     }
 
@@ -117,7 +133,6 @@ public class BattleUIManager : MonoBehaviour
         _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
         _totalPageText.text = $"/{totalPage}";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
-
     }
     private void RefreshStartButtonState()
     {
@@ -129,6 +144,7 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
+        _startButton.gameObject.SetActive(interactable);
 
         //RefreshSectorSelectionPanel();
     }
@@ -136,6 +152,7 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
     {
         _startButton.interactable = false;
+        Hide_startBtn();
     }
 
     private void TryBindPlayerUI()
@@ -152,4 +169,13 @@ public class BattleUIManager : MonoBehaviour
         } 
     }
 
+    public void Show_startBtn()
+    {
+        _startButton.gameObject.SetActive(true);
+    }
+
+    public void Hide_startBtn()
+    {
+        _startButton.gameObject.SetActive(false);
+    }
 }

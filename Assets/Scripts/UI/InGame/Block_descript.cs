@@ -1,6 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, 
     IBeginDragHandler, IDragHandler
@@ -17,9 +18,19 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private Canvas canvas;
 
+    [Header("마우스 호버 설정")]
+    [SerializeField]
+    private Image _image;
+    private Color _originColor;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (_image == null)
+            _image = GetComponent<Image>();
+
+        _originColor = _image.color;
+
         canvas = GetComponentInParent<Canvas>();
     }
 
@@ -61,6 +72,9 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // 색상 변경
+        _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
         if (eventData.pointerDrag != null) return;
 
         showPanel();
@@ -68,6 +82,8 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        _image.color = _originColor;
+
         if (CardTooltip.Instance != null)
         {
             CardTooltip.Instance.Hide();
@@ -143,6 +159,7 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (eventData.button == PointerEventData.InputButton.Right) return;
         if (GameManager.Instance.IsExecutingRound) return;
 
         EventBus.Publish(new DragBeginEvent
@@ -163,6 +180,7 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnDrag(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        return;
+        //throw new System.NotImplementedException();
     }
 }

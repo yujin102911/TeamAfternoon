@@ -11,11 +11,43 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField] private GameObject _timelinePanel;  // 타임라인 패널
     [SerializeField] private GameObject _sectorSelectText; // 섹터 선택하세요 텍스트
 
+    [Header("책 UI 연결")]
+    [SerializeField]
+    private RectTransform HandPanel;
+
     [Header("연출 설정")]
     [SerializeField] private float _storyLineDuration = 1.5f;
     [SerializeField] private float _timelinePanelDuration = 1.5f;
     [SerializeField] private float _timelineUpDuration = 1f;
     [SerializeField] private float targetHeight = 620f;
+
+    [Header("책 연출 설정")]
+    [SerializeField] private float _handPanelUpY = 200f;
+    [SerializeField] private float _handPanelDownY = 0f;
+    [SerializeField] private float _handPanelDuration = 1f;
+
+    [Header("대상 카메라")]
+    [SerializeField] private Camera targetCamera;
+
+    [Header("Move Y")]
+    [SerializeField] private float moveYOffset = 0.4f;
+    [SerializeField] private float moveDuration = 0.3f;
+
+    [Header("Zoom (Orthographic)")]
+    [SerializeField] private float zoomInSizeOffset = -0.4f;
+    [SerializeField] private float zoomDuration = 0.3f;
+
+    [Header("Ease")]
+    [SerializeField]
+    private AnimationCurve easeCurve =
+        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    private Coroutine cameraCoroutine;
+
+    // 🔹 기준값 캐싱
+    private Vector3 basePosition;
+    private float baseOrthoSize;
+
 
     private RectTransform _storyLineRect;
     private float targetWidth;
@@ -32,7 +64,26 @@ public class BattleSequenceController : MonoBehaviour
         {
             _timelineRect = _timelinePanel.GetComponent<RectTransform>();
         }
+
+        if (targetCamera == null)
+            targetCamera = Camera.main;
+
+        basePosition = targetCamera.transform.position;
+        baseOrthoSize = targetCamera.orthographicSize;
     }
+
+    /// <summary>
+    /// true  → 줌인 연출
+    /// false → 줌아웃 (원위치 복귀)
+    /// </summary>
+    public void PlayCameraEffect(bool isZoomIn)
+    {
+        if (cameraCoroutine != null)
+            StopCoroutine(cameraCoroutine);
+
+        cameraCoroutine = StartCoroutine(CameraEffectCoroutine(isZoomIn));
+    }
+
     // 연출 재생 후 끝나면 onComplete
     public void PlayerTurnStartSequence(Action onComplete)
     {
@@ -54,11 +105,15 @@ public class BattleSequenceController : MonoBehaviour
     private IEnumerator CoSequence(Action onComplete)
     {
         _storyLine.SetActive(false);
+
         yield return StartCoroutine(ScrollUp());
 
         yield return StartCoroutine(AnimateExpand());
 
         yield return StartCoroutine(ScrollDown());
+
+        PlayCameraEffect(false);
+        yield return StartCoroutine(Move_HandPanel(true));
 
         TurnOnSectorSelectText();
 
@@ -117,6 +172,69 @@ public class BattleSequenceController : MonoBehaviour
         }
         _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, 0f);
 
+    }
+
+    public IEnumerator Move_HandPanel(bool isUp)
+    {
+        Vector2 startPos = HandPanel.anchoredPosition;
+
+        float targetY = isUp ? _handPanelUpY : _handPanelDownY;
+        Vector2 endPos = new Vector2(startPos.x, targetY);
+
+        float elapsed = 0f;
+
+        while (elapsed < _handPanelDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / _handPanelDuration;
+
+            // Ease Out
+            t = 1f - Mathf.Pow(1f - t, 3f);
+
+            HandPanel.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+
+        HandPanel.anchoredPosition = endPos;
+    }
+
+    private IEnumerator CameraEffectCoroutine(bool isZoomIn)
+    {
+        Transform camTransform = targetCamera.transform;
+
+        Vector3 startPos = camTransform.position;
+        float startSize = targetCamera.orthographicSize;
+
+        Vector3 targetPos = isZoomIn
+            ? basePosition + Vector3.up * moveYOffset
+            : basePosition;
+
+        float targetSize = isZoomIn
+            ? baseOrthoSize + zoomInSizeOffset
+            : baseOrthoSize;
+
+        float elapsed = 0f;
+        float duration = Mathf.Max(moveDuration, zoomDuration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float easedT = easeCurve.Evaluate(t);
+
+            camTransform.position =
+                Vector3.Lerp(startPos, targetPos, easedT);
+
+            targetCamera.orthographicSize =
+                Mathf.Lerp(startSize, targetSize, easedT);
+
+            yield return null;
+        }
+
+        camTransform.position = targetPos;
+        targetCamera.orthographicSize = targetSize;
+
+        cameraCoroutine = null;
     }
 
 }
