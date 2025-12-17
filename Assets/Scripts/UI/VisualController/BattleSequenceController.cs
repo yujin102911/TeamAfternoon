@@ -6,6 +6,11 @@ using System;
 
 public class BattleSequenceController : MonoBehaviour
 {
+    [SerializeField]
+    private RectTransform[] _enemyCardUIs;
+    [SerializeField] private float _cardYOffset = 200f;
+    [SerializeField] private float _cardDuration = 1f;
+
     [Header("UI 연결")]
     [SerializeField] private GameObject _storyLine;      // 스토리라인 텍스트
     [SerializeField] private GameObject _timelinePanel;  // 타임라인 패널
@@ -235,6 +240,56 @@ public class BattleSequenceController : MonoBehaviour
         targetCamera.orthographicSize = targetSize;
 
         cameraCoroutine = null;
+    }
+
+    public IEnumerator Move_enemyCardUIs(bool isUp)
+    {
+        int count = _enemyCardUIs.Length;
+
+        Vector2[] startPositions = new Vector2[count];
+        Vector2[] endPositions = new Vector2[count];
+
+        
+
+        // 시작 / 종료 위치 캐싱
+        for (int i = 0; i < count; i++)
+        {
+            
+
+            RectTransform rt = _enemyCardUIs[i];
+            startPositions[i] = rt.anchoredPosition;
+
+            float targetY = isUp ? startPositions[i].y + _cardYOffset : startPositions[i].y - _cardYOffset;
+
+            endPositions[i] = new Vector2(startPositions[i].x, targetY);
+
+            Debug.Log($"{i}번 {targetY}");
+        }
+
+        float elapsed = 0f;
+
+        while (elapsed < _cardDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / _cardDuration;
+
+            // Ease Out
+            t = 1f - Mathf.Pow(1f - t, 3f);
+
+            for (int i = 0; i < count; i++)
+            {
+                _enemyCardUIs[i].anchoredPosition =
+                    Vector2.Lerp(startPositions[i], endPositions[i], t);
+            }
+
+            yield return null;
+        }
+
+        // 최종 위치 보정
+        for (int i = 0; i < count; i++)
+        {
+            _enemyCardUIs[i].anchoredPosition = endPositions[i];
+        }
     }
 
 }
