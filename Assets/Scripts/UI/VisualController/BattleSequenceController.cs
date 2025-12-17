@@ -111,6 +111,8 @@ public class BattleSequenceController : MonoBehaviour
     {
         _storyLine.SetActive(false);
 
+        //yield return StartCoroutine(Move_enemyCardUIs(false));
+
         yield return StartCoroutine(ScrollUp());
 
         yield return StartCoroutine(AnimateExpand());
@@ -119,6 +121,9 @@ public class BattleSequenceController : MonoBehaviour
 
         PlayCameraEffect(false);
         yield return StartCoroutine(Move_HandPanel(true));
+
+        if (BattleUIManager.Instance != null)
+            BattleUIManager.Instance.Show_startBtn();
 
         TurnOnSectorSelectText();
 
