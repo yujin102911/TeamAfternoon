@@ -331,7 +331,8 @@ public class GameManager : MonoBehaviour
         _battleSystem.SetPlayerStartPosition(sectorNum);
        
         StartNewBattle();
-
+        if (_timelineUI != null)
+            _timelineUI.UpdateDangerIndicators();
         OnGameStateChanged?.Invoke();
 
     }
@@ -378,6 +379,10 @@ public class GameManager : MonoBehaviour
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
+        _battleSequenceController.PlayCameraEffect(true);
+        // 전투로 넘어가는 연출 코루틴으로 넣기
+        yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
+
         if (_timelineManager != null)
         {
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
@@ -395,9 +400,22 @@ public class GameManager : MonoBehaviour
         {
             _timelineManager.OnRoundEnded();
         }
+
         if (_battleSystem != null)
         {
             _battleSystem.DecayBuffs();
+            _battleSystem.ChooseCureSector();
+        }
+
+        if (TimelineManager.Instance != null && TimelineManager.Instance.Is_Cure) 
+        {
+            _mapVisualController.RefreshMapOwnershipVisuals();
+        }
+
+        // 회복 사이클이 돌면 수치 감소
+        if(_currentRound % _battleSystem.RecoverCycle == 0)
+        {
+            _battleSystem.DecreaseCureGauge(5);
         }
 
         UpdateEnemyPatterns();

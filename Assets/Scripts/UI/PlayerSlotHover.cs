@@ -38,6 +38,7 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (eventData.button == PointerEventData.InputButton.Right) return;
         if (GameManager.Instance.IsExecutingRound) return;
         if (Is_prev || placedBlock == null) return;
 

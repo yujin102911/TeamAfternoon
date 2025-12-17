@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using VInspector;
 
 public class TimelineUI : MonoBehaviour
 {
+    [Header("새로운 레이아웃 전용")]
+    public bool New_Layout = false;
+    public GameObject New_Layout_description; // 설명 슬롯
+
     [Header("타임라인 슬롯 프리팹")]
     public GameObject enemySlotPrefab;      // 적 전조 슬롯
     public GameObject cursorSlotPrefab;     // 실행 커서 슬롯
@@ -80,7 +86,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged += (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged += (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
         }
     }
@@ -90,7 +98,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged -= UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged -= (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
         }
     }
@@ -135,8 +145,20 @@ public class TimelineUI : MonoBehaviour
             GameObject slot = Instantiate(playerSlotPrefab, playerTimelinePanel);
             slot.name = $"PlayerSlot_{tick}";
 
+
+            TimelineDropZone dropZone = null;
+
+            // TODO: New_Layout 확정되면 나중에 지우기
             // 드롭 이벤트 핸들러 추가
-            TimelineDropZone dropZone = slot.AddComponent<TimelineDropZone>();
+            if (New_Layout)
+            {
+                dropZone = slot.transform.Find("Image")?.AddComponent<TimelineDropZone>();
+            }
+            else
+            {
+                dropZone = slot.AddComponent<TimelineDropZone>();
+            }
+
             dropZone.tickIndex = tick;
 
             TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
@@ -483,6 +505,11 @@ public class TimelineUI : MonoBehaviour
             // 기본 색상 초기화
             if (image != null)
             {
+                if (New_Layout)
+                {
+                    normalColor.a = 0;
+                }
+
                 image.color = normalColor;
             }
 
@@ -625,7 +652,13 @@ public class TimelineUI : MonoBehaviour
             // 놓인 블럭 정보
             BlockData blockData = placed.GetBlockData();
 
-            GameObject descriptionSlot = Instantiate(descriptionSlotPrefab, descriptionPanel);
+            // 레이아웃에 따른 프리펩 선정
+            GameObject prefab = New_Layout ? New_Layout_description : descriptionSlotPrefab;
+
+            GameObject descriptionSlot = Instantiate(prefab, descriptionPanel);
+
+
+
             descriptionSlot.name = $"{placed.startTick}. DescriptionSlot";
             //descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
             descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed);
@@ -760,5 +793,27 @@ public class TimelineUI : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void UpdateDangerIndicators()
+    {
+        if (TimelineManager.Instance == null) return;
+        foreach(GameObject slot in cursorSlots)
+        {
+            TimelineTickHoverHandler handler = slot.GetComponent<TimelineTickHoverHandler>();
+            if (handler != null)
+                handler.SetCautionStatus(false);
+        }
+        List<int> dangerTicks = TimelineManager.Instance.GetProjectedDangerTicks();
+        foreach (int tick in dangerTicks)
+        {
+            int slotIndex = (tick * 2) - 1;
+            if (slotIndex >= 0 && slotIndex < cursorSlots.Count)
+            {
+                TimelineTickHoverHandler handler = cursorSlots[slotIndex].GetComponent<TimelineTickHoverHandler>();
+                if (handler != null)
+                    handler.SetCautionStatus(true);
+            }
+        }
     }
 }

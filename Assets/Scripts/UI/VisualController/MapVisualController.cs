@@ -36,7 +36,15 @@ public class MapVisualController : MonoBehaviour
         {
             RuntimeEnemy owner = _battleSystem.GetEnemyAtSector(i);
             Color targetColor = (owner != null) ? owner.Data.AssignedColor : GetNormalColor();
+
             _mapSystem.SetSectorBaseColor(i, targetColor);
+
+            // 정화 모드면 색 재설정
+            if (TimelineManager.Instance.Is_Cure)
+            {
+                targetColor = _battleSystem.AbleCureSectors.Contains(i) ? _mapConfig.cureColor : GetNormalColor();
+                _mapSystem.SetSectorBaseColor(i, targetColor);
+            }
         }
     }
     #endregion
