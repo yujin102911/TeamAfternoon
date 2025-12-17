@@ -331,7 +331,8 @@ public class GameManager : MonoBehaviour
         _battleSystem.SetPlayerStartPosition(sectorNum);
        
         StartNewBattle();
-
+        if (_timelineUI != null)
+            _timelineUI.UpdateDangerIndicators();
         OnGameStateChanged?.Invoke();
 
     }
