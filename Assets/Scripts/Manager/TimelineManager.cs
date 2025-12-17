@@ -12,6 +12,9 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("정화 온오프")]
+    public bool Is_Cure = false;
+
     [SerializeField] private int _totalTicks = 8;
 
     // System
@@ -322,6 +325,13 @@ public class TimelineManager : MonoBehaviour
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
 
+            // 정화 시도
+            if (_battleSystem.TryCurePage(tick) && Is_Cure)
+            {
+                // TODO: 정화 이펙트 넣기
+                yield return new WaitForSeconds(0.4f);
+            }
+
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);
 
@@ -334,6 +344,8 @@ public class TimelineManager : MonoBehaviour
                     _battleSystem.ProcessEnemyAttack(attack);
                 }
             }
+
+            
 
             // 연출 대기
             yield return new WaitForSeconds(0.4f);
