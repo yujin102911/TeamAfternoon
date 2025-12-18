@@ -75,9 +75,16 @@ public class BlockData : ScriptableObject
         }
         else
         {
-            int center = blockLength / 2;
-            int distance = Mathf.Abs(index - center);
-            result = (center - distance) + 1;
+            int midLeft = (blockLength - 1) / 2;
+            int midRight = blockLength / 2;
+            //int center = (blockLength - 1) / 2;
+            //int distance = Mathf.Abs(index - center);
+
+
+            //result = (center - distance) + 1;
+
+            int distance = Mathf.Min(Mathf.Abs(index - midLeft), Mathf.Abs(index - midRight));
+            result = (midLeft + 1 - distance);
         }
 
         return result;
