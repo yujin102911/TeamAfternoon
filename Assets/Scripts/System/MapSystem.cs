@@ -247,6 +247,25 @@ public class MapSystem
             }
         }
     }
+
+    // 지정된 섹터의 화면상의 좌표 반환
+    public Vector2 GetSector_Pos_ToScreen(int sectorNum)
+    {
+        _sectors.TryGetValue(sectorNum, out GameObject obj);
+
+        if (obj == null)
+            return Vector2.zero;
+
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(obj.transform.position);
+
+        // 화면 중심 기준으로 변환
+        Vector2 centeredPos = new Vector2(
+            screenPos.x - Screen.width * 0.5f,
+            screenPos.y - Screen.height * 0.5f
+        );
+
+        return centeredPos;
+    }
     #endregion
 
     #region Input Logic
