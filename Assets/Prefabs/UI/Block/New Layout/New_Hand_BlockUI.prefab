@@ -109,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 99.4, y: 15}
+  m_AnchoredPosition: {x: 99.4, y: 0}
   m_SizeDelta: {x: 195.304, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4275473480570946808
@@ -319,11 +319,19 @@ MonoBehaviour:
   - {fileID: 7701586184992849658}
   dragGhostPrefab: {fileID: 4394573347416189982, guid: a308ef42c64bdf24c845265f53cfdc9b, type: 3}
   _attackColor: {r: 0.882353, g: 0.60784316, b: 0, a: 0}
-  _moveColor: {r: 0.49803925, g: 0.67058825, b: 0.9176471, a: 0}
-  _noneColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0}
   Sword_icon: {fileID: -554068590, guid: a064743e5c91a5248b895627ae6dfd58, type: 3}
+  _moveColor: {r: 0.49803925, g: 0.67058825, b: 0.9176471, a: 0}
   CW_icon: {fileID: -1363557414506129027, guid: 0413e4f2f4fd1bb41b06eafbd04dd9cd, type: 3}
   CCW_icon: {fileID: 7923068818945362068, guid: 7c53b81f4c22faf419d725e3aef9e4e3, type: 3}
+  _cureColors:
+  - {r: 0.8207547, g: 0.73091197, b: 0.53039336, a: 0}
+  - {r: 0.8301887, g: 0.6641896, b: 0.29369885, a: 0}
+  - {r: 0.8745099, g: 0.6039216, b: 0, a: 0}
+  _cureIcons:
+  - {fileID: 1452326144, guid: 5bc51627f5c85c7499d501ad606cebf9, type: 3}
+  - {fileID: 1089374565, guid: 3ba686591887059489a475a49115859e, type: 3}
+  - {fileID: -554068590, guid: a064743e5c91a5248b895627ae6dfd58, type: 3}
+  _noneColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0}
   _image: {fileID: 1532651525079477781}
 --- !u!225 &7085014726523682819
 CanvasGroup:
@@ -490,7 +498,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6390451932297252811
 RectTransform:
   m_ObjectHideFlags: 0

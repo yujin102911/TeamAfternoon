@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021e2050029ab3c42aa4571c60d42650, type: 3}
+  m_Name: Idiots 3
+  m_EditorClassIdentifier: 
+  Pattern_Name: "\uACBD\uACE0, \uACF5\uACA9!"
+  Sentence: "\"\uBA48\uCD9C \uC218\uAC00 \uC5C6\uC5B4! \uC81C\uBC1C... \uB204\uAC00
+    \uC880 \uBA48\uCDB0\uC918!\"\n\uC591\uCCA0\uB85C \uB9CC\uB4E4\uC5B4\uC9C4 \uB098\uBB34\uAFBC\uC774
+    \uB3C4\uB07C\uB97C \uD718\uB450\uB974\uACE0 \uC788\uC5C8\uC5B4\uC694."
+  attacks:
+  - tick: 3
+    targetSectors: 07000000
+    damage: 1
+  - tick: 4
+    targetSectors: 08000000050000000600000001000000
+    damage: 1
+  - tick: 7
+    targetSectors: 03000000
+    damage: 1
+  - tick: 8
+    targetSectors: 01000000020000000400000005000000
+    damage: 1
+  parryings: []

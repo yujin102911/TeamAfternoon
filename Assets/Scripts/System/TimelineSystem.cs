@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -34,6 +35,11 @@ public class TimelineSystem
     /// 이동 요청 이벤트 (방향)
     /// </summary>
     public event Action<MoveDirection> OnMoveRequested;
+
+    /// <summary>
+    /// 정화 요청 이벤트 (방향)
+    /// </summary>
+    public event Action<int> OnCureRequested;
 
     /// <summary>
     /// 블록 시작 이벤트 (키워드 처리용)
@@ -275,6 +281,13 @@ public class TimelineSystem
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
                 OnMoveRequested?.Invoke(dir);
+                break;
+
+            case ActionType.Cure:
+                int cure_power = runtimeBlock.BaseData.CalCulate_CurePower(cardTickIndex);
+                Debug.Log($"블럭내 {cardTickIndex}번째의 정화 액션 발동!! - 정화량: {cure_power}");
+
+                OnCureRequested?.Invoke(cure_power);
                 break;
 
             case ActionType.None:

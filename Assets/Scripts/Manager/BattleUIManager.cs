@@ -5,6 +5,8 @@ using TMPro;
 
 public class BattleUIManager : MonoBehaviour
 {
+    public static BattleUIManager Instance;
+
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
@@ -25,6 +27,11 @@ public class BattleUIManager : MonoBehaviour
 
     private Dictionary<RuntimeEnemy, UnitStatusUI> _enemyUIMap = new Dictionary<RuntimeEnemy, UnitStatusUI>();
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
@@ -32,8 +39,6 @@ public class BattleUIManager : MonoBehaviour
             BattleSystem battle = GameManager.Instance.BattleSystem;
 
             battle.OnPlayerHPChanged += HandlePlayerHPChanged;
-            battle.OnEnemyHPChanged += HandleEnemyHPChanged;
-            battle.OnEnemyDied += HandleEnemyDied;
             battle.OnBattleInitialized += HandleBattleInitialized;
             battle.UpdateCureGauage += HandleCureChanged;
 
@@ -55,8 +60,6 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
             GameManager.Instance.OnGameStateChanged -= TryBindPlayerUI;
             battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
-            battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
-            battle.OnEnemyDied -= HandleEnemyDied;
             battle.OnBattleInitialized -= HandleBattleInitialized;
             battle.UpdateCureGauage -= HandleCureChanged;
         }
@@ -76,21 +79,12 @@ public class BattleUIManager : MonoBehaviour
         {
             _playerStatusUI.Init(battle.PlayerHP, battle.PlayerMaxHP);
         }
-        foreach (Transform child in _enemyUIContainer) Destroy(child.gameObject);
-        _enemyUIMap.Clear();
-
-        foreach (RuntimeEnemy enemy in battle.Enemies)
+        if (_cureUI != null && battle.Enemies.Count > 0)
         {
-            GameObject go = Instantiate(_enemyStatusPrefab, _enemyUIContainer);
-            UnitStatusUI ui = go.GetComponent<UnitStatusUI>();
-
-            if (ui != null)
-            {
-                ui.Init(enemy.Data.Enemy_Name, enemy.CurrentHP, enemy.MaxHP);
-                _enemyUIMap.Add(enemy, ui);
-            }
+            int maxCure = battle.Enemies[0].Data.MaxCureValue;
+            // 이름 표시 기능이 UnitStatusUI에 있다면 활용 가능
+            _cureUI.Init("Purification", 0, maxCure);
         }
-
         Show_startBtn();
     }
 
@@ -98,7 +92,7 @@ public class BattleUIManager : MonoBehaviour
     {
         if (_cureUI != null)
         {
-            _cureUI.UpdateHP(current, max);
+            _cureUI.UpdateCureGauage(current, max);
         }
     }
 
@@ -110,28 +104,10 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void HandleEnemyHPChanged(RuntimeEnemy enemy)
-    {
-        if (_enemyUIMap.TryGetValue(enemy, out UnitStatusUI ui))
-        {
-            ui.UpdateHP(enemy.CurrentHP, enemy.MaxHP);
-        }
-    }
-
-    private void HandleEnemyDied(RuntimeEnemy enemy)
-    {
-        if (_enemyUIMap.TryGetValue(enemy, out UnitStatusUI ui))
-        {
-            if (ui != null) 
-                Destroy(ui.gameObject);
-            _enemyUIMap.Remove(enemy);
-        }
-    }
-
     private void HandleRoundChanged(int chapter, int page, int totalPage)
     {
-        _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
-        _totalPageText.text = $"/{totalPage}";
+        _pageText.text = $"<size=56pt>{0+page.ToString()}";
+        _totalPageText.text = $"LINE";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
     }
     private void RefreshStartButtonState()
@@ -144,7 +120,7 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
-        _startButton.gameObject.SetActive(interactable);
+        //_startButton.gameObject.SetActive(interactable);
 
         //RefreshSectorSelectionPanel();
     }

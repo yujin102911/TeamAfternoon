@@ -19,7 +19,7 @@ public class BattleSystem
 
     private int _totalSectors;
 
-    private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>();
+    private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>(); // 현재 싸우고 있는 적
 
     private Dictionary<string, int> _playerBuffs = new Dictionary<string, int>();
     private Dictionary<string, int> _enemyBuffs = new Dictionary<string, int>();
@@ -33,15 +33,18 @@ public class BattleSystem
 
     #region Events
     public event Action<int, int> OnPlayerHPChanged;          // 플레이어 HP 변화 시 발행되는 이벤트(UI용)
-    public event Action<RuntimeEnemy> OnEnemyHPChanged;       // 적 HP 변화 시 발행되는 이벤트(UI용)
-    public event Action<RuntimeEnemy> OnEnemyDied;            // 적 죽으면 발행되는 이벤트
-    public event Action<int> OnPlayerMoved;
-    public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
-    public event Action<List<int>> OnEnemyAttack;             // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
-    public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
-    public event Action<string, int, bool> OnBuffChanged;
-    public event Action OnBattleInitialized;
     public event Action<int, int> UpdateCureGauage;             // 정화 게이지 UI업데이트
+
+    public event Action OnEnemyPurified; // 적 정화 완료시 발행
+
+    public event Action<RuntimeEnemy> OnEnemyHit;       // 적 맞았을 때 발행 (일단 안씀)
+    public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
+    public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
+    public event Action<int> OnPlayerMoved;
+    public event Action<List<int>> OnEnemyAttack;             // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
+    public event Action<string, int, bool> OnBuffChanged;
+
+    public event Action OnBattleInitialized;
     #endregion
 
     #region Properties
@@ -59,94 +62,59 @@ public class BattleSystem
     /// <summary>
     /// 체력, 적, 버프 초기화 미리 설정
     /// </summary>
-    public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, int startSector = 1)
+    public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, bool keepPlayerHP = false)
     {
-        _playerHP = playerMaxHP;
-        _playerMaxHP = playerMaxHP;
-
         _totalSectors = totalSectors;
-
         _enemies = enemies;
+
+        if (!keepPlayerHP) _playerHP = playerMaxHP;
+        _playerMaxHP = playerMaxHP;
+        if (_playerHP <= 0) _playerHP = playerMaxHP;
 
         _playerBuffs.Clear();
         _enemyBuffs.Clear();
-
         ChooseCureSector();
 
-        OnBattleInitialized?.Invoke();
+        _currentCure = 0;
+        if (_enemies.Count > 0 && _enemies[0].Data != null)
+            _maxCure = _enemies[0].Data.MaxCureValue;
+        else
+            _maxCure = 50;
 
-        Debug.Log($"[BattleSystem] 전투 초기화 - 플레이어 HP: {_playerHP}/{playerMaxHP}");
-        Debug.Log($"[BattleSystem] 전투 초기화 - 적 {_enemies.Count} 마리 배치됨");
+            OnBattleInitialized?.Invoke();
+
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
-
-        foreach (RuntimeEnemy enemy in _enemies)
-        {
-            OnEnemyHPChanged?.Invoke(enemy);
-        }
-
-        // 정화 수치 UI 초기화
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
+        Debug.Log($"[BattleSystem] 전투 시작! 목표 정화량: {_maxCure}");
+
     }
 
     
 
     public void DealDamageToCurrentSector(int damage, int currentTick)
     {
-        if (damage <= 0) return;
+        OnPlayerAttack?.Invoke(); // 플레이어 공격 모션
 
-        int attackPos = PlayerCurrentSector;
-
-        RuntimeEnemy target = null;
-
-        // 공격 위치에 있는 적 찾기
+        // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
         {
-            if (enemy.IsHitByAttackFrom(attackPos))
+            if (enemy.IsHitByAttackFrom(_playerCurrentSector))
             {
-                target = enemy;
-                break; // 한명만
-            }
-        }
-
-        if (target != null)
-        {
-            OnPlayerAttack?.Invoke();
-            if (target.CurrentPattern != null)
-            {
-                // 적이 현재 틱에 패링 중인지 확인
-                EnemyParrying parry = target.CurrentPattern.GetParryingAt(currentTick);
-
-                if (parry != null)
+                // 패링 체크 등은 여기서 수행
+                if (enemy.CurrentPattern != null)
                 {
-                    // 패링 성공! (적은 데미지 안 입고, 플레이어가 데미지 입음)
-                    Debug.Log($"[BattleSystem] 패링 발생: {target.Data.Enemy_Name}가 공격을 튕겨냈습니다");
-                    int reflectDamage = Mathf.CeilToInt(damage * parry.damageMultiplier);
-
-                    DealDamageToPlayer(reflectDamage);
-
-                    return;
+                    EnemyParrying parry = enemy.CurrentPattern.GetParryingAt(currentTick);
+                    if (parry != null)
+                    {
+                        DealDamageToPlayer((int)(damage * parry.damageMultiplier));
+                        return;
+                    }
                 }
+
+                // 적 피격 연출
+                OnEnemyHit?.Invoke(enemy);
+                Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (물리 데미지는 0)");
             }
-            int finalDamage = CalculateDamage(damage, true);
-
-            TotalDamage = finalDamage;
-
-            target.TakeDamage(finalDamage);
-            Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 피격! ({finalDamage} 피해)");
-
-            OnEnemyHPChanged?.Invoke(target);
-
-            if (target.IsDead)
-            {
-                Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 사망");
-                HandleEnemyDeathSectorInheritance(target);
-                OnEnemyDied?.Invoke(target);
-                CheckVictoryCondition();
-            }
-        }
-        else
-        {
-            Debug.Log($"[BattleSystem] 공격 빗나감 (섹터 {attackPos}에 적 없음");
         }
     }
 
@@ -278,19 +246,6 @@ public class BattleSystem
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
     }
 
-    private void CheckVictoryCondition()
-    {
-        bool allDead = true;
-        foreach(RuntimeEnemy enemy in _enemies)
-        {
-            if (!enemy.IsDead)
-            {
-                allDead = false; break;
-            }
-        }
-        if (allDead)
-            OnEnemyDefeated();
-    }
 
     private void OnEnemyDefeated()
     {
@@ -352,7 +307,6 @@ public class BattleSystem
         if (_enemies == null) return null;
         foreach (RuntimeEnemy enemy in _enemies)
         {
-            if (enemy.IsDead) continue;
             if (enemy.AttackableSectors.Contains(sectorIndex))
                 return enemy;
         }
@@ -380,10 +334,10 @@ public class BattleSystem
     }
 
     // 정화 시도
-    public bool TryCurePage(int tick)
+    public bool TryCurePage(int tick, bool is_cure)
     {
         Debug.Log($"페이지 정화 시도");
-        if (_ableCureSectors.Contains(_playerCurrentSector))
+        if (_ableCureSectors.Contains(_playerCurrentSector) && is_cure)
         {
             //정화 연산
             Cure(_curePower);
@@ -406,8 +360,8 @@ public class BattleSystem
         // 정화 되었는지 체크
         if (_currentCure >= _maxCure)
         {
-            Debug.Log($"[BattleSystem] 정화 완료!!");
-            GameManager.Instance?.EndBattle(true);
+            Debug.Log($"[BattleSystem] 정화 완료!");
+            OnEnemyPurified?.Invoke();
         }
     }
 
@@ -417,7 +371,7 @@ public class BattleSystem
         if (amount <= 0) return;
 
         _currentCure = Mathf.Min(_maxCure, _currentCure + amount);
-        Debug.Log($"[BattleSystem] 정화섹터 작동! ({amount} 수치 정화)");
+        Debug.Log($"[BattleSystem] 정화 발동! ({amount} 수치 정화)");
 
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
     }
@@ -458,25 +412,6 @@ public class BattleSystem
                 buffs.Remove(key);
                 OnBuffChanged?.Invoke(key, 0, isPlayer); 
             }
-        }
-    }
-
-    /// <summary>
-    /// 죽은 적의 섹터를 살아있는 적에게 넘겨주는 함수
-    /// </summary>
-    private void HandleEnemyDeathSectorInheritance(RuntimeEnemy deadEnemy)
-    {
-        List<RuntimeEnemy> survivors = new List<RuntimeEnemy>();
-        foreach(RuntimeEnemy enemy in _enemies)
-        {
-            if (!enemy.IsDead && enemy != deadEnemy)
-                survivors.Add(enemy);
-        }
-        if (survivors.Count > 0)
-        {
-            List<int> inheritanceSectors = deadEnemy.AttackableSectors;
-            foreach (RuntimeEnemy survivor in survivors)
-                survivor.AddHitSectors(inheritanceSectors);
         }
     }
 }

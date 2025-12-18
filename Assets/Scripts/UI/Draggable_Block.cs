@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -26,17 +27,29 @@ public class Draggable_Block : MonoBehaviour
     private Transform originalParent;
     private bool isDragging = false;
 
-    [Header("색상 설정")]
+    [TabGroup("Attack")]
     [SerializeField]
     private Color _attackColor;
+    [TabGroup("Attack")]
+    public Sprite Sword_icon;
+
+    [TabGroup("Move")]
     [SerializeField]
     private Color _moveColor;
+    [TabGroup("Move")]
+    public Sprite CW_icon;
+    [TabGroup("Move")]
+    public Sprite CCW_icon;
+
+    [TabGroup("Cure")]
+    [SerializeField]
+    private Color[] _cureColors;
+    [TabGroup("Cure")]
+    public Sprite[] _cureIcons;
+
+    [TabGroup("None")]
     [SerializeField]
     private Color _noneColor;
-
-    public Sprite Sword_icon;
-    public Sprite CW_icon;
-    public Sprite CCW_icon;
 
     [Header("빌딩인지 체크")]
     public bool isBuildingPhase = false; // 빌딩 페이즈인지 여부
@@ -105,6 +118,14 @@ public class Draggable_Block : MonoBehaviour
                     txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
                     img.color = new Color(_moveColor.r, _moveColor.g, _moveColor.b, 1.0f);
                     iconSprite = CW_icon;
+                }
+                else if (action == ActionType.Cure)
+                {
+                    txt.text = "";
+                    int index = data.CalCulate_CurePower(i) - 1;
+                    Color CureColor = _cureColors[index];
+                    img.color = new Color(CureColor.r, CureColor.g, CureColor.b, 1.0f);
+                    iconSprite = _cureIcons[index];
                 }
                 else
                 {

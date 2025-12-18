@@ -6,6 +6,7 @@ public enum ActionType
     None,
     Attack,
     Move,
+    Cure
 }
 
 public enum MoveDirection
@@ -61,6 +62,34 @@ public class BlockData : ScriptableObject
 
     // 기존 함수들은 그대로 유지 (숨김 처리 가능)
     #region Runtime Methods (Hidden in Inspector)
+    
+    // 정화 액션의 위치에 따른 정화량 계산
+    [HideInInspector]
+    public int CalCulate_CurePower(int index)
+    {
+        int result = 0;
+
+        if(blockLength <= 2)
+        {
+            result = 1;
+        }
+        else
+        {
+            int midLeft = (blockLength - 1) / 2;
+            int midRight = blockLength / 2;
+            //int center = (blockLength - 1) / 2;
+            //int distance = Mathf.Abs(index - center);
+
+
+            //result = (center - distance) + 1;
+
+            int distance = Mathf.Min(Mathf.Abs(index - midLeft), Mathf.Abs(index - midRight));
+            result = (midLeft + 1 - distance);
+        }
+
+        return result;
+    }
+
     [HideInInspector]
     public ActionType GetEffectAt(int tickIndex)
     {
