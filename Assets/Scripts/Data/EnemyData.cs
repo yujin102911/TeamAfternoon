@@ -12,13 +12,11 @@ public class EnemyPhaseGroup
 [CreateAssetMenu(fileName = "New EnemyData", menuName = "Data/Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
-    [Header("적 최대 체력")]
-    [SerializeField]
-    private int _maxEnemyHp = 100;
-
-    [Header("적 이름")]
+    [Header("적 정보")]
     [SerializeField]
     private string _enemyName = "Enemy";
+    [SerializeField]
+    private int _maxCureValue = 50;
 
     [Header("적 이미지")]
     [SerializeField]
@@ -26,9 +24,9 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private Sprite _enemyDeadSprite;
 
-    [Header("페이즈 별 패턴 구성")]
-    [Tooltip("Index0 : 1페이즈, Index1: 2페이즈 ...")]
-    public List<EnemyPhaseGroup> PhaseGroups = new List<EnemyPhaseGroup>();
+    [Header("패턴 리스트 (순서대로 반복)")]
+    [SerializeField]
+    private List<EnemyPattern> _patterns = new List<EnemyPattern>();
 
     [Header("비주얼 설정")]
     [SerializeField]
@@ -38,8 +36,9 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private List<EnemyAbility> _enemyAbilities = new List<EnemyAbility>();
 
-    public int Max_EnemyHp => _maxEnemyHp;
     public string Enemy_Name => _enemyName;
+    public List<EnemyPattern> Patterns => _patterns;
+    public int MaxCureValue => _maxCureValue;
     public Sprite Enemy_Sprite => _enemySprite;
     public Sprite EnemyDeadSprite => _enemyDeadSprite;
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
