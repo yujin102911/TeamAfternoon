@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// 플레이어 이동 비주얼을 담당하는 스크립트
@@ -24,14 +23,18 @@ public class PlayerVisualController : MonoBehaviour
     [SerializeField] private float _shakeAngle = 15f;
     [SerializeField] private int _shakeCount = 3;
 
+    [Header("베기 이펙트 설정")]
+    // 1. Hierarchy에 있는 SlashEffect 오브젝트를 여기에 드래그하여 연결합니다.
+    public GameObject trailEffectPrefab;
 
     private GameObject _playerInstance;
     private SpriteRenderer _playerRenderer;
     private GameObject _currentGhost;
 
     private Coroutine _moveCoroutine;
-    private Coroutine _effectCoroutine;
     private MapSystem _mapSystem;
+
+    public Transform CurrentPlayerTransform => _playerInstance != null ? _playerInstance.transform : null;
 
     /// <summary>
     /// GameManager 가 호출
@@ -49,9 +52,11 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_mapSystem != null)
         {
-            Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
-            targetPos.y += _yOffset;
-            MoveTo(targetPos);
+            Transform targetTransform = _mapSystem.GetSectorTransform(sectorIndex);
+            if (targetTransform != null)
+            {
+                MoveTo(targetTransform);
+            }
         }
     }
 
@@ -63,13 +68,18 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_mapSystem != null)
         {
-            Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
-            targetPos.y += _yOffset;
+            Transform sectorTr = _mapSystem.GetSectorTransform(sectorIndex);
+            if (sectorTr == null) return;
+
+            Vector3 targetPos = sectorTr.position + new Vector3(0, _yOffset, 0);
             if (_playerInstance != null)
                 Destroy(_playerInstance);
+
             if (_playerPrefab != null)
             {
                 _playerInstance = Instantiate(_playerPrefab, targetPos, Quaternion.identity);
+                _playerInstance.transform.SetParent(sectorTr);
+
                 _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
                 if (_playerRenderer == null) _playerRenderer = _playerInstance.GetComponent<SpriteRenderer>();
             }
@@ -93,7 +103,17 @@ public class PlayerVisualController : MonoBehaviour
     #region Private Effect Routines
     private IEnumerator ShakeRoutine()
     {
-        Quaternion originalRot = Quaternion.identity;
+        //트레일 렌더러 코드    
+        if (trailEffectPrefab != null)
+        {
+            GameObject newTrail = Instantiate(
+                trailEffectPrefab,
+                Vector3.zero,
+                Quaternion.identity
+            );
+        }
+
+        Quaternion originalRot = _playerInstance.transform.localRotation;
 
         float speed = _shakeDuration / _shakeCount;
 
@@ -160,16 +180,18 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 내부 이동 함수
     /// </summary>
-    private void MoveTo(Vector3 targetPosition)
+    private void MoveTo(Transform targetSector)
     {
         if (_playerInstance == null) return;
         if (_moveCoroutine != null)
             StopCoroutine(_moveCoroutine);
-        _moveCoroutine = StartCoroutine(MoveRoutine(targetPosition));
+        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector));
     }
 
-    private IEnumerator MoveRoutine(Vector3 target)
+    private IEnumerator MoveRoutine(Transform targetSector)
     {
+        _playerInstance.transform.SetParent(null);
+
         Vector3 startPosition = _playerInstance.transform.position;
         float elapsedTime = 0f;
 
@@ -181,12 +203,17 @@ public class PlayerVisualController : MonoBehaviour
             // 0 ~ 1 사이의 진행률(t) 계산
             float t = elapsedTime / _moveDuration;
 
-            _playerInstance.transform.position = Vector3.Lerp(startPosition, target, t);
+            Vector3 currentDestPos = targetSector.position + new Vector3(0, _yOffset, 0);
+
+            _playerInstance.transform.position = Vector3.Lerp(startPosition, currentDestPos, t);
             yield return null;
         }
 
         // 시간 끝나면 목표 지점에 정확히 안착
-        _playerInstance.transform.position = target;
+        _playerInstance.transform.SetParent(targetSector);
+
+        _playerInstance.transform.localPosition = new Vector3(0, _yOffset, 0);
+
         _moveCoroutine = null;
     }
     #endregion

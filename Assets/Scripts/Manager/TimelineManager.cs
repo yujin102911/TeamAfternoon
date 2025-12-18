@@ -12,6 +12,9 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("정화 온오프")]
+    public bool Is_Cure = false;
+
     [SerializeField] private int _totalTicks = 8;
 
     // System
@@ -188,6 +191,22 @@ public class TimelineManager : MonoBehaviour
         return false;
     }
 
+    public bool TryMoveBlock_OnTimeline(RuntimeBlock runtimeBlock, int startTick) 
+    {
+        // TimelineSystem에 배치 요청
+        bool success = _timelineSystem.TryPlaceBlock(runtimeBlock, startTick);
+
+        if (success)
+        {
+            // UI 업데이트
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// 타임라인에서 블록 제거
     /// </summary>
@@ -204,6 +223,32 @@ public class TimelineManager : MonoBehaviour
             _currentHand.Add(runtimeBlock);
 
             Debug.Log($"[TimelineDirector] 블록 제거: {runtimeBlock.BaseData.BlockName}");
+
+            // UI 업데이트
+            OnHandChanged?.Invoke(_currentHand);
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+        }
+    }
+
+    public void RemovePlacedBlock_OnTimeline(PlacedBlock placedBlock)
+    {
+        RuntimeBlock runtimeBlock = _timelineSystem.RemovePlacedBlock(placedBlock);
+        
+        // UI 업데이트
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+
+    public void ReturnToHand(RuntimeBlock runtimeBlock)
+    {
+        if (runtimeBlock != null)
+        {
+            // 손패로 복귀 전 방향 초기화
+            runtimeBlock.InitializeDirections();
+
+            // 손패로 복귀
+            _currentHand.Add(runtimeBlock);
+
+            Debug.Log($"[TimelineDirector] 손패로 복귀: {runtimeBlock.BaseData.BlockName}");
 
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
@@ -280,6 +325,13 @@ public class TimelineManager : MonoBehaviour
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
 
+            // 정화 시도
+            if (_battleSystem.TryCurePage(tick) && Is_Cure)
+            {
+                // TODO: 정화 이펙트 넣기
+                yield return new WaitForSeconds(0.4f);
+            }
+
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);
 
@@ -292,6 +344,8 @@ public class TimelineManager : MonoBehaviour
                     _battleSystem.ProcessEnemyAttack(attack);
                 }
             }
+
+            
 
             // 연출 대기
             yield return new WaitForSeconds(0.4f);
@@ -317,8 +371,22 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public void OnRoundEnded()
     {
+        // 방향 전환할 블록들 보관하는 리스트
+        List<RuntimeBlock> blocksToReset = new List<RuntimeBlock>();
+        foreach (PlacedBlock placed in _timelineSystem.PlacedBlocks)
+        {
+            if (placed.linkedRuntimeBlock != null)
+            {
+                blocksToReset.Add(placed.linkedRuntimeBlock);
+            }
+        }
         // 현재 배치를 이전 배치로 이동 (잔상용)
         _timelineSystem.SaveCurrentAsPreview();
+
+        foreach (RuntimeBlock rb in blocksToReset)
+        {
+            rb.InitializeDirections();
+        }
 
         // 손패 클리어 (GameDirector가 새로 줄 예정)
         _currentHand.Clear();
@@ -406,6 +474,55 @@ public class TimelineManager : MonoBehaviour
                 sectors.AddRange(attack.targetSectors);
         }
         return sectors;
+    }
+
+    public List<int> GetProjectedDangerTicks()
+    {
+        List<int> dangerTicks = new List<int>();
+        if (_battleSystem == null || _currentEnemyPattern == null) return dangerTicks;
+
+        int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
+        int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
+        int totalSectors = 8;  // _mapSystem.TotalSectors 접근 가능하면 사용
+
+        for (int t = 1; t <= _totalTicks; t++)
+        {
+            PlacedBlock placed = _timelineSystem.FindFirstAction(t);
+            if (placed != null)
+            {
+                int cardIndex = placed.GetCardTickIndex(t);
+                BlockData data = placed.GetBlockData();
+                if (data.GetEffectAt(cardIndex) == ActionType.Move)
+                {
+                    int currentTickSpeed = 1 + baseBuffSpeed;
+                    if (placed.linkedRuntimeBlock != null)
+                    {
+                        foreach (var keyword in placed.linkedRuntimeBlock.AttachedKeywords)
+                        {
+                            currentTickSpeed += keyword.GetSpeedBonus();
+                        }
+                    }
+                    MoveDirection dir = placed.GetDirectionAt(cardIndex);
+                    if (dir != MoveDirection.None)
+                    {
+                        int direction = (dir == MoveDirection.Right ? 1 : -1);
+                        currentSimulatedSector += (direction * currentTickSpeed);
+
+                        while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
+                        while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
+                    } 
+                }
+
+            }
+            EnemyAttack attack = _currentEnemyPattern.GetAttackAt(t);
+            if (attack != null && attack.targetSectors != null)
+            {
+                if (attack.targetSectors.Contains(currentSimulatedSector))
+                    dangerTicks.Add(t);
+            }
+        }
+        return dangerTicks;
+
     }
     #endregion
 }

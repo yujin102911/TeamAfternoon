@@ -16,4 +16,5 @@ public class MapConfiguration : ScriptableObject
     public Color attackColor = new Color(1f, 0.3f, 0.3f);
     public Color selectableColor = new Color(0.5f, 1f, 0.5f);
     public Color hoverColor = new Color(0.7f, 1f, 0.7f);
+    public Color cureColor = new Color(0.7f, 1f, 0.7f);
 }

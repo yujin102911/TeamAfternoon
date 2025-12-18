@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,10 @@ public class GameResultUI : MonoBehaviour
     [SerializeField] private GameObject _victoryPanel;
     [SerializeField] private GameObject _defeatPanel;
 
+    [Header("텍스트")]
+    [SerializeField] private TextMeshProUGUI _victoryText;
+    [SerializeField] private TextMeshProUGUI _defeatText;
+
     [Header("버튼")]
     [SerializeField] private Button _goToMainBtn;
     [SerializeField] private string _librarySceneName;
@@ -18,6 +23,17 @@ public class GameResultUI : MonoBehaviour
     [Header("연출")]
     [SerializeField] private float _delaySeconds = 1.0f;
     [SerializeField] private float _fadeDuration = 1.0f;
+
+    [Header("수정 연출")]
+    [SerializeField]
+    private NoiseTextureGenerator _noiseTextureGenerator;
+    [SerializeField] 
+    private RectTransform _crystalTransform;
+    [SerializeField]
+    private Vector3 _startPos;
+    public float moveY = 0;
+    [SerializeField]
+    private float duration = 1.0f;
 
     private void Start()
     {
@@ -38,22 +54,56 @@ public class GameResultUI : MonoBehaviour
         }
     }
 
-    private void HandleBattleEnded(bool isVictory)
+    private void HandleBattleEnded(bool isVictory, int totalRound, int hitCount, int attackCount, int leftHP)
     {
         if (isVictory)
         {
-            StartCoroutine(ShowPanelCoroutine(_victoryPanel));
+            StartCoroutine(ShowPanelCoroutine(isVictory, totalRound, hitCount, attackCount, leftHP, _victoryPanel, _victoryText));
         }
         else
         {
-            StartCoroutine(ShowPanelCoroutine(_defeatPanel));
+            StartCoroutine(ShowPanelCoroutine(isVictory, totalRound, hitCount, attackCount, leftHP, _defeatPanel, _defeatText));
         }
     }
 
-    private IEnumerator ShowPanelCoroutine(GameObject targetPanel)
+    private IEnumerator ShowPanelCoroutine(bool isVictory, int totalRound, int hitCount, int attackCount, int leftHP, GameObject targetPanel, TextMeshProUGUI targetText)
     {
         CanvasGroup cg = targetPanel.GetComponent<CanvasGroup>();
         if (cg == null) cg = targetPanel.AddComponent<CanvasGroup>();
+
+        // 수정 연출 추가
+
+        if (isVictory)
+        {
+            yield return StartCoroutine(MoveUpByY_Ease(_startPos, moveY, duration));
+
+            if (targetText != null)
+            {
+                targetText.text =
+                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐 진행되었으며,\n" +
+                    $"전투 중 사역마는 <size=72><color=#626262> {hitCount}</size></color>회의 피격을 받았으며\n" +
+                    $"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을 수행하였습니다.\n" +
+                    $"전투 종료 시점 기준 잔존 체력은 <size=72><color=#626262> {leftHP}</size></color>로 확인되었습니다.\n\n" +
+                    $"이상으로 본 전투 성과 보고를 마치겠습니다.";
+
+            }
+        }
+        else
+        {
+            if (targetText != null)
+            {
+                targetText.text = 
+                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐\n"
+                    +$"진행되었으나, 전투 중 사역마는\n"
+                    +$"<size=72><color=#626262>{hitCount}</size></color>회의 피격을 받았으며\n"
+                    +$"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을\n"
+                    +$"수행하였습니다.\n"
+                    +$"전투 종료 시점 기준,\n"
+                    +$"사역마의 전투 지속은 불가능한\n"
+                    +$"상태로 확인되었습니다.";
+
+            }
+        }
 
         cg.alpha = 0f;
         cg.interactable = false;
@@ -80,6 +130,39 @@ public class GameResultUI : MonoBehaviour
     {
         Debug.Log("고투 라이브러리");
         ServiceLocator.Instance.Scene.Load(_librarySceneName);
+    }
+
+    IEnumerator MoveUpByY_Ease(Vector3 startPos, float moveY, float duration)
+    {
+        Vector3 endPos = startPos + Vector3.up * moveY;
+
+        float elapsed = 0f;
+
+        if (_noiseTextureGenerator != null)
+            _noiseTextureGenerator.GenerateNoiseTexture();
+
+        CardBurnEffect cardBurnEffect = _crystalTransform.GetComponent<CardBurnEffect>();
+
+        if(!_crystalTransform.gameObject.activeSelf)
+            _crystalTransform.gameObject.SetActive(true);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Ease Out
+            t = 1f - Mathf.Pow(1f - t, 3f);
+
+            _crystalTransform.anchoredPosition = Vector3.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+
+        _crystalTransform.anchoredPosition = endPos;
+
+        cardBurnEffect.Initialize();
+        
+        yield return StartCoroutine(cardBurnEffect.BurnAnimationCoroutine(null));
     }
 
 }

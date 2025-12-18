@@ -18,6 +18,28 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         }
     }
 
+    // 타임라인 내에서 드랍할때 작동
+    public void OnDrop_inTimeline(RuntimeBlock r_block)
+    {
+        // 색상 원래대로
+        if (image != null)
+        {
+            image.color = originalColor;
+        }
+
+        if (r_block != null && TimelineManager.Instance != null)
+        {
+            // 배치 시도
+            bool success = TimelineManager.Instance.TryMoveBlock_OnTimeline(r_block, tickIndex);
+
+            // 실패 시
+            if (!success)
+            {
+                TimelineManager.Instance.ReturnToHand(r_block);
+            }
+        }
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
         // 색상 원래대로
@@ -25,6 +47,8 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         {
             image.color = originalColor;
         }
+
+        if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
 
         // 드래그 중인 카드 가져오기
         RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
@@ -47,13 +71,25 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        originalColor = image.color;
-        if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
+        
+        RuntimeBlock block_info = null;
 
-        RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+        if (DragOn_timeline.instance != null && !DragOn_timeline.instance.isDragging)
+        {
+            if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
+
+            block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+        }
+        else
+        {
+            block_info = DragOn_timeline.instance.draggingBlock;
+        }
+
 
         if (block_info != null && TimelineManager.Instance != null)
         {
+            originalColor = image.color;
+
             // 배치 가능한지 확인
             bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength);
             if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
@@ -66,6 +102,11 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         // 색상 원래대로
         if (eventData.pointerDrag != null && image != null
             && (IsColorSimilar(image.color, new Color(0.5f, 1f, 0.5f))) || IsColorSimilar(image.color, new Color(1f, 0.6f, 0.6f)))
+        {
+            image.color = originalColor;
+        }
+
+        if (DragOn_timeline.instance != null && DragOn_timeline.instance.isDragging)
         {
             image.color = originalColor;
         }

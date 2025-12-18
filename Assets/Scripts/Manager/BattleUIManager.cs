@@ -9,10 +9,15 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
     [SerializeField] private TextMeshProUGUI _pageText;
+    [SerializeField] private TextMeshProUGUI _totalPageText;
     [SerializeField] private TextMeshProUGUI _chapterText;
 
+    [Header("정화 게이지 UI")]
+    [SerializeField]
+    private UnitStatusUI _cureUI;
+
     [Header("플레이어 UI")]
-    [SerializeField] private UnitStatusUI _playerStatusUI;
+    [SerializeField] private PlayerHeartUI _playerStatusUI;
 
     [Header("적 UI 설정")]
     [SerializeField] private GameObject _enemyStatusPrefab;
@@ -30,10 +35,12 @@ public class BattleUIManager : MonoBehaviour
             battle.OnEnemyHPChanged += HandleEnemyHPChanged;
             battle.OnEnemyDied += HandleEnemyDied;
             battle.OnBattleInitialized += HandleBattleInitialized;
+            battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged += HandleRoundChanged;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
+            GameManager.Instance.OnGameStateChanged += TryBindPlayerUI;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -46,10 +53,12 @@ public class BattleUIManager : MonoBehaviour
             BattleSystem battle = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
             GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
+            GameManager.Instance.OnGameStateChanged -= TryBindPlayerUI;
             battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
             battle.OnEnemyHPChanged -= HandleEnemyHPChanged;
             battle.OnEnemyDied -= HandleEnemyDied;
             battle.OnBattleInitialized -= HandleBattleInitialized;
+            battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
 
@@ -65,8 +74,7 @@ public class BattleUIManager : MonoBehaviour
         // 플레이어 UI초기화
         if (_playerStatusUI != null)
         {
-            _playerStatusUI.Init("Player", battle.PlayerHP, battle.PlayerMaxHP);
-            _playerStatusUI.UpdateHP(battle.PlayerHP, battle.PlayerMaxHP);
+            _playerStatusUI.Init(battle.PlayerHP, battle.PlayerMaxHP);
         }
         foreach (Transform child in _enemyUIContainer) Destroy(child.gameObject);
         _enemyUIMap.Clear();
@@ -82,13 +90,23 @@ public class BattleUIManager : MonoBehaviour
                 _enemyUIMap.Add(enemy, ui);
             }
         }
+
+        Show_startBtn();
+    }
+
+    private void HandleCureChanged(int current, int max)
+    {
+        if (_cureUI != null)
+        {
+            _cureUI.UpdateHP(current, max);
+        }
     }
 
     private void HandlePlayerHPChanged(int current, int max)
     {
         if (_playerStatusUI != null)
         {
-            _playerStatusUI.UpdateHP(current, max);
+            _playerStatusUI.UpdateHearts(current, max);
         }
     }
 
@@ -110,11 +128,11 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void HandleRoundChanged(int chapter, int page)
+    private void HandleRoundChanged(int chapter, int page, int totalPage)
     {
         _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
+        _totalPageText.text = $"/{totalPage}";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
-
     }
     private void RefreshStartButtonState()
     {
@@ -126,22 +144,38 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
+        _startButton.gameObject.SetActive(interactable);
 
         //RefreshSectorSelectionPanel();
     }
 
-    private void RefreshStartButtonState(bool isVictory)
+    private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
     {
         _startButton.interactable = false;
+        Hide_startBtn();
     }
 
-    //private void RefreshSectorSelectionPanel()
-    //{
-    //    if (_sectorSelectionPanel == null || GameManager.Instance == null) return;
-    //    bool showPanel = !GameManager.Instance.IsSectorSelected;
-    //    _sectorSelectionPanel.SetActive(showPanel);
-    //}
+    private void TryBindPlayerUI()
+    {
+        var visualController = FindAnyObjectByType<PlayerVisualController>();
 
+        if (visualController != null && _playerStatusUI != null)
+        {
+            Transform playerTr = visualController.CurrentPlayerTransform;
+            if (playerTr != null)
+            {
+                _playerStatusUI.SetFollowTarget(playerTr);
+            }
+        } 
+    }
 
+    public void Show_startBtn()
+    {
+        _startButton.gameObject.SetActive(true);
+    }
 
+    public void Hide_startBtn()
+    {
+        _startButton.gameObject.SetActive(false);
+    }
 }

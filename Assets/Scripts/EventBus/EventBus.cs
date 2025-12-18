@@ -16,6 +16,21 @@ public static class EventBus
         _listeners[t].Add(callback);
     }
 
+    public static void Unsubscribe<T>(Action<T> callback)
+    {
+        Type t = typeof(T);
+
+        if (_listeners.TryGetValue(t, out var list))
+        {
+            list.Remove(callback);
+
+            // 리스너가 비었으면 타입 키 자체 제거 (선택사항이지만 추천)
+            if (list.Count == 0)
+                _listeners.Remove(t);
+        }
+    }
+
+
     public static void Publish<T>(T eventData)
     {
         Type t = typeof(T);

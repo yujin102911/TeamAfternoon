@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 타임라인 각 틱 슬롯에 붙어 마우스 호버 시 프리뷰를 요청하는 핸들러
+/// 위험 표시 기능 추가
 /// </summary>
 public class TimelineTickHoverHandler : MonoBehaviour, 
     IPointerEnterHandler, IPointerExitHandler
@@ -16,9 +17,14 @@ public class TimelineTickHoverHandler : MonoBehaviour,
     [SerializeField]
     private Image _inCircle;
 
+    [Header("위험 표시 설정")]
+    [SerializeField]
+    private GameObject _cautionIcon;
+
     private void Start()
     {
         _timelineUI = GetComponentInParent<TimelineUI>();
+        if (_cautionIcon != null ) _cautionIcon.SetActive(false);
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -53,6 +59,14 @@ public class TimelineTickHoverHandler : MonoBehaviour,
     {
         _outCircle.color = new Color(_outCircle.color.r, _outCircle.color.g, _outCircle.color.b, 0f);
         _inCircle.color = new Color(_inCircle.color.r, _inCircle.color.g, _inCircle.color.b, 0f);
+    }
+
+    public void SetCautionStatus(bool isDanger)
+    {
+        if (_cautionIcon != null)
+        {
+            _cautionIcon.SetActive(isDanger);
+        }
     }
 
 }

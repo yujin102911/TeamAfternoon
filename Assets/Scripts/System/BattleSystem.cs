@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
-using System;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 전투 로직을 처리하는 System
@@ -21,6 +23,12 @@ public class BattleSystem
 
     private Dictionary<string, int> _playerBuffs = new Dictionary<string, int>();
     private Dictionary<string, int> _enemyBuffs = new Dictionary<string, int>();
+
+    private List<int> _ableCureSectors = new List<int>();
+    private int _maxCure = 20;
+    private int _currentCure = 0;
+    private int _curePower = 1;
+    private int _recoverCycle = 3;
     #endregion
 
     #region Events
@@ -33,13 +41,19 @@ public class BattleSystem
     public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
     public event Action<string, int, bool> OnBuffChanged;
     public event Action OnBattleInitialized;
+    public event Action<int, int> UpdateCureGauage;             // 정화 게이지 UI업데이트
     #endregion
 
     #region Properties
     public int PlayerHP => _playerHP;
     public int PlayerMaxHP => _playerMaxHP;
     public int PlayerCurrentSector => _playerCurrentSector;
+
+    public int TotalDamage;
     public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
+
+    public List<int> AbleCureSectors => _ableCureSectors;
+    public int RecoverCycle => _recoverCycle;
     #endregion
 
     /// <summary>
@@ -57,6 +71,8 @@ public class BattleSystem
         _playerBuffs.Clear();
         _enemyBuffs.Clear();
 
+        ChooseCureSector();
+
         OnBattleInitialized?.Invoke();
 
         Debug.Log($"[BattleSystem] 전투 초기화 - 플레이어 HP: {_playerHP}/{playerMaxHP}");
@@ -67,7 +83,12 @@ public class BattleSystem
         {
             OnEnemyHPChanged?.Invoke(enemy);
         }
+
+        // 정화 수치 UI 초기화
+        UpdateCureGauage?.Invoke(_currentCure, _maxCure);
     }
+
+    
 
     public void DealDamageToCurrentSector(int damage, int currentTick)
     {
@@ -107,6 +128,8 @@ public class BattleSystem
                 }
             }
             int finalDamage = CalculateDamage(damage, true);
+
+            TotalDamage = finalDamage;
 
             target.TakeDamage(finalDamage);
             Debug.Log($"[BattleSystem] {target.Data.Enemy_Name} 피격! ({finalDamage} 피해)");
@@ -334,6 +357,79 @@ public class BattleSystem
                 return enemy;
         }
         return null;
+    }
+
+    // 정화 가능한 섹터 뽑기
+    public void ChooseCureSector()
+    {
+        if(_ableCureSectors == null) return;
+
+        _ableCureSectors.Clear();
+
+        int a = Random.Range(1, _totalSectors + 1);
+        int b;
+
+        do
+        {
+            b = Random.Range(1, _totalSectors + 1);
+        }
+        while (b == a);
+
+        _ableCureSectors.Add(a);
+        _ableCureSectors.Add(b);
+    }
+
+    // 정화 시도
+    public bool TryCurePage(int tick)
+    {
+        Debug.Log($"페이지 정화 시도");
+        if (_ableCureSectors.Contains(_playerCurrentSector))
+        {
+            //정화 연산
+            Cure(_curePower);
+            Debug.Log($"정화 성공");
+            return true;
+        }
+
+        Debug.Log($"정화 실패");
+        return false;
+    }
+
+    public void Cure(int damage) 
+    {
+        if (damage <= 0) return;
+
+        OnPlayerAttack?.Invoke();
+
+        IncreaseCureGauge(damage);
+
+        // 정화 되었는지 체크
+        if (_currentCure >= _maxCure)
+        {
+            Debug.Log($"[BattleSystem] 정화 완료!!");
+            GameManager.Instance?.EndBattle(true);
+        }
+    }
+
+    // 정화 수치 증가
+    public void IncreaseCureGauge(int amount)
+    {
+        if (amount <= 0) return;
+
+        _currentCure = Mathf.Min(_maxCure, _currentCure + amount);
+        Debug.Log($"[BattleSystem] 정화섹터 작동! ({amount} 수치 정화)");
+
+        UpdateCureGauage?.Invoke(_currentCure, _maxCure);
+    }
+
+    // 정화 수치 감소
+    public void DecreaseCureGauge(int amount)
+    {
+        if (amount <= 0) return;
+
+        _currentCure = Mathf.Max(0, _currentCure - amount);
+
+        UpdateCureGauage?.Invoke(_currentCure, _maxCure);
     }
 
     /// <summary>

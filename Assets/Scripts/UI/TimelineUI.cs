@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using VInspector;
 
 public class TimelineUI : MonoBehaviour
 {
+    [Header("새로운 레이아웃 전용")]
+    public bool New_Layout = false;
+    public GameObject New_Layout_description; // 설명 슬롯
+
     [Header("타임라인 슬롯 프리팹")]
     public GameObject enemySlotPrefab;      // 적 전조 슬롯
     public GameObject cursorSlotPrefab;     // 실행 커서 슬롯
@@ -52,7 +58,10 @@ public class TimelineUI : MonoBehaviour
     public Color parryingColor = new Color(1f, 1f, 0.3f);
     [Header("플레이어 색상")]
     public Color Player_attackColor;
+    public Sprite Sword_icon;
     public Color Player_moveColor;
+    public Sprite CW_icon;
+    public Sprite CCW_icon;
     public Color occupiedColor = new Color(0.3f, 0.3f, 0.3f);
 
     // 슬롯 저장 (틱 1~18)
@@ -77,7 +86,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged += (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged += (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
         }
     }
@@ -87,7 +98,9 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged -= UpdatePlayerTimeline;
+            TimelineManager.Instance.OnTimelineChanged -= (cur, prev) => UpdateDangerIndicators();
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
+            TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
         }
     }
@@ -132,8 +145,20 @@ public class TimelineUI : MonoBehaviour
             GameObject slot = Instantiate(playerSlotPrefab, playerTimelinePanel);
             slot.name = $"PlayerSlot_{tick}";
 
+
+            TimelineDropZone dropZone = null;
+
+            // TODO: New_Layout 확정되면 나중에 지우기
             // 드롭 이벤트 핸들러 추가
-            TimelineDropZone dropZone = slot.AddComponent<TimelineDropZone>();
+            if (New_Layout)
+            {
+                dropZone = slot.transform.Find("Image")?.AddComponent<TimelineDropZone>();
+            }
+            else
+            {
+                dropZone = slot.AddComponent<TimelineDropZone>();
+            }
+
             dropZone.tickIndex = tick;
 
             TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
@@ -307,12 +332,22 @@ public class TimelineUI : MonoBehaviour
 
         // 이 틱에서의 효과 확인
         int cardTickIndex = tick - placedBlock.startTick;
-        // 놓인 블럭 정보
+        // 놓인 블럭 정보 (기본 데이터)
         BlockData blockData = placedBlock.GetBlockData();
 
         ActionType effect = blockData.GetEffectAt(cardTickIndex);
-        MoveDirection moveDir = blockData.moveDirections[cardTickIndex];
-        string effectText = "";
+        MoveDirection moveDir = MoveDirection.None;
+
+        if (placedBlock.linkedRuntimeBlock != null && placedBlock.linkedRuntimeBlock.CurrentMoveDirections != null)
+        {
+            moveDir = placedBlock.linkedRuntimeBlock.CurrentMoveDirections[cardTickIndex];
+        }
+        else
+        {
+            moveDir = blockData.moveDirections[cardTickIndex];
+        }
+
+            string effectText = "";
         switch (effect)
         {
             case ActionType.None:
@@ -323,9 +358,9 @@ public class TimelineUI : MonoBehaviour
                 break;
             case ActionType.Move:
                 if (moveDir == MoveDirection.Right)
-                    effectText = $"이동: 시계방향";
+                    effectText = $"이동: 시계방향\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Left)
-                    effectText = $"이동: 반시계방향";
+                    effectText = $"이동: 반시계방향\n좌클릭: 방향 변경";
                 break;
         }
 
@@ -470,6 +505,11 @@ public class TimelineUI : MonoBehaviour
             // 기본 색상 초기화
             if (image != null)
             {
+                if (New_Layout)
+                {
+                    normalColor.a = 0;
+                }
+
                 image.color = normalColor;
             }
 
@@ -538,6 +578,7 @@ public class TimelineUI : MonoBehaviour
                             color = Player_attackColor;
                             color.a = 0.25f;
                             text = "▲";
+                            iconSprite = Sword_icon;
                             break;
 
                         case ActionType.Move:
@@ -553,10 +594,18 @@ public class TimelineUI : MonoBehaviour
                             {
                                 dir = blockData.moveDirections[i];
                             }
+
                             if (dir == MoveDirection.Left)
+                            {
                                 text = "<";
+                                iconSprite = CCW_icon;
+                            }
                             else if (dir == MoveDirection.Right)
+                            {
                                 text = ">";
+                                iconSprite = CW_icon;
+                            }
+                                
                             break;
                     }
 
@@ -570,6 +619,14 @@ public class TimelineUI : MonoBehaviour
                     if (iconImage != null)
                     {
                         iconImage.enabled = showIcon;
+                        iconImage.sprite = iconSprite;
+                    }
+
+                    // 아이콘 있으면 적용
+                    if(iconSprite != null)
+                    {
+                        cellText.text = "";
+                        iconImage.enabled = true;
                         iconImage.sprite = iconSprite;
                     }
 
@@ -595,9 +652,16 @@ public class TimelineUI : MonoBehaviour
             // 놓인 블럭 정보
             BlockData blockData = placed.GetBlockData();
 
-            GameObject descriptionSlot = Instantiate(descriptionSlotPrefab, descriptionPanel);
+            // 레이아웃에 따른 프리펩 선정
+            GameObject prefab = New_Layout ? New_Layout_description : descriptionSlotPrefab;
+
+            GameObject descriptionSlot = Instantiate(prefab, descriptionPanel);
+
+
+
             descriptionSlot.name = $"{placed.startTick}. DescriptionSlot";
-            descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
+            //descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
+            descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed);
             descriptionSlots.Add(descriptionSlot);
 
             for (int i = 0; i < blockData.blockLength; i++)
@@ -618,6 +682,8 @@ public class TimelineUI : MonoBehaviour
                             img.gameObject.SetActive(false);
                         }
                     }
+
+                    iconImage.gameObject.SetActive(true);
 
                     image.sprite = Set_SlotSprite;
 
@@ -641,6 +707,7 @@ public class TimelineUI : MonoBehaviour
                             //color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
                             color = Player_attackColor;
                             text = "▲";
+                            iconSprite = Sword_icon;
                             break;
 
                         case ActionType.Move:
@@ -655,10 +722,18 @@ public class TimelineUI : MonoBehaviour
                             {
                                 dir = blockData.moveDirections[i];
                             }
+
                             if (dir == MoveDirection.Left)
+                            {
                                 text = "<";
+                                iconSprite = CCW_icon;
+                            }
                             else if (dir == MoveDirection.Right)
+                            {
                                 text = ">";
+                                iconSprite = CW_icon;
+                            }
+
                             break;
 
                     }
@@ -673,6 +748,14 @@ public class TimelineUI : MonoBehaviour
                     if (iconImage != null)
                     {
                         iconImage.enabled = showIcon;
+                        iconImage.sprite = iconSprite;
+                    }
+
+                    // 아이콘 있으면 적용
+                    if (iconSprite != null)
+                    {
+                        cellText.text = "";
+                        iconImage.enabled = true;
                         iconImage.sprite = iconSprite;
                     }
 
@@ -710,5 +793,27 @@ public class TimelineUI : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void UpdateDangerIndicators()
+    {
+        if (TimelineManager.Instance == null) return;
+        foreach(GameObject slot in cursorSlots)
+        {
+            TimelineTickHoverHandler handler = slot.GetComponent<TimelineTickHoverHandler>();
+            if (handler != null)
+                handler.SetCautionStatus(false);
+        }
+        List<int> dangerTicks = TimelineManager.Instance.GetProjectedDangerTicks();
+        foreach (int tick in dangerTicks)
+        {
+            int slotIndex = (tick * 2) - 1;
+            if (slotIndex >= 0 && slotIndex < cursorSlots.Count)
+            {
+                TimelineTickHoverHandler handler = cursorSlots[slotIndex].GetComponent<TimelineTickHoverHandler>();
+                if (handler != null)
+                    handler.SetCautionStatus(true);
+            }
+        }
     }
 }

@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2686350335356439353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 973253541114696372}
+  - component: {fileID: 8214370545068926648}
+  - component: {fileID: 4090912715003932462}
+  - component: {fileID: 1979076862494004251}
+  - component: {fileID: 3084520134297434512}
+  - component: {fileID: 1782644105926750430}
+  - component: {fileID: 5726066454712002909}
+  m_Layer: 0
+  m_Name: VisualController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &973253541114696372
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.9543873, y: 0.2075958, z: 0.030571729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8214370545068926648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9586faabfad954a499c81c18307285bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4090912715003932462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9e77ede1d911d438b2a42554ee20d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerPrefab: {fileID: 3652769322740185573, guid: 06faf5bec4959384687341467e0ef737, type: 3}
+  _moveDuration: 0.4
+  _yOffset: 0.8
+  _playerGhostPrefab: {fileID: 3652769322740185573, guid: a0fa235507c78c149bc5d7a3f826b015, type: 3}
+  _ghostYOffset: 0.8
+  _hitFlashDuration: 0.2
+  _hitColor: {r: 1, g: 0, b: 0, a: 1}
+  _shakeDuration: 0.3
+  _shakeAngle: 15
+  _shakeCount: 3
+  trailEffectPrefab: {fileID: 5454234269023465998, guid: 7a0c7f276b3f74445abff41c6a7ea415, type: 3}
+--- !u!114 &1979076862494004251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a79e44baa8ca9640904b871a01603d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyPrefab: {fileID: 4482405001485822806, guid: e12360b313e20744abe2b4c0b735afec, type: 3}
+  _enemyContainer: {fileID: 0}
+  _spacing: 2.5
+  textPrefab: {fileID: 8065810026165535893, guid: ad88349cdc9819d46bafdb0ef347efe3, type: 3}
+  Offset: {x: 4, y: 2, z: 0}
+  blinkDuration: 0.3
+  EnemyHitColor: {r: 1, g: 0, b: 0, a: 1}
+  textLifetime: 0.5
+  floatUpSpeed: 1
+--- !u!114 &3084520134297434512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b19436e342e11040a504f5bd97c8aa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _storyLine: {fileID: 0}
+  _timelinePanel: {fileID: 0}
+  _sectorSelectText: {fileID: 0}
+  _storyLineDuration: 1.5
+  _timelinePanelDuration: 1.5
+  _timelineUpDuration: 0.7
+  targetHeight: 620
+--- !u!114 &1782644105926750430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ef3b5121ae2d549944681408f0bb7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _victoryPanel: {fileID: 0}
+  _defeatPanel: {fileID: 0}
+  _victoryText: {fileID: 0}
+  _defeatText: {fileID: 0}
+  _goToMainBtn: {fileID: 0}
+  _librarySceneName: Stage Scene
+  _delaySeconds: 0.5
+  _fadeDuration: 1
+  _noiseTextureGenerator: {fileID: 5726066454712002909}
+  _crystalTransform: {fileID: 0}
+  _startPos: {x: 514, y: 90, z: 0}
+  moveY: 210
+  duration: 2
+--- !u!114 &5726066454712002909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686350335356439353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e6927c1ad0d8ed4b802335adeb9b49a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureSize: 256
+  noiseScale: 30
+  octaves: 6
+  persistence: 0.5
+  lacunarity: 4
+  seed: 0
+  generatedTexture: {fileID: 0}
+  contrast: 0.5
+  brightness: 0.33
+  targetMaterial: {fileID: 2100000, guid: 21641be2969d962408640a61082d92d2, type: 2}

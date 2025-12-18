@@ -4,13 +4,21 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 플레이어 슬롯 마우스 오버 핸들러 (배치된 카드 정보)
 /// </summary>
-public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler,
+    IBeginDragHandler, IDragHandler
 {
     public int tick;
     public TimelineUI timelineUI;
     public PlacedBlock placedBlock;
     // 잔상인지 아닌지
     public bool Is_prev = false;
+
+    private Canvas canvas;
+
+    void Start()
+    {
+        canvas = GetComponentInParent<Canvas>();
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -26,6 +34,34 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
         {
             timelineUI.HidePlayerTooltip();
         }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right) return;
+        if (GameManager.Instance.IsExecutingRound) return;
+        if (Is_prev || placedBlock == null) return;
+
+        EventBus.Publish(new DragBeginEvent
+        {
+            pointer = eventData,
+            block = placedBlock.linkedRuntimeBlock,
+            startWorldPos = transform.position,
+            canvas = canvas
+        });
+
+        if (TimelineManager.Instance != null)
+        {
+            // PlacedBlock 리스트에서만 제거
+            TimelineManager.Instance.RemovePlacedBlock_OnTimeline(placedBlock);
+
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        return;
+        //throw new System.NotImplementedException();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -64,6 +100,9 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 }
             }
         }
+
+
+
         // 이 아래는 시스템이 더 나와야 제작가능
         // 우클릭으로 카드 제거
         //if (eventData.button == PointerEventData.InputButton.Right && placedBlock != null)

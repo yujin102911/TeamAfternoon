@@ -110,6 +110,10 @@ public class MapSystem
                 sectorObj.name = $"Sector_{sectorNum}";
                 sectorObj.transform.localScale = new Vector3(size * 0.9f, size * 0.9f, 1);
 
+                FloatObject floater = sectorObj.AddComponent<FloatObject>();
+                floater.floatStrength = 0.07f;
+                floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
+
                 MapSectorHandler handler = sectorObj.AddComponent<MapSectorHandler>();
                 handler.Initialize(sectorNum, this);
 
@@ -156,6 +160,10 @@ public class MapSystem
                 sectorObj.name = $"Sector_{sectorNum}";
                 sectorObj.transform.localScale = new Vector3(size * 0.9f, size * 0.9f, 1);
 
+                FloatObject floater = sectorObj.AddComponent<FloatObject>();
+                floater.floatStrength = 0.15f;
+                floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
+
                 var handler = sectorObj.AddComponent<MapSectorHandler>();
                 handler.Initialize(sectorNum, this);
 
@@ -179,6 +187,13 @@ public class MapSystem
         }
         Debug.LogWarning($"[MapSystem] 존재하지 않는 섹터 {sectorIndex}의 위치를 요청했습니다");
         return Vector3.zero;
+    }
+
+    public Transform GetSectorTransform(int sectorNum)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+            return obj.transform;
+        return null;
     }
     #endregion
 
@@ -218,6 +233,18 @@ public class MapSystem
         {
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = color;
+        }
+    }
+
+    public void PlaySectorParticle(int sectorNum)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+        {
+            ParticleSystem ps = obj.GetComponentInChildren<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Play();
+            }
         }
     }
     #endregion

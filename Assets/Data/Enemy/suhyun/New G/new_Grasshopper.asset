@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de4d75918fa12964f975bc78eea7ee02, type: 3}
+  m_Name: new_Grasshopper
+  m_EditorClassIdentifier: 
+  _maxEnemyHp: 1
+  _enemyName: "\uBCA0\uC9F1\uC774"
+  _enemySprite: {fileID: 2331183500015241389, guid: d7d31eab89ea837479e321c6bc54cdcd, type: 3}
+  _enemyDeadSprite: {fileID: -2510470124470490886, guid: fcfebfec4fb31a049a2cfc28e265bb86, type: 3}
+  PhaseGroups:
+  - PhaseName: 1
+    Patterns:
+    - {fileID: 11400000, guid: 73043f332bbb1c24e848c23638b776bf, type: 2}
+    - {fileID: 11400000, guid: 69362ca00459c3143a3526794274633e, type: 2}
+    - {fileID: 11400000, guid: 94f4c61fbb12a794f8596b91d1791fd7, type: 2}
+    IsLoop: 0
+  - PhaseName: 2
+    Patterns:
+    - {fileID: 11400000, guid: cebaccb644ef2c247b362d96cb3587b2, type: 2}
+    - {fileID: 11400000, guid: a4514ee64da1cd74299d8d342df1e07e, type: 2}
+    - {fileID: 11400000, guid: 81f55b98cfa132849a36f1bfe018df64, type: 2}
+    - {fileID: 11400000, guid: 27b25451d6687434c95f84b2fff58a88, type: 2}
+    IsLoop: 0
+  - PhaseName: 3
+    Patterns:
+    - {fileID: 11400000, guid: da377f2ba4a589d4e82b0882b926aaf8, type: 2}
+    IsLoop: 1
+  _assignedColor: {r: 0.43921572, g: 0.47058827, b: 0.13725491, a: 1}
+  _enemyAbilities: []

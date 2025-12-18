@@ -1,10 +1,13 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, 
+    IBeginDragHandler, IDragHandler
 {
     private RuntimeBlock _runtimeBlock;
+    private PlacedBlock _placedBlock;
 
     [SerializeField]
     private RectTransform _rectTransform;
@@ -15,21 +18,27 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private Canvas canvas;
 
+    [Header("마우스 호버 설정")]
+    [SerializeField]
+    private Image _image;
+    private Color _originColor;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (_image == null)
+            _image = GetComponent<Image>();
+
+        _originColor = _image.color;
+
         canvas = GetComponentInParent<Canvas>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetUp(int start_tick, float width, float spacing, PlacedBlock placedBlock)
     {
-        
-    }
-
-    public void SetUp(int start_tick, float width, float spacing, RuntimeBlock runtimeBlock)
-    {
-        _runtimeBlock = runtimeBlock;
+        _placedBlock = placedBlock;
+        _runtimeBlock = placedBlock.linkedRuntimeBlock;
+        //_runtimeBlock = runtimeBlock;
 
         _rectTransform.position = new Vector3(
             _rectTransform.position.x + (start_tick - 1) * (width + spacing),
@@ -39,20 +48,20 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         // 너비 설정
         Vector2 size = _rectTransform.sizeDelta;
-        int length = runtimeBlock.BaseData.blockLength;
+        int length = _runtimeBlock.BaseData.blockLength;
         size.x = (width * length) + spacing * (length - 1);
         _rectTransform.sizeDelta = size;
 
         // 이름 설정
-        _blockNameText.text = runtimeBlock.BaseData.blockName;
+        _blockNameText.text = _runtimeBlock.BaseData.blockName;
 
         _keywordNameText.text = "";
         // 키워드 설정
-        if (runtimeBlock.AttachedKeywords.Count > 0)
+        if (_runtimeBlock.AttachedKeywords.Count > 0)
         {
-            for (int i = 0; i < runtimeBlock.AttachedKeywords.Count; i++)
+            for (int i = 0; i < _runtimeBlock.AttachedKeywords.Count; i++)
             {
-                _keywordNameText.text += $"#{runtimeBlock.AttachedKeywords[i].KeywordName} ";
+                _keywordNameText.text += $"#{_runtimeBlock.AttachedKeywords[i].KeywordName} ";
             }
         }
         else
@@ -63,6 +72,9 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // 색상 변경
+        _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
         if (eventData.pointerDrag != null) return;
 
         showPanel();
@@ -70,9 +82,23 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        _image.color = _originColor;
+
         if (CardTooltip.Instance != null)
         {
             CardTooltip.Instance.Hide();
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData) 
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            if (TimelineManager.Instance != null)
+            {
+                TimelineManager.Instance.RemovePlacedBlock(_placedBlock);
+
+            }
         }
     }
 
@@ -129,5 +155,32 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
             index++;
         }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right) return;
+        if (GameManager.Instance.IsExecutingRound) return;
+
+        EventBus.Publish(new DragBeginEvent
+        {
+            pointer = eventData,
+            block = _runtimeBlock,
+            startWorldPos = transform.position,
+            canvas = canvas
+        });
+
+        if (TimelineManager.Instance != null)
+        {
+            // PlacedBlock 리스트에서만 제거
+            TimelineManager.Instance.RemovePlacedBlock_OnTimeline(_placedBlock);
+
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        return;
+        //throw new System.NotImplementedException();
     }
 }

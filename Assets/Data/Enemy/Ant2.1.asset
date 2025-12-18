@@ -13,16 +13,15 @@ MonoBehaviour:
   m_Name: Ant2.1
   m_EditorClassIdentifier: 
   Pattern_Name: ant2-1
-  Sentence: "\uBCA0\uC9F1\uC774\uAC00 \uAC11\uC790\uAE30 \uC0AC\uB77C\uC84C\uB2E4\uB294
-    \uC0AC\uC2E4\uC744 \uC54C\uAC8C \uB41C \uAC1C\uBBF8\uB294 \uC7A0\uC2DC \uAE30\uBED0\uD588\uC9C0\uB9CC,
-    \uB3D9\uB8CC \uAC1C\uBBF8\uB4E4\uC758 \u201C\uC77C\uD130\uB85C \uB3CC\uC544\uC624\uB77C\u201D\uB294
-    \uB9D0\uC740 \uB05D\uB0B4 \uB4E3\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4."
+  Sentence: "\uBCA0\uC9F1\uC774\uC758 \uAE30\uCC99\uC774 \uC0AC\uB77C\uC9C0\uC790
+    \uAC1C\uBBF8\uB294 \uC804\uBA74 \uACF5\uACA9\uC744 \uD3EC\uAE30\uD558\uACE0\n\uC774\uB3D9
+    \uACBD\uB85C\uB97C \uC81C\uD55C\uD558\uB294 \uC555\uBC15 \uC804\uB7B5\uC73C\uB85C
+    \uC804\uD658\uD588\uC2B5\uB2C8\uB2E4."
   attacks:
-  - tick: 8
-    targetSectors: 01000000020000000300000004000000050000000600000008000000
-    damage: 4
-  parryings:
-  - tick: 2
-    damageMultiplier: 1
   - tick: 6
-    damageMultiplier: 1
+    targetSectors: 0600000007000000080000000100000002000000
+    damage: 1
+  - tick: 8
+    targetSectors: 08000000040000000200000006000000
+    damage: 1
+  parryings: []
