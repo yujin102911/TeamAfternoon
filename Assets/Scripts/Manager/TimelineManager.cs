@@ -284,7 +284,11 @@ public class TimelineManager : MonoBehaviour
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
-            if (GameManager.Instance.IsRoundInterrupted) break;
+            if (GameManager.Instance.IsRoundInterrupted)
+            {
+                OnCurrentTickChanged?.Invoke(0);
+                break;
+            }
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2*tick - 1);
 
@@ -292,7 +296,11 @@ public class TimelineManager : MonoBehaviour
 
             // 1. 플레이어 블록 처리 (TimelineSystem이 이벤트 발행 → Director가 BattleSystem 호출)
             _timelineSystem.ProcessTick(tick);
-            if (GameManager.Instance.IsRoundInterrupted) break;
+            if (GameManager.Instance.IsRoundInterrupted)
+            {
+                OnCurrentTickChanged?.Invoke(0);
+                break;
+            }
 
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
@@ -318,7 +326,11 @@ public class TimelineManager : MonoBehaviour
 
             }
 
-            if (GameManager.Instance.IsRoundInterrupted) break;
+            if (GameManager.Instance.IsRoundInterrupted)
+            {
+                OnCurrentTickChanged?.Invoke(0);
+                break;
+            }
 
             // 연출 대기
             yield return new WaitForSeconds(0.4f);
