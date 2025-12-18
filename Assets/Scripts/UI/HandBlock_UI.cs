@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VInspector;
 
+
 public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
      IDragHandler, IEndDragHandler
 {
     public RuntimeBlock runtimeBlock;
+
 
     [Header("참조")]
     public TextMeshProUGUI BlockNameText;
@@ -22,18 +25,32 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private Canvas canvas;
     private CanvasGroup canvasGroup;
 
-    [Tab("색")]
-    [Header("색상 설정")]
+    [TabGroup("Attack")]
     [SerializeField]
     private Color _attackColor;
+    [TabGroup("Attack")]
+    public Sprite Sword_icon;
+
+    [TabGroup("Move")]
     [SerializeField]
     private Color _moveColor;
+    [TabGroup("Move")]
+    public Sprite CW_icon;
+    [TabGroup("Move")]
+    public Sprite CCW_icon;
+
+    [TabGroup("Cure")]
+    [SerializeField]
+    private Color[] _cureColors;
+    [TabGroup("Cure")]
+    public Sprite[] _cureIcons;
+
+    [TabGroup("None")]
     [SerializeField]
     private Color _noneColor;
 
-    public Sprite Sword_icon;
-    public Sprite CW_icon;
-    public Sprite CCW_icon;
+    
+    
 
     private ScrollRect parentScroll;
     private RectTransform rectTransform;
@@ -116,7 +133,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             ActionType action = data.GetEffectAt(i);
             if (txt)
             {
-                if (action == ActionType.Attack || action == ActionType.Cure)
+                if (action == ActionType.Attack)
                 {
                     txt.text = "▲";
                     img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);
@@ -124,9 +141,17 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
                 }
                 else if (action == ActionType.Move)
                 {
-                    txt.text = ">"; // TODO: 추후에 동그란 화살표 모양으로 바꿔야됨
+                    txt.text = ">";
                     img.color = new Color(_moveColor.r, _moveColor.g, _moveColor.b, 1.0f);
                     iconSprite = CW_icon;
+                }
+                else if(action == ActionType.Cure)
+                {
+                    txt.text = "";
+                    int index = data.CalCulate_CurePower(i) - 1;
+                    Color CureColor = _cureColors[index];
+                    img.color = new Color(CureColor.r, CureColor.g, CureColor.b, 1.0f);
+                    iconSprite = _cureIcons[index];
                 }
                 else
                 {
