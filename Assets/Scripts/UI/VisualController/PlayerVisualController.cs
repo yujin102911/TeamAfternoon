@@ -29,6 +29,7 @@ public class PlayerVisualController : MonoBehaviour
 
     private GameObject _playerInstance;
     private SpriteRenderer _playerRenderer;
+    private ParticleSystem _playerAttackParticle;
     private GameObject _currentGhost;
 
     private Coroutine _moveCoroutine;
@@ -82,6 +83,8 @@ public class PlayerVisualController : MonoBehaviour
 
                 _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
                 if (_playerRenderer == null) _playerRenderer = _playerInstance.GetComponent<SpriteRenderer>();
+
+                _playerAttackParticle = _playerInstance.GetComponentInChildren<ParticleSystem>();
             }
         }
     }
@@ -90,6 +93,10 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayAttackShake()
     {
         if (_playerInstance == null) return;
+        if (_playerAttackParticle != null)
+        {
+            _playerAttackParticle.Play();
+        }
         StartCoroutine(ShakeRoutine());
     }
 
