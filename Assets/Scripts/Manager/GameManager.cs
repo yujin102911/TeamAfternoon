@@ -46,7 +46,6 @@ public class GameManager : MonoBehaviour
     private TimelineManager _timelineManager;
 
     private int _currentRound = 0;
-    private int _globalTurnIndex = 0;
     private int _currentEnemyIndex = 0;
 
     // 게임 상태 변수
@@ -256,8 +255,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetupGame()
     {
-        _currentRound = 0; 
-        _globalTurnIndex = 0;
+        _currentRound = 0;
         _currentEnemyIndex = 0;
 
         IsExecutingRound = false;
@@ -429,10 +427,7 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.DecayBuffs();
             _battleSystem.ChooseCureSector();
-            if (_currentRound % _battleSystem.RecoverCycle == 0)
-            {
-                _battleSystem.DecreaseCureGauge(5);
-            }
+            _battleSystem.OnRoundEnded();
         }
         UpdateEnemyPatterns();
         PrepareNextHand();
@@ -524,7 +519,6 @@ public class GameManager : MonoBehaviour
                 TimelineManager.Instance.SetEnemyPattern(nextPattern);
             }
         }
-        _globalTurnIndex++;
 
     }
     #endregion

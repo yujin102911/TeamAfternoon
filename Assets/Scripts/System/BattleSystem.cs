@@ -29,6 +29,9 @@ public class BattleSystem
     private int _currentCure = 0;
     private int _curePower = 1;
     private int _recoverCycle = 3;
+
+    private int _battleTurnCount = 0;
+
     #endregion
 
     #region Events
@@ -85,6 +88,8 @@ public class BattleSystem
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
+
+        _battleTurnCount = 0;
         Debug.Log($"[BattleSystem] 전투 시작! 목표 정화량: {_maxCure}");
 
     }
@@ -412,6 +417,16 @@ public class BattleSystem
                 buffs.Remove(key);
                 OnBuffChanged?.Invoke(key, 0, isPlayer); 
             }
+        }
+    }
+
+    public void OnRoundEnded()
+    {
+        _battleTurnCount++;
+        if (_battleTurnCount > 0 && _battleTurnCount % _recoverCycle == 0)
+        {
+            DecreaseCureGauge(5);
+            Debug.Log($"[BattleSystem] {_recoverCycle}턴 경과! 정화 수치 자연 감소 (-5)");
         }
     }
 }
