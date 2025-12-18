@@ -1,21 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public enum PhaseConditionType
-{
-    None,            // 조건 없음
-    HpThreshold,     // 적 전체 체력 n% 이하
-    EnemyCount,      // 남은 적 n마리 이하
-}
-
-[System.Serializable]
-public class PhaseTransitionData
-{
-    public string PhaseName; // "1->2페이즈 조건"
-    public PhaseConditionType ConditionType;
-    public float ConditionValue; // 0.5면 50%, 1이면 1마리 등
-}
-
 [System.Serializable]
 public class BookPage
 {
@@ -44,6 +29,17 @@ public class StageData : ScriptableObject
     [TextArea(3, 20)]
     private string _stageName; //스테이지 이름
 
+    [Header("편지 내용")]
+    [Tooltip("클리어 전 보일 의뢰 편지")]
+    [SerializeField]
+    [TextArea(5, 20)]
+    private string _requestLetter;
+
+    [Tooltip("클리어 후 보일 감사 편지")]
+    [SerializeField]
+    [TextArea(5, 20)]
+    private string _thankLetter;
+
     [Header("책 표지/타이틀 정보")]
     [TextArea(4,20)]
     public string BookCredit = "2025 by Team Afternoon";
@@ -69,13 +65,9 @@ public class StageData : ScriptableObject
     [SerializeField]
     private List<StageEnemySetup> _enemySpawns = new List<StageEnemySetup>();
 
-    [Header("페이즈 전환 조건( Index0: 1->2 전환 조건)")]
-    [SerializeField]
-    private List <PhaseTransitionData> _phaseConditions = new List<PhaseTransitionData>();
-
     [Header("체력 설정")]
     [SerializeField]
-    private int _playerMaxHP = 20;                //추후 유저 데이터에서 받아오기
+    private int _playerMaxHP = 20;
 
     [Header("스테이지 진행도")]
     [SerializeField]
@@ -86,10 +78,11 @@ public class StageData : ScriptableObject
     public List<BookPage > BookPages => _bookPages;
     public List<int> SpreadPollutionIDs => _spreadPollutionIDs;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
-    public List<PhaseTransitionData> PhaseConditions => _phaseConditions;
     public MapSize MapSize => _mapSize;
     public List<Vector3> SectorPoints => _sectorTransform;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
+    public string RequestLetter => _requestLetter;
+    public string ThankLetter => _thankLetter;
 
 }

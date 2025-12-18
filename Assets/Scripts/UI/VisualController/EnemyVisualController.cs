@@ -36,8 +36,6 @@ public class EnemyVisualController : MonoBehaviour
         _battleSystem = battleSystem;
 
         _battleSystem.OnBattleInitialized += CreateEnemies;
-        _battleSystem.OnEnemyHPChanged += HandleEnemyHit;
-        _battleSystem.OnEnemyDied += HandleEnemyDead;
     }
 
     private void OnDestroy()
@@ -45,8 +43,6 @@ public class EnemyVisualController : MonoBehaviour
         if (_battleSystem != null)
         {
             _battleSystem.OnBattleInitialized -= CreateEnemies;
-            _battleSystem.OnEnemyHPChanged -= HandleEnemyHit;
-            _battleSystem.OnEnemyDied -= HandleEnemyDead;
         }
     }
 
@@ -70,39 +66,39 @@ public class EnemyVisualController : MonoBehaviour
                 _visualMap.Add(enemy, visual);
             }
         }
-        AlignEnemies();
+        //AlignEnemies();
 
     }
 
-    private void AlignEnemies()
-    {
-        int activeCount = 0;
-        foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
-        {
-            if (!enemy.IsDead) activeCount++;
-        }
+    //private void AlignEnemies()
+    //{
+    //    int activeCount = 0;
+    //    foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+    //    {
+    //        if (!enemy.IsDead) activeCount++;
+    //    }
 
-        if (activeCount == 0) return;
+    //    if (activeCount == 0) return;
 
-        float totalWidth = (activeCount - 1) * _spacing;
+    //    float totalWidth = (activeCount - 1) * _spacing;
 
-        float startX = -totalWidth / 2f;
+    //    float startX = -totalWidth / 2f;
 
-        int currentIndex = 0;
-        foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
-        {
-            if (enemy.IsDead) continue;
+    //    int currentIndex = 0;
+    //    foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+    //    {
+    //        if (enemy.IsDead) continue;
 
-            if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
-            {
-                // 현재 위치 = 시작점 + (순서 * 간격)
-                float xPos = startX + (currentIndex * _spacing);
+    //        if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
+    //        {
+    //            // 현재 위치 = 시작점 + (순서 * 간격)
+    //            float xPos = startX + (currentIndex * _spacing);
 
-                visual.transform.localPosition = new Vector3(xPos, 0, 0);
-                currentIndex++;
-            }
-        }
-    }
+    //            visual.transform.localPosition = new Vector3(xPos, 0, 0);
+    //            currentIndex++;
+    //        }
+    //    }
+    //}
 
     private void HandleEnemyHit(RuntimeEnemy enemy)
     {

@@ -132,12 +132,6 @@ public class TimelineManager : MonoBehaviour
         }
 
     }
-
-    private void HandleEnemyDied(RuntimeEnemy deadEnemy)
-    {
-        RefreshCombinedEnemyPattern();
-    }
-
     // ========================================
     // 공개 메서드
     // ========================================
@@ -262,37 +256,6 @@ public class TimelineManager : MonoBehaviour
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
     }
-
-    public void RefreshCombinedEnemyPattern()
-    {
-        if (_battleSystem == null || _battleSystem.Enemies == null) return;
-        EnemyPattern masterPattern = ScriptableObject.CreateInstance<EnemyPattern>();
-        masterPattern.name = "Combined Pattern";
-
-        foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
-        {
-            if (enemy.IsDead) continue;
-            if (enemy.CurrentPattern == null) continue;
-            foreach (EnemyAttack attack in enemy.CurrentPattern.attacks)
-            {
-                int realTick = attack.tick;
-                if (realTick <= _totalTicks)
-                {
-                    masterPattern.attacks.Add(new EnemyAttack(realTick, attack.targetSectors, attack.damage));
-                }
-            }
-            foreach (EnemyParrying parry in enemy.CurrentPattern.parryings)
-            {
-                int realTick = parry.tick; 
-                if (realTick <= _totalTicks)
-                {
-                    masterPattern.parryings.Add(new EnemyParrying(realTick, parry.damageMultiplier));
-                }
-            }
-        }
-        SetEnemyPattern(masterPattern);
-    }
-
     public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
     {
         if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
@@ -321,6 +284,7 @@ public class TimelineManager : MonoBehaviour
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
+            if (GameManager.Instance.IsRoundInterrupted) break;
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2*tick - 1);
 
@@ -328,6 +292,7 @@ public class TimelineManager : MonoBehaviour
 
             // 1. 플레이어 블록 처리 (TimelineSystem이 이벤트 발행 → Director가 BattleSystem 호출)
             _timelineSystem.ProcessTick(tick);
+            if (GameManager.Instance.IsRoundInterrupted) break;
 
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
@@ -350,9 +315,10 @@ public class TimelineManager : MonoBehaviour
                 {
                     _battleSystem.ProcessEnemyAttack(attack);
                 }
+
             }
 
-            
+            if (GameManager.Instance.IsRoundInterrupted) break;
 
             // 연출 대기
             yield return new WaitForSeconds(0.4f);
@@ -416,7 +382,6 @@ public class TimelineManager : MonoBehaviour
     public void Initialize(BattleSystem battleSystem)
     {
         _battleSystem = battleSystem;
-        _battleSystem.OnEnemyDied += HandleEnemyDied;
     }
 
     #region Preview Methods - public
