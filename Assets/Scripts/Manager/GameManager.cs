@@ -287,6 +287,7 @@ public class GameManager : MonoBehaviour
         {
             _mapSystem.GenerateMap(currentStageData.MapSize, currentStageData.SectorPoints);
         }
+        // 혹시 모를 예외 상황을 위함
         else
         {
             _mapSystem.GenerateMap(_mapSize);
