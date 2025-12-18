@@ -44,6 +44,17 @@ public class StageData : ScriptableObject
     [TextArea(3, 20)]
     private string _stageName; //스테이지 이름
 
+    [Header("편지 내용")]
+    [Tooltip("클리어 전 보일 의뢰 편지")]
+    [SerializeField]
+    [TextArea(5, 20)]
+    private string _requestLetter;
+
+    [Tooltip("클리어 후 보일 감사 편지")]
+    [SerializeField]
+    [TextArea(5, 20)]
+    private string _thankLetter;
+
     [Header("책 표지/타이틀 정보")]
     [TextArea(4,20)]
     public string BookCredit = "2025 by Team Afternoon";
@@ -91,5 +102,7 @@ public class StageData : ScriptableObject
     public List<Vector3> SectorPoints => _sectorTransform;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
+    public string RequestLetter => _requestLetter;
+    public string ThankLetter => _thankLetter;
 
 }

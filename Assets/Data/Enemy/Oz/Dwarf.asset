@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de4d75918fa12964f975bc78eea7ee02, type: 3}
+  m_Name: Dwarf
+  m_EditorClassIdentifier: 
+  _maxEnemyHp: 100
+  _enemyName: Dwarf
+  _enemySprite: {fileID: 0}
+  _enemyDeadSprite: {fileID: 0}
+  PhaseGroups:
+  - PhaseName: 1
+    Patterns:
+    - {fileID: 11400000, guid: 77d5a3dbe975ebb439c03b2a6c50ddaf, type: 2}
+    - {fileID: 11400000, guid: 658c6f65f7c0e4246af1b8bc1587735a, type: 2}
+    - {fileID: 11400000, guid: c5a5605ad0243194d9a59b7ede6daf8a, type: 2}
+    - {fileID: 11400000, guid: 4d8425579ed162744a1cc726970924b0, type: 2}
+    IsLoop: 1
+  _assignedColor: {r: 1, g: 1, b: 1, a: 1}
+  _enemyAbilities: []
