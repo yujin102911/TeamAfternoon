@@ -137,8 +137,8 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleRoundChanged(int chapter, int page, int totalPage)
     {
-        _pageText.text = $"Page\n<size=56pt>{0+page.ToString()}";
-        _totalPageText.text = $"/{totalPage}";
+        _pageText.text = $"<size=56pt>{0+page.ToString()}";
+        _totalPageText.text = $"LINE";
         _chapterText.text = $"Chapter {chapter.ToString()}.";
     }
     private void RefreshStartButtonState()

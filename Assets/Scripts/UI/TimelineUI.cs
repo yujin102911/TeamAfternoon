@@ -362,20 +362,28 @@ public class TimelineUI : MonoBehaviour
             moveDir = blockData.moveDirections[cardTickIndex];
         }
 
-            string effectText = "";
+
+        string titleText = "";
+        string effectText = "";
         switch (effect)
         {
             case ActionType.None:
-                effectText = "행동 없음";
+                titleText = "행동 없음";
+                effectText = "움직이지 않고 가만히 있는다";
+                break;
+            case ActionType.Cure:
+                titleText = "정화";
+                effectText = $"정화 수치: {blockData.CalCulate_CurePower(cardTickIndex)}";
                 break;
             case ActionType.Attack:
                 effectText = $"데미지: {blockData.attackDamage}";
                 break;
             case ActionType.Move:
+                titleText = "이동";
                 if (moveDir == MoveDirection.Right)
-                    effectText = $"이동: 시계방향\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 시계\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Left)
-                    effectText = $"이동: 반시계방향\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 반시계\n좌클릭: 방향 변경";
                 break;
         }
 
@@ -385,13 +393,17 @@ public class TimelineUI : MonoBehaviour
             if (is_prev)
             {
                 Player_tooltipTitleText.text = $"과거의 {blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
+                Player_tooltipTitleText.text = "과거의 " + titleText;
                 Player_tooltipDetailText.text = $"{effectText}\n";
             }
             else
             {
                 Player_tooltipTitleText.text = $"{blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
+                Player_tooltipTitleText.text = titleText;
                 Player_tooltipDetailText.text = $"{effectText}\n우클릭: 제거";
             }
+
+            
 
         }
 
