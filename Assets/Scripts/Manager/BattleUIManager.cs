@@ -105,7 +105,7 @@ public class BattleUIManager : MonoBehaviour
     {
         if (_cureUI != null)
         {
-            _cureUI.UpdateHP(current, max);
+            _cureUI.UpdateCureGauage(current, max);
         }
     }
 

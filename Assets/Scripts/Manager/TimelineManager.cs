@@ -60,6 +60,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnBlockStarted += HandleBlockStarted;
         _timelineSystem.OnBlockEnded += HandleBlockEnded;
         _timelineSystem.OnBlockTick += HandleBlockTick;
+        _timelineSystem.OnCureRequested += HandleCureRequest;
     }
 
     void OnDestroy()
@@ -72,6 +73,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnBlockStarted -= HandleBlockStarted;
             _timelineSystem.OnBlockEnded -= HandleBlockEnded;
             _timelineSystem.OnBlockTick -= HandleBlockTick;
+            _timelineSystem.OnCureRequested -= HandleCureRequest;
         }
     }
 
@@ -87,6 +89,11 @@ public class TimelineManager : MonoBehaviour
     private void HandleMoveRequest(MoveDirection direction)
     {
         _battleSystem.MovePlayer(direction);
+    }
+
+    private void HandleCureRequest(int power)
+    {
+        _battleSystem.Cure(power);
     }
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
@@ -325,12 +332,12 @@ public class TimelineManager : MonoBehaviour
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
 
-            // 정화 시도
-            if (_battleSystem.TryCurePage(tick) && Is_Cure)
-            {
-                // TODO: 정화 이펙트 넣기
-                yield return new WaitForSeconds(0.4f);
-            }
+            //// 정화 시도
+            //if (_battleSystem.TryCurePage(tick, Is_Cure))
+            //{
+            //    // TODO: 정화 이펙트 넣기
+            //    yield return new WaitForSeconds(0.4f);
+            //}
 
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);
