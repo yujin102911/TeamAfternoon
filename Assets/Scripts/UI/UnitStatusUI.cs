@@ -31,4 +31,16 @@ public class UnitStatusUI : MonoBehaviour
         }
     }
 
+    public void UpdateCureGauage(int current, int max)
+    {
+        if (_hpSlider != null)
+        {
+            _hpSlider.maxValue = max;
+            _hpSlider.value = current;
+        }
+        if (_hpText != null)
+        {
+            _hpText.text = $"{current}<color=#7e6c4b><size=30>/{max}</size></color>";
+        }
+    }
 }

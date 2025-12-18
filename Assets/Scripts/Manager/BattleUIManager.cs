@@ -5,6 +5,8 @@ using TMPro;
 
 public class BattleUIManager : MonoBehaviour
 {
+    public static BattleUIManager Instance;
+
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
@@ -24,6 +26,11 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private Transform _enemyUIContainer;
 
     private Dictionary<RuntimeEnemy, UnitStatusUI> _enemyUIMap = new Dictionary<RuntimeEnemy, UnitStatusUI>();
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -98,7 +105,7 @@ public class BattleUIManager : MonoBehaviour
     {
         if (_cureUI != null)
         {
-            _cureUI.UpdateHP(current, max);
+            _cureUI.UpdateCureGauage(current, max);
         }
     }
 
@@ -144,7 +151,7 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
-        _startButton.gameObject.SetActive(interactable);
+        //_startButton.gameObject.SetActive(interactable);
 
         //RefreshSectorSelectionPanel();
     }

@@ -380,10 +380,10 @@ public class BattleSystem
     }
 
     // 정화 시도
-    public bool TryCurePage(int tick)
+    public bool TryCurePage(int tick, bool is_cure)
     {
         Debug.Log($"페이지 정화 시도");
-        if (_ableCureSectors.Contains(_playerCurrentSector))
+        if (_ableCureSectors.Contains(_playerCurrentSector) && is_cure)
         {
             //정화 연산
             Cure(_curePower);
@@ -417,7 +417,7 @@ public class BattleSystem
         if (amount <= 0) return;
 
         _currentCure = Mathf.Min(_maxCure, _currentCure + amount);
-        Debug.Log($"[BattleSystem] 정화섹터 작동! ({amount} 수치 정화)");
+        Debug.Log($"[BattleSystem] 정화 발동! ({amount} 수치 정화)");
 
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
     }
