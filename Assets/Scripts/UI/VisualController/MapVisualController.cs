@@ -8,6 +8,7 @@ using System.Collections.Generic;
 /// </summary>
 public class MapVisualController : MonoBehaviour
 {
+    [SerializeField] private UIEffectPool effectPool;
 
     private MapSystem _mapSystem;
     private BattleSystem _battleSystem;
@@ -98,6 +99,9 @@ public class MapVisualController : MonoBehaviour
                 if (i == 0)
                 {
                     _mapSystem.PlaySectorParticle(index);
+
+                    Vector2 spawn_pos = _mapSystem.GetSector_Pos_ToScreen(index);
+                    Play_LightingEffect(spawn_pos);
                 }
             }
             yield return new WaitForSeconds(0.1f);
@@ -106,6 +110,12 @@ public class MapVisualController : MonoBehaviour
                 _mapSystem.ResetSectorColor(index);
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    public void Play_LightingEffect(Vector2 uiPosition)
+    {
+        UIPooledEffect effect = effectPool.Get();
+        effect.Play(uiPosition);
     }
     #endregion
 

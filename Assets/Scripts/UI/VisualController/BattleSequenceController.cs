@@ -11,6 +11,13 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField] private float _cardYOffset = 200f;
     [SerializeField] private float _cardDuration = 1f;
 
+    [Header("좌우 적 이미지 연출")]
+    [SerializeField] private RectTransform leftImage;
+    [SerializeField] private RectTransform rightImage;
+
+    [SerializeField] private float moveDistance = 500f;
+    [SerializeField] private float duration = 0.5f;
+
     [Header("UI 연결")]
     [SerializeField] private GameObject _storyLine;      // 스토리라인 텍스트
     [SerializeField] private GameObject _timelinePanel;  // 타임라인 패널
@@ -297,4 +304,67 @@ public class BattleSequenceController : MonoBehaviour
         }
     }
 
+    public IEnumerator Slide_Enemy(bool is_in)
+    {
+        float halfWidth = Screen.width * 0.5f;
+
+        // 화면 안 기준 위치 (도착 지점)
+        Vector2 insideLeftPos = new Vector2(-moveDistance * 0.5f, 0);
+        Vector2 insideRightPos = new Vector2(moveDistance * 0.5f, 0);
+
+        // 화면 밖 위치
+        Vector2 outsideLeftPos = new Vector2(-halfWidth - moveDistance, 0);
+        Vector2 outsideRightPos = new Vector2(halfWidth + moveDistance, 0);
+
+        Vector2 leftStart, leftEnd;
+        Vector2 rightStart, rightEnd;
+
+        if (is_in)
+        {
+            // 들어오기
+            leftStart = outsideLeftPos;
+            rightStart = outsideRightPos;
+
+            leftEnd = insideLeftPos;
+            rightEnd = insideRightPos;
+        }
+        else
+        {
+            // 나가기
+            leftStart = insideLeftPos;
+            rightStart = insideRightPos;
+
+            leftEnd = outsideLeftPos;
+            rightEnd = outsideRightPos;
+
+            // 회전 정지
+            leftImage.GetComponent<UIRotate>().OnExit();
+            rightImage.GetComponent<UIRotate>().OnExit();
+        }
+
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+
+            leftImage.anchoredPosition = Vector2.Lerp(leftStart, leftEnd, eased);
+            rightImage.anchoredPosition = Vector2.Lerp(rightStart, rightEnd, eased);
+
+            yield return null;
+        }
+
+        leftImage.anchoredPosition = leftEnd;
+        rightImage.anchoredPosition = rightEnd;
+
+        if (is_in) 
+        {
+            // 회전 시작
+            leftImage.GetComponent<UIRotate>().OnArrived();
+            rightImage.GetComponent<UIRotate>().OnArrived();
+        }
+    }
 }
