@@ -12,17 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de4d75918fa12964f975bc78eea7ee02, type: 3}
   m_Name: Oz
   m_EditorClassIdentifier: 
-  _maxEnemyHp: 100
   _enemyName: Oz
+  _maxCureValue: 10
   _enemySprite: {fileID: 0}
   _enemyDeadSprite: {fileID: 0}
-  PhaseGroups:
-  - PhaseName: 1
-    Patterns:
-    - {fileID: 11400000, guid: d5664db412318f34887017205832cf9d, type: 2}
-    - {fileID: 11400000, guid: 1feedf692540eb444a770fe7808490de, type: 2}
-    - {fileID: 11400000, guid: cac48afa7e970e144a8dd3b04df058cd, type: 2}
-    - {fileID: 11400000, guid: 0271e929940abe843858161b1c1183e0, type: 2}
-    IsLoop: 1
+  _patterns:
+  - {fileID: 11400000, guid: d5664db412318f34887017205832cf9d, type: 2}
+  - {fileID: 11400000, guid: 1feedf692540eb444a770fe7808490de, type: 2}
+  - {fileID: 11400000, guid: cac48afa7e970e144a8dd3b04df058cd, type: 2}
+  - {fileID: 11400000, guid: 0271e929940abe843858161b1c1183e0, type: 2}
   _assignedColor: {r: 1, g: 1, b: 1, a: 1}
   _enemyAbilities: []

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Rendering.UI;
 
 /// <summary>
 /// 게임 전투 흐름 총괄 관리
@@ -46,6 +47,7 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private int _globalTurnIndex = 0;
+    private int _currentEnemyIndex = 0;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
@@ -81,6 +83,7 @@ public class GameManager : MonoBehaviour
     }
     public bool IsSectorSelected => _isSectorSelected;
     public bool IsBattleEnded => _isBattleEnded;
+    public bool IsRoundInterrupted { get; private set; }
     #endregion
 
     #region Events
@@ -198,7 +201,6 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttack += _mapVisualController.OnEnemyAttackVisual;
-            _battleSystem.OnEnemyDied += (e) => _mapVisualController.RefreshMapOwnershipVisuals();
         }
 
         if (_timelineUI != null && _playerVisualController != null)
@@ -214,6 +216,7 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerAttack += CountPlayerAttack;
             _battleSystem.OnPlayerHit += CountPlayerHit;
+            _battleSystem.OnEnemyPurified += HandleEnemyPurified; 
         }
 
     }
@@ -226,7 +229,6 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight -= _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight -= () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttack -= _mapVisualController.OnEnemyAttackVisual;
-            _battleSystem.OnEnemyDied -= (e) => _mapVisualController.RefreshMapOwnershipVisuals();
         }
 
         if (_timelineUI != null && _playerVisualController != null)
@@ -256,6 +258,7 @@ public class GameManager : MonoBehaviour
     {
         _currentRound = 0; 
         _globalTurnIndex = 0;
+        _currentEnemyIndex = 0;
 
         IsExecutingRound = false;
         _isBattleEnded = false;
@@ -291,12 +294,6 @@ public class GameManager : MonoBehaviour
         // UserData 기반 덱 생성
         _deckSystem.InitializeDeck();
 
-        // 적 배치
-        if (currentStageData != null)
-            SetupEnemiesFromStage(currentStageData);
-        else
-            Debug.LogError("StageData가 없습니다");
-
         if (_mapVisualController != null)
         {
             _mapVisualController.RefreshMapOwnershipVisuals();
@@ -304,6 +301,7 @@ public class GameManager : MonoBehaviour
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
         if (FindAnyObjectByType<SceneIntroController>() == null)
             OnIntroCompleted();
+        LoadEnemyAtIndex(0, false);
     }
 
     public void OnIntroCompleted()
@@ -314,6 +312,12 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] 연출 종료. 맵 선택 활성화");
             _mapSystem.EnableSelectionMode();
         });
+    }
+
+    private void HandleEnemyPurified()
+    {
+        Debug.Log("[GameManager] 적 정화 감지! 라운드 중단을 요청합니다.");
+        IsRoundInterrupted = true;
     }
 
     /// <summary>
@@ -376,6 +380,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator ExecuteRoundCoroutine()
     {
         IsExecutingRound = true;
+        IsRoundInterrupted = false;
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
@@ -391,11 +396,27 @@ public class GameManager : MonoBehaviour
         }
 
         yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(false));
-        EndRound();
+        if (IsRoundInterrupted)
+        {
+            HandleRoundInterrupted(); // 적 교체 및 리셋
+        }
+        else
+        {
+            EndRound(); // 정상적인 턴 종료 (패턴 넘기기 포함)
+        }
         IsExecutingRound = false;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 종료 ====");
     }
+    private void HandleRoundInterrupted()
+    {
+        Debug.Log("[GameManager] 라운드 중단됨. 다음 적 로드 시퀀스 진입.");
 
+        if (_timelineManager != null) _timelineManager.OnRoundEnded();
+        _currentEnemyIndex++;
+        LoadEnemyAtIndex(_currentEnemyIndex, true);
+        if (!_isBattleEnded)
+            PrepareNextHand();
+    }
     private void EndRound()
     {
         if (_timelineManager != null)
@@ -407,33 +428,28 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.DecayBuffs();
             _battleSystem.ChooseCureSector();
+            if (_currentRound % _battleSystem.RecoverCycle == 0)
+            {
+                _battleSystem.DecreaseCureGauge(5);
+            }
         }
-
-        if (TimelineManager.Instance != null && TimelineManager.Instance.Is_Cure) 
-        {
-            _mapVisualController.RefreshMapOwnershipVisuals();
-        }
-
-        // 회복 사이클이 돌면 수치 감소
-        if(_currentRound % _battleSystem.RecoverCycle == 0)
-        {
-            _battleSystem.DecreaseCureGauge(5);
-        }
-
         UpdateEnemyPatterns();
-        NotifyRoundChanged();
+        PrepareNextHand();
 
+        
+    }
+    private void PrepareNextHand()
+    {
         _deckSystem.DiscardHand();
         _deckSystem.DrawCards(_startHandSize);
 
+        if (_timelineManager != null && TimelineManager.Instance.Is_Cure)
+            _mapVisualController.RefreshMapOwnershipVisuals();
         _battleSequenceController.PlayerTurnStartSequence(() =>
         {
             if (_timelineManager != null)
-            {
                 _timelineManager.ReceiveHand(_deckSystem.Hand);
-            }
         });
-        
     }
 
     public void EndBattle(bool victory)
@@ -444,8 +460,22 @@ public class GameManager : MonoBehaviour
         int _leftPlayerHP = _battleSystem.PlayerHP;
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
 
-        // 현재 돌아가고 있는 모든 코루틴 종료
-        StopAllCoroutines();
+        if (victory)
+        {
+            if (currentStageData != null)
+            {
+                currentStageData.IsCleared = true;
+                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
+
+                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
+                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(currentStageData);
+#endif
+            }
+        }
+            // 현재 돌아가고 있는 모든 코루틴 종료
+            StopAllCoroutines();
 
          SaveService.Save(userGameData);
 
@@ -454,143 +484,47 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Enemy Pattern Methods
-    /// <summary>
-    /// 적 세팅하는 함수
-    /// </summary>
-    private void SetupEnemiesFromStage(StageData stage)
+    private void LoadEnemyAtIndex(int index, bool keepPlayerHP)
     {
-        List<RuntimeEnemy> enemies = new List<RuntimeEnemy>();
-        foreach (StageEnemySetup spawn in stage.EnemySpawns)
+        if (currentStageData == null || index >= currentStageData.EnemySpawns.Count)
         {
-            if (spawn.enemyData == null) continue;
-            RuntimeEnemy newEnemy = new RuntimeEnemy(
-                spawn.enemyData,
-                new List<int>(spawn.hitSectors)
-                );
-            enemies.Add(newEnemy);
+            // 더 이상 적이 없으면 겜 끗
+            EndBattle(true);
+            return;
         }
-        _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors);
+        StageEnemySetup spawn = currentStageData.EnemySpawns[index];
+
+        List<RuntimeEnemy> enemies = new List<RuntimeEnemy>
+        {
+            new RuntimeEnemy(spawn.enemyData, new List<int>(spawn.hitSectors))
+        };
+        _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors, keepPlayerHP);
         UpdateEnemyPatterns();
-        NotifyRoundChanged();
+        Debug.Log($"[GameManager] {_currentEnemyIndex + 1}번째 적 등장: {spawn.enemyData.Enemy_Name}");
     }
+
+
     /// <summary>
     /// 있는 적 중 패턴 번갈아가며 뽑아오는 함수
     /// </summary>
     private void UpdateEnemyPatterns()
     {
-        if (_battleSystem == null || _battleSystem.Enemies == null) return;
-        if (currentStageData == null) return;
-
-        List<RuntimeEnemy> aliveEnemies = new List<RuntimeEnemy>();
-        foreach (RuntimeEnemy e in _battleSystem.Enemies)
-        {
-            if (!e.IsDead) aliveEnemies.Add(e);
-        }
-
-        if (aliveEnemies.Count == 0) return;
-
-        // 페이즈를 넘겨야 하는지 검사
-        CheckAndApplyPhaseTransition(aliveEnemies);
-
-        foreach (RuntimeEnemy e in aliveEnemies) e.SetPattern(null);
-
-        int activeEnemyIndex = _globalTurnIndex % aliveEnemies.Count;
-        RuntimeEnemy activeEnemy = aliveEnemies[activeEnemyIndex];
+        if (_battleSystem.Enemies.Count ==0) return;
+        RuntimeEnemy activeEnemy = _battleSystem.Enemies[0];
 
         EnemyPattern nextPattern = activeEnemy.GetNextPattern();
-        int enemyCurrentPhase = activeEnemy.CurrentPhaseIndex + 1;
-        if (enemyCurrentPhase > _currentPhase)
-        {
-            _currentPhase = enemyCurrentPhase;
-            _phaseTurnCount = 0;
-            Debug.Log($"[GameManager] 패턴 고갈로 인한 {_currentPhase} 페이즈 강제 진입");
-        }
+
         if (nextPattern != null)
         {
             activeEnemy.SetPattern(nextPattern);
-            Debug.Log($"[GameManager] 이번 턴 행동: {activeEnemy.Data.Enemy_Name} / {nextPattern.Pattern_Name}");
-            _timelineUI.OnPatternChanged(nextPattern);
+            _timelineUI?.OnPatternChanged(nextPattern);
+            if (TimelineManager.Instance != null)
+            {
+                TimelineManager.Instance.SetEnemyPattern(nextPattern);
+            }
         }
         _globalTurnIndex++;
-        _phaseTurnCount++;
 
-        if (_timelineManager !=  null) 
-            _timelineManager.RefreshCombinedEnemyPattern();
-
-        Debug.Log("[GameManager] 적 패턴 갱신 로직 완료");
-
-    }
-    /// <summary>
-    /// 페이즈 검사
-    /// </summary>
-    private void CheckAndApplyPhaseTransition(List<RuntimeEnemy> enemies)
-    {
-        if (currentStageData.PhaseConditions == null) return;
-
-        int currentPhaseIndex = _currentPhase - 1;
-        int nextPhaseIndex = currentPhaseIndex;
-
-        for (int i = 0; i < currentStageData.PhaseConditions.Count; i++)
-        {
-            PhaseTransitionData condition = currentStageData.PhaseConditions[i];
-            bool isMet = false;
-
-            if (condition.ConditionType == PhaseConditionType.EnemyCount)
-            {
-                if (enemies.Count <= condition.ConditionValue) isMet = true;
-            }
-            else if(condition.ConditionType == PhaseConditionType.HpThreshold)
-            {
-                float totalMax = 0;
-                float totalCur = 0;
-                foreach (RuntimeEnemy e in _battleSystem.Enemies)
-                {
-                    totalMax += e.MaxHP;
-                    totalCur += e.CurrentHP;
-                }
-                if (totalMax > 0 && (totalCur / totalMax) <= condition.ConditionValue) 
-                    isMet = true;
-            }
-            if (isMet)
-            {
-                int targetIndex = i + 1;
-                if (targetIndex > currentPhaseIndex)
-                {
-                    if (targetIndex == currentPhaseIndex + 1)
-                    {
-                        nextPhaseIndex = targetIndex;
-                    }
-                }
-            }
-        }
-        if (nextPhaseIndex > currentPhaseIndex)
-        {
-            _currentPhase = nextPhaseIndex + 1;
-            _phaseTurnCount = 0;
-            Debug.Log($"[GameManager] {_currentPhase} 페이즈 진입");
-
-            foreach (RuntimeEnemy e in enemies)
-                e.ForceChangePhase(nextPhaseIndex);
-        }
-    }
-
-    private void NotifyRoundChanged()
-    {
-        int totalPhasePages = 0;
-        int targetPhaseIndex = _currentPhase - 1;
-        if (_battleSystem != null && _battleSystem.Enemies != null)
-        {
-            foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
-            {
-                if (enemy.IsDead) continue;
-                int phaseIndex = _currentPhase - 1;
-                if (enemy.Data != null && targetPhaseIndex < enemy.Data.PhaseGroups.Count)
-                {
-                    totalPhasePages += enemy.Data.PhaseGroups[targetPhaseIndex].Patterns.Count;
-                }
-            } 
-        }
-        OnRoundChanged?.Invoke(_currentPhase, _phaseTurnCount, totalPhasePages);
     }
     #endregion
 
