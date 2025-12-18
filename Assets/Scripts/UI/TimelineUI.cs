@@ -573,6 +573,7 @@ public class TimelineUI : MonoBehaviour
                             text = "-";
                             break;
 
+                        case ActionType.Cure:
                         case ActionType.Attack:
                             //color = new Color(1f, 0.5f, 0.5f, 0.25f); // 연한 빨강
                             color = Player_attackColor;
@@ -703,6 +704,7 @@ public class TimelineUI : MonoBehaviour
                             text = "-";
                             break;
 
+                        case ActionType.Cure:
                         case ActionType.Attack:
                             //color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
                             color = Player_attackColor;

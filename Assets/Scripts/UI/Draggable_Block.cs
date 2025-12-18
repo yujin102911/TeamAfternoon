@@ -94,7 +94,7 @@ public class Draggable_Block : MonoBehaviour
             ActionType action = data.GetEffectAt(i);
             if (txt)
             {
-                if (action == ActionType.Attack)
+                if (action == ActionType.Attack || action == ActionType.Cure)
                 {
                     txt.text = "▲";
                     img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);

@@ -381,15 +381,17 @@ public class GameManager : MonoBehaviour
 
         _battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
+        BattleUIManager.Instance.Hide_startBtn();
         yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
+        yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(true));
 
         if (_timelineManager != null)
         {
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
 
+        yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(false));
         EndRound();
-
         IsExecutingRound = false;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 종료 ====");
     }

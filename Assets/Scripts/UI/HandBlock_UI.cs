@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VInspector;
 
 public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
      IDragHandler, IEndDragHandler
@@ -21,6 +22,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private Canvas canvas;
     private CanvasGroup canvasGroup;
 
+    [Tab("색")]
     [Header("색상 설정")]
     [SerializeField]
     private Color _attackColor;
@@ -114,7 +116,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             ActionType action = data.GetEffectAt(i);
             if (txt)
             {
-                if (action == ActionType.Attack)
+                if (action == ActionType.Attack || action == ActionType.Cure)
                 {
                     txt.text = "▲";
                     img.color = new Color(_attackColor.r, _attackColor.g, _attackColor.b, 1.0f);
