@@ -27,7 +27,7 @@ public class BattleSystem
     private int _maxCure = 20;
     private int _currentCure = 0;
     private int _curePower = 1;
-    private int _recoverCycle = 3;
+    private int _recoverCycle = 4;
 
     private int _battleTurnCount = 0;
 
@@ -86,8 +86,8 @@ public class BattleSystem
         else
             _maxCure = 50;
 
-            OnBattleInitialized?.Invoke();
-
+        OnBattleInitialized?.Invoke();
+        _recoverCycle = enemies.Count;
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
 

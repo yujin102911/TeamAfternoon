@@ -6,8 +6,8 @@ using System.Collections.Generic;
 public class StageInfo_Panel : MonoBehaviour
 {
     [Header("UI 그룹")]
-    [SerializeField] private GameObject _titlePageGroup; // 이미지 1번 형태의 레이아웃
-    [SerializeField] private GameObject _storyPageGroup; // 이미지 2,3번 형태의 레이아웃
+    [SerializeField] private GameObject _titlePageGroup; // 타이틀 페이지 레이아웃
+    [SerializeField] private GameObject _storyPageGroup; // 스토리 페이지 레이아웃
 
     [Header("외부 UI")]
     [SerializeField] private GameObject _letterButton;
@@ -16,6 +16,10 @@ public class StageInfo_Panel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _tpTitleLeft;
     [SerializeField] private TextMeshProUGUI _tpCredits;
     [SerializeField] private TextMeshProUGUI _tpTitleRight;
+
+    [Header("타이틀 페이지 버튼")]
+    [SerializeField] private Button _titleEnterBtn;
+    [SerializeField] private Button _readContentBtn;
 
     [Header("스토리 페이지 UI 요소 - 왼쪽")]
     [SerializeField] private TextMeshProUGUI _leftChapter;
@@ -27,11 +31,13 @@ public class StageInfo_Panel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _rightBodyTop;
     [SerializeField] private TextMeshProUGUI _rightBodyMiddle;
 
-    [Header("네비게이션")]
+    [Header("스토리 페이지 버튼")]
+    [SerializeField] private Button _storyEnterBtn;
     [SerializeField] private Button _prevBtn;
     [SerializeField] private Button _nextBtn;
+
+    [Header("네비게이션")]
     [SerializeField] private Button _closeBtn;
-    [SerializeField] private Button _enterStageBtn;
 
     [Header("연출(오염효과)")]
     [SerializeField] private List<GameObject> _pollutionObjects;
@@ -44,6 +50,7 @@ public class StageInfo_Panel : MonoBehaviour
         _prevBtn.onClick.AddListener(OnClick_Prev);
         _nextBtn.onClick.AddListener(OnClick_Next);
         _closeBtn.onClick.AddListener(Hide);
+        _readContentBtn.onClick.AddListener(OnClick_Next);
     }
 
     public void Show(int id)
@@ -65,13 +72,7 @@ public class StageInfo_Panel : MonoBehaviour
 
     private void UpdatePageUI()
     {
-        _prevBtn.gameObject.SetActive(_currentPageIndex > -1);
-
         int maxIndex = _currentData.BookPages.Count;
-        bool hasNext = (_currentPageIndex + 2) < maxIndex;
-        if (_currentPageIndex == -1 && maxIndex > 0) hasNext = true;
-
-        _nextBtn.gameObject.SetActive(hasNext);
 
         if (_currentPageIndex == -1)
         {
@@ -81,11 +82,19 @@ public class StageInfo_Panel : MonoBehaviour
             _tpTitleLeft.text = _currentData.StageName;
             _tpCredits.text = $"{_currentData.BookCredit}";
             _tpTitleRight.text = _currentData.StageName;
+
+            _readContentBtn.gameObject.SetActive(true) ;
+            _titleEnterBtn.gameObject.SetActive(true) ;
+
+            _prevBtn.gameObject.SetActive(false) ;
+            _nextBtn.gameObject.SetActive(false);
+            _storyEnterBtn.gameObject.SetActive(false) ;
         }
         else
         {
             _titlePageGroup.SetActive(false ) ;
             _storyPageGroup.SetActive(true);
+
             if (_currentPageIndex < _currentData.BookPages.Count)
             {
                 SetPageContent(_currentData.BookPages[_currentPageIndex], _leftChapter, _leftBodyTop, _leftBodyMiddle);
@@ -102,6 +111,15 @@ public class StageInfo_Panel : MonoBehaviour
             {
                 ClearPage(_rightChpater, _rightBodyTop, _rightBodyMiddle);
             }
+
+            _readContentBtn.gameObject .SetActive(false) ;
+            _titleEnterBtn.gameObject.SetActive(false) ;
+
+            _storyEnterBtn.gameObject.SetActive(true) ;
+            _prevBtn.gameObject.SetActive(true) ;
+
+            bool hasNext = (_currentPageIndex + 2) < maxIndex ;
+            _nextBtn.gameObject.SetActive(hasNext) ;
         }
         UpdatePollution();
     }
