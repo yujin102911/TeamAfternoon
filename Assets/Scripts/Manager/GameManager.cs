@@ -218,7 +218,8 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerAttack += CountPlayerAttack;
             _battleSystem.OnPlayerHit += CountPlayerHit;
-            _battleSystem.OnEnemyPurified += HandleEnemyPurified; 
+            _battleSystem.OnEnemyPurified += HandleEnemyPurified;
+            _battleSystem.UpdateCureGauage += UpdateEnemyImagesWrapper;
         }
 
     }
@@ -246,6 +247,7 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerAttack -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
+            _battleSystem.UpdateCureGauage -= UpdateEnemyImagesWrapper;
         }
     }
 
@@ -391,6 +393,12 @@ public class GameManager : MonoBehaviour
         BattleUIManager.Instance.Hide_startBtn();
         yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
         //yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(true));
+
+        if (_battleSystem != null)
+        {
+            UpdateEnemyImagesWrapper(_battleSystem.CurrentCure, _battleSystem.MaxCure);
+        }
+
         yield return StartCoroutine(_battleSequenceController.Slide_Enemy(true));
 
         if (_timelineManager != null)
@@ -535,6 +543,20 @@ public class GameManager : MonoBehaviour
         int totalChapter = currentStageData.EnemySpawns.Count;
         OnRoundChanged?.Invoke(currentLine, totalLine, currentChapter, totalChapter);
 
+    }
+
+    private void UpdateEnemyImagesWrapper(int currentCure, int maxCure)
+    {
+        if (_battleSystem.Enemies.Count > 0)
+        {
+            RuntimeEnemy currentEnemy = _battleSystem.Enemies[0];
+            float curePercent = 0f;
+            if (maxCure > 0)
+            {
+                curePercent = (float)currentCure / maxCure;
+            }
+            _battleSequenceController.UpdateEnemyImages(currentEnemy.Data, curePercent);
+        }
     }
     #endregion
 

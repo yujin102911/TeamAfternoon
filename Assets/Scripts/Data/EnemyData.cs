@@ -19,10 +19,12 @@ public class EnemyData : ScriptableObject
     private int _maxCureValue = 50;
 
     [Header("적 이미지")]
+    [Tooltip("왼쪽 적 스프라이트")]
     [SerializeField]
-    private Sprite _enemySprite;
+    private List<Sprite> _leftEnemySprites = new List<Sprite>();
+    [Tooltip("오른쪽 적 스프라이트")]
     [SerializeField]
-    private Sprite _enemyDeadSprite;
+    private List<Sprite> _rightEnemySprites = new List<Sprite>();
 
     [Header("적 이미지")]
     [SerializeField]
@@ -43,8 +45,8 @@ public class EnemyData : ScriptableObject
     public string Enemy_Name => _enemyName;
     public List<EnemyPattern> Patterns => _patterns;
     public int MaxCureValue => _maxCureValue;
-    public Sprite Enemy_Sprite => _enemySprite;
-    public Sprite EnemyDeadSprite => _enemyDeadSprite;
+    public List<Sprite> LeftEnemySprites => _leftEnemySprites;
+    public List<Sprite > RightEnemySprites => _rightEnemySprites;
     public Sprite BackGroundSprite => _bgSprite;
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
     public Color AssignedColor => _assignedColor;

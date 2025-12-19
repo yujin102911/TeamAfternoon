@@ -12,8 +12,8 @@ public class EnemyVisual : MonoBehaviour
 
     public void Initialize(RuntimeEnemy enemy)
     {
-        if (enemy.Data.Enemy_Sprite != null) 
-            _spriteRenderer.sprite = enemy.Data.Enemy_Sprite;
+        //if (enemy.Data.Enemy_Sprite != null) 
+        //    _spriteRenderer.sprite = enemy.Data.Enemy_Sprite;
     }
 
     public void PlayerHitAnimation()
@@ -34,8 +34,8 @@ public class EnemyVisual : MonoBehaviour
 
     public void EnemyDeadColor(RuntimeEnemy enemy)
     {
-        if (enemy.Data.EnemyDeadSprite != null)
-            _spriteRenderer.sprite = enemy.Data.EnemyDeadSprite;
+        //if (enemy.Data.EnemyDeadSprite != null)
+        //    _spriteRenderer.sprite = enemy.Data.EnemyDeadSprite;
     }
 
 }
