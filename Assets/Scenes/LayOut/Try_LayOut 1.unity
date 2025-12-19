@@ -2305,7 +2305,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 10.46, y: 4.11}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2710,17 +2710,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2318157039028727859, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   m_PrefabInstance: {fileID: 817008277}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &817008279 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4117377257286800874, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
-  m_PrefabInstance: {fileID: 817008277}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a4fbdb4fe1f9cd4e95e8e122773f93a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &828744083
 GameObject:
   m_ObjectHideFlags: 0
@@ -6037,9 +6026,9 @@ MonoBehaviour:
   _startButton: {fileID: 243445876}
   _sectorSelectionPanel: {fileID: 0}
   _pageText: {fileID: 2137121192}
-  _totalPageText: {fileID: 1673110919}
+  _totalPageText: {fileID: 0}
   _chapterText: {fileID: 343748529}
-  _cureUI: {fileID: 817008279}
+  _cureUI: {fileID: 0}
   _playerStatusUI: {fileID: 2714568068618234301}
   _enemyStatusPrefab: {fileID: 2714568068089599078, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   _enemyUIContainer: {fileID: 38265765}
@@ -8067,19 +8056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e1e4df17d18c8428c5613ba6c9b57e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _introLayers:
-  - Group: {fileID: 1989983586}
-    Duration: 1.5
-  - Group: {fileID: 452978701}
-    Duration: 1.5
-  - Group: {fileID: 86100542}
-    Duration: 1.5
-  - Group: {fileID: 1328318665}
-    Duration: 1.5
-  - Group: {fileID: 466193881}
-    Duration: 2.5
-  - Group: {fileID: 1933166474}
-    Duration: 1.5
+  _introLayers: []
   _startDelay: 0.5
 --- !u!224 &7356480051528924633
 RectTransform:
