@@ -80,11 +80,12 @@ public class GameResultUI : MonoBehaviour
             if (targetText != null)
             {
                 targetText.text =
-                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐 진행되었으며,\n" +
-                    $"전투 중 사역마는 <size=72><color=#626262> {hitCount}</size></color>회의 피격을 받았으며\n" +
-                    $"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을 수행하였습니다.\n" +
-                    $"전투 종료 시점 기준 잔존 체력은 <size=72><color=#626262> {leftHP}</size></color>로 확인되었습니다.\n\n" +
-                    $"이상으로 본 전투 성과 보고를 마치겠습니다.";
+                    $"토토님께,\n\n" +
+                    $"「오즈의 마법사」 정화 결과를 아래와 같이 보고합니다.\n\n" +
+                    $"본 정화는 총 <size=48><color=#626262>{totalRound}</size></color>줄에 걸쳐 진행되었으며,\n" +
+                    $"작업 중 <size=48><color=#626262> {attackCount}</size></color>회의 정화를 하였습니다.\n\n" +
+                    $"책의 코어는 이제 완전히 정화되었습니다.\n\n" +
+                    $"해피 엔딩을 빕니다";
 
             }
         }
@@ -92,15 +93,13 @@ public class GameResultUI : MonoBehaviour
         {
             if (targetText != null)
             {
-                targetText.text = 
-                    $"본 전투는 총 <size=72><color=#626262> {totalRound}</size></color>라운드에 걸쳐\n"
-                    +$"진행되었으나, 전투 중 사역마는\n"
-                    +$"<size=72><color=#626262>{hitCount}</size></color>회의 피격을 받았으며\n"
-                    +$"<size=72><color=#626262>{attackCount}</size></color>회의 유효 공격을\n"
-                    +$"수행하였습니다.\n"
-                    +$"전투 종료 시점 기준,\n"
-                    +$"사역마의 전투 지속은 불가능한\n"
-                    +$"상태로 확인되었습니다.";
+                targetText.text =
+                    $"토토님께,\n\n"
+                    + $"「오즈의 마법사」 정화 결과를 아래와 같이 보고합니다.\n\n"
+                    + $"본 정화는 총 <size=48><color=#626262>{totalRound}</size></color>줄에 걸쳐 진행되었으며,\n"
+                    + $"작업 중 <size=48><color=#626262>{attackCount}</size></color>회의 정화를 하였지만,\n"
+                    + $"책의 코어에 접근하는 것은 실패하였습니다.\n"
+                    + $"빠른 시일 내에 해당 책에 재조치가 있을 예정입니다.\n";
 
             }
         }

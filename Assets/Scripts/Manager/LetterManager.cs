@@ -11,8 +11,13 @@ public class LetterManager : MonoBehaviour
     [SerializeField] private GameObject letterPanel;
     [SerializeField] private GameObject letterButton;
 
-    [Tooltip("편지 내용이 표시될 텍스트")]
-    [SerializeField] private TextMeshProUGUI letterContentText;
+    //[Tooltip("편지 내용이 표시될 텍스트")]
+    //[SerializeField] private TextMeshProUGUI letterContentText;
+    [Header("클리어 전 보여줄 의뢰서")]
+    [SerializeField] private GameObject requestPanel;
+
+    [Header("클리어 후 보여줄 패널")]
+    [SerializeField] private GameObject thankPanel;
 
     public void SetStageData(StageData stageData)
     {
@@ -26,18 +31,21 @@ public class LetterManager : MonoBehaviour
             if (_stageData.IsCleared)
             {
                 // 클리어 했다면 감사 편지
-                letterContentText.text = _stageData.ThankLetter;
+                if (thankPanel != null) thankPanel.SetActive(true);
+                if (requestPanel != null) requestPanel.SetActive(false);
             }
             else
             {
                 // 클리어 전이라면 의뢰 편지
-                letterContentText.text = _stageData.RequestLetter;
+                if (requestPanel != null) requestPanel.SetActive(true);
+                if (thankPanel != null) thankPanel.SetActive(false);
             }
         }
         else
         {
             Debug.LogWarning("LetterManager에 StageData가 할당되지 않았습니다.");
-            letterContentText.text = "편지 내용을 불러올 수 없습니다.";
+            if (requestPanel != null) requestPanel.SetActive(true);
+            if (thankPanel != null) thankPanel.SetActive(false);
         }
         letterPanel.SetActive(true);
         notification.SetActive(false);
