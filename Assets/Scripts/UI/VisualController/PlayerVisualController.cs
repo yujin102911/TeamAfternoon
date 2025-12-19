@@ -111,14 +111,14 @@ public class PlayerVisualController : MonoBehaviour
     private IEnumerator ShakeRoutine()
     {
         //트레일 렌더러 코드    
-        if (trailEffectPrefab != null)
-        {
-            GameObject newTrail = Instantiate(
-                trailEffectPrefab,
-                Vector3.zero,
-                Quaternion.identity
-            );
-        }
+        //if (trailEffectPrefab != null)
+        //{
+        //    GameObject newTrail = Instantiate(
+        //        trailEffectPrefab,
+        //        Vector3.zero,
+        //        Quaternion.identity
+        //    );
+        //}
 
         Quaternion originalRot = _playerInstance.transform.localRotation;
 

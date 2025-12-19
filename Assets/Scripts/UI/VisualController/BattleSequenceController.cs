@@ -11,6 +11,13 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField] private float _cardYOffset = 200f;
     [SerializeField] private float _cardDuration = 1f;
 
+    [Header("배경 전환 연출")]
+    [SerializeField] private RectTransform bgCurrent;
+    [SerializeField] private RectTransform bgNext;
+    [SerializeField] private float _bgSwitchDuration = 1.0f;
+    
+    private bool _isPlaying;
+
     [Header("좌우 적 이미지 연출")]
     [SerializeField] private RectTransform leftImage;
     [SerializeField] private RectTransform rightImage;
@@ -304,6 +311,7 @@ public class BattleSequenceController : MonoBehaviour
         }
     }
 
+    // 적 입장
     public IEnumerator Slide_Enemy(bool is_in)
     {
         float halfWidth = Screen.width * 0.5f;
@@ -366,6 +374,57 @@ public class BattleSequenceController : MonoBehaviour
             leftImage.GetComponent<UIRotate>().OnArrived();
             rightImage.GetComponent<UIRotate>().OnArrived();
         }
+    }
+
+    public void ChangeBackground(Sprite nextSprite)
+    {
+        if (_isPlaying)
+            return;
+
+        
+        StartCoroutine(ScrollCoroutine(nextSprite));
+    }
+
+    public IEnumerator ScrollCoroutine(Sprite nextSprite)
+    {
+        _isPlaying = true;
+
+        bgNext.GetComponent<Image>().sprite = nextSprite;
+
+        float height = bgCurrent.rect.height;
+
+        Vector2 curStart = Vector2.zero;
+        Vector2 curEnd = Vector2.up * height;
+
+        Vector2 nextStart = Vector2.down * height;
+        Vector2 nextEnd = Vector2.zero;
+
+        bgCurrent.anchoredPosition = curStart;
+        bgNext.anchoredPosition = nextStart;
+
+        float time = 0f;
+
+        while (time < _bgSwitchDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / _bgSwitchDuration);
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+
+            bgCurrent.anchoredPosition =
+                Vector2.Lerp(curStart, curEnd, eased);
+            bgNext.anchoredPosition =
+                Vector2.Lerp(nextStart, nextEnd, eased);
+
+            yield return null;
+        }
+
+        bgCurrent.anchoredPosition = curEnd;
+        bgNext.anchoredPosition = nextEnd;
+
+        // 역할 교체
+        (bgCurrent, bgNext) = (bgNext, bgCurrent);
+
+        _isPlaying = false;
     }
 
     public void UpdateEnemyImages(EnemyData enemyData, float curePercentage)
