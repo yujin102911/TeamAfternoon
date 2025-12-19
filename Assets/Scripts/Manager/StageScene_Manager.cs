@@ -13,7 +13,7 @@ public class StageScene_Manager : MonoBehaviour
     private Button[] _stageBookBtns;    // 스테이지 버튼 배열
     [Header("스테이지 버튼")]
     [SerializeField]
-    private Button _toStageBtn;
+    private Button[] _toStageBtns;    // 스테이지 입장 버튼
     [Header("덱 빌딩 버튼")]
     [SerializeField]
     private Button _deckBtn;    // 덱 버튼
@@ -24,7 +24,16 @@ public class StageScene_Manager : MonoBehaviour
     {
         SetStage_btn();
         _deckBtn.onClick.AddListener(OnClick_DeckBtn);
-        _toStageBtn.onClick.AddListener(OnClick_StageBtn);
+        if (_toStageBtns != null)
+        {
+            foreach (Button btn in _toStageBtns)
+            {
+                if (btn != null)
+                {
+                    btn.onClick.AddListener(OnClick_StageBtn);
+                }
+            }
+        }
     }
 
     private void SetStage_btn()
@@ -32,20 +41,30 @@ public class StageScene_Manager : MonoBehaviour
         for(int i = 0; i < _stageBookBtns.Length; i++)
         {
             int index = i + 1; // 로컬 복사본 생성
-            _stageBookBtns[i].onClick.AddListener(() => Select_stage(index));
-            _stageBookBtns[i].gameObject.GetComponent<Stage_BookBtn>().Stage_ID = index;
+            if (_stageBookBtns[i] != null)
+            {
+                _stageBookBtns[i].onClick.AddListener(() => Select_stage(index));
 
-            if (StageScene_UIManager.Instance != null)
-                _stageBookBtns[i].onClick.AddListener(() => StageScene_UIManager.Instance.BookClicked(index));
+                var bookBtn = _stageBookBtns[i].gameObject.GetComponent<Stage_BookBtn>();
+                if (bookBtn != null) bookBtn.Stage_ID = index;
 
-            if (DeckBuildingManager.Instance != null)
-                _stageBookBtns[i].onClick.AddListener(DeckBuildingManager.Instance.Off_Tags);
+                if (StageScene_UIManager.Instance != null)
+                    _stageBookBtns[i].onClick.AddListener(() => StageScene_UIManager.Instance.BookClicked(index));
+
+                if (DeckBuildingManager.Instance != null)
+                    _stageBookBtns[i].onClick.AddListener(DeckBuildingManager.Instance.Off_Tags);
+            }
         }
     }
 
     public void OnClick_StageBtn()
     {
         Debug.Log($"StageScene_Manager: OnClick_StageBtn - Stage {selected_stage_id}");
+        if (selected_stage_id == 0)
+        {
+            Debug.LogWarning("선택된 스테이지가 없습니다.");
+            return;
+        }
         GameManager.SelectedStageID = selected_stage_id; // (스테이지 ID는 1부터 시작하므로 +1)
         // 씬 전환
         ServiceLocator.Instance.Scene.Load(BattleScene_Name);
