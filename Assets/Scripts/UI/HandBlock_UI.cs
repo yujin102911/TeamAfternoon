@@ -100,7 +100,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         BlockData data = rBlock.BaseData;
 
         //블럭 이름 설정
-        if (BlockNameText != null) BlockNameText.text = data.BlockName;
+        if (BlockNameText != null) BlockNameText.text = "~"+data.BlockName+"~";
 
         BlockDamageText.text = "데미지: " + data.attackDamage.ToString();
 
