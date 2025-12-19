@@ -87,7 +87,6 @@ public class BattleSystem
             _maxCure = 50;
 
         OnBattleInitialized?.Invoke();
-        _recoverCycle = enemies.Count;
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         UpdateCureGauage?.Invoke(_currentCure, _maxCure);
 
@@ -427,7 +426,7 @@ public class BattleSystem
         _battleTurnCount++;
         if (_battleTurnCount > 0 && _battleTurnCount % _recoverCycle == 0)
         {
-            DecreaseCureGauge(5);
+            DecreaseCureGauge(0);
             Debug.Log($"[BattleSystem] {_recoverCycle}턴 경과! 정화 수치 자연 감소 (-5)");
         }
     }
