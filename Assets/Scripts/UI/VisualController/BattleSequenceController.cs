@@ -367,4 +367,42 @@ public class BattleSequenceController : MonoBehaviour
             rightImage.GetComponent<UIRotate>().OnArrived();
         }
     }
+
+    public void UpdateEnemyImages(EnemyData enemyData, float curePercentage)
+    {
+        if (enemyData == null) return;
+
+        UpdateSingleImage(leftImage, enemyData.LeftEnemySprites, curePercentage);
+        UpdateSingleImage(rightImage, enemyData.RightEnemySprites, curePercentage);
+    }
+
+    private void UpdateSingleImage(RectTransform targetRect, System.Collections.Generic.List<Sprite> sprites, float percent)
+    {
+        if (targetRect == null) return;
+        Image img = targetRect.GetComponent<Image>();
+        if (img == null) return;  
+
+        if (sprites == null || sprites.Count == 0)
+        {
+            img.sprite = null;
+            Color c = img.color;
+            c.a = 0;
+            img.color = c;
+            return;
+        } 
+        Color color = img.color;
+        color.a = 1f;
+        img.color = color;
+        img.sprite = GetSpriteByPercentage(sprites, percent);
+    }
+    private Sprite GetSpriteByPercentage(System.Collections.Generic.List<Sprite> sprites, float percent)
+    {
+        if (sprites == null || sprites.Count == 0) return null;
+        if (sprites.Count == 1)  return sprites[0];
+        int maxIndex = sprites.Count - 1;
+        int index = Mathf.FloorToInt(percent * maxIndex);
+        index = Mathf.Clamp(index, 0, maxIndex);
+
+        return sprites[index];
+    }
 }
