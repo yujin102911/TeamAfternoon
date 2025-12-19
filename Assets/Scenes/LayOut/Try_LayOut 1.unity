@@ -7213,7 +7213,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!223 &589791636704180844
 Canvas:
   m_ObjectHideFlags: 0
@@ -8372,7 +8372,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e1e4df17d18c8428c5613ba6c9b57e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _introLayers: []
+  _introLayers:
+  - Group: {fileID: 1989983586}
+    Duration: 1.5
+  - Group: {fileID: 452978701}
+    Duration: 1.5
+  - Group: {fileID: 86100542}
+    Duration: 1.5
+  - Group: {fileID: 1328318665}
+    Duration: 1.5
+  - Group: {fileID: 466193881}
+    Duration: 2.5
+  - Group: {fileID: 1933166474}
+    Duration: 1.5
   _startDelay: 0.5
 --- !u!224 &7356480051528924633
 RectTransform:

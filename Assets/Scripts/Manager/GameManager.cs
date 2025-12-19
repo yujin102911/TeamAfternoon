@@ -316,6 +316,9 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] 연출 종료. 맵 선택 활성화");
             _mapSystem.EnableSelectionMode();
         });
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.BGM_Battle);
     }
 
     private void HandleEnemyPurified()
@@ -378,6 +381,10 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("[GameManager] 이미 라운드가 실행 중입니다.");
             return;
         }
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.SFX_Execute);
+
         StartCoroutine(ExecuteRoundCoroutine());
     }
 

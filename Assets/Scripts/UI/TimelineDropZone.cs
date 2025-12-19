@@ -37,6 +37,11 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
             {
                 TimelineManager.Instance.ReturnToHand(r_block);
             }
+            else
+            {
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
+            }
         }
     }
 
@@ -60,6 +65,8 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 
             if (success)
             {
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
                 //블록 배치 성공 시 드래그 블록 숨기기
                 //Draggable_Block.Instance.Hide();
             }

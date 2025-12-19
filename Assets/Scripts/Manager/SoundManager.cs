@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance;
+
+    [Header("Audio Mixer Groups")]
+    [SerializeField] private AudioMixerGroup bgmMixerGroup;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
 
     [SerializeField] private List<SoundData> soundDatas;
 
@@ -25,6 +30,7 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         _bgmSource = gameObject.AddComponent<AudioSource>();
+        _bgmSource.outputAudioMixerGroup = bgmMixerGroup;
 
         _soundMap = new Dictionary<SoundID, SoundData>();
         foreach (var data in soundDatas)
@@ -80,6 +86,7 @@ public class SoundManager : MonoBehaviour
                 return src;
 
         var newSource = gameObject.AddComponent<AudioSource>();
+        newSource.outputAudioMixerGroup = sfxMixerGroup;
         _sfxPool.Add(newSource);
         return newSource;
     }

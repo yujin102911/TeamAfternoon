@@ -28,9 +28,16 @@ public enum SoundID
 
     // UI
     UI_Click,
-    UI_Popup_Open,
+    UI_Click2,
+    UI_Click3,
+    UI_Click4,
+    UI_Closing_Book,
 
     // SFX
-    SFX_Attack,
-    SFX_Hit,
+    SFX_Lightning,
+    SFX_Cure,
+    SFX_Spell_Write,
+    SFX_Spell_Cancle,
+    SFX_Execute
+
 }

@@ -285,6 +285,9 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
         canvasGroup.blocksRaycasts = false;
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.SFX_Spell_Cancle);
     }
 
     public void OnDrag(PointerEventData eventData)

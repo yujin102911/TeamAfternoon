@@ -86,7 +86,7 @@ public class BattleUIManager : MonoBehaviour
         {
             int maxCure = battle.Enemies[0].Data.MaxCureValue;
             // 이름 표시 기능이 UnitStatusUI에 있다면 활용 가능
-            _cureUI.Init("페이지 정화 진행도:", 0, maxCure);
+            _cureUI.Init("챕터 정화 진행도:", 0, maxCure);
         }
         if (GameManager.Instance != null && !GameManager.Instance.IsExecutingRound)
         {
