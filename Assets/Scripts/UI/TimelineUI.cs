@@ -287,7 +287,7 @@ public class TimelineUI : MonoBehaviour
 
         if(tooltipTitleText != null)
         {
-            tooltipTitleText.text = $"틱 {tick}";
+            tooltipTitleText.text = $"책의 방해";
         }
 
         // 툴팁 텍스트 설정
@@ -296,7 +296,7 @@ public class TimelineUI : MonoBehaviour
             if (attack != null)
             {
                 string sectors = string.Join(", ", attack.targetSectors);
-                tooltipDetailText.text = $"섹터: {sectors}\n데미지: {attack.damage}";
+                tooltipDetailText.text = $"<color=#D94036>♥</color> -{attack.damage}";
             }
             if (parrying != null)
             {
@@ -369,7 +369,7 @@ public class TimelineUI : MonoBehaviour
         {
             case ActionType.None:
                 titleText = "행동 없음";
-                effectText = "움직이지 않고 가만히 있는다";
+                //effectText = "움직이지 않고 가만히 있는다";
                 break;
             case ActionType.Cure:
                 titleText = "정화";
@@ -400,7 +400,7 @@ public class TimelineUI : MonoBehaviour
             {
                 Player_tooltipTitleText.text = $"{blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
                 Player_tooltipTitleText.text = titleText;
-                Player_tooltipDetailText.text = $"{effectText}\n우클릭: 제거";
+                Player_tooltipDetailText.text = $"{effectText}\n우클릭: 마법 제거";
             }
 
             
