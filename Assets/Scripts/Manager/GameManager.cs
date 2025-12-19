@@ -60,6 +60,9 @@ public class GameManager : MonoBehaviour
     // 통계용 변수
     private int _statPlayerAttackCount = 0;
     private int _statPlayerHitCount = 0;
+
+    // 배경 전환 저장용
+    private Sprite _bgSprite;
     #endregion
 
     #region Properties
@@ -400,6 +403,7 @@ public class GameManager : MonoBehaviour
         if (IsRoundInterrupted)
         {
             HandleRoundInterrupted(); // 적 교체 및 리셋
+            yield return StartCoroutine(_battleSequenceController.ScrollCoroutine(_bgSprite));
         }
         else
         {
@@ -498,6 +502,10 @@ public class GameManager : MonoBehaviour
         };
         _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors, keepPlayerHP);
         UpdateEnemyPatterns();
+
+        // 변경할 배경정보 받아오기
+        _bgSprite = enemies[0].Data.BackGroundSprite;
+
         Debug.Log($"[GameManager] {_currentEnemyIndex + 1}번째 적 등장: {spawn.enemyData.Enemy_Name}");
     }
 
