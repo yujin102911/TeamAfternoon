@@ -88,7 +88,14 @@ public class BattleUIManager : MonoBehaviour
             // 이름 표시 기능이 UnitStatusUI에 있다면 활용 가능
             _cureUI.Init("페이지 정화 진행도:", 0, maxCure);
         }
-        Show_startBtn();
+        if (GameManager.Instance != null && !GameManager.Instance.IsExecutingRound)
+        {
+            Show_startBtn();
+        }
+        else
+        {
+            RefreshStartButtonState();
+        }
     }
 
     private void HandleCureChanged(int current, int max)
@@ -128,9 +135,7 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
 
         _startButton.interactable = interactable;
-        //_startButton.gameObject.SetActive(interactable);
 
-        //RefreshSectorSelectionPanel();
     }
 
     private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
