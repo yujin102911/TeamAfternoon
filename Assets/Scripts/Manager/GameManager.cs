@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
     #region Events
 
     public event Action OnGameStateChanged;
-    public event Action<int, int, int> OnRoundChanged;
+    public event Action<int, int, int, int> OnRoundChanged;      // 현재 라인, 총 라인, 현재 적, 총 적
     public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
 
     #endregion
@@ -521,6 +521,11 @@ public class GameManager : MonoBehaviour
                 TimelineManager.Instance.SetEnemyPattern(nextPattern);
             }
         }
+        int currentChapter = _currentEnemyIndex + 1;
+        int currentLine = activeEnemy.PatternSequenceIndex;
+        int totalLine = activeEnemy.Data.Patterns.Count;
+        int totalChapter = currentStageData.EnemySpawns.Count;
+        OnRoundChanged?.Invoke(currentLine, totalLine, currentChapter, totalChapter);
 
     }
     #endregion

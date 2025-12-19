@@ -10,9 +10,12 @@ public class BattleUIManager : MonoBehaviour
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _sectorSelectionPanel;
-    [SerializeField] private TextMeshProUGUI _pageText;
-    [SerializeField] private TextMeshProUGUI _totalPageText;
+
+    [SerializeField] private TextMeshProUGUI _lineText;
+    [SerializeField] private TextMeshProUGUI _totalLineText;
+
     [SerializeField] private TextMeshProUGUI _chapterText;
+    [SerializeField] private TextMeshProUGUI _totalChapterText;
 
     [Header("정화 게이지 UI")]
     [SerializeField]
@@ -104,11 +107,16 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void HandleRoundChanged(int chapter, int page, int totalPage)
+    private void HandleRoundChanged(int currentLine, int totalLine, int currentChapter, int totalChapter)
     {
-        _pageText.text = $"<size=56pt>{0+page.ToString()}";
-        _totalPageText.text = $"LINE";
-        _chapterText.text = $"Chapter {chapter.ToString()}.";
+        if (_lineText != null)
+            _lineText.text = $"<size=56pt>0{currentLine.ToString()}";
+        if (_totalLineText != null)
+            _totalLineText.text = $"/ 0{totalLine}";
+        if (_chapterText != null)
+            _chapterText.text = $"0{currentChapter.ToString()}";
+        if (_totalChapterText != null)
+            _totalChapterText.text = $"/ 0{totalChapter}";
     }
     private void RefreshStartButtonState()
     {
