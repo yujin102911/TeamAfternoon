@@ -59,6 +59,9 @@ public class BattleSystem
 
     public List<int> AbleCureSectors => _ableCureSectors;
     public int RecoverCycle => _recoverCycle;
+
+    public int CurrentCure => _currentCure;
+    public int MaxCure => _maxCure;
     #endregion
 
     /// <summary>
