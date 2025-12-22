@@ -50,6 +50,9 @@ public class LetterManager : MonoBehaviour
         letterPanel.SetActive(true);
         notification.SetActive(false);
         letterButton.SetActive(false);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Click);
     }
 
     public void PressXButton()
@@ -57,6 +60,9 @@ public class LetterManager : MonoBehaviour
         letterPanel.SetActive(false);
         bookButton.SetActive(true);
         letterButton.SetActive(true);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Click);
     }
 
 }

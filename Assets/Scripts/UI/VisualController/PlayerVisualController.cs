@@ -110,6 +110,9 @@ public class PlayerVisualController : MonoBehaviour
     #region Private Effect Routines
     private IEnumerator ShakeRoutine()
     {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.SFX_Cure);
+
         //트레일 렌더러 코드    
         //if (trailEffectPrefab != null)
         //{

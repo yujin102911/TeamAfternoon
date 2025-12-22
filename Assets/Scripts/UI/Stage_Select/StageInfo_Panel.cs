@@ -68,6 +68,9 @@ public class StageInfo_Panel : MonoBehaviour
     {
         this.gameObject.SetActive(false);
         _letterButton.SetActive(true );
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Closing_Book);
     }
 
     private void UpdatePageUI()
@@ -148,6 +151,9 @@ public class StageInfo_Panel : MonoBehaviour
     }
     private void OnClick_Next()
     {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Click3);
+
         if (_currentPageIndex == -1)
             _currentPageIndex = 0;
         else
@@ -156,6 +162,9 @@ public class StageInfo_Panel : MonoBehaviour
     }
     private void OnClick_Prev()
     {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Click3);
+
         if (_currentPageIndex == 0)
             _currentPageIndex = -1;
         else

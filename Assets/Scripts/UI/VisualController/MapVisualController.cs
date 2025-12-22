@@ -89,6 +89,9 @@ public class MapVisualController : MonoBehaviour
     private IEnumerator FlashAttackRoutine(List<int> sectors)
     {
         if (_mapSystem == null) yield break;
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.SFX_Lightning);
+
         Color flashColor = GetAttackColor();
         for (int i = 0; i < 2; i++)
         {
@@ -110,6 +113,8 @@ public class MapVisualController : MonoBehaviour
                 _mapSystem.ResetSectorColor(index);
             yield return new WaitForSeconds(0.1f);
         }
+
+        
     }
 
     public void Play_LightingEffect(Vector2 uiPosition)

@@ -37,6 +37,8 @@ public class StageScene_UIManager : MonoBehaviour
     // 책이 클릭 될 때 작동
     public void BookClicked(int id)
     {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.UI_Click2);
         _stageInfoPanel.Show(id);
     }
 
@@ -74,5 +76,14 @@ public class StageScene_UIManager : MonoBehaviour
     private void Hide_Txt() 
     {
         _bookTitleTxt.text = "";
+    }
+
+    public void Exit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
