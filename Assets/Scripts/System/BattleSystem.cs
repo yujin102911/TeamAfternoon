@@ -24,6 +24,8 @@ public class BattleSystem
     private Dictionary<string, int> _enemyBuffs = new Dictionary<string, int>();
 
     private List<int> _ableCureSectors = new List<int>();
+    private Dictionary<int, int> _passObjectives = new Dictionary<int, int>();
+
     private int _maxCure = 20;
     private int _currentCure = 0;
     private int _curePower = 1;
@@ -45,6 +47,8 @@ public class BattleSystem
     public event Action<int> OnPlayerMoved;
     public event Action<List<int>> OnEnemyAttack;             // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
     public event Action<string, int, bool> OnBuffChanged;
+
+    public event Action<int, int> OnObjectiveUpdated;
 
     public event Action OnBattleInitialized;
     #endregion
@@ -95,7 +99,20 @@ public class BattleSystem
 
     }
 
-    
+    public void SetPassObjectives(List<(int sector, int count)> objectives)
+    {
+        _passObjectives.Clear();
+        foreach (var obj in objectives)
+        {
+            if (obj.sector > 0 && (_totalSectors == 0 || obj.sector <= _totalSectors))
+            {
+                _passObjectives[obj.sector] = obj.count;
+                OnObjectiveUpdated?.Invoke(obj.sector, obj.count);
+                Debug.Log($"[BattleSystem] 목표 등록됨: {obj.sector}번 섹터 {obj.count}회"); // 확인용 로그 추가
+            }
+        }
+        Debug.Log("설정 완료지렁이");
+    }
 
     public void DealDamageToCurrentSector(int damage, int currentTick)
     {
@@ -200,21 +217,63 @@ public class BattleSystem
 
         while (targetSector > _totalSectors)
         {
-            targetSector -= _totalSectors;
+            Debug.Log("이동할 수 없습니다.");
+            return;
         }
         while (targetSector < 1)
         {
-            targetSector += _totalSectors;
+            Debug.Log("이동할 수 없습니다.");
+            return;
         }
 
         int prevSector = _playerCurrentSector;
-        _playerCurrentSector = Mathf.Clamp(targetSector, 1, 8);
+        _playerCurrentSector = Mathf.Clamp(targetSector, 1, _totalSectors);
 
         if (prevSector != _playerCurrentSector)
         {
             Debug.Log($"[BattleSystem] 이동: {prevSector} -> {_playerCurrentSector} (Speed보너스: {speedBonus})");
+            CheckAndDecreaseObjective(prevSector);
             OnPlayerMoved?.Invoke(_playerCurrentSector);
         }
+    }
+
+    private void CheckAndDecreaseObjective(int leavedSector)
+    {
+        if (_passObjectives.ContainsKey(leavedSector))
+        {
+            if (_passObjectives[leavedSector] > 0)
+            {
+                _passObjectives[leavedSector]--;
+                Debug.Log($"[BattleSystem] 목표 달성 진행: 섹터 {leavedSector} (남은 횟수: {_passObjectives[leavedSector]})");
+                OnObjectiveUpdated?.Invoke(leavedSector, _passObjectives[leavedSector]);
+                CheckGameClearCondition();
+            }
+        }
+    }
+
+    private void CheckGameClearCondition()
+    {
+        bool isAllClear = true;
+        foreach (var count in _passObjectives.Values)
+        {
+            if (count > 0)
+            {
+                isAllClear = false;
+                break;
+            }
+        }
+        if (isAllClear)
+        {
+            Debug.Log("[BattleSystem] 모든 통과 목표 달성! 게임 클리어!");
+            GameManager.Instance?.EndBattle(true);
+        }
+    }
+
+    public int GetRemainingPassCount(int sector)
+    {
+        if (_passObjectives.ContainsKey(sector))
+            return _passObjectives[sector];
+        return 0;
     }
 
     public bool IsPlayerHitByAttack(EnemyAttack attack)

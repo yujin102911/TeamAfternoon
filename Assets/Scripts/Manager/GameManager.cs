@@ -61,6 +61,9 @@ public class GameManager : MonoBehaviour
     private int _statPlayerAttackCount = 0;
     private int _statPlayerHitCount = 0;
 
+    // 지우개 용
+    List<(int, int)> objectives = new List<(int, int)>();
+
     // 배경 전환 저장용
     private Sprite _bgSprite;
     #endregion
@@ -141,7 +144,6 @@ public class GameManager : MonoBehaviour
         _deckSystem = new DeckSystem(dataRepository, userGameData);
         _battleSystem = new BattleSystem();
         _mapSystem = new MapSystem(mapConfig, mapRootTransform);
-
         // 선택된 스테이지가 있다면 (SelectedStageID 변수가 1 이상이면) DataRepository에서 갖다 덮어 씌워버리깅
         if (SelectedStageID > 0)
         {
@@ -187,6 +189,15 @@ public class GameManager : MonoBehaviour
         // PlayerVisualController 연결
         if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
+
+        if (objectives.Count == 0) // 중복 추가 방지
+        {
+            objectives.Add((4, 3));
+            objectives.Add((2, 1));
+        }
+        _battleSystem.SetPassObjectives(objectives);
+
+        Debug.Log("[GameManager] 외부 시스템 연결 및 목표 설정 완료 (Start)");
 
         Debug.Log("[GameManager] 외부 시스템 연결 완료 (Start)");
 

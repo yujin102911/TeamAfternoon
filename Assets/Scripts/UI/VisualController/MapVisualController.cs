@@ -24,6 +24,12 @@ public class MapVisualController : MonoBehaviour
         _mapSystem = mapSystem;
         _battleSystem = battleSystem;
         _mapConfig = mapConfig;
+        _battleSystem.OnObjectiveUpdated += HandleObjectiveUpdated;
+    }
+    void OnDestroy()
+    {
+        if (_battleSystem != null)
+            _battleSystem.OnObjectiveUpdated -= HandleObjectiveUpdated;
     }
 
     /// <summary>
@@ -38,9 +44,24 @@ public class MapVisualController : MonoBehaviour
             RuntimeEnemy owner = _battleSystem.GetEnemyAtSector(i);
             Color targetColor = (owner != null) ? owner.Data.AssignedColor : GetNormalColor();
 
+            // 목표 횟수 가져오기
+            int remaining = _battleSystem.GetRemainingPassCount(i);
+
+            if (remaining > 0)
+            {
+                // [수정] 목표가 남아있으면 색상 변경 + 숫자 표시
+                targetColor = Color.yellow; // 노란색으로 표시
+                _mapSystem.SetSectorText(i, remaining.ToString()); // 숫자 표시!
+            }
+            else
+            {
+                // [수정] 목표가 없거나 달성했으면 텍스트 지우기
+                _mapSystem.SetSectorText(i, "");
+            }
+
             _mapSystem.SetSectorBaseColor(i, targetColor);
 
-            // 정화 모드면 색 재설정
+            // 정화 모드 로직
             if (TimelineManager.Instance.Is_Cure)
             {
                 targetColor = _battleSystem.AbleCureSectors.Contains(i) ? _mapConfig.cureColor : GetNormalColor();
@@ -116,6 +137,13 @@ public class MapVisualController : MonoBehaviour
     {
         UIPooledEffect effect = effectPool.Get();
         effect.Play(uiPosition);
+    }
+    #endregion
+
+    #region Objective Methods
+    private void HandleObjectiveUpdated(int sector, int count)
+    {
+        RefreshMapOwnershipVisuals();
     }
     #endregion
 
