@@ -128,6 +128,10 @@ public class GameResultUI : MonoBehaviour
     public void GoToLibrary()
     {
         Debug.Log("고투 라이브러리");
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.SFX_Execute);
+
         ServiceLocator.Instance.Scene.Load(_librarySceneName);
     }
 

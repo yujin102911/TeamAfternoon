@@ -387,6 +387,9 @@ public class BattleSequenceController : MonoBehaviour
 
     public IEnumerator ScrollCoroutine(Sprite nextSprite)
     {
+        if (nextSprite == null)
+            yield break;
+
         _isPlaying = true;
 
         bgNext.GetComponent<Image>().sprite = nextSprite;

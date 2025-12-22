@@ -505,6 +505,7 @@ public class GameManager : MonoBehaviour
     {
         if (currentStageData == null || index >= currentStageData.EnemySpawns.Count)
         {
+            _bgSprite = null;
             // 더 이상 적이 없으면 겜 끗
             EndBattle(true);
             return;
