@@ -50,6 +50,15 @@ public class BlockData : ScriptableObject
     public int attackDamage;
 
 
+    //───────────────────────────────
+    // 부분 블록 설정 ⭐ NEW!
+    //───────────────────────────────
+    [BoxGroup("부분 블록 설정"), LabelText("부분 블록 리스트")]
+    [InfoBox("이 블록의 부분 블록들을 순서대로 등록\n[0]=전체(자기자신), [1]=2번째부터, [2]=3번째부터...", InfoMessageType.Info)]
+    [Tooltip("인덱스 0부터 순서대로: 전체(Full), Part2, Part3, Part4...")]
+    public BlockData[] partialBlockDatas;
+
+
     // ───────────────────────────────────────────────
     //  프로퍼티 (Readonly - 인스펙터 숨김)
     // ───────────────────────────────────────────────
@@ -59,17 +68,18 @@ public class BlockData : ScriptableObject
     [HideInInspector] public ActionType[] ActionTypes => actionTypes;
     [HideInInspector] public MoveDirection[] MoveDirections => moveDirections;
     [HideInInspector] public int AttackDamage => attackDamage;
+    [HideInInspector] public BlockData[] PartialBlockDatas => partialBlockDatas; // ⭐ NEW!
 
     // 기존 함수들은 그대로 유지 (숨김 처리 가능)
     #region Runtime Methods (Hidden in Inspector)
-    
+
     // 정화 액션의 위치에 따른 정화량 계산
     [HideInInspector]
     public int CalCulate_CurePower(int index)
     {
         int result = 0;
 
-        if(blockLength <= 2)
+        if (blockLength <= 2)
         {
             result = 1;
         }

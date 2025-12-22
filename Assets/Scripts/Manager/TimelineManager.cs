@@ -24,6 +24,12 @@ public class TimelineManager : MonoBehaviour
     // 현재 손패 (GameDirector로부터 받음)
     private List<RuntimeBlock> _currentHand = new List<RuntimeBlock>();
 
+    // HandBlock_UI 관리 (원본 블록 → HandBlock_UI 매핑) ⭐ NEW!
+    private Dictionary<RuntimeBlock, HandBlock_UI> _handBlockUIMap = new Dictionary<RuntimeBlock, HandBlock_UI>();
+
+    // PlacedBlock → HandBlock_UI 매핑 ⭐ NEW!
+    private Dictionary<PlacedBlock, HandBlock_UI> _placedToHandMap = new Dictionary<PlacedBlock, HandBlock_UI>();
+
     // 현재 적 패턴
     private EnemyPattern _currentEnemyPattern;
 
@@ -132,6 +138,53 @@ public class TimelineManager : MonoBehaviour
         }
 
     }
+
+    // ========================================
+    // HandBlock_UI 관리 (NEW!)
+    // ========================================
+
+    /// <summary>
+    /// HandBlock_UI 등록
+    /// </summary>
+    public void RegisterHandBlockUI(HandBlock_UI handBlockUI)
+    {
+        if (handBlockUI == null) return;
+
+        RuntimeBlock originalBlock = handBlockUI.GetOriginalBlock();
+        if (originalBlock != null && !_handBlockUIMap.ContainsKey(originalBlock))
+        {
+            _handBlockUIMap[originalBlock] = handBlockUI;
+            Debug.Log($"[TimelineManager] HandBlock_UI 등록: {originalBlock.BaseData.BlockName}");
+        }
+    }
+
+    /// <summary>
+    /// HandBlock_UI 등록 해제
+    /// </summary>
+    public void UnregisterHandBlockUI(HandBlock_UI handBlockUI)
+    {
+        if (handBlockUI == null) return;
+
+        RuntimeBlock originalBlock = handBlockUI.GetOriginalBlock();
+        if (originalBlock != null && _handBlockUIMap.ContainsKey(originalBlock))
+        {
+            _handBlockUIMap.Remove(originalBlock);
+            Debug.Log($"[TimelineManager] HandBlock_UI 등록 해제: {originalBlock.BaseData.BlockName}");
+        }
+    }
+
+    /// <summary>
+    /// 원본 블록에 해당하는 HandBlock_UI 찾기
+    /// </summary>
+    public HandBlock_UI FindHandBlockUI(RuntimeBlock originalBlock)
+    {
+        if (_handBlockUIMap.TryGetValue(originalBlock, out HandBlock_UI handBlockUI))
+        {
+            return handBlockUI;
+        }
+        return null;
+    }
+
     // ========================================
     // 공개 메서드
     // ========================================
@@ -161,7 +214,41 @@ public class TimelineManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 블록을 타임라인에 배치 시도
+    /// 블록을 타임라인에 배치 시도 (HandBlock_UI와 연동) ⭐ 수정됨!
+    /// </summary>
+    public bool TryPlaceBlockWithUI(RuntimeBlock runtimeBlock, RuntimeBlock originalBlock, HandBlock_UI handBlockUI, int startTick)
+    {
+        // TimelineSystem에 배치 요청
+        bool success = _timelineSystem.TryPlaceBlock(runtimeBlock, startTick);
+
+        if (success)
+        {
+            // PlacedBlock 찾기 (방금 배치된 블록)
+            PlacedBlock placedBlock = _timelineSystem.PlacedBlocks
+                .FirstOrDefault(p => p.linkedRuntimeBlock == runtimeBlock && p.startTick == startTick);
+
+            if (placedBlock != null && handBlockUI != null)
+            {
+                // PlacedBlock → HandBlock_UI 매핑 저장
+                _placedToHandMap[placedBlock] = handBlockUI;
+
+                // HandBlock_UI 숨김
+                handBlockUI.HideBlock(placedBlock);
+            }
+
+            Debug.Log($"[TimelineManager] 블록 배치 성공: {runtimeBlock.BaseData.BlockName} at T{startTick}");
+
+            // UI 업데이트
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 블록을 타임라인에 배치 시도 (기존 메서드 - 호환성 유지)
     /// </summary>
     public bool TryPlaceBlock(RuntimeBlock runtimeBlock, int startTick)
     {
@@ -192,7 +279,7 @@ public class TimelineManager : MonoBehaviour
         return false;
     }
 
-    public bool TryMoveBlock_OnTimeline(RuntimeBlock runtimeBlock, int startTick) 
+    public bool TryMoveBlock_OnTimeline(RuntimeBlock runtimeBlock, int startTick)
     {
         // TimelineSystem에 배치 요청
         bool success = _timelineSystem.TryPlaceBlock(runtimeBlock, startTick);
@@ -209,7 +296,7 @@ public class TimelineManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 타임라인에서 블록 제거
+    /// 타임라인에서 블록 제거 (HandBlock_UI 복구) ⭐ 수정됨!
     /// </summary>
     public void RemovePlacedBlock(PlacedBlock placedBlock)
     {
@@ -220,13 +307,23 @@ public class TimelineManager : MonoBehaviour
 
         if (runtimeBlock != null)
         {
-            // 손패로 복귀 전 방향 초기화
-            runtimeBlock.InitializeDirections();
+            // HandBlock_UI 찾기
+            if (_placedToHandMap.TryGetValue(placedBlock, out HandBlock_UI handBlockUI))
+            {
+                // ⭐ HandBlock_UI 복구 (부분 블록은 손패로 복귀하지 않음)
+                handBlockUI.RestoreBlock();
+                _placedToHandMap.Remove(placedBlock);
 
-            // 손패로 복귀
-            _currentHand.Add(runtimeBlock);
+                Debug.Log($"[TimelineManager] HandBlock_UI 복구: {handBlockUI.GetOriginalBlock().BaseData.BlockName}");
+            }
+            else
+            {
+                // HandBlock_UI가 없는 경우 (기존 방식) - 손패로 복귀
+                runtimeBlock.InitializeDirections();
+                _currentHand.Add(runtimeBlock);
 
-            Debug.Log($"[TimelineDirector] 블록 제거: {runtimeBlock.BaseData.BlockName}");
+                Debug.Log($"[TimelineManager] 블록 제거 (손패 복귀): {runtimeBlock.BaseData.BlockName}");
+            }
 
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
@@ -237,35 +334,64 @@ public class TimelineManager : MonoBehaviour
     public void RemovePlacedBlock_OnTimeline(PlacedBlock placedBlock)
     {
         RuntimeBlock runtimeBlock = _timelineSystem.RemovePlacedBlock(placedBlock);
-        
+
+        // HandBlock_UI 복구 확인
+        if (_placedToHandMap.TryGetValue(placedBlock, out HandBlock_UI handBlockUI))
+        {
+            handBlockUI.RestoreBlock();
+            _placedToHandMap.Remove(placedBlock);
+        }
+
         // UI 업데이트
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
+    public void ToggleDirection(PlacedBlock placed, int tick)
+    {
+        placed.ToggleDirection(tick);
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+
+    /// <summary>
+    /// 블록 방향 토글 (별칭)
+    /// </summary>
+    public void ToggleBlockDirection(PlacedBlock placed, int tick)
+    {
+        ToggleDirection(placed, tick);
+    }
+
+    /// <summary>
+    /// 특정 블록을 손패로 복귀
+    /// </summary>
     public void ReturnToHand(RuntimeBlock runtimeBlock)
     {
-        if (runtimeBlock != null)
+        if (runtimeBlock == null) return;
+
+        // 방향 초기화
+        runtimeBlock.InitializeDirections();
+
+        // 손패로 복귀
+        if (!_currentHand.Contains(runtimeBlock))
         {
-            // 손패로 복귀 전 방향 초기화
-            runtimeBlock.InitializeDirections();
-
-            // 손패로 복귀
             _currentHand.Add(runtimeBlock);
-
-            Debug.Log($"[TimelineDirector] 손패로 복귀: {runtimeBlock.BaseData.BlockName}");
+            Debug.Log($"[TimelineManager] 블록을 손패로 복귀: {runtimeBlock.BaseData.BlockName}");
 
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
-            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
     }
-    public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
+
+    /// <summary>
+    /// 특정 틱 범위가 배치 가능한지 확인 (UI에서 미리보기용)
+    /// </summary>
+    public bool CanPlaceAt(int startTick, int length)
     {
-        if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
-        int index = tick - placedBlock.startTick;
-        placedBlock.linkedRuntimeBlock.ToggleDirections(index);
-        Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
-        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+        return _timelineSystem.CanPlaceBlock(startTick, length);
+    }
+
+    public void Initialize(BattleSystem battleSystem)
+    {
+        _battleSystem = battleSystem;
     }
 
     /// <summary>
@@ -293,7 +419,7 @@ public class TimelineManager : MonoBehaviour
                 break;
             }
             //틱이 분리됨에 따른 틱 쪼개기
-            OnCurrentTickChanged?.Invoke(2*tick - 1);
+            OnCurrentTickChanged?.Invoke(2 * tick - 1);
 
             Debug.Log($"[TimelineDirector] --- 틱 {tick} ---");
 
@@ -307,13 +433,6 @@ public class TimelineManager : MonoBehaviour
 
             yield return new WaitForSeconds(0.4f);
             if (GameManager.Instance.IsBattleEnded) yield break;
-
-            //// 정화 시도
-            //if (_battleSystem.TryCurePage(tick, Is_Cure))
-            //{
-            //    // TODO: 정화 이펙트 넣기
-            //    yield return new WaitForSeconds(0.4f);
-            //}
 
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);
@@ -384,19 +503,6 @@ public class TimelineManager : MonoBehaviour
         // UI 업데이트
         OnHandChanged?.Invoke(_currentHand);
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
-    }
-
-    /// <summary>
-    /// 특정 틱 범위가 배치 가능한지 확인 (UI에서 미리보기용)
-    /// </summary>
-    public bool CanPlaceAt(int startTick, int length)
-    {
-        return _timelineSystem.CanPlaceBlock(startTick, length);
-    }
-
-    public void Initialize(BattleSystem battleSystem)
-    {
-        _battleSystem = battleSystem;
     }
 
     #region Preview Methods - public
@@ -497,7 +603,7 @@ public class TimelineManager : MonoBehaviour
 
                         while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
                         while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
-                    } 
+                    }
                 }
 
             }
