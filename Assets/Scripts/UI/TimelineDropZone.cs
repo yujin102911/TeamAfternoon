@@ -98,7 +98,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
             originalColor = image.color;
 
             // 배치 가능한지 확인
-            bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength);
+            bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength, block_info);
             if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.Rendering.VolumeComponent;
 
 /// <summary>
 /// 타임라인 배치 로직을 처리하는 System
@@ -75,7 +76,7 @@ public class TimelineSystem
         int length = runtimeBlock.BaseData.BlockLength;
 
         // 배치 가능 여부 확인
-        if (!CanPlaceBlock(startTick, length))
+        if (!CanPlaceBlock(startTick, length, runtimeBlock))
         {
             Debug.LogWarning($"[TimelineSystem] T{startTick}에 배치 불가 (길이: {length})");
             return false;
@@ -124,7 +125,7 @@ public class TimelineSystem
     /// <summary>
     /// 특정 위치에 블록 배치 가능한지 확인
     /// </summary>
-    public bool CanPlaceBlock(int startTick, int length)
+    public bool CanPlaceBlock(int startTick, int length, RuntimeBlock block)
     {
         // 범위 체크
         if (startTick < 1 || startTick + length > 9)
@@ -135,7 +136,9 @@ public class TimelineSystem
         // 겹치는 블록 확인
         for (int tick = startTick; tick < startTick + length; tick++)
         {
-            if (IsTickOccupied(tick))
+            int darg_block_tick = tick - startTick;
+
+            if (IsTickOccupied(tick, darg_block_tick, block))
             {
                 return false;
             }
@@ -147,13 +150,27 @@ public class TimelineSystem
     /// <summary>
     /// 특정 틱이 이미 차지되어 있는지 확인
     /// </summary>
-    private bool IsTickOccupied(int tick)
+    private bool IsTickOccupied(int tick, int darg_block_tick, RuntimeBlock block)
     {
         foreach (PlacedBlock placed in _placedBlocks)
         {
             if (placed.IsActiveAt(tick))
             {
-                return true;
+                //겹치기 가능인지 판단
+                if (placed.linkedRuntimeBlock.BaseData.actionTypes[placed.GetCardTickIndex(tick)]
+                    == block.BaseData.actionTypes[darg_block_tick])
+                {
+                    Debug.Log($"놓인거 {tick}틱 {placed.linkedRuntimeBlock.BaseData.actionTypes[placed.GetCardTickIndex(tick)].ToString()}");
+                    Debug.Log($"들고있는거 {darg_block_tick}틱: {block.BaseData.actionTypes[darg_block_tick].ToString()}");
+                    return false;
+                }
+                else
+                {
+                    
+                    return true;
+                }
+
+                    
             }
         }
         return false;
@@ -178,8 +195,34 @@ public class TimelineSystem
     /// </summary>
     public PlacedBlock FindFirstAction(int tick)
     {
-        int indexA = _placedBlocks.FindIndex(x => x.IsActiveAt(tick));
-        int indexB = _prevPlacedBlocks.FindIndex(x => x.IsActiveAt(tick));
+        int indexA = -1;
+        int first = _placedBlocks.FindIndex(x => x.IsActiveAt(tick));
+        int second = _placedBlocks.FindIndex(first + 1, x => x.IsActiveAt(tick));
+
+        if(second != -1)
+        {
+            indexA = second;
+        }
+        else
+        {
+            indexA = first;
+        }
+
+        int indexB = -1;
+        int first_B = _prevPlacedBlocks.FindIndex(x => x.IsActiveAt(tick));
+        int second_B = _prevPlacedBlocks.FindIndex(first_B + 1, x => x.IsActiveAt(tick));
+
+        if (second_B != -1)
+        {
+            indexB = second_B;
+        }
+        else
+        {
+            indexB = first_B;
+        }
+
+        //int indexA = _placedBlocks.FindIndex(x => x.IsActiveAt(tick));
+        //int indexB = _prevPlacedBlocks.FindIndex(x => x.IsActiveAt(tick));
 
         bool foundA = indexA != -1;
         bool foundB = indexB != -1;
@@ -215,6 +258,8 @@ public class TimelineSystem
     public void ProcessTick(int tick)
     {
         PlacedBlock placed = FindFirstAction(tick);
+
+        //Debug.Log(placed.linkedRuntimeBlock.BaseData.blockName);
 
         if (placed == null) return;
 

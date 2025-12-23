@@ -524,6 +524,9 @@ public class TimelineUI : MonoBehaviour
                 if (img.gameObject != slot)   // 자기 자신 제외
                 {
                     img.gameObject.SetActive(true);
+                    Color color = img.color;
+                    color.a = 1f;
+                    img.color = color;
                 }
             }
 
@@ -713,11 +716,18 @@ public class TimelineUI : MonoBehaviour
                     {
                         if (img.gameObject != slot)   // 자기 자신 제외
                         {
-                            img.gameObject.SetActive(false);
+                            //img.gameObject.SetActive(false);
+                            Color color1 = img.color;
+                            color1.a = 0f;
+                            img.color = color1;
                         }
                     }
 
                     iconImage.gameObject.SetActive(true);
+
+                    Color color2 = iconImage.color;
+                    color2.a = 1.0f;
+                    iconImage.color = color2;
 
                     image.sprite = Set_SlotSprite;
 
@@ -829,7 +839,7 @@ public class TimelineUI : MonoBehaviour
 
         if (TimelineManager.Instance != null)
         {
-            return TimelineManager.Instance.CanPlaceAt(startTick, length);
+            //return TimelineManager.Instance.CanPlaceAt(startTick, length);
         }
 
         return false;

@@ -389,9 +389,9 @@ public class TimelineManager : MonoBehaviour
     /// <summary>
     /// 특정 틱 범위가 배치 가능한지 확인 (UI에서 미리보기용)
     /// </summary>
-    public bool CanPlaceAt(int startTick, int length)
+    public bool CanPlaceAt(int startTick, int length, RuntimeBlock runtimeBlock)
     {
-        return _timelineSystem.CanPlaceBlock(startTick, length);
+        return _timelineSystem.CanPlaceBlock(startTick, length, runtimeBlock);
     }
 
     public void Initialize(BattleSystem battleSystem)

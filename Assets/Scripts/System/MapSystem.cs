@@ -7,6 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public enum MapSize
 {
+    Sectors_4,
     Sectors_8,    // 3x3
     Sectors_12,   // 4x3
     Custom,       // 맵에 설치한 포인트들 기준
@@ -66,6 +67,13 @@ public class MapSystem
 
         switch (mapSize)
         {
+            case MapSize.Sectors_4:
+                _totalSectors = 4;
+                gridDimensions = new Vector2(2, 2);
+                gridPositions.Add(new Vector2Int(0, 1)); gridPositions.Add(new Vector2Int(1, 1));
+                gridPositions.Add(new Vector2Int(1, 0)); gridPositions.Add(new Vector2Int(0, 0));
+                break;
+
             case MapSize.Sectors_8:
             default:
                 _totalSectors = 8;
