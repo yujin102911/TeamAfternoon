@@ -39,6 +39,10 @@ public class Draggable_Block : MonoBehaviour, IEndDragHandler
     public void Show(RuntimeBlock rBlock)
     {
         runtimeBlock = rBlock;
+
+        // ⭐ 디버깅 로그
+        Debug.Log($"[Draggable_Block] Show 호출됨 - 블록: {rBlock.BaseData.BlockName}, 길이: {rBlock.BaseData.BlockLength}");
+
         Set_TickVisuals(rBlock.BaseData);
         SetText(rBlock.BaseData);
     }
@@ -157,12 +161,19 @@ public class Draggable_Block : MonoBehaviour, IEndDragHandler
             // 드롭존에 배치 시도
             int tickIndex = dropZone.tickIndex;
 
+            // ⭐ 디버깅 로그
+            Debug.Log($"[Draggable_Block] OnEndDrag - 배치 시도 블록: {runtimeBlock?.BaseData?.BlockName ?? "NULL"}, 길이: {runtimeBlock?.BaseData?.BlockLength ?? 0}");
+
             if (TimelineManager.Instance != null)
             {
                 // ⭐ HandBlock_UI가 있으면 새로운 메서드 사용
                 if (_sourceHandBlock != null)
                 {
                     RuntimeBlock originalBlock = _sourceHandBlock.GetOriginalBlock();
+
+                    // ⭐ 추가 디버깅
+                    Debug.Log($"[Draggable_Block] 원본 블록: {originalBlock.BaseData.BlockName}, 배치 블록: {runtimeBlock.BaseData.BlockName}");
+
                     bool success = TimelineManager.Instance.TryPlaceBlockWithUI(
                         runtimeBlock,
                         originalBlock,
@@ -170,22 +181,22 @@ public class Draggable_Block : MonoBehaviour, IEndDragHandler
                         tickIndex
                     );
 
-                    if (success)
-                    {
-                        //if (SoundManager.Instance != null)
-                        //    SoundManager.Instance.Play(SoundID.SFX_Card_Place);
-                    }
+                    //if (success)
+                    //{
+                    //    if (SoundManager.Instance != null)
+                    //        SoundManager.Instance.Play(SoundID.SFX_Card_Place);
+                    //}
                 }
                 else
                 {
                     // 기존 방식 (호환성)
                     bool success = TimelineManager.Instance.TryPlaceBlock(runtimeBlock, tickIndex);
 
-                    if (success)
-                    {
-                        //if (SoundManager.Instance != null)
-                        //    SoundManager.Instance.Play(SoundID.SFX_Card_Place);
-                    }
+                    //if (success)
+                    //{
+                    //    if (SoundManager.Instance != null)
+                    //        SoundManager.Instance.Play(SoundID.SFX_Card_Place);
+                    //}
                 }
             }
         }

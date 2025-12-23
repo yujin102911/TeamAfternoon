@@ -56,6 +56,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Header("드래그할 블록 선택")]
     private RuntimeBlock _selectedBlockForDrag; // 버튼 클릭 시 선택된 블록
     private RuntimeBlock _originalRuntimeBlock; // 원본 보관용 (항상 유지)
+    private int _selectedButtonIndex = 0; // 선택된 버튼 인덱스 (0 = 전체 블록) ⭐ NEW!
 
     [Header("배치 상태")]
     private bool _isPlaced = false; // 배치되었는지 여부
@@ -127,6 +128,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         // 기본값: 전체 블록 선택
         _selectedBlockForDrag = runtimeBlock;
+        _selectedButtonIndex = 0; // ⭐ 인덱스 초기화
 
         // 배치 상태 초기화
         _isPlaced = false;
@@ -228,6 +230,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (partialBlocks != null && clickedIndex < partialBlocks.Length)
         {
             _selectedBlockForDrag = partialBlocks[clickedIndex];
+            _selectedButtonIndex = clickedIndex; // ⭐ 인덱스 저장
 
             string blockName = _selectedBlockForDrag?.BaseData?.BlockName ?? "Unknown";
             Debug.Log($"[HandBlock_UI] {clickedIndex}번 버튼 클릭 → {blockName} 선택됨");
@@ -236,6 +239,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         {
             Debug.LogWarning($"[HandBlock_UI] {clickedIndex}번 인덱스에 할당된 부분 블록이 없습니다!");
             _selectedBlockForDrag = runtimeBlock; // 기본값으로 폴백
+            _selectedButtonIndex = 0;
         }
     }
 
@@ -407,6 +411,9 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (_selectedBlockForDrag == null)
             _selectedBlockForDrag = runtimeBlock;
 
+        // ⭐ 디버깅 로그
+        Debug.Log($"[HandBlock_UI] OnBeginDrag - 선택된 블록: {_selectedBlockForDrag.BaseData.BlockName}, 길이: {_selectedBlockForDrag.BaseData.BlockLength}, 인덱스: {_selectedButtonIndex}");
+
         // 드래그용 복제 생성
         ghost = Instantiate(dragGhostPrefab, canvas.transform);
         ghost.transform.position = transform.position;
@@ -442,7 +449,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             // 드롭 실패 시 원래대로 복구
             canvasGroup.alpha = 1f;
             canvasGroup.blocksRaycasts = true;
-            _selectedBlockForDrag = null;
+            // ⭐ 선택은 유지 (다시 드래그 가능하도록)
         }
         // dropSuccess인 경우 HideBlock()이 Draggable_Block에서 호출됨
 
@@ -492,10 +499,21 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
         _isPlaced = false;
         _currentPlacedBlock = null;
-        _selectedBlockForDrag = null;
 
         // 원본 블록으로 복구
         runtimeBlock = _originalRuntimeBlock;
+
+        // ⭐ 이전 선택 복구 (버튼 상태 유지)
+        if (partialBlocks != null && _selectedButtonIndex >= 0 && _selectedButtonIndex < partialBlocks.Length)
+        {
+            _selectedBlockForDrag = partialBlocks[_selectedButtonIndex];
+            Debug.Log($"[HandBlock_UI] 이전 선택 복구: {_selectedButtonIndex}번 버튼 ({_selectedBlockForDrag.BaseData.BlockName})");
+        }
+        else
+        {
+            _selectedBlockForDrag = runtimeBlock; // 폴백
+            _selectedButtonIndex = 0;
+        }
 
         // UI 복구
         gameObject.SetActive(true);

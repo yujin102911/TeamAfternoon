@@ -55,20 +55,25 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 
         if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
 
-        // 드래그 중인 카드 가져오기
-        RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+        // ⭐ 수정: 선택된 블록 가져오기 (부분 블록 지원)
+        HandBlock_UI handBlockUI = eventData.pointerDrag.GetComponent<HandBlock_UI>();
+        RuntimeBlock block_info = handBlockUI.GetSelectedBlock();
 
         if (block_info != null && TimelineManager.Instance != null)
         {
-            // 배치 시도
-            bool success = TimelineManager.Instance.TryPlaceBlock(block_info, tickIndex);
+            // ⭐ 수정: TryPlaceBlockWithUI 사용 (HandBlock_UI 숨김 지원)
+            RuntimeBlock originalBlock = handBlockUI.GetOriginalBlock();
+            bool success = TimelineManager.Instance.TryPlaceBlockWithUI(
+                block_info,      // 선택된 블록 (부분 블록 가능)
+                originalBlock,   // 원본 블록
+                handBlockUI,     // HandBlock_UI
+                tickIndex
+            );
 
             if (success)
             {
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
-                //블록 배치 성공 시 드래그 블록 숨기기
-                //Draggable_Block.Instance.Hide();
             }
         }
     }
@@ -78,14 +83,16 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        
+
         RuntimeBlock block_info = null;
 
         if (DragOn_timeline.instance != null && !DragOn_timeline.instance.isDragging)
         {
             if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
 
-            block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+            // ⭐ 수정: 선택된 블록 가져오기
+            HandBlock_UI handBlockUI = eventData.pointerDrag.GetComponent<HandBlock_UI>();
+            block_info = handBlockUI.GetSelectedBlock();
         }
         else
         {
@@ -97,7 +104,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         {
             originalColor = image.color;
 
-            // 배치 가능한지 확인
+            // ⭐ 수정: 선택된 블록의 길이로 체크 (부분 블록 지원)
             bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength);
             if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
         }
