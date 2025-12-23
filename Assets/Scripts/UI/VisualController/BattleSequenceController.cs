@@ -346,8 +346,10 @@ public class BattleSequenceController : MonoBehaviour
             rightEnd = outsideRightPos;
 
             // 회전 정지
-            leftImage.GetComponent<UIRotate>().OnExit();
-            rightImage.GetComponent<UIRotate>().OnExit();
+            if (leftImage != null)
+                leftImage.GetComponent<UIRotate>().OnExit();
+            if (rightImage != null)
+                rightImage.GetComponent<UIRotate>().OnExit();
         }
 
         float time = 0f;
@@ -359,20 +361,33 @@ public class BattleSequenceController : MonoBehaviour
 
             float eased = Mathf.SmoothStep(0f, 1f, t);
 
-            leftImage.anchoredPosition = Vector2.Lerp(leftStart, leftEnd, eased);
-            rightImage.anchoredPosition = Vector2.Lerp(rightStart, rightEnd, eased);
+            if (leftImage != null)
+            {
+                leftImage.anchoredPosition = Vector2.Lerp(leftStart, leftEnd, eased);
+            }
+
+            if (rightImage != null)
+            {
+                rightImage.anchoredPosition = Vector2.Lerp(rightStart, rightEnd, eased);
+            }
+
+            
 
             yield return null;
         }
 
-        leftImage.anchoredPosition = leftEnd;
-        rightImage.anchoredPosition = rightEnd;
+        if(leftImage != null)
+            leftImage.anchoredPosition = leftEnd;
+        if (rightImage != null)
+            rightImage.anchoredPosition = rightEnd;
 
         if (is_in) 
         {
             // 회전 시작
-            leftImage.GetComponent<UIRotate>().OnArrived();
-            rightImage.GetComponent<UIRotate>().OnArrived();
+            if (leftImage != null)
+                leftImage.GetComponent<UIRotate>().OnArrived();
+            if (rightImage != null)
+                rightImage.GetComponent<UIRotate>().OnArrived();
         }
     }
 

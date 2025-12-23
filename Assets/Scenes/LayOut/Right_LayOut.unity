@@ -3128,6 +3128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce20e7bef32d7f847aa1d30853c6bca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Is_Cure: 0
   _totalTicks: 8
 --- !u!4 &1994000752
 Transform:
@@ -3158,9 +3159,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startButton: {fileID: 243445876}
   _sectorSelectionPanel: {fileID: 0}
-  _pageText: {fileID: 2137121192}
-  _totalPageText: {fileID: 1673110919}
+  _lineText: {fileID: 0}
+  _totalLineText: {fileID: 0}
   _chapterText: {fileID: 343748529}
+  _totalChapterText: {fileID: 0}
+  _cureUI: {fileID: 0}
   _playerStatusUI: {fileID: 2714568068618234301}
   _enemyStatusPrefab: {fileID: 2714568068089599078, guid: 5cd77caddccea9f49843d44ea06eecdd, type: 3}
   _enemyUIContainer: {fileID: 38265765}
@@ -3248,6 +3251,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VisualController
       objectReference: {fileID: 0}
+    - target: {fileID: 3084520134297434512, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
+      propertyPath: HandPanel
+      value: 
+      objectReference: {fileID: 5176707674424316698}
     - target: {fileID: 3084520134297434512, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       propertyPath: _storyLine
       value: 
@@ -3689,17 +3696,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085260374}
   m_CullTransparentMesh: 1
---- !u!114 &2137121192 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8230515703035414371, guid: 106989d0f93b2c24095c33326ba3e556, type: 3}
-  m_PrefabInstance: {fileID: 2019473175}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!28 &2142109940
 Texture2D:
   m_ObjectHideFlags: 0
