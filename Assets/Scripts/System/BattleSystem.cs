@@ -17,6 +17,7 @@ public class BattleSystem
     private float _vulnerableAmount = 1.5f;
 
     private int _totalSectors;
+    private int _columns;
 
     private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>(); // 현재 싸우고 있는 적
 
@@ -71,9 +72,10 @@ public class BattleSystem
     /// <summary>
     /// 체력, 적, 버프 초기화 미리 설정
     /// </summary>
-    public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, bool keepPlayerHP = false)
+    public void InitializeBattle(List<RuntimeEnemy> enemies, int playerMaxHP, int totalSectors, int columns, bool keepPlayerHP = false)
     {
         _totalSectors = totalSectors;
+        _columns = columns;
         _enemies = enemies;
 
         if (!keepPlayerHP) _playerHP = playerMaxHP;
@@ -212,11 +214,24 @@ public class BattleSystem
         int speedBonus = GetBuffValue("Speed", true);
         int moveAmount = 1 + speedBonus;
 
-        int direction = (moveDirection == MoveDirection.Right) ? 1 : -1;
-        int targetSector = _playerCurrentSector + (direction * moveAmount);
+        int targetSector = _playerCurrentSector;
 
-        while (targetSector > _totalSectors)
+        switch (moveDirection)
         {
+            case MoveDirection.Front:
+                targetSector += moveAmount;
+                break;
+            case MoveDirection.Back:
+                targetSector -= moveAmount;
+                break;
+            case MoveDirection.Left:
+                targetSector -= (_columns * moveAmount);
+                break;
+            case MoveDirection.Right:
+                targetSector += (_columns * moveAmount);
+                break;
+        }
+        while (targetSector > _totalSectors){
             Debug.Log("이동할 수 없습니다.");
             return;
         }

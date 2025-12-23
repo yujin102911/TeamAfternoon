@@ -58,10 +58,24 @@ public class RuntimeBlock
     public void ToggleDirections(int index)
     {
         if (CurrentMoveDirections == null || index < 0 || index >= CurrentMoveDirections.Length) return;
-        
-        if (CurrentMoveDirections[index] == MoveDirection.Left)
-            CurrentMoveDirections[index] = MoveDirection.Right;
-        else if (CurrentMoveDirections[index] == MoveDirection.Right)
-            CurrentMoveDirections[index] = MoveDirection.Left;
+
+        switch (CurrentMoveDirections[index])
+        {
+            case MoveDirection.Front:
+                CurrentMoveDirections[index] = MoveDirection.Right;
+                break;
+            case MoveDirection.Right:
+                CurrentMoveDirections[index] = MoveDirection.Back;
+                break;
+            case MoveDirection.Back:
+                CurrentMoveDirections[index] = MoveDirection.Left;
+                break;
+            case MoveDirection.Left:
+                CurrentMoveDirections[index] = MoveDirection.Front;
+                break;
+            default:
+                CurrentMoveDirections[index] = MoveDirection.Front;
+                break;
+        }
     }
 }

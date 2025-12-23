@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
     [SerializeField] private int _playerMaxHP = 20;
-    [SerializeField] private MapSize _mapSize = MapSize.Sectors_8;
+    [SerializeField] private MapSize _mapSize = MapSize.Grid_3x3;
 
     [Header("테스트용 스테이지 데이터")]
     [SerializeField] private StageData currentStageData;
@@ -527,7 +527,7 @@ public class GameManager : MonoBehaviour
         {
             new RuntimeEnemy(spawn.enemyData, new List<int>(spawn.hitSectors))
         };
-        _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors, keepPlayerHP);
+        _battleSystem.InitializeBattle(enemies, _playerMaxHP, _mapSystem.TotalSectors, _mapSystem.Columns,keepPlayerHP);
         UpdateEnemyPatterns();
 
         // 변경할 배경정보 받아오기

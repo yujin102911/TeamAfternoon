@@ -68,9 +68,13 @@ public class TimelineUI : MonoBehaviour
     [TabGroup("Move")]
     public Color Player_moveColor;
     [TabGroup("Move")]
-    public Sprite CW_icon;
+    public Sprite Front_icon;
     [TabGroup("Move")]
-    public Sprite CCW_icon;
+    public Sprite Back_icon;
+    [TabGroup("Move")]
+    public Sprite Left_icon;
+    [TabGroup("Move")]
+    public Sprite Right_icon;
     
 
     [TabGroup("Cure")]
@@ -381,10 +385,14 @@ public class TimelineUI : MonoBehaviour
             case ActionType.Move:
                 titleText = "이동";
                 if (moveDir == MoveDirection.Right)
-                    effectText = $"이동 방향: 시계\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 우로 이동\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Left)
-                    effectText = $"이동 방향: 반시계\n좌클릭: 방향 변경";
-                break;
+                    effectText = $"이동 방향: 좌로 이동\n좌클릭: 방향 변경";
+                else if (moveDir == MoveDirection.Front)
+                    effectText = $"이동 방향: 앞으로 이동\n좌클릭: 방향 변경";
+                else if (moveDir == MoveDirection.Back)
+                    effectText = $"이동 방향: 뒤로 이동\n좌클릭: 방향 변경";
+                    break;
         }
 
         // 툴팁 텍스트 설정
@@ -632,17 +640,14 @@ public class TimelineUI : MonoBehaviour
                                 dir = blockData.moveDirections[i];
                             }
 
-                            if (dir == MoveDirection.Left)
+                            switch (dir)
                             {
-                                text = "<";
-                                iconSprite = CCW_icon;
+                                case MoveDirection.Front: text = "R"; iconSprite = Front_icon; break;
+                                case MoveDirection.Right: text = "D"; iconSprite = Right_icon; break;
+                                case MoveDirection.Back: text = "L"; iconSprite = Back_icon; break;
+                                case MoveDirection.Left: text = "U"; iconSprite = Left_icon; break;
                             }
-                            else if (dir == MoveDirection.Right)
-                            {
-                                text = ">";
-                                iconSprite = CW_icon;
-                            }
-                                
+
                             break;
                     }
 
@@ -773,15 +778,12 @@ public class TimelineUI : MonoBehaviour
                                 dir = blockData.moveDirections[i];
                             }
 
-                            if (dir == MoveDirection.Left)
+                            switch (dir)
                             {
-                                text = "<";
-                                iconSprite = CCW_icon;
-                            }
-                            else if (dir == MoveDirection.Right)
-                            {
-                                text = ">";
-                                iconSprite = CW_icon;
+                                case MoveDirection.Front: text = "R"; iconSprite = Front_icon; break;
+                                case MoveDirection.Right: text = "D"; iconSprite = Right_icon; break;
+                                case MoveDirection.Back: text = "L"; iconSprite = Back_icon; break;
+                                case MoveDirection.Left: text = "U"; iconSprite = Left_icon; break;
                             }
 
                             break;

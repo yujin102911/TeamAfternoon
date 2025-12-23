@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 
 /// <summary>
 /// 맵 크기 열거형
@@ -10,6 +11,8 @@ public enum MapSize
     Sectors_4,
     Sectors_8,    // 3x3
     Sectors_12,   // 4x3
+    Grid_3x3,    // 3x3
+    Grid_4x3,   // 4x3
     Custom,       // 맵에 설치한 포인트들 기준
 }
 
@@ -25,12 +28,17 @@ public class MapSystem
     private bool _isSelectionEnabled = false;
     private int _totalSectors;
 
+    private int _columns;
+    private int _rows;
+
     private Dictionary<int, GameObject> _sectors = new Dictionary<int, GameObject>();
     private Dictionary<int, Color> _sectorBaseColors = new Dictionary<int, Color>();
 
     public event Action<int> OnSectorSelected;
 
     public int TotalSectors => _totalSectors;
+    public int Rows => _rows;
+    public int Columns => _columns;
 
     public MapSystem(MapConfiguration config, Transform rootTransform)
     {
@@ -57,16 +65,23 @@ public class MapSystem
             {
                 // 설정된게 없으면 sector8 을 기본으로 걍 설정
                 Debug.LogError("[MapSystem] Custom모드지만 배치 포인트 리스트가 비어있음");
-                mapSize = MapSize.Sectors_8;
+                mapSize = MapSize.Grid_3x3;
             }
         }
 
         List<Vector2Int> gridPositions = new List<Vector2Int>();
-        Vector2 gridDimensions = Vector2.zero;
         float currentSectorSize = _config.baseSectorSize;
 
         switch (mapSize)
         {
+            case MapSize.Grid_3x3:
+                _columns = 3;
+                _rows = 3;
+                break;
+            case MapSize.Grid_4x3:
+                _columns = 4;
+                _rows = 3;
+                break;
             case MapSize.Sectors_4:
                 _totalSectors = 4;
                 gridDimensions = new Vector2(2, 2);
@@ -76,25 +91,20 @@ public class MapSystem
 
             case MapSize.Sectors_8:
             default:
-                _totalSectors = 8;
-                gridDimensions = new Vector2(3, 3);
-                gridPositions.Add(new Vector2Int(0, 2)); gridPositions.Add(new Vector2Int(1, 2));
-                gridPositions.Add(new Vector2Int(2, 2)); gridPositions.Add(new Vector2Int(2, 1));
-                gridPositions.Add(new Vector2Int(2, 0)); gridPositions.Add(new Vector2Int(1, 0));
-                gridPositions.Add(new Vector2Int(0, 0)); gridPositions.Add(new Vector2Int(0, 1));
-                break;
-            case MapSize.Sectors_12:
-                _totalSectors = 12;
-                gridDimensions = new Vector2(4, 3);
-                gridPositions.Add(new Vector2Int(0, 2)); gridPositions.Add(new Vector2Int(1, 2));
-                gridPositions.Add(new Vector2Int(2, 2)); gridPositions.Add(new Vector2Int(3, 2));
-                gridPositions.Add(new Vector2Int(0, 1)); gridPositions.Add(new Vector2Int(1, 1));
-                gridPositions.Add(new Vector2Int(2, 1)); gridPositions.Add(new Vector2Int(3, 1));
-                gridPositions.Add(new Vector2Int(0, 0)); gridPositions.Add(new Vector2Int(1, 0));
-                gridPositions.Add(new Vector2Int(2, 0)); gridPositions.Add(new Vector2Int(3, 0));
+                _columns = 3;
+                _rows = 3;
                 break;
         }
-        CreateSectorObjects(gridPositions, gridDimensions, currentSectorSize);
+        _totalSectors = _columns * _rows;
+        for (int y = _rows - 1; y >= 0; y--) 
+        {
+            for (int x = 0; x < _columns; x++) 
+            {
+                gridPositions.Add(new Vector2Int(x, y));
+            }
+        }
+        Vector2 dimensions = new Vector2(_columns, _rows);
+        CreateSectorObjects(gridPositions, dimensions, currentSectorSize);
         Debug.Log($"[MapSystem] 맵 생성 완료: {mapSize} ({_totalSectors} 섹터)");
     }
 
@@ -183,6 +193,33 @@ public class MapSystem
                 Debug.LogError("섹터 프리팹이 연결되지 않았습니다");
             }
         }
+    }
+    #endregion
+
+    #region Grid Navigation Logic (이동 계산용)
+    public Vector2Int GetGridCoords(int sectorNum)
+    {
+        int index = sectorNum - 1;
+        int rowFromTop = index / _columns; 
+        int col = index % _columns; 
+
+        return new Vector2Int(col, (_rows - 1) - rowFromTop);
+    }
+
+    public int GetSectorNumFromCoords(int x, int y)
+    {
+        if (x < 0 || x >= _columns || y < 0 || y >= _rows) return -1;
+
+        int rowFromTop = (_rows - 1) - y;
+        return (rowFromTop * _columns) + x + 1;
+    }
+    /// <summary>
+    /// 특정 섹션에서 상하좌우 인접한 섹터 번호 반환
+    /// </summary>
+    public int GetNeighborSector(int currentSector, Vector2Int direction)
+    {
+        Vector2Int coords = GetGridCoords(currentSector);
+        return GetSectorNumFromCoords(coords.x + direction.x, coords.y + direction.y);
     }
     #endregion
 
