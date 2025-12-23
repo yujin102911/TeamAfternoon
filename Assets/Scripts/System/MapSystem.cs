@@ -308,5 +308,15 @@ public class MapSystem
         }
     }
     #endregion
-
+    public void SetSectorText(int sectorNum, string text)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+        {
+            var handler = obj.GetComponent<MapSectorHandler>();
+            if (handler != null)
+            {
+                handler.UpdateText(text);
+            }
+        }
+    }
 }
