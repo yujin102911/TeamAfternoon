@@ -315,6 +315,8 @@ public class TimelineManager : MonoBehaviour
                 _placedToHandMap.Remove(placedBlock);
 
                 Debug.Log($"[TimelineManager] HandBlock_UI 복구: {handBlockUI.GetOriginalBlock().BaseData.BlockName}");
+
+                // ⭐ OnHandChanged 호출 안함! (HandBlock_UI가 알아서 복구함)
             }
             else
             {
@@ -323,10 +325,12 @@ public class TimelineManager : MonoBehaviour
                 _currentHand.Add(runtimeBlock);
 
                 Debug.Log($"[TimelineManager] 블록 제거 (손패 복귀): {runtimeBlock.BaseData.BlockName}");
+
+                // ⭐ 이때만 OnHandChanged 호출!
+                OnHandChanged?.Invoke(_currentHand);
             }
 
-            // UI 업데이트
-            OnHandChanged?.Invoke(_currentHand);
+            // Timeline 업데이트는 항상 호출
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
     }
