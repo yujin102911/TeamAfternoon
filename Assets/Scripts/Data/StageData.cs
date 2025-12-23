@@ -57,7 +57,7 @@ public class StageData : ScriptableObject
 
     [Header("맵 정보")]
     [SerializeField]
-    private MapSize _mapSize = MapSize.Sectors_8;
+    private MapSize _mapSize = MapSize.Grid_3x3;
     [SerializeField]
     private List<Vector3> _sectorTransform = new List<Vector3>(); // 만약 _mapSize가 Custom인 경우에는 위치 정보가 담긴 리스트가 채워져있어야함
 

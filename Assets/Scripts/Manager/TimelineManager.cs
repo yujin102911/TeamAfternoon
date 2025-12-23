@@ -407,8 +407,8 @@ public class TimelineManager : MonoBehaviour
     {
         if (_battleSystem == null) return 1;
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
-
         int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
+        int columns = 3; // TODO: 추후 MapSystem에 있는 정보를 가져올 수 있도록 수정
 
         for (int t = 1; t <= targetTick; t++)
         {
@@ -438,11 +438,16 @@ public class TimelineManager : MonoBehaviour
                     {
                         int direction = (dir == MoveDirection.Right) ? 1 : -1;
 
-                        currentSimulatedSector += (direction * currentTickSpeed);
+                        int moveAmount = 1 + baseBuffSpeed;
 
-                        int totalSectors = 8; // _mapSystem.TotalSectors 접근 가능하면 사용
-                        while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
-                        while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
+                        switch (dir)
+                        {
+                            case MoveDirection.Front: currentSimulatedSector += moveAmount; break;
+                            case MoveDirection.Back: currentSimulatedSector -= moveAmount; break;
+                            case MoveDirection.Left: currentSimulatedSector -= (columns * moveAmount); break;
+                            case MoveDirection.Right: currentSimulatedSector += (columns * moveAmount); break;
+                        }
+                        currentSimulatedSector = Mathf.Clamp(currentSimulatedSector, 1, 8); // TODO: totalSector사용가능하면 사용하도록
                     }
                 }
             }

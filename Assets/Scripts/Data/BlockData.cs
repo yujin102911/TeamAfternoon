@@ -12,8 +12,10 @@ public enum ActionType
 public enum MoveDirection
 {
     None,
-    Left,
-    Right,
+    Left,   // 좌로 이동(-열)
+    Right,  // 우로 이동(+열)
+    Front,  // 앞으로 이동(+1)
+    Back,   // 뒤로 이동(-1)
 }
 
 [CreateAssetMenu(fileName = "New BlockData", menuName = "Data/Block Data")]
@@ -125,7 +127,7 @@ public class BlockData : ScriptableObject
             if (actionTypes[i] != ActionType.Move)
                 moveDirections[i] = MoveDirection.None;
             else
-                moveDirections[i] = MoveDirection.Right;
+                moveDirections[i] = MoveDirection.Front;
         }
     }
 
@@ -138,7 +140,7 @@ public class BlockData : ScriptableObject
         for (int i = 0; i < actionTypes.Length; i++)
         {
             moveDirections[i] = actionTypes[i] == ActionType.Move ?
-                                (moveDirections[i] == MoveDirection.None ? MoveDirection.Right : moveDirections[i])
+                                (moveDirections[i] == MoveDirection.None ? MoveDirection.Front : moveDirections[i])
                                 : MoveDirection.None;
         }
 #if UNITY_EDITOR
