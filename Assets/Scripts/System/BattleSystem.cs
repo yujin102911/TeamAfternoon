@@ -45,6 +45,8 @@ public class BattleSystem
     public event Action<RuntimeEnemy> OnEnemyHit;       // 적 맞았을 때 발행 (일단 안씀)
     public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
     public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
+    public event Action OnPlayerCure;                       // 정화 할 때 발행되는 이벤트
+    public event Action OnPlayerAttackSuccess;                       // 때릴 때 발행되는 이벤트
     public event Action<int> OnPlayerMoved;
     public event Action<List<int>> OnEnemyAttack;             // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
     public event Action<string, int, bool> OnBuffChanged;
@@ -136,9 +138,18 @@ public class BattleSystem
                     }
                 }
 
-                // 적 피격 연출
-                OnEnemyHit?.Invoke(enemy);
-                Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (물리 데미지는 0)");
+                //타격 범위인지 확인
+                if(_playerCurrentSector % _columns == 0)
+                {
+                    IncreaseCureGauge(damage);
+                    OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
+
+                    // 적 피격 연출
+                    OnEnemyHit?.Invoke(enemy);
+                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {damage})");
+                }
+
+                
             }
         }
     }
@@ -241,6 +252,11 @@ public class BattleSystem
             return;
         }
 
+        if (!IsAdjacent(_playerCurrentSector, targetSector))
+        {
+            return;
+        }
+
         int prevSector = _playerCurrentSector;
         _playerCurrentSector = Mathf.Clamp(targetSector, 1, _totalSectors);
 
@@ -250,6 +266,25 @@ public class BattleSystem
             CheckAndDecreaseObjective(prevSector);
             OnPlayerMoved?.Invoke(_playerCurrentSector);
         }
+    }
+
+    bool IsAdjacent(int from, int to)
+    {
+        int fromIndex = from - 1; // 1부터 시작하니까
+        int toIndex = to - 1;
+
+        int fromRow = fromIndex / _columns;
+        int fromCol = fromIndex % _columns;
+
+        int toRow = toIndex / _columns;
+        int toCol = toIndex % _columns;
+
+        int rowDiff = Mathf.Abs(fromRow - toRow);
+        int colDiff = Mathf.Abs(fromCol - toCol);
+
+        // 상하좌우만 허용
+        return (rowDiff == 1 && colDiff == 0) ||
+               (rowDiff == 0 && colDiff == 1);
     }
 
     private void CheckAndDecreaseObjective(int leavedSector)
@@ -433,9 +468,17 @@ public class BattleSystem
     {
         if (damage <= 0) return;
 
-        OnPlayerAttack?.Invoke();
+        OnPlayerCure?.Invoke();
 
-        IncreaseCureGauge(damage);
+        if (TimelineManager.Instance.Is_POC)
+        {
+            IncreaseCureGauge(4);
+        }
+        else
+        {
+            IncreaseCureGauge(damage);
+        }
+            
 
         // 정화 되었는지 체크
         if (_currentCure >= _maxCure)

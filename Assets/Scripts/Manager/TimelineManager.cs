@@ -12,6 +12,9 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("POC 온오프")]
+    public bool Is_POC = false;
+
     [Header("정화 온오프")]
     public bool Is_Cure = false;
 

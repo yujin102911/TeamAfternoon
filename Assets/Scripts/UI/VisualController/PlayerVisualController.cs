@@ -93,11 +93,22 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayAttackShake()
     {
         if (_playerInstance == null) return;
-        if (_playerAttackParticle != null)
+
+        StartCoroutine(ShakeRoutine(false));
+    }
+
+    public void PlayAttackEffect()
+    {
+        //트레일 렌더러 코드    
+        if (trailEffectPrefab != null)
         {
-            _playerAttackParticle.Play();
+            GameObject newTrail = Instantiate(
+                trailEffectPrefab,
+                Vector3.zero,
+                Quaternion.identity
+            );
         }
-        StartCoroutine(ShakeRoutine());
+        
     }
 
     public void PlayHitEffect()
@@ -105,23 +116,23 @@ public class PlayerVisualController : MonoBehaviour
         if (_playerRenderer == null) return;
         StartCoroutine(HitFlashRoutine());
     }
+
+    public void PlayCureShake()
+    {
+        if (_playerInstance == null) return;
+        if (_playerAttackParticle != null)
+        {
+            _playerAttackParticle.Play();
+        }
+        StartCoroutine(ShakeRoutine(true));
+    }
     #endregion
 
     #region Private Effect Routines
-    private IEnumerator ShakeRoutine()
+    private IEnumerator ShakeRoutine(bool is_cure)
     {
-        if (SoundManager.Instance != null)
+        if (SoundManager.Instance != null && is_cure == true)
             SoundManager.Instance.Play(SoundID.SFX_Cure);
-
-        //트레일 렌더러 코드    
-        //if (trailEffectPrefab != null)
-        //{
-        //    GameObject newTrail = Instantiate(
-        //        trailEffectPrefab,
-        //        Vector3.zero,
-        //        Quaternion.identity
-        //    );
-        //}
 
         Quaternion originalRot = _playerInstance.transform.localRotation;
 

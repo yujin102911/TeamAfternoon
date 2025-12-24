@@ -221,6 +221,8 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
             _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
+            _battleSystem.OnPlayerCure += _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
         }
@@ -250,6 +252,8 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
             _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
+            _battleSystem.OnPlayerCure -= _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview -= _playerVisualController.HidePlayerPreview;
         }
