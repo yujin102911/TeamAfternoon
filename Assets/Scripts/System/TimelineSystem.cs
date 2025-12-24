@@ -330,6 +330,11 @@ public class TimelineSystem
 
             case ActionType.Cure:
                 int cure_power = runtimeBlock.BaseData.CalCulate_CurePower(cardTickIndex);
+
+                if (TimelineManager.Instance.Is_POC)
+                {
+                    cure_power = blockData.AttackDamage;
+                }
                 Debug.Log($"블럭내 {cardTickIndex}번째의 정화 액션 발동!! - 정화량: {cure_power}");
 
                 OnCureRequested?.Invoke(cure_power);

@@ -470,15 +470,16 @@ public class BattleSystem
 
         if (TimelineManager.Instance.Is_POC)
         {
-            int real_dam = TimelineManager.Instance.POC_Damage;
+            //int real_dam = TimelineManager.Instance.POC_Damage;
 
-            if (TimelineManager.Instance.Is_One)
-                real_dam /= 2;
+            //if (TimelineManager.Instance.Is_One)
+            //    real_dam /= 2;
 
-            IncreaseCureGauge(real_dam);
+            //IncreaseCureGauge(real_dam);
 
+            IncreaseCureGauge(damage);
             // 적 피격 연출
-            OnEnemyHit?.Invoke(real_dam);
+            OnEnemyHit?.Invoke(damage);
         }
         else
         {
