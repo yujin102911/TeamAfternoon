@@ -69,6 +69,7 @@ public class BattleSystem
 
     public int CurrentCure => _currentCure;
     public int MaxCure => _maxCure;
+    public int Columns => _columns;
     #endregion
 
     /// <summary>
@@ -220,51 +221,47 @@ public class BattleSystem
 
     public void MovePlayer(MoveDirection moveDirection) 
     {
-        if (moveDirection == MoveDirection.None) return;
+        if (moveDirection == MoveDirection.None || _columns <= 0) return;
 
         int speedBonus = GetBuffValue("Speed", true);
         int moveAmount = 1 + speedBonus;
 
-        int targetSector = _playerCurrentSector;
+        int currentIndex = _playerCurrentSector - 1;
+        int curRow = currentIndex / _columns;
+        int curCol = currentIndex % _columns;
+
+        int targetRow = curRow;
+        int targetCol = curCol;
 
         switch (moveDirection)
         {
             case MoveDirection.Front:
-                targetSector += moveAmount;
+                targetCol += moveAmount;
                 break;
             case MoveDirection.Back:
-                targetSector -= moveAmount;
+                targetCol -= moveAmount;
                 break;
             case MoveDirection.Left:
-                targetSector -= (_columns * moveAmount);
+                targetRow -= moveAmount;
                 break;
             case MoveDirection.Right:
-                targetSector += (_columns * moveAmount);
+                targetRow += moveAmount;
                 break;
         }
-        while (targetSector > _totalSectors){
-            Debug.Log("이동할 수 없습니다.");
-            return;
-        }
-        while (targetSector < 1)
+        int rows = _totalSectors / _columns;
+        if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
         {
-            Debug.Log("이동할 수 없습니다.");
-            return;
+            int prevSector = _playerCurrentSector;
+            _playerCurrentSector = (targetRow *  _columns) + targetCol + 1;
+            if (prevSector != _playerCurrentSector)
+            {
+                Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
+                OnPlayerMoved?.Invoke(_playerCurrentSector);
+            }
         }
-
-        if (!IsAdjacent(_playerCurrentSector, targetSector))
+        else
         {
-            return;
-        }
-
-        int prevSector = _playerCurrentSector;
-        _playerCurrentSector = Mathf.Clamp(targetSector, 1, _totalSectors);
-
-        if (prevSector != _playerCurrentSector)
-        {
-            Debug.Log($"[BattleSystem] 이동: {prevSector} -> {_playerCurrentSector} (Speed보너스: {speedBonus})");
-            CheckAndDecreaseObjective(prevSector);
-            OnPlayerMoved?.Invoke(_playerCurrentSector);
+            Debug.Log("[BattleSystem]이동 불가");
         }
     }
 

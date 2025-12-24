@@ -175,7 +175,11 @@ public class PlayerVisualController : MonoBehaviour
     /// </summary>
     public void ShowPlayerPreview(int sectorIndex)
     {
-        if (_mapSystem == null) return;
+        if (_mapSystem == null || sectorIndex <= 0)
+        {
+            HidePlayerPreview();
+            return;
+        }
 
         if (_currentGhost == null && _playerGhostPrefab != null)
             _currentGhost = Instantiate(_playerGhostPrefab);

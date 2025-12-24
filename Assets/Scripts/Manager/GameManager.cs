@@ -61,9 +61,6 @@ public class GameManager : MonoBehaviour
     private int _statPlayerAttackCount = 0;
     private int _statPlayerHitCount = 0;
 
-    // 지우개 용
-    List<(int, int)> objectives = new List<(int, int)>();
-
     // 배경 전환 저장용
     private Sprite _bgSprite;
     #endregion
@@ -120,9 +117,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        SetupGame();
         LateInitialize();
         SubscribeEvents();
-        SetupGame();
     }
 
     private void OnDestroy()
@@ -173,7 +170,7 @@ public class GameManager : MonoBehaviour
     {
         // 타임라인 매니저
         _timelineManager = TimelineManager.Instance;
-        if (_timelineManager != null) _timelineManager.Initialize(_battleSystem);
+        if (_timelineManager != null) _timelineManager.Initialize(_battleSystem, _mapSystem.TotalSectors, _mapSystem.Columns);
         else Debug.LogError("[GameManager] TimelineManager를 찾을 수 없습니다");
 
         // MapVisualController 연결
@@ -189,13 +186,6 @@ public class GameManager : MonoBehaviour
         // PlayerVisualController 연결
         if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
-
-        if (objectives.Count == 0) // 중복 추가 방지
-        {
-            objectives.Add((4, 3));
-            objectives.Add((2, 1));
-        }
-        _battleSystem.SetPassObjectives(objectives);
 
         Debug.Log("[GameManager] 외부 시스템 연결 및 목표 설정 완료 (Start)");
 

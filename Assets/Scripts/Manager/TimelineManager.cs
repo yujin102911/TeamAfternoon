@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director
@@ -19,6 +20,11 @@ public class TimelineManager : MonoBehaviour
     public bool Is_Cure = false;
 
     [SerializeField] private int _totalTicks = 8;
+
+    // 기본적으로 8로 설정(오류 방지, Init할 때 게임매니저한테 토탈 섹터 받음)
+    [SerializeField] private int _totalSectors = 8;
+    private int _totalColumns = 0;
+
 
     // System
     private TimelineSystem _timelineSystem;
@@ -397,9 +403,11 @@ public class TimelineManager : MonoBehaviour
         return _timelineSystem.CanPlaceBlock(startTick, length, runtimeBlock);
     }
 
-    public void Initialize(BattleSystem battleSystem)
+    public void Initialize(BattleSystem battleSystem, int totalSector, int columns)
     {
         _battleSystem = battleSystem;
+        _totalSectors = totalSector;
+        _totalColumns = columns;
     }
 
     #region Preview Methods - public
@@ -408,10 +416,14 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public int SimulatePlayerPosition(int targetTick)
     {
-        if (_battleSystem == null) return 1;
+        if (_battleSystem == null || targetTick <= 0)
+        {
+            return _battleSystem != null ? _battleSystem.PlayerCurrentSector : 1;
+        }
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
         int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
-        int columns = 3; // TODO: 추후 MapSystem에 있는 정보를 가져올 수 있도록 수정
+        int columns = _totalColumns > 0 ? _totalColumns : 3;
+        int rows = _totalSectors / columns;
 
         for (int t = 1; t <= targetTick; t++)
         {
@@ -422,16 +434,6 @@ public class TimelineManager : MonoBehaviour
                 int cardIndex = placed.GetCardTickIndex(t);
                 BlockData data = placed.GetBlockData();
 
-                // 이번 틱의 속도 계산
-                int currentTickSpeed = 1 + baseBuffSpeed;
-                if (placed.linkedRuntimeBlock != null)
-                {
-                    foreach (var keyword in placed.linkedRuntimeBlock.AttachedKeywords)
-                    {
-                        currentTickSpeed += keyword.GetSpeedBonus();
-                    }
-                }
-
                 // 이동 액션일 경우 시뮬레이션
                 if (data.GetEffectAt(cardIndex) == ActionType.Move)
                 {
@@ -439,18 +441,23 @@ public class TimelineManager : MonoBehaviour
 
                     if (dir != MoveDirection.None)
                     {
-                        int direction = (dir == MoveDirection.Right) ? 1 : -1;
-
                         int moveAmount = 1 + baseBuffSpeed;
+
+                        int curIdx = currentSimulatedSector - 1;
+                        int r = curIdx / columns;
+                        int c = curIdx % columns;
 
                         switch (dir)
                         {
-                            case MoveDirection.Front: currentSimulatedSector += moveAmount; break;
-                            case MoveDirection.Back: currentSimulatedSector -= moveAmount; break;
-                            case MoveDirection.Left: currentSimulatedSector -= (columns * moveAmount); break;
-                            case MoveDirection.Right: currentSimulatedSector += (columns * moveAmount); break;
+                            case MoveDirection.Front: c += moveAmount; break;
+                            case MoveDirection.Back: c -= moveAmount; break;
+                            case MoveDirection.Left: r -= moveAmount; break;
+                            case MoveDirection.Right: r += moveAmount; break;
                         }
-                        currentSimulatedSector = Mathf.Clamp(currentSimulatedSector, 1, 8); // TODO: totalSector사용가능하면 사용하도록
+                        if (r >= 0 && r < rows && c >= 0 && c < columns)
+                        {
+                            currentSimulatedSector = (r * columns) + c + 1;
+                        }
                     }
                 }
             }
@@ -478,7 +485,10 @@ public class TimelineManager : MonoBehaviour
 
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
         int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
-        int totalSectors = 8;  // _mapSystem.TotalSectors 접근 가능하면 사용
+
+        int totalSectors = _totalSectors;
+        int columns = _totalColumns;
+        int rows = totalSectors /  columns;
 
         for (int t = 1; t <= _totalTicks; t++)
         {
@@ -489,23 +499,30 @@ public class TimelineManager : MonoBehaviour
                 BlockData data = placed.GetBlockData();
                 if (data.GetEffectAt(cardIndex) == ActionType.Move)
                 {
-                    int currentTickSpeed = 1 + baseBuffSpeed;
-                    if (placed.linkedRuntimeBlock != null)
-                    {
-                        foreach (var keyword in placed.linkedRuntimeBlock.AttachedKeywords)
-                        {
-                            currentTickSpeed += keyword.GetSpeedBonus();
-                        }
-                    }
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
-                    if (dir != MoveDirection.None)
+                    int moveAmount = 1 + baseBuffSpeed;
+                    int curIdx = currentSimulatedSector - 1;
+                    int r = curIdx / columns;
+                    int c = curIdx % columns;
+                    switch (dir)
                     {
-                        int direction = (dir == MoveDirection.Right ? 1 : -1);
-                        currentSimulatedSector += (direction * currentTickSpeed);
-
-                        while (currentSimulatedSector > totalSectors) currentSimulatedSector -= totalSectors;
-                        while (currentSimulatedSector < 1) currentSimulatedSector += totalSectors;
-                    } 
+                        case MoveDirection.Front:
+                            c += moveAmount;
+                            break;
+                        case MoveDirection.Back:
+                            c -= moveAmount;
+                            break;
+                        case MoveDirection.Left:
+                            r -= moveAmount;
+                            break;
+                        case MoveDirection.Right:
+                            r += moveAmount;
+                            break;
+                    }
+                    if (r >= 0 && r < rows && c >= 0 && c < columns)
+                    {
+                        currentSimulatedSector = (r * columns) + c + 1;
+                    }
                 }
 
             }
