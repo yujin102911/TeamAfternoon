@@ -42,7 +42,8 @@ public class BattleSystem
 
     public event Action OnEnemyPurified; // 적 정화 완료시 발행
 
-    public event Action<RuntimeEnemy> OnEnemyHit;       // 적 맞았을 때 발행 (일단 안씀)
+    //public event Action<RuntimeEnemy> OnEnemyHit;       // 적 맞았을 때 발행 (일단 안씀)
+    public event Action<int> OnEnemyHit;
     public event Action OnPlayerAttack;                       // 때릴 때 발행되는 이벤트
     public event Action OnPlayerHit;                          // 맞을 때 발행되는 이벤트
     public event Action OnPlayerCure;                       // 정화 할 때 발행되는 이벤트
@@ -146,7 +147,7 @@ public class BattleSystem
                     OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
 
                     // 적 피격 연출
-                    OnEnemyHit?.Invoke(enemy);
+                    OnEnemyHit?.Invoke(damage);
                     Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {damage})");
                 }
 
@@ -469,7 +470,15 @@ public class BattleSystem
 
         if (TimelineManager.Instance.Is_POC)
         {
-            IncreaseCureGauge(4);
+            int real_dam = TimelineManager.Instance.POC_Damage;
+
+            if (TimelineManager.Instance.Is_One)
+                real_dam /= 2;
+
+            IncreaseCureGauge(real_dam);
+
+            // 적 피격 연출
+            OnEnemyHit?.Invoke(real_dam);
         }
         else
         {

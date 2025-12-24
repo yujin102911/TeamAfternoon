@@ -116,6 +116,11 @@ public class EnemyVisualController : MonoBehaviour
         }
     }
 
+    public void PlayDamage(int damage)
+    {
+        StartCoroutine(ShowEnemyDamage(damage));
+    }
+
     public IEnumerator ShowEnemyDamage(int damage)
     {
         
@@ -133,7 +138,7 @@ public class EnemyVisualController : MonoBehaviour
         TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.text = damage.ToString();
+            tmp.text = "-" + damage.ToString();
         }
         StartCoroutine(DestroyDamageText(go));
     }

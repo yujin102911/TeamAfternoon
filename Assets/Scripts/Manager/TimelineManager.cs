@@ -15,6 +15,8 @@ public class TimelineManager : MonoBehaviour
 
     [Header("POC 온오프")]
     public bool Is_POC = false;
+    public bool Is_One = false;
+    public int POC_Damage = 4;
 
     [Header("정화 온오프")]
     public bool Is_Cure = false;
