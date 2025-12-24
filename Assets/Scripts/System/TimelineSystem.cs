@@ -352,15 +352,20 @@ public class TimelineSystem
     public void SaveCurrentAsPreview()
     {
         //과거 정보 복사
-        _prevPlacedBlocks.Clear();
-        _prevblockMap.Clear();
 
-        foreach (var p in _placedBlocks)
+        if (!TimelineManager.Instance.Is_POC) 
         {
-            PlacedBlock placedBlock = p.Clone();
-            _prevPlacedBlocks.Add(placedBlock);
-            _prevblockMap.Add(placedBlock, _blockMap[p].Clone());
+            _prevPlacedBlocks.Clear();
+            _prevblockMap.Clear();
+
+            foreach (var p in _placedBlocks)
+            {
+                PlacedBlock placedBlock = p.Clone();
+                _prevPlacedBlocks.Add(placedBlock);
+                _prevblockMap.Add(placedBlock, _blockMap[p].Clone());
+            }
         }
+        
             
 
         //_prevblockMap = new Dictionary<PlacedBlock, RuntimeBlock>(_blockMap);
