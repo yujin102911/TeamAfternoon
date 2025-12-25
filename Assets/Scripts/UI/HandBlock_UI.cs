@@ -49,9 +49,6 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [SerializeField]
     private Color _noneColor;
 
-    
-    
-
     private ScrollRect parentScroll;
     private RectTransform rectTransform;
 
@@ -81,18 +78,6 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         canvasGroup.alpha = 1f;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void Init(RuntimeBlock rBlock)
     {
         canvasGroup.alpha = 1f;
@@ -109,6 +94,22 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         //키워드 표시 설정
         Update_KeywordText();
+    }
+
+    public void Init(BlockData Block)
+    {
+        canvasGroup.alpha = 1f;
+
+        //블럭 이름 설정
+        if (BlockNameText != null) BlockNameText.text = "~" + Block.BlockName + "~";
+
+        BlockDamageText.text = "데미지: " + Block.attackDamage.ToString();
+
+        //틱 정보 설정
+        UpdateTickVisuals(Block);
+
+        //키워드 표시 설정
+        //Update_KeywordText();
     }
 
     private void UpdateTickVisuals(BlockData data)
@@ -188,6 +189,53 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     // ========================
     public void OnPointerEnter(PointerEventData eventData)
     {
+        HandlePointerEnter(eventData);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        HandlePointerExit(eventData);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        HandleBeginDrag(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        HandleDrag(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        HandleEndDrag(eventData);
+    }
+
+    private string BuildTooltipText()
+    {
+        List<string> lines = new List<string>();
+
+        if (runtimeBlock.AttachedKeywords != null)
+        {
+            int index = 1;
+            foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
+            {
+                if (keyword == null) continue;
+
+                // 이름 제외 → 설명만
+                if (!string.IsNullOrEmpty(keyword.KeywordDescription))
+                    lines.Add($"{index}. {keyword.KeywordDescription}");
+                index++;
+            }
+        }
+
+        return string.Join("\n", lines);
+    }
+
+
+    protected virtual void HandlePointerEnter(PointerEventData eventData)
+    {
         if (runtimeBlock == null) return;
         if (CardTooltip.Instance == null) return;
         if (eventData.pointerDrag != null) return;
@@ -200,7 +248,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             return;
 
         string effectTitle = "";
-        
+
 
         string body = BuildTooltipText();
 
@@ -235,32 +283,9 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
             index++;
         }
-
-        
     }
 
-    private string BuildTooltipText()
-    {
-        List<string> lines = new List<string>();
-
-        if (runtimeBlock.AttachedKeywords != null)
-        {
-            int index = 1;
-            foreach (KeywordData keyword in runtimeBlock.AttachedKeywords)
-            {
-                if (keyword == null) continue;
-
-                // 이름 제외 → 설명만
-                if (!string.IsNullOrEmpty(keyword.KeywordDescription))
-                    lines.Add($"{index}. {keyword.KeywordDescription}");
-                index++;
-            }
-        }
-
-        return string.Join("\n", lines);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
+    protected virtual void HandlePointerExit(PointerEventData eventData)
     {
         _image.color = _originColor;
 
@@ -270,7 +295,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    protected virtual void HandleBeginDrag(PointerEventData eventData)
     {
         if (GameManager.Instance.IsExecutingRound) return;
 
@@ -290,13 +315,13 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             SoundManager.Instance.Play(SoundID.SFX_Spell_Cancle);
     }
 
-    public void OnDrag(PointerEventData eventData)
+    protected virtual void HandleDrag(PointerEventData eventData)
     {
         if (ghost != null)
             ghost.transform.position = eventData.position;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    protected virtual void HandleEndDrag(PointerEventData eventData)
     {
         // 드래그 종료
         Destroy(ghost);

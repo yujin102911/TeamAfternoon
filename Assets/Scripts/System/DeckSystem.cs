@@ -175,7 +175,7 @@ public class DeckSystem
     /// <summary>
     /// 원본에 강화 붙이기. RuntimeBlock을 생성합니다. (Factory)
     /// </summary> 
-    private RuntimeBlock CreateRuntimeBlock(int blockId)
+    public RuntimeBlock CreateRuntimeBlock(int blockId)
     {
         // 블럭 데이터베이스에 이 아이디 가진 블럭 없으면 아주 곤란해
         if (!_repo.blockDatas.TryGetValue(blockId, out BlockData blockData))

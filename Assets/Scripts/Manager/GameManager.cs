@@ -71,6 +71,8 @@ public class GameManager : MonoBehaviour
     public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
     public StageData CurrentStageData => currentStageData;
+    // 덱빌딩에서 사용
+    public UserGameData UserGameData => userGameData;
     public bool IsExecutingRound
     {
         get => _isExecutingRound;
