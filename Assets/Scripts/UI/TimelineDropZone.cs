@@ -53,15 +53,17 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
             image.color = originalColor;
         }
 
-        if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
+        if (eventData.pointerDrag == null) return;
 
-        // 드래그 중인 카드 가져오기
-        RuntimeBlock block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+        var draggable = eventData.pointerDrag.GetComponent<IDraggableUI>();
+        if (draggable == null) return;
 
-        if (block_info != null && TimelineManager.Instance != null)
+        RuntimeBlock block = draggable.RuntimeBlock;
+
+        if (block != null && TimelineManager.Instance != null)
         {
             // 배치 시도
-            bool success = TimelineManager.Instance.TryPlaceBlock(block_info, tickIndex);
+            bool success = TimelineManager.Instance.TryPlaceBlock(block, tickIndex);
 
             if (success)
             {
@@ -78,19 +80,34 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        
+
         RuntimeBlock block_info = null;
 
-        if (DragOn_timeline.instance != null && !DragOn_timeline.instance.isDragging)
-        {
-            if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
-
-            block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
-        }
-        else
+        if (DragOn_timeline.instance != null && DragOn_timeline.instance.isDragging)
         {
             block_info = DragOn_timeline.instance.draggingBlock;
         }
+        else
+        {
+            if (eventData.pointerDrag == null) return;
+
+            var source = eventData.pointerDrag.GetComponent<IDraggableUI>();
+            if (source == null) return;
+
+            block_info = source.RuntimeBlock;
+        }
+
+
+        //if (DragOn_timeline.instance != null && !DragOn_timeline.instance.isDragging)
+        //{
+        //    if (eventData.pointerDrag == null || eventData.pointerDrag.GetComponent<HandBlock_UI>() == null) return;
+
+        //    block_info = eventData.pointerDrag.GetComponent<HandBlock_UI>().runtimeBlock;
+        //}
+        //else
+        //{
+        //    block_info = DragOn_timeline.instance.draggingBlock;
+        //}
 
 
         if (block_info != null && TimelineManager.Instance != null)

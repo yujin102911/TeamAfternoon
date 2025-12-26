@@ -6,7 +6,10 @@ public enum ActionType
     None,
     Attack,
     Move,
-    Cure
+    Cure,
+    Bow_start,
+    Bow_middle,
+    Bow_end
 }
 
 public enum MoveDirection

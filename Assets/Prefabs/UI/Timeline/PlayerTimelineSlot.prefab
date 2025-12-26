@@ -297,6 +297,7 @@ GameObject:
   - component: {fileID: 7123896944169645863}
   - component: {fileID: 317398888820616225}
   - component: {fileID: 2252693944495300661}
+  - component: {fileID: 8411300863346398057}
   m_Layer: 5
   m_Name: PlayerTimelineSlot
   m_TagString: Untagged
@@ -364,3 +365,36 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8411300863346398057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8148141235847223948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23aa520c99a9d0e4da89ed3ac8633f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 2252693944495300661}
+  icon: {fileID: 60412288176870408}
+  text: {fileID: 2405337241528370280}
+  Set_SlotSprite: {fileID: 1709575923450173352, guid: 03029d1fbe29f01409ac9e568a097865, type: 3}
+  Empty_SlotSprite: {fileID: -4420271499086867679, guid: d740a3fe9f05b5a4faeb9522c13b5fcc, type: 3}
+  occupiedColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+  Player_attackColor: {r: 0.8962264, g: 0.51998043, b: 0.51998043, a: 0}
+  Sword_icon: {fileID: -3329635539102808797, guid: 771a2aafa8c47014d92a209e56ad3292, type: 3}
+  Player_moveColor: {r: 0.53333336, g: 0.6784314, b: 0.9215687, a: 0}
+  Front_icon: {fileID: 4855760940365738296, guid: b79d0c1f0543f23428a9c83f2c869f30, type: 3}
+  Back_icon: {fileID: 6304670062566087916, guid: 67bc69137f146c94aa928fa16c789652, type: 3}
+  Left_icon: {fileID: 965161617350467846, guid: 068bf229c09f18347804cde7c610e6e9, type: 3}
+  Right_icon: {fileID: 3574153532769391866, guid: eac2bfbc4f234b447b24871ee4950de3, type: 3}
+  _cureColors:
+  - {r: 0.8117648, g: 0.7294118, b: 0.5254902, a: 0}
+  - {r: 0.8196079, g: 0.654902, b: 0.26666668, a: 0}
+  - {r: 0.83921576, g: 0.6, b: 0, a: 0}
+  _cureIcons:
+  - {fileID: 1452326144, guid: 5bc51627f5c85c7499d501ad606cebf9, type: 3}
+  - {fileID: 1089374565, guid: 3ba686591887059489a475a49115859e, type: 3}
+  - {fileID: -554068590, guid: a064743e5c91a5248b895627ae6dfd58, type: 3}

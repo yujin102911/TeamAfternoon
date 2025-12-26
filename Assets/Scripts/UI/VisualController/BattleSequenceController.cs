@@ -134,7 +134,7 @@ public class BattleSequenceController : MonoBehaviour
         yield return StartCoroutine(ScrollDown());
 
         PlayCameraEffect(false);
-        yield return StartCoroutine(Move_HandPanel(true));
+        //yield return StartCoroutine(Move_HandPanel(true));
 
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.Show_startBtn();
@@ -165,6 +165,8 @@ public class BattleSequenceController : MonoBehaviour
     // 두루마기 내려오는 연출
     private IEnumerator ScrollDown()
     {
+        if (_timelinePanel == null) yield break;
+
         float timer = 0f;
         _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, 0);
 
@@ -183,6 +185,7 @@ public class BattleSequenceController : MonoBehaviour
     // 두루마기 올라가는 연출
     private IEnumerator ScrollUp()
     {
+        if (_timelinePanel == null) yield break;
         if (_timelineRect.sizeDelta.y == 0) yield break;
 
         float timer = 0f;

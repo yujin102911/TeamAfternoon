@@ -55,7 +55,16 @@ public class DragOn_timeline : MonoBehaviour
 
         ghost = Instantiate(prefab, canvas.transform);
         ghost.transform.position = e.startWorldPos;
-        ghost.GetComponent<Draggable_Block>().Show(draggingBlock);
+
+        if(ghost.GetComponent<Draggable_Block>() != null)
+        {
+            ghost.GetComponent<Draggable_Block>().Show(draggingBlock);
+        }
+        else
+        {
+            ghost.GetComponent<Film_UI>().Show(draggingBlock);
+        }
+
 
         if (SoundManager.Instance != null)
             SoundManager.Instance.Play(SoundID.SFX_Spell_Cancle);

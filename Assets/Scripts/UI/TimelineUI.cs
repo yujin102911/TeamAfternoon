@@ -238,7 +238,7 @@ public class TimelineUI : MonoBehaviour
                 //    //text.color = Color.white;
                 //}
 
-                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString());
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), attack.targetSectors);
             }
             else
             {
@@ -522,54 +522,15 @@ public class TimelineUI : MonoBehaviour
         // 모든 슬롯 초기화
         foreach (GameObject slot in playerSlots)
         {
-            Image image = slot.GetComponent<Image>();
-            TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
-            Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
+            ITimelineSlotView slotView = slot.GetComponent<ITimelineSlotView>();
 
-            var images = slot.GetComponentsInChildren<Image>(true);
-            foreach (var img in images)
+            if (slotView == null)
             {
-                if (img.gameObject != slot)   // 자기 자신 제외
-                {
-                    img.gameObject.SetActive(true);
-                    Color color = img.color;
-                    color.a = 1f;
-                    img.color = color;
-                }
+                Debug.LogError($"ITimelineSlotView missing on {slot.name}");
+                continue;
             }
 
-            image.sprite = Empty_SlotSprite;
-
-            // 기본 색상 초기화
-            if (image != null)
-            {
-                if (New_Layout)
-                {
-                    normalColor.a = 0;
-                }
-
-                image.color = normalColor;
-            }
-
-            // 텍스트 초기화
-            if (cellText != null)
-            {
-                cellText.text = "";
-            }
-
-            // 아이콘 초기화
-            if (iconImage != null)
-            {
-                iconImage.enabled = false;
-                iconImage.sprite = null;
-            }
-
-            // 기존 호버 핸들러 제거
-            PlayerSlotHover hoverHandler = slot.GetComponent<PlayerSlotHover>();
-            if (hoverHandler != null)
-            {
-                hoverHandler.placedBlock = null;
-            }
+            slotView.Clear();
         }
 
         // 잔상 카드 표시
@@ -583,107 +544,47 @@ public class TimelineUI : MonoBehaviour
             for (int i = 0; i < blockData.blockLength; i++)
             {
                 int tickIndex = placed.startTick + i - 1;
+
                 if (tickIndex >= 0 && tickIndex < playerSlots.Count)
                 {
-                    GameObject slot = playerSlots[tickIndex];
-                    Image image = slot.GetComponent<Image>();
-                    TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
-                    Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
 
+                    if (tickIndex < 0 || tickIndex >= playerSlots.Count)
+                        continue;
 
-                    image.sprite = Set_SlotSprite;
+                    GameObject slotGO = playerSlots[tickIndex];
 
-                    // 기본값
-                    Color color = occupiedColor;
-                    string text = "";
-                    bool showIcon = false;
-                    Sprite iconSprite = null;
+                    ITimelineSlotView slotView = slotGO.GetComponent<ITimelineSlotView>();
 
-                    // 이 틱의 효과에 따라 색상 / 텍스트 / 아이콘 설정
-                    ActionType effect = blockData.actionTypes[i];
-
-                    switch (effect)
+                    if (slotView == null)
                     {
-                        case ActionType.None:
-                            //color = new Color(occupiedColor.r, occupiedColor.g, occupiedColor.b, 0.25f); // 회색
-                            color = occupiedColor;
-                            color.a = 0.25f;
-                            text = "-";
-                            break;
-
-                        case ActionType.Cure:
-                            text = "";
-                            int index = blockData.CalCulate_CurePower(i) - 1;
-                            color = _cureColors[index];
-                            color.a = 0.25f;
-                            iconSprite = _cureIcons[index];
-                            break;
-                        case ActionType.Attack:
-                            //color = new Color(1f, 0.5f, 0.5f, 0.25f); // 연한 빨강
-                            color = Player_attackColor;
-                            color.a = 0.25f;
-                            text = "▲";
-                            iconSprite = Sword_icon;
-                            break;
-
-                        case ActionType.Move:
-                            //color = new Color(0.5f, 0.8f, 1f, 0.25f); // 연한 파랑
-                            color = Player_moveColor;
-                            color.a = 0.25f;
-                            MoveDirection dir = MoveDirection.None;
-                            if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
-                            {
-                                dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
-                            }
-                            else
-                            {
-                                dir = blockData.moveDirections[i];
-                            }
-
-                            switch (dir)
-                            {
-                                case MoveDirection.Front: text = "R"; iconSprite = Front_icon; break;
-                                case MoveDirection.Right: text = "D"; iconSprite = Right_icon; break;
-                                case MoveDirection.Back: text = "L"; iconSprite = Back_icon; break;
-                                case MoveDirection.Left: text = "U"; iconSprite = Left_icon; break;
-                            }
-
-                            break;
+                        Debug.LogError($"ITimelineSlotView missing on {slotGO.name}");
+                        continue;
                     }
 
-                    // 적용
-                    if (image != null)
-                        image.color = color;
+                    ActionType action = blockData.GetEffectAt(i);
 
-                    if (cellText != null)
-                        cellText.text = text;
+                    MoveDirection dir = MoveDirection.None;
+                    if (placed.linkedRuntimeBlock != null)
+                        dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
 
-                    if (iconImage != null)
-                    {
-                        iconImage.enabled = showIcon;
-                        iconImage.sprite = iconSprite;
-                    }
+                    int damage = action == ActionType.Cure
+                        ? blockData.CalCulate_CurePower(i)
+                        : blockData.attackDamage;
 
-                    // 아이콘 있으면 적용
-                    if(iconSprite != null)
-                    {
-                        cellText.text = "";
-                        iconImage.enabled = true;
-                        iconImage.sprite = iconSprite;
-                    }
+                    slotView.SetAction(
+                        action,
+                        dir,
+                        damage,
+                        isPreview: false,
+                        isPrev: true
+                    );
 
                     // 호버 핸들러 추가/업데이트
-                    PlayerSlotHover hoverHandler = slot.GetComponent<PlayerSlotHover>();
-                    if (hoverHandler == null)
-                    {
-                        hoverHandler = slot.AddComponent<PlayerSlotHover>();
-                        hoverHandler.timelineUI = this;
-                    }
-
-                    //과거 잔상 표시용
-                    hoverHandler.Is_prev = true;
-                    hoverHandler.tick = tickIndex + 1;
-                    hoverHandler.placedBlock = placed;
+                    slotView.SetHoverData(
+                        tickIndex + 1,
+                        placed,
+                        isPrev: true
+                    );
                 }
             }
         }
@@ -699,133 +600,54 @@ public class TimelineUI : MonoBehaviour
 
             GameObject descriptionSlot = Instantiate(prefab, descriptionPanel);
 
-
-
             descriptionSlot.name = $"{placed.startTick}. DescriptionSlot";
-            //descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed.linkedRuntimeBlock);
             descriptionSlot.GetComponent<Block_descript>().SetUp(placed.startTick, playerSlotWidth, playerSlotSpacing, placed);
             descriptionSlots.Add(descriptionSlot);
 
             for (int i = 0; i < blockData.blockLength; i++)
             {
                 int tickIndex = placed.startTick + i - 1;
+
                 if (tickIndex >= 0 && tickIndex < playerSlots.Count)
                 {
-                    GameObject slot = playerSlots[tickIndex];
-                    Image image = slot.GetComponent<Image>();
-                    TextMeshProUGUI cellText = slot.GetComponentInChildren<TextMeshProUGUI>();
-                    Image iconImage = slot.transform.Find("Icon")?.GetComponent<Image>();
 
-                    var images = slot.GetComponentsInChildren<Image>(true);
-                    foreach (var img in images)
+                    if (tickIndex < 0 || tickIndex >= playerSlots.Count)
+                        continue;
+
+                    GameObject slotGO = playerSlots[tickIndex];
+
+                    ITimelineSlotView slotView = slotGO.GetComponent<ITimelineSlotView>();
+
+                    if (slotView == null)
                     {
-                        if (img.gameObject != slot)   // 자기 자신 제외
-                        {
-                            //img.gameObject.SetActive(false);
-                            Color color1 = img.color;
-                            color1.a = 0f;
-                            img.color = color1;
-                        }
+                        Debug.LogError($"ITimelineSlotView missing on {slotGO.name}");
+                        continue;
                     }
 
-                    iconImage.gameObject.SetActive(true);
+                    ActionType action = blockData.GetEffectAt(i);
 
-                    Color color2 = iconImage.color;
-                    color2.a = 1.0f;
-                    iconImage.color = color2;
+                    MoveDirection dir = MoveDirection.None;
+                    if (placed.linkedRuntimeBlock != null)
+                        dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
 
-                    image.sprite = Set_SlotSprite;
+                    int damage = action == ActionType.Cure
+                        ? blockData.CalCulate_CurePower(i)
+                        : blockData.attackDamage;
 
-                    // 기본값
-                    Color color = occupiedColor;
-                    string text = "";
-                    bool showIcon = false;
-                    Sprite iconSprite = null;
-
-                    // 이 틱의 효과에 따라 색상 / 텍스트 / 아이콘 설정
-                    ActionType effect = blockData.actionTypes[i];
-
-                    switch (effect)
-                    {
-                        case ActionType.None:
-                            color = occupiedColor;          // 회색
-                            text = "-";
-                            break;
-
-                        case ActionType.Cure:
-                            text = "";
-                            int index = blockData.CalCulate_CurePower(i) - 1;
-                            color = _cureColors[index];
-                            iconSprite = _cureIcons[index];
-                            break;
-                        case ActionType.Attack:
-                            //color = new Color(1f, 0.3f, 0.3f); // 연한 빨강
-                            color = Player_attackColor;
-                            text = "▲";
-                            iconSprite = Sword_icon;
-                            break;
-
-                        case ActionType.Move:
-                            //color = new Color(0.3f, 0.7f, 1f); // 연한 파랑
-                            color = Player_moveColor;
-                            MoveDirection dir = MoveDirection.None;
-                            if (placed.linkedRuntimeBlock != null && placed.linkedRuntimeBlock.CurrentMoveDirections != null)
-                            {
-                                dir = placed.linkedRuntimeBlock.CurrentMoveDirections[i];
-                            }
-                            else
-                            {
-                                dir = blockData.moveDirections[i];
-                            }
-
-                            switch (dir)
-                            {
-                                case MoveDirection.Front: text = "R"; iconSprite = Front_icon; break;
-                                case MoveDirection.Right: text = "D"; iconSprite = Right_icon; break;
-                                case MoveDirection.Back: text = "L"; iconSprite = Back_icon; break;
-                                case MoveDirection.Left: text = "U"; iconSprite = Left_icon; break;
-                            }
-
-                            break;
-
-                    }
-
-                    // 적용
-                    if (image != null)
-                        image.color = new Color(color.r, color.g, color.b, 1.0f);
-
-                    if (cellText != null)
-                        cellText.text = text;
-
-                    if (iconImage != null)
-                    {
-                        iconImage.enabled = showIcon;
-                        iconImage.sprite = iconSprite;
-                    }
-
-                    // 아이콘 있으면 적용
-                    if (iconSprite != null)
-                    {
-                        cellText.text = "";
-                        iconImage.enabled = true;
-                        iconImage.sprite = iconSprite;
-                    }
+                    slotView.SetAction(
+                        action,
+                        dir,
+                        damage,
+                        isPreview: false,
+                        isPrev: false
+                    );
 
                     // 호버 핸들러 추가/업데이트
-                    PlayerSlotHover hoverHandler = slot.GetComponent<PlayerSlotHover>();
-                    if (hoverHandler == null)
-                    {
-                        hoverHandler = slot.AddComponent<PlayerSlotHover>();
-                        hoverHandler.timelineUI = this;
-                    }
-
-                    if (hoverHandler != null)
-                    {
-                        hoverHandler.Is_prev = false;
-                    }
-
-                    hoverHandler.tick = tickIndex + 1;
-                    hoverHandler.placedBlock = placed;
+                    slotView.SetHoverData(
+                        tickIndex + 1,
+                        placed,
+                        isPrev: false
+                    );
                 }
             }
         }

@@ -8,10 +8,12 @@ using VInspector;
 
 
 public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
-     IDragHandler, IEndDragHandler
+     IDragHandler, IEndDragHandler, IDraggableUI
 {
     public RuntimeBlock runtimeBlock;
 
+    // IDraggableUI 인터페이스 구현
+    public RuntimeBlock RuntimeBlock => runtimeBlock;
 
     [Header("참조")]
     public TextMeshProUGUI BlockNameText;
@@ -57,6 +59,8 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private Image _image;
     private Color _originColor;
 
+    
+
     private void Awake()
     {
         if (_image == null)
@@ -78,7 +82,7 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         canvasGroup.alpha = 1f;
     }
 
-    public void Init(RuntimeBlock rBlock)
+    public virtual void Init(RuntimeBlock rBlock)
     {
         canvasGroup.alpha = 1f;
         runtimeBlock = rBlock;
