@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -20,20 +21,36 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
         canvas = GetComponentInParent<Canvas>();
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    private void Update_UIUX(bool is_on)
     {
-        if (timelineUI != null && placedBlock != null && eventData.pointerDrag == null)
+        if (timelineUI == null || placedBlock == null) return;
+
+        int startIndex = placedBlock.startTick;
+        int endIndex = startIndex + placedBlock.linkedRuntimeBlock.BaseData.blockLength - 1;
+
+        if (is_on)
         {
             timelineUI.ShowPlayerCardTooltip(tick, placedBlock, transform.position, Is_prev);
+        }
+        else
+        {
+            timelineUI.HidePlayerTooltip();
+        }
+
+        timelineUI.HighlightSlots(startIndex, endIndex, is_on);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (eventData.pointerDrag == null)
+        {
+            Update_UIUX(true);
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (timelineUI != null)
-        {
-            timelineUI.HidePlayerTooltip();
-        }
+        Update_UIUX(false);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -49,6 +66,8 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
             startWorldPos = transform.position,
             canvas = canvas
         });
+
+        Update_UIUX(false);
 
         if (TimelineManager.Instance != null)
         {
@@ -75,8 +94,11 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
             return;
         } 
 
+        // 카드 제거
         if (eventData.button == PointerEventData.InputButton.Right)
         {
+            Update_UIUX(false);
+
             if (TimelineManager.Instance != null)
             {
                 TimelineManager.Instance.RemovePlacedBlock(placedBlock);

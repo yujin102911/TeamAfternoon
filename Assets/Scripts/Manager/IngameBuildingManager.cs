@@ -216,6 +216,8 @@ public class IngameBuildingManager : MonoBehaviour
     // 추가 버튼에서 작동
     private void Deck_to_Hand()
     {
+        if (_buildingHand.Count + _selection.Selected.Count > _maxHandCount) return; // 덱 최대 매수 오버
+
         List<DeckBuilding_CellGroupUI> toRemove = new List<DeckBuilding_CellGroupUI>();
 
         foreach (var cellGroup in _selection.Selected)
@@ -241,6 +243,8 @@ public class IngameBuildingManager : MonoBehaviour
 
     public bool MoveDeckToHand(RuntimeBlock block)
     {
+        
+
         if (_buildingDeck.Remove(block))
         {
             _buildingHand.Add(block);

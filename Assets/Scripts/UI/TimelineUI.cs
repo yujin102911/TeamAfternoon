@@ -21,6 +21,10 @@ public class TimelineUI : MonoBehaviour
     public GameObject playerSlotPrefab;     // 플레이어 배치 슬롯
     public GameObject descriptionSlotPrefab; // 설명 슬롯
 
+    [Header("타임라인 슬롯 강조색")]
+    [SerializeField] private Color _highlightedColor;
+    [SerializeField] private Color _defaultColor;
+
     [Header("타임라인 슬롯 스프라이트")]
     public Sprite Set_SlotSprite;         // 장착 시 슬롯 스프라이트
     public Sprite Empty_SlotSprite;       // 빈 슬롯 스프라이트
@@ -126,6 +130,7 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
+    // 슬롯 온오프
     public void SetActive_Slots(bool is_active)
     {
         foreach (var enemy in enemySlots)
@@ -136,6 +141,45 @@ public class TimelineUI : MonoBehaviour
         foreach (var player in playerSlots)
         {
             player.SetActive(is_active);
+        }
+    }
+
+    // 슬롯 색 변경
+    public void HighlightSlots(int startIndex, int endIndex, bool is_enter)
+    {
+        //ResetSlotColor();
+
+        // 인덱스 보정 (역순 / 범위 초과 방지)
+        startIndex = Mathf.Clamp(startIndex, 1, playerSlots.Count);
+        endIndex = Mathf.Clamp(endIndex, 1, playerSlots.Count);
+
+        if (startIndex > endIndex)
+            (startIndex, endIndex) = (endIndex, startIndex);
+
+        for (int i = startIndex - 1; i <= endIndex - 1; i++)
+        {
+            Image img = playerSlots[i].GetComponent<Image>();
+            if (img != null)
+            {
+                if (is_enter)
+                {
+                    img.color = _highlightedColor;
+                }
+                else
+                {
+                    img.color = _defaultColor;
+                }
+                
+            }
+        }
+    }
+
+    private void ResetSlotColor()
+    {
+        foreach (var slot in playerSlots)
+        {
+            Image img = slot.GetComponent<Image>();
+            img.color = _defaultColor;
         }
     }
 
@@ -395,19 +439,30 @@ public class TimelineUI : MonoBehaviour
                 effectText = $"정화 수치: {blockData.CalCulate_CurePower(cardTickIndex)}";
                 break;
             case ActionType.Attack:
-                effectText = $"데미지: {blockData.attackDamage}";
+                titleText = "근거리 공격";
+                effectText = $"적에게 가장 가까운 열에서 <b>{blockData.attackDamage}피해</b>를 줍니다.";
                 break;
             case ActionType.Move:
                 titleText = "이동";
                 if (moveDir == MoveDirection.Right)
-                    effectText = $"이동 방향: 우로 이동\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 아래\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Left)
-                    effectText = $"이동 방향: 좌로 이동\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 위\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Front)
-                    effectText = $"이동 방향: 앞으로 이동\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 앞\n좌클릭: 방향 변경";
                 else if (moveDir == MoveDirection.Back)
-                    effectText = $"이동 방향: 뒤로 이동\n좌클릭: 방향 변경";
+                    effectText = $"이동 방향: 뒤\n좌클릭: 방향 변경";
                     break;
+
+            case ActionType.Bow_end:
+            case ActionType.Bow_middle:
+                titleText = "활시위 당기는중...";
+                break;
+            
+            case ActionType.Bow_start:
+                titleText = "원거리 공격";
+                effectText = $"거리에 관계없이 적에게 <b>{blockData.attackDamage}피해</b>를 줍니다.";
+                break;
         }
 
         // 툴팁 텍스트 설정
@@ -423,7 +478,7 @@ public class TimelineUI : MonoBehaviour
             {
                 Player_tooltipTitleText.text = $"{blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
                 Player_tooltipTitleText.text = titleText;
-                Player_tooltipDetailText.text = $"{effectText}\n우클릭: 마법 제거";
+                Player_tooltipDetailText.text = $"{effectText}\n<b>우클릭:</b> 영상 제거";
             }
 
             
@@ -625,6 +680,7 @@ public class TimelineUI : MonoBehaviour
 
                     // 호버 핸들러 추가/업데이트
                     slotView.SetHoverData(
+                        this,
                         tickIndex + 1,
                         placed,
                         isPrev: true
@@ -688,6 +744,7 @@ public class TimelineUI : MonoBehaviour
 
                     // 호버 핸들러 추가/업데이트
                     slotView.SetHoverData(
+                        this,
                         tickIndex + 1,
                         placed,
                         isPrev: false

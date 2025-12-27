@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
 public class PlayerTimeLineSlotView : MonoBehaviour, ITimelineSlotView
 {
@@ -9,6 +10,15 @@ public class PlayerTimeLineSlotView : MonoBehaviour, ITimelineSlotView
     {
         cell.Clear();
         _canvasGroup.alpha = 1f;
+
+        var hover = GetComponent<PlayerSlotHover>();
+        if (hover != null)
+        {
+            hover.timelineUI = null;
+            hover.tick = -1;
+            hover.placedBlock = null;
+            hover.Is_prev = false;
+        }  
     }
 
     public void SetAction(ActionType action, MoveDirection dir, int damage, bool isPreview, bool isPrev)
@@ -21,11 +31,12 @@ public class PlayerTimeLineSlotView : MonoBehaviour, ITimelineSlotView
         }
     }
 
-    public void SetHoverData(int tick, PlacedBlock block, bool isPrev)
+    public void SetHoverData(TimelineUI timeline, int tick, PlacedBlock block, bool isPrev)
     {
         var hover = GetComponent<PlayerSlotHover>();
         if (hover == null) hover = gameObject.AddComponent<PlayerSlotHover>();
 
+        hover.timelineUI = timeline;
         hover.tick = tick;
         hover.placedBlock = block;
         hover.Is_prev = isPrev;

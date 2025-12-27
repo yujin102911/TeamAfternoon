@@ -79,8 +79,10 @@ public class BuildingHand_Panel : MonoBehaviour
         int ix = 0;
         foreach (RuntimeBlock block in hand)
         {
-
             GameObject go = Get();
+            go.transform.SetParent(_spawnPoint, false);
+            go.transform.SetSiblingIndex(ix);
+
             Building_Hand uiBlock = go.GetComponent<Building_Hand>();
             if (uiBlock != null) uiBlock.Init(block);
             ix++;
