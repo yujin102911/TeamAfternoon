@@ -37,7 +37,7 @@ public class StartPanel : MonoBehaviour
     {
         if (_timeText != null)
         {
-            _timeText.text = DateTime.Now.ToString("HH:mm:ss");
+            _timeText.text = DateTime.Now.ToString("hh:mm tt");
         }
     }
 
