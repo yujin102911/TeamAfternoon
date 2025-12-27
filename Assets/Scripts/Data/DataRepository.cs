@@ -59,5 +59,13 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
     {
         return stageDatas.TryGetValue(id, out var data) ? data : null;
     }
+    public bool HasUnreadMail()
+    {
+        foreach (var stage in stageDatas.Values)
+        {
+            if (!stage.IsRead) return true;
+        }
+        return false;
+    }
 
 }

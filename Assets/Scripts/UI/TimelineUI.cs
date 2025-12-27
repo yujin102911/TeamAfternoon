@@ -102,6 +102,8 @@ public class TimelineUI : MonoBehaviour
     {
         CreateTimelineSlots();
 
+        SetActive_Slots(false);
+
         if (TimelineManager.Instance != null)
         {
             TimelineManager.Instance.OnTimelineChanged += UpdatePlayerTimeline;
@@ -121,6 +123,19 @@ public class TimelineUI : MonoBehaviour
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
             TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
+        }
+    }
+
+    public void SetActive_Slots(bool is_active)
+    {
+        foreach (var enemy in enemySlots)
+        {
+            enemy.SetActive(is_active);
+        }
+
+        foreach (var player in playerSlots)
+        {
+            player.SetActive(is_active);
         }
     }
 
@@ -476,9 +491,7 @@ public class TimelineUI : MonoBehaviour
                 List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
                 if (attackSectors != null && attackSectors.Count > 0)
                     OnRequestHighlight?.Invoke(attackSectors);
-            }
-
-                
+            }      
         }
     }
 
@@ -488,6 +501,37 @@ public class TimelineUI : MonoBehaviour
         {
             return;
         }
+        OnRequestHidePreview?.Invoke();
+        OnRequestClearHighlight?.Invoke();
+    }
+
+    // 슬라이더에서 호출
+    public void Show_Preview(int tick)
+    {
+        if (TimelineManager.Instance != null)
+        {
+            int new_tick = (tick - 1) / 2 + 1;
+
+            if (tick % 2 == 1)
+            {
+                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+                OnRequestPreviewPlayer?.Invoke(predictedSector);
+            }
+            else
+            {
+                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+                OnRequestPreviewPlayer?.Invoke(predictedSector);
+
+                List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
+                if (attackSectors != null && attackSectors.Count > 0)
+                    OnRequestHighlight?.Invoke(attackSectors);
+            }
+        }
+    }
+
+    // 슬라이더에서 호출
+    public void Hide_Preview()
+    {
         OnRequestHidePreview?.Invoke();
         OnRequestClearHighlight?.Invoke();
     }

@@ -92,8 +92,8 @@ public class Unlocked_BlockUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (IngameBuildingManager.Instance == null) return;
+        return;
 
-        IngameBuildingManager.Instance.OnSlotClicked(this);
+        //IngameBuildingManager.Instance.OnSlotClicked(this);
     }
 }

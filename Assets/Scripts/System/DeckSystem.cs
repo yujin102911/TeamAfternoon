@@ -58,6 +58,21 @@ public class DeckSystem
         OnDeckChanged?.Invoke();
     }
 
+    public void InitializeDeck(List<RuntimeBlock> hand)
+    {
+        _drawPile.Clear();
+        _hand.Clear();
+        _discardPile.Clear();
+
+        if (hand == null)
+            return;
+
+        _drawPile.AddRange(hand);
+
+        Debug.Log($"[DeckSystem] 덱 동기화 완료:{_drawPile.Count}장");
+        OnDeckChanged?.Invoke();
+    }
+
     /// <summary>
     /// 카드를 count장 뽑는 함수
     /// </summary>

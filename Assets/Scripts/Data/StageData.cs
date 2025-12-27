@@ -2,15 +2,6 @@
 using UnityEngine;
 
 [System.Serializable]
-public class BookPage
-{
-    public string ChapterTitle;
-    public bool IsChapterStart;
-    [TextArea(5, 20)]
-    public string BodyText;
-}
-
-[System.Serializable]
 public struct StageEnemySetup
 {
     [Tooltip("배치할 적 데이터 원본")]
@@ -29,31 +20,17 @@ public class StageData : ScriptableObject
     [TextArea(3, 20)]
     private string _stageName; //스테이지 이름
 
-    [Header("편지 내용")]
-    [Tooltip("클리어 전 보일 의뢰 편지")]
+    [Header("메일 내용")]
+    [Tooltip("클리어 전 보일 의뢰 메일")]
     [SerializeField]
     [TextArea(5, 20)]
     private string _requestLetter;
-
-    [Tooltip("클리어 후 보일 감사 편지")]
+    [Tooltip("보내는 사람")]
     [SerializeField]
-    [TextArea(5, 20)]
-    private string _thankLetter;
-
-    [Header("책 표지/타이틀 정보")]
-    [TextArea(4,20)]
-    public string BookCredit = "2025 by Team Afternoon";
-
-    [Header("타이틀 페이지 오염 ID")]
-    public int TitlePollutionID = 0;
-
-    [Header("펼침면 별 오염 ID 리스트")]
-    [Tooltip("순서대로 1번째 펼침면 (0,1).,..")]
-    [SerializeField] private List<int> _spreadPollutionIDs = new List<int>();
-
-    [Header("책 본문 내용(인덱스 순서대로 2페이지씩 배치)")]
+    private string _sender = "@inailedit.com";
+    [Tooltip("받는 사람")]
     [SerializeField]
-    private List<BookPage> _bookPages = new List<BookPage>();
+    private string _receiver = "@clearrun.fake";
 
     [Header("맵 정보")]
     [SerializeField]
@@ -72,17 +49,19 @@ public class StageData : ScriptableObject
     [Header("스테이지 진행도")]
     [SerializeField]
     private bool _isCleared = false;
+    [SerializeField]
+    private bool _isRead = false;
 
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
-    public List<BookPage > BookPages => _bookPages;
-    public List<int> SpreadPollutionIDs => _spreadPollutionIDs;
+    public string Sender => _sender;
+    public string Receiver => _receiver;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public MapSize MapSize => _mapSize;
     public List<Vector3> SectorPoints => _sectorTransform;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
+    public bool IsRead { get => _isRead; set => _isRead = value; }
     public string RequestLetter => _requestLetter;
-    public string ThankLetter => _thankLetter;
 
 }
