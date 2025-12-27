@@ -33,10 +33,9 @@ public class TimeLineResetController : MonoBehaviour
     }
 
     [ContextMenu("TestPlay")]
-    public void Play()
+    public Coroutine Play()
     {
-        //StopAllCoroutines();
-        StartCoroutine(PlayRoutine(duration));
+        return StartCoroutine(PlayRoutine(duration));
     }
 
 

@@ -62,12 +62,13 @@ public class StepSlider : MonoBehaviour
         playRoutine = StartCoroutine(PlayRoutine(duration));
     }
 
-    public void Return(float duration)
+    public Coroutine Return(float duration)
     {
         if (playRoutine != null)
             StopCoroutine(playRoutine);
 
         playRoutine = StartCoroutine(ReturnRoutine(duration));
+        return playRoutine;
     }
 
     private IEnumerator PlayRoutine(float duration)

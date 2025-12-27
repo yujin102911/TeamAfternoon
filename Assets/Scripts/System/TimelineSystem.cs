@@ -28,19 +28,19 @@ public class TimelineSystem
     // ========================================
 
     /// <summary>
-    /// 공격 요청 이벤트 (데미지)
+    /// 근접 공격 요청 이벤트 (데미지)
     /// </summary>
-    public event Action<int, int> OnAttackRequested;
+    public event Action<int> OnMeleeAttackRequested;
+
+    /// <summary>
+    /// 정화 요청 이벤트 (방향)
+    /// </summary>
+    public event Action<int> OnLongRangeAttackRequested;
 
     /// <summary>
     /// 이동 요청 이벤트 (방향)
     /// </summary>
     public event Action<MoveDirection> OnMoveRequested;
-
-    /// <summary>
-    /// 정화 요청 이벤트 (방향)
-    /// </summary>
-    public event Action<int> OnCureRequested;
 
     /// <summary>
     /// 블록 시작 이벤트 (키워드 처리용)
@@ -317,7 +317,7 @@ public class TimelineSystem
                 Debug.Log($"  → {blockData.BlockName}: 공격 요청 {damage}");
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
-                OnAttackRequested?.Invoke(damage, currentTick);
+                OnMeleeAttackRequested?.Invoke(damage);
                 break;
 
             case ActionType.Move:
@@ -337,7 +337,7 @@ public class TimelineSystem
                 }
                 Debug.Log($"블럭내 {cardTickIndex}번째의 정화 액션 발동!! - 정화량: {cure_power}");
 
-                OnCureRequested?.Invoke(cure_power);
+                OnLongRangeAttackRequested?.Invoke(cure_power);
                 break;
 
             case ActionType.None:
