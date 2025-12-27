@@ -3,32 +3,16 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// 시작버튼을 관리하는 스크립트,,,, 이거에 넣을게 정말 시작 버튼밖에 없단말인가
+/// </summary>
 public class BattleUIManager : MonoBehaviour
 {
     public static BattleUIManager Instance;
 
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
-    [SerializeField] private GameObject _sectorSelectionPanel;
 
-    [SerializeField] private TextMeshProUGUI _lineText;
-    [SerializeField] private TextMeshProUGUI _totalLineText;
-
-    [SerializeField] private TextMeshProUGUI _chapterText;
-    [SerializeField] private TextMeshProUGUI _totalChapterText;
-
-    [Header("정화 게이지 UI")]
-    [SerializeField]
-    private UnitStatusUI _cureUI;
-
-    [Header("플레이어 UI")]
-    [SerializeField] private PlayerHeartUI _playerStatusUI;
-
-    [Header("적 UI 설정")]
-    [SerializeField] private GameObject _enemyStatusPrefab;
-    [SerializeField] private Transform _enemyUIContainer;
-
-    private Dictionary<RuntimeEnemy, UnitStatusUI> _enemyUIMap = new Dictionary<RuntimeEnemy, UnitStatusUI>();
 
     private void Awake()
     {
@@ -41,14 +25,11 @@ public class BattleUIManager : MonoBehaviour
         {
             BattleSystem battle = GameManager.Instance.BattleSystem;
 
-            battle.OnPlayerHPChanged += HandlePlayerHPChanged;
             battle.OnBattleInitialized += HandleBattleInitialized;
-            battle.UpdateCureGauage += HandleCureChanged;
+            //battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
-            GameManager.Instance.OnRoundChanged += HandleRoundChanged;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
-            GameManager.Instance.OnGameStateChanged += TryBindPlayerUI;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -60,11 +41,8 @@ public class BattleUIManager : MonoBehaviour
         {
             BattleSystem battle = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
-            GameManager.Instance.OnRoundChanged -= HandleRoundChanged;
-            GameManager.Instance.OnGameStateChanged -= TryBindPlayerUI;
-            battle.OnPlayerHPChanged -= HandlePlayerHPChanged;
             battle.OnBattleInitialized -= HandleBattleInitialized;
-            battle.UpdateCureGauage -= HandleCureChanged;
+            //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
 
@@ -77,17 +55,6 @@ public class BattleUIManager : MonoBehaviour
 
     public void InitializeUI(BattleSystem battle)
     {
-        // 플레이어 UI초기화
-        if (_playerStatusUI != null)
-        {
-            _playerStatusUI.Init(battle.PlayerHP, battle.PlayerMaxHP);
-        }
-        if (_cureUI != null && battle.Enemies.Count > 0)
-        {
-            int maxCure = battle.Enemies[0].Data.MaxCureValue;
-            // 이름 표시 기능이 UnitStatusUI에 있다면 활용 가능
-            _cureUI.Init("챕터 정화 진행도:", 0, maxCure);
-        }
         if (GameManager.Instance != null && !GameManager.Instance.IsExecutingRound)
         {
             Hide_startBtn();
@@ -98,41 +65,15 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void HandleCureChanged(int current, int max)
-    {
-        if (_cureUI != null)
-        {
-            _cureUI.UpdateCureGauage(current, max);
-        }
-    }
-
-    private void HandlePlayerHPChanged(int current, int max)
-    {
-        if (_playerStatusUI != null)
-        {
-            _playerStatusUI.UpdateHearts(current, max);
-        }
-    }
-
-    private void HandleRoundChanged(int currentLine, int totalLine, int currentChapter, int totalChapter)
-    {
-        if (_lineText != null)
-            _lineText.text = $"<size=56pt>0{currentLine.ToString()}";
-        if (_totalLineText != null)
-            _totalLineText.text = $"/ 0{totalLine}";
-        if (_chapterText != null)
-            _chapterText.text = $"0{currentChapter.ToString()}";
-        if (_totalChapterText != null)
-            _totalChapterText.text = $"/ 0{totalChapter}";
-    }
-    private void RefreshStartButtonState()
+    public void RefreshStartButtonState()
     {
         if (_startButton == null || GameManager.Instance == null) return;
         bool isRoundRunning = GameManager.Instance.IsExecutingRound;
+        bool isSequencePlaying = GameManager.Instance.IsSequencePlaying;
         bool isSectorSelected = GameManager.Instance.IsSectorSelected;
         bool isGameOver = GameManager.Instance.IsBattleEnded;
 
-        bool interactable = !isRoundRunning && isSectorSelected && !isGameOver;
+        bool interactable = !isRoundRunning && isSectorSelected && !isGameOver && !isSequencePlaying;
 
         _startButton.interactable = interactable;
 
@@ -144,19 +85,6 @@ public class BattleUIManager : MonoBehaviour
         //Hide_startBtn();
     }
 
-    private void TryBindPlayerUI()
-    {
-        var visualController = FindAnyObjectByType<PlayerVisualController>();
-
-        if (visualController != null && _playerStatusUI != null)
-        {
-            Transform playerTr = visualController.CurrentPlayerTransform;
-            if (playerTr != null)
-            {
-                _playerStatusUI.SetFollowTarget(playerTr);
-            }
-        } 
-    }
 
     public void Show_startBtn()
     {
