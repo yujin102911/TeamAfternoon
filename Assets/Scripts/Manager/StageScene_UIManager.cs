@@ -39,7 +39,7 @@ public class StageScene_UIManager : MonoBehaviour
     {
         if (SoundManager.Instance != null)
             SoundManager.Instance.Play(SoundID.UI_Click2);
-        _stageInfoPanel.Show(id);
+        //_stageInfoPanel.Show(id);
     }
 
     // 책 위에 마우스 호버
