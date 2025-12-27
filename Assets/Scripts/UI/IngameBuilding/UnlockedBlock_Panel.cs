@@ -8,7 +8,6 @@ public class UnlockedBlock_Panel : MonoBehaviour
     [SerializeField] private int _initialSize = 10;
 
     private Queue<GameObject> _handPool = new Queue<GameObject>();
-    private List<RuntimeBlock> blockDatas = new List<RuntimeBlock>();
 
     private void Awake()
     {
@@ -17,27 +16,19 @@ public class UnlockedBlock_Panel : MonoBehaviour
 
     void Start()
     {
-        blockDatas.Clear();
-
-        if(blockDatas.Count == 0 && GameManager.Instance != null)
+        if (IngameBuildingManager.Instance != null)
         {
-            foreach (var block in GameManager.Instance.UserGameData.Unlocked_Blocks)
-            {
-                int blockId = block.Owner_blockID;
-                RuntimeBlock runtimeBlock = GameManager.Instance.DeckSystem.CreateRuntimeBlock(blockId);
-                if (runtimeBlock != null)
-                {
-                    blockDatas.Add(runtimeBlock);
-                }
-            }
+            IngameBuildingManager.Instance.OnBuildingDeckChanged += Update_UnlockedBlockUI;
+            Update_UnlockedBlockUI(IngameBuildingManager.Instance.BuildingDeck);
         }
-
-        Update_UnlockedBlockUI(blockDatas);
     }
 
     private void OnDestroy()
     {
-
+        if (IngameBuildingManager.Instance != null)
+        {
+            IngameBuildingManager.Instance.OnBuildingDeckChanged -= Update_UnlockedBlockUI;
+        }
     }
 
     private void InitializePool()
@@ -52,7 +43,6 @@ public class UnlockedBlock_Panel : MonoBehaviour
 
     public GameObject Get()
     {
-        Debug.Log($"{_handPool.Count}. 블럭 풀 크기");
         if (_handPool.Count > 0)
         {
             GameObject obj = _handPool.Dequeue();
@@ -89,14 +79,14 @@ public class UnlockedBlock_Panel : MonoBehaviour
         {
 
             GameObject go = Get();
-            Unlocked_BlockUI uiBlock = go.GetComponent<Unlocked_BlockUI>();
+            DeckBuilding_CellGroupUI uiBlock = go.GetComponent<DeckBuilding_CellGroupUI>();
             if (uiBlock != null) uiBlock.Init(block);
             ix++;
         }
     }
 
-    public void Update_UnlockedBlockUI(IReadOnlyList<RuntimeBlock> hand)
+    public void Update_UnlockedBlockUI(IReadOnlyList<RuntimeBlock> deck)
     {
-        Update_UnlockedBlockUI(new List<RuntimeBlock>(hand));
+        Update_UnlockedBlockUI(new List<RuntimeBlock>(deck));
     }
 }

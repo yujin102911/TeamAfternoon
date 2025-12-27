@@ -131,8 +131,8 @@ public class MapSystem
                 floater.floatStrength = 0.07f;
                 floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
 
-                MapSectorHandler handler = sectorObj.AddComponent<MapSectorHandler>();
-                handler.Initialize(sectorNum, this);
+                //MapSectorHandler handler = sectorObj.AddComponent<MapSectorHandler>();
+                //handler.Initialize(sectorNum, this);
 
                 _sectors.Add(sectorNum, sectorObj);
                 SetSectorBaseColor(sectorNum, _config.normalColor);
@@ -177,12 +177,12 @@ public class MapSystem
                 sectorObj.name = $"Sector_{sectorNum}";
                 sectorObj.transform.localScale = new Vector3(size * 0.9f, size * 0.9f, 1);
 
-                FloatObject floater = sectorObj.AddComponent<FloatObject>();
-                floater.floatStrength = 0.15f;
-                floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
+                //FloatObject floater = sectorObj.AddComponent<FloatObject>();
+                //floater.floatStrength = 0.15f;
+                //floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
 
-                var handler = sectorObj.AddComponent<MapSectorHandler>();
-                handler.Initialize(sectorNum, this);
+                //var handler = sectorObj.AddComponent<MapSectorHandler>();
+                //handler.Initialize(sectorNum, this);
 
                 _sectors.Add(sectorNum, sectorObj);
                 SetSectorBaseColor(sectorNum, _config.normalColor);
@@ -328,6 +328,11 @@ public class MapSystem
     {
         if (_isSelectionEnabled) 
             OnSectorSelected?.Invoke(sectorNum);
+    }
+
+    public void Handle_SetSector(int sectorNum)
+    {
+        OnSectorSelected?.Invoke(sectorNum);
     }
 
     public void HandleSectorHover(int sectorNum, bool isEnter)

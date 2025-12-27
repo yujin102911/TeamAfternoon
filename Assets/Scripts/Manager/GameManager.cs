@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
     public BattleSystem BattleSystem => _battleSystem;
     public MapSystem MapSystem => _mapSystem;
     public int CurrentRound => _currentRound;
+    public int StartHandSize => _startHandSize;
     public StageData CurrentStageData => currentStageData;
     // 덱빌딩에서 사용
     public UserGameData UserGameData => userGameData;
@@ -313,8 +314,21 @@ public class GameManager : MonoBehaviour
         }
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
         if (FindAnyObjectByType<SceneIntroController>() == null)
-            OnIntroCompleted();
+            //OnIntroCompleted();
         LoadEnemyAtIndex(0, false);
+    }
+
+    public void GameStart(List<RuntimeBlock> hand)
+    {
+        // 덱 교체
+        _deckSystem.InitializeDeck(hand);
+        
+        //시작 연출
+        
+        _battleSequenceController.GameStartSequence();
+
+        //5섹터 고정 및 게임 시작
+        _mapSystem.Handle_SetSector(5);
     }
 
     public void OnIntroCompleted()
@@ -406,7 +420,7 @@ public class GameManager : MonoBehaviour
 
         _battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
-        BattleUIManager.Instance.Hide_startBtn();
+        //BattleUIManager.Instance.Hide_startBtn();
         yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
         //yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(true));
 
@@ -417,8 +431,10 @@ public class GameManager : MonoBehaviour
 
         yield return StartCoroutine(_battleSequenceController.Slide_Enemy(true));
 
+        // 타임라인 실행
         if (_timelineManager != null)
         {
+            _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
 
@@ -471,6 +487,7 @@ public class GameManager : MonoBehaviour
 
         if (_timelineManager != null && TimelineManager.Instance.Is_Cure)
             _mapVisualController.RefreshMapOwnershipVisuals();
+        
         _battleSequenceController.PlayerTurnStartSequence(() =>
         {
             if (_timelineManager != null)

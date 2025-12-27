@@ -90,7 +90,7 @@ public class BattleUIManager : MonoBehaviour
         }
         if (GameManager.Instance != null && !GameManager.Instance.IsExecutingRound)
         {
-            Show_startBtn();
+            Hide_startBtn();
         }
         else
         {
@@ -141,7 +141,7 @@ public class BattleUIManager : MonoBehaviour
     private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
     {
         _startButton.interactable = false;
-        Hide_startBtn();
+        //Hide_startBtn();
     }
 
     private void TryBindPlayerUI()

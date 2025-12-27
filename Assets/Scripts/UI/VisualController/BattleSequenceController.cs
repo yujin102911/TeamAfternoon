@@ -11,6 +11,23 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField] private float _cardYOffset = 200f;
     [SerializeField] private float _cardDuration = 1f;
 
+    [Header("타임 라인UI")]
+    [SerializeField] private TimelineUI _timelineUI;
+
+    [Header("게임 시작 가림막 페이드 아웃")]
+    [SerializeField]
+    private GameStartPanel_VController _gamestartPanel;
+
+    [Header("연출 코드")]
+    [SerializeField]
+    private TimeLineResetController _resetController;
+    [SerializeField]
+    private SilinderResetController _silinderResetController;
+
+    [Header("타임라인 슬라이더")]
+    [SerializeField]
+    private StepSlider _timelineSlider;
+
     [Header("배경 전환 연출")]
     [SerializeField] private RectTransform bgCurrent;
     [SerializeField] private RectTransform bgNext;
@@ -91,6 +108,12 @@ public class BattleSequenceController : MonoBehaviour
         baseOrthoSize = targetCamera.orthographicSize;
     }
 
+    //슬라이더 연출
+    public void PlaySlider()
+    {
+        _timelineSlider.Play(TimelineManager.Instance.Tick_interval * 16);
+    }
+
     /// <summary>
     /// true  → 줌인 연출
     /// false → 줌아웃 (원위치 복귀)
@@ -101,6 +124,16 @@ public class BattleSequenceController : MonoBehaviour
             StopCoroutine(cameraCoroutine);
 
         cameraCoroutine = StartCoroutine(CameraEffectCoroutine(isZoomIn));
+    }
+
+    // 게임 시작 시 연출
+    public void GameStartSequence()
+    {
+        if (BattleUIManager.Instance != null)
+            BattleUIManager.Instance.Show_startBtn();
+
+        _gamestartPanel.FadeOut();
+        _timelineUI.SetActive_Slots(true);
     }
 
     // 연출 재생 후 끝나면 onComplete
@@ -124,6 +157,7 @@ public class BattleSequenceController : MonoBehaviour
     private IEnumerator CoSequence(Action onComplete)
     {
         _storyLine.SetActive(false);
+        _timelineUI.SetActive_Slots(false);
 
         //yield return StartCoroutine(Move_enemyCardUIs(false));
 
@@ -165,6 +199,10 @@ public class BattleSequenceController : MonoBehaviour
     // 두루마기 내려오는 연출
     private IEnumerator ScrollDown()
     {
+        _resetController.Play();
+        //_silinderResetController.Play();
+        _timelineSlider.Return(2.0f);
+
         if (_timelinePanel == null) yield break;
 
         float timer = 0f;

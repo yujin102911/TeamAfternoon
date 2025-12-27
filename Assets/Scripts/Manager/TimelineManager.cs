@@ -21,6 +21,8 @@ public class TimelineManager : MonoBehaviour
     [Header("정화 온오프")]
     public bool Is_Cure = false;
 
+    [Header("틱 설정")]
+    public float Tick_interval = 0.4f;
     [SerializeField] private int _totalTicks = 8;
 
     // 기본적으로 8로 설정(오류 방지, Init할 때 게임매니저한테 토탈 섹터 받음)
@@ -284,6 +286,8 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public IEnumerator ExecuteTimeline()
     {
+        float startTime = Time.time;   // 시작 시간 기록
+
         Debug.Log("[TimelineDirector] 타임라인 실행 시작");
 
         // 라운드 시작 키워드 호출
@@ -316,14 +320,14 @@ public class TimelineManager : MonoBehaviour
                 break;
             }
 
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(Tick_interval);
             if (GameManager.Instance.IsBattleEnded) yield break;
 
             //// 정화 시도
             //if (_battleSystem.TryCurePage(tick, Is_Cure))
             //{
             //    // TODO: 정화 이펙트 넣기
-            //    yield return new WaitForSeconds(0.4f);
+            //    yield return new WaitForSeconds(Tick_interval);
             //}
 
             //틱이 분리됨에 따른 틱 쪼개기
@@ -347,7 +351,7 @@ public class TimelineManager : MonoBehaviour
             }
 
             // 연출 대기
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(Tick_interval);
             // 모든 틱 끝나면 0 으로 신호 보내서 하이라이트 끄기
             OnCurrentTickChanged?.Invoke(0);
         }
@@ -362,7 +366,8 @@ public class TimelineManager : MonoBehaviour
             }
         }
 
-        Debug.Log("[TimelineDirector] 타임라인 실행 완료");
+        float elapsed = Time.time - startTime;   // 총 실행 시간
+        Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
     }
 
     /// <summary>
