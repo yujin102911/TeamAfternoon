@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 public class StageLinkHandler : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private string battleSceneName = "battleScene";
+    [SerializeField] private AppLauncher _launcher;
 
     private TextMeshProUGUI _tmpText;
 
@@ -32,9 +33,9 @@ public class StageLinkHandler : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log($"[LinkHandler] 스테이지 {id}로 이동합니다.");
         GameManager.SelectedStageID = id;
-        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
+        if (_launcher != null)
         {
-            ServiceLocator.Instance.Scene.Load(battleSceneName);
+            _launcher.LaunchBattle(battleSceneName);
         }
     }
 

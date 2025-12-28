@@ -15,6 +15,14 @@ public class SceneService
         Debug.Log($"[SceneService] Load -> {sceneName} (prev: {current})");
     }
 
+    public AsyncOperation LoadAsync(string sceneName)
+    {
+        string current = SceneManager.GetActiveScene().name;
+        sceneHistory.Push(current);
+
+        return SceneManager.LoadSceneAsync(sceneName);
+    }
+
     /// <summary> 이전 씬으로 되돌아가기 </summary>
     public void Back()
     {
