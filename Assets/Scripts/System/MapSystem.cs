@@ -156,7 +156,18 @@ public class MapSystem
     /// </summary>
     private void CreateSectorObjects(List<Vector2Int> positions, Vector2 dimensions, float size)
     {
-        float totalSpacing = size + _config.sectorSpacing;
+        SpriteRenderer prefabSr = _config.sectorPrefab.GetComponent<SpriteRenderer>();
+        Vector2 spriteUnitSize = Vector2.zero;
+
+        if (prefabSr != null && prefabSr.sprite != null)
+            spriteUnitSize = prefabSr.sprite.bounds.size;
+
+        float finalScale = size / spriteUnitSize.x;
+        Vector3 targetScale = new Vector3(finalScale, finalScale, 1);
+
+        float xSpacing = (spriteUnitSize.x * finalScale) + _config.sectorSpacing;
+        float ySpacing = (spriteUnitSize.y * finalScale) + _config.sectorSpacing;
+
         Vector3 centerPos = _rootTransform.position;
         float xOffset = (dimensions.x - 1) / 2.0f;
         float yOffset = (dimensions.y - 1) / 2.0f;
@@ -166,8 +177,8 @@ public class MapSystem
             int sectorNum = i + 1;
             Vector2Int gridPos = positions[i];
 
-            float x = centerPos.x + (gridPos.x - xOffset) * totalSpacing;
-            float y = centerPos.y + (gridPos.y - yOffset) * totalSpacing;
+            float x = centerPos.x + (gridPos.x - xOffset) * xSpacing;
+            float y = centerPos.y + (gridPos.y - yOffset) * ySpacing;
             Vector3 worldPos = new Vector3(x, y, 0);
 
             GameObject sectorObj;
@@ -175,14 +186,7 @@ public class MapSystem
             {
                 sectorObj = UnityEngine.Object.Instantiate(_config.sectorPrefab, worldPos, Quaternion.identity, _rootTransform);
                 sectorObj.name = $"Sector_{sectorNum}";
-                sectorObj.transform.localScale = new Vector3(size * 0.9f, size * 0.9f, 1);
-
-                //FloatObject floater = sectorObj.AddComponent<FloatObject>();
-                //floater.floatStrength = 0.15f;
-                //floater.floatSpeed = UnityEngine.Random.Range(0.8f, 1.2f);
-
-                //var handler = sectorObj.AddComponent<MapSectorHandler>();
-                //handler.Initialize(sectorNum, this);
+                sectorObj.transform.localScale = targetScale;
 
                 _sectors.Add(sectorNum, sectorObj);
                 SetSectorBaseColor(sectorNum, _config.normalColor);
