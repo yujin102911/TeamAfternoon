@@ -156,24 +156,13 @@ public class BattleSequenceController : MonoBehaviour
 
     private IEnumerator CoSequence(Action onComplete)
     {
-        _storyLine.SetActive(false);
-        _timelineUI.SetActive_Slots(false);
+        GameManager.Instance.IsSequencePlaying = true;
+        BattleUIManager.Instance.RefreshStartButtonState();
 
-        //yield return StartCoroutine(Move_enemyCardUIs(false));
+        yield return StartCoroutine(ScrollLeft());
 
-        yield return StartCoroutine(ScrollUp());
-
-        yield return StartCoroutine(AnimateExpand());
-
-        yield return StartCoroutine(ScrollDown());
-
-        PlayCameraEffect(false);
-        //yield return StartCoroutine(Move_HandPanel(true));
-
-        if (BattleUIManager.Instance != null)
-            BattleUIManager.Instance.Show_startBtn();
-
-        TurnOnSectorSelectText();
+        GameManager.Instance.IsSequencePlaying = false;
+        BattleUIManager.Instance.RefreshStartButtonState();
 
         onComplete?.Invoke();
     }
@@ -196,28 +185,16 @@ public class BattleSequenceController : MonoBehaviour
         _storyLineRect.sizeDelta = new Vector2(targetWidth, _storyLineRect.sizeDelta.y);
     }
 
-    // 두루마기 내려오는 연출
-    private IEnumerator ScrollDown()
+    // 타임라인 원래대로 돌아오는 연출
+    private IEnumerator ScrollLeft()
     {
-        _resetController.Play();
-        //_silinderResetController.Play();
-        _timelineSlider.Return(2.0f);
+        Coroutine beltReset = _resetController.Play();
+        Coroutine sliderReturn = _timelineSlider.Return(2.0f);
 
-        if (_timelinePanel == null) yield break;
-
-        float timer = 0f;
-        _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, 0);
-
-        while (timer < _timelinePanelDuration)
-        {
-            timer += Time.deltaTime;
-
-            float currentHeight = Mathf.Lerp(0f, targetHeight, timer/ _timelinePanelDuration);
-            _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, currentHeight);
-
-            yield return null;
-        }
-        _timelineRect.sizeDelta = new Vector2(_timelineRect.sizeDelta.x, targetHeight);
+        _timelineUI.SetActive_Slots(false);
+        yield return beltReset;
+        yield return sliderReturn;
+        _timelineUI.SetActive_Slots(true);
     }
 
     // 두루마기 올라가는 연출

@@ -68,12 +68,12 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem = new TimelineSystem();
 
         // TimelineSystem 이벤트 구독 (중재자 역할)
-        _timelineSystem.OnAttackRequested += HandleAttackRequest;
+        _timelineSystem.OnMeleeAttackRequested += HandleMeleeAttackRequest;
+        _timelineSystem.OnLongRangeAttackRequested += HandleLongRangeAttackRequest;
         _timelineSystem.OnMoveRequested += HandleMoveRequest;
         _timelineSystem.OnBlockStarted += HandleBlockStarted;
         _timelineSystem.OnBlockEnded += HandleBlockEnded;
         _timelineSystem.OnBlockTick += HandleBlockTick;
-        _timelineSystem.OnCureRequested += HandleCureRequest;
     }
 
     void OnDestroy()
@@ -81,12 +81,12 @@ public class TimelineManager : MonoBehaviour
         // 이벤트 구독 해제
         if (_timelineSystem != null)
         {
-            _timelineSystem.OnAttackRequested -= HandleAttackRequest;
+            _timelineSystem.OnMeleeAttackRequested -= HandleMeleeAttackRequest;
+            _timelineSystem.OnLongRangeAttackRequested -= HandleLongRangeAttackRequest;
             _timelineSystem.OnMoveRequested -= HandleMoveRequest;
             _timelineSystem.OnBlockStarted -= HandleBlockStarted;
             _timelineSystem.OnBlockEnded -= HandleBlockEnded;
             _timelineSystem.OnBlockTick -= HandleBlockTick;
-            _timelineSystem.OnCureRequested -= HandleCureRequest;
         }
     }
 
@@ -94,9 +94,13 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleAttackRequest(int baseDamage, int currentTick)
+    private void HandleMeleeAttackRequest(int baseDamage)
     {
-        _battleSystem.DealDamageToCurrentSector(baseDamage, currentTick);
+        _battleSystem.MeleeAttack(baseDamage);
+    }
+    private void HandleLongRangeAttackRequest(int power)
+    {
+        _battleSystem.LongRangeAttack(power);
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -104,10 +108,6 @@ public class TimelineManager : MonoBehaviour
         _battleSystem.MovePlayer(direction);
     }
 
-    private void HandleCureRequest(int power)
-    {
-        _battleSystem.Cure(power);
-    }
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
     {
@@ -428,7 +428,6 @@ public class TimelineManager : MonoBehaviour
             return _battleSystem != null ? _battleSystem.PlayerCurrentSector : 1;
         }
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
-        int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
         int columns = _totalColumns > 0 ? _totalColumns : 3;
         int rows = _totalSectors / columns;
 
@@ -448,7 +447,7 @@ public class TimelineManager : MonoBehaviour
 
                     if (dir != MoveDirection.None)
                     {
-                        int moveAmount = 1 + baseBuffSpeed;
+                        int moveAmount = 1;
 
                         int curIdx = currentSimulatedSector - 1;
                         int r = curIdx / columns;
@@ -491,7 +490,6 @@ public class TimelineManager : MonoBehaviour
         if (_battleSystem == null || _currentEnemyPattern == null) return dangerTicks;
 
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
-        int baseBuffSpeed = _battleSystem.GetBuffValue("Speed", true);
 
         int totalSectors = _totalSectors;
         int columns = _totalColumns;
@@ -507,7 +505,7 @@ public class TimelineManager : MonoBehaviour
                 if (data.GetEffectAt(cardIndex) == ActionType.Move)
                 {
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
-                    int moveAmount = 1 + baseBuffSpeed;
+                    int moveAmount = 1;
                     int curIdx = currentSimulatedSector - 1;
                     int r = curIdx / columns;
                     int c = curIdx % columns;
