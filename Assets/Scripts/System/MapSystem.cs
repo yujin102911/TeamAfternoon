@@ -316,6 +316,28 @@ public class MapSystem
     }
     #endregion
 
+    #region Visibility Control
+    public void SetSectorVisibility(int sectorNum, bool isVisible)
+    {
+        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
+        {
+            Renderer[] renderers = obj.GetComponentsInChildren<Renderer>(true);
+            foreach (var r in renderers)
+            {
+                if (r.CompareTag("Player")) continue;
+                r.enabled = isVisible;
+            }
+        }
+    }
+    public void SetAllSectorsVisibility(bool isVisible)
+    {
+        foreach (int sectorNum in _sectors.Keys)
+        {
+            SetSectorVisibility(sectorNum, isVisible);
+        }
+    }
+    #endregion
+
     #region Input Logic
     public void EnableSelectionMode()
     {
