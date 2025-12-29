@@ -9,7 +9,8 @@ public enum ActionType
     Cure,
     Bow_start,
     Bow_middle,
-    Bow_end
+    Bow_end,
+    Bow_single,
 }
 
 public enum MoveDirection
