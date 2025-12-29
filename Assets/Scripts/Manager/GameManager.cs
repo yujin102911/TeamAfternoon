@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviour
         SetupGame();
         LateInitialize();
         SubscribeEvents();
+        LoadEnemyAtIndex(0, false);
     }
 
     private void OnDestroy()
@@ -208,6 +209,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttackSuccess += _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyAttackSuccess += _enemyVisualController.PlayEnemyAttack;
         }
 
         if (_timelineUI != null && _playerVisualController != null)
@@ -228,6 +230,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess += CountPlayerAttack;
             _battleSystem.OnPlayerHit += CountPlayerHit;
             _battleSystem.OnEnemyDied += HandleEnemyPurified;
+            _battleSystem.OnEnemyDied += _enemyVisualController.PlayEnemyDie;
         }
 
     }
@@ -240,6 +243,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestHighlight -= _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight -= () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttackSuccess -= _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyAttackSuccess -= _enemyVisualController.PlayEnemyAttack;
         }
 
         if (_timelineUI != null && _playerVisualController != null)
@@ -258,6 +262,7 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
+            _battleSystem.OnEnemyDied -= _enemyVisualController.PlayEnemyDie;
         }
     }
 
@@ -315,7 +320,7 @@ public class GameManager : MonoBehaviour
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
         //if (FindAnyObjectByType<SceneIntroController>() == null)
             //OnIntroCompleted();
-        LoadEnemyAtIndex(0, false);
+        
     }
 
     public void GameStart(List<RuntimeBlock> hand)
