@@ -112,4 +112,14 @@ public class StepSlider : MonoBehaviour
         slider.interactable = true;
         _timelineUI.SetActive_Slots(true);
     }
+
+    public void Stop()
+    {
+        if (playRoutine != null)
+        {
+            StopCoroutine(playRoutine);
+            playRoutine = null;
+        }
+        slider.interactable = false;
+    }
 }
