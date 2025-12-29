@@ -459,6 +459,7 @@ public class TimelineUI : MonoBehaviour
                 titleText = "활시위 당기는중...";
                 break;
             
+            case ActionType.Bow_single:
             case ActionType.Bow_start:
                 titleText = "원거리 공격";
                 effectText = $"거리에 관계없이 적에게 <b>{blockData.attackDamage}피해</b>를 줍니다.";

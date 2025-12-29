@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7391957836394801193}
   - component: {fileID: 3690453541241597313}
   - component: {fileID: 6362197471685837033}
+  - component: {fileID: 1002300490018169825}
   m_Layer: 0
   m_Name: EnemySlime
   m_TagString: Untagged
@@ -126,3 +127,16 @@ MonoBehaviour:
   attackFxPrefab: {fileID: 310687532499607209, guid: aa71c3f8b565cf9408ea46e0715cd378, type: 3}
   initialPoolSize: 30
   _offset: {x: 0, y: -0.25, z: 0}
+--- !u!114 &1002300490018169825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3412332403343710032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b26ad0bddd4d4de4799714f24d85de1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spriteRenderer: {fileID: 7391957836394801193}

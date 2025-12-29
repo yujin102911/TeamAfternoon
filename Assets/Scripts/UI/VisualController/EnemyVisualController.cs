@@ -26,6 +26,7 @@ public class EnemyVisualController : MonoBehaviour
     // 적 애니메이터
     private Animator _enemyAnimator;
     private EnemyAttackEffect _enemyAttackEffect;
+    private EnemyVisual visual;
 
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private List<RuntimeEnemy> _currentEnemies = new List<RuntimeEnemy>();
@@ -82,6 +83,8 @@ public class EnemyVisualController : MonoBehaviour
             GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyContainer);
             _enemyAnimator = obj.GetComponent<Animator>();
             _enemyAttackEffect = obj.GetComponent<EnemyAttackEffect>();
+
+            visual = obj.GetComponent<EnemyVisual>();
 
             // 맵 전체 좌표정보 전달
             if (GameManager.Instance.MapSystem != null)

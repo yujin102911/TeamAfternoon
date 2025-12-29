@@ -219,6 +219,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMeleeAttack += _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
+            _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
@@ -252,6 +253,8 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
             _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
+            _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
+
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
@@ -509,6 +512,11 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _isBattleEnded = true;
         IsExecutingRound = false;
+
+        //idle 정지
+        _playerVisualController.Stop_PlayerIdle();
+        _enemyVisualController.Stop_EnemyIdle();
+
         if (_battleSequenceController != null)
         {
             _battleSequenceController.StopSlider();

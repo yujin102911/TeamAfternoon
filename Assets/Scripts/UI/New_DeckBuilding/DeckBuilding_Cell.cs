@@ -63,6 +63,7 @@ public class DeckBuilding_Cell : MonoBehaviour
                 _directionIcon.sprite = Move_Di_icon;
                 break;
 
+            case ActionType.Bow_single:
             case ActionType.Cure:
             case ActionType.Bow_start:
                 _actionIcon.sprite = Bow_startIcon;
