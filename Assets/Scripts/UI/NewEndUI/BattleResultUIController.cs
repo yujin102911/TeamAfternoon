@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using Sirenix.OdinInspector;
+using System.Collections;
 
 public class BattleResultUIController : MonoBehaviour
 {
@@ -18,6 +19,10 @@ public class BattleResultUIController : MonoBehaviour
     [Header("텍스트 연결")]
     [SerializeField] private TextMeshProUGUI _victoryStageText;
     [SerializeField] private TextMeshProUGUI _defeatStageText;
+
+
+    [Header("연출 설정")]
+    [SerializeField] private float _delayBeforeResult = 1.5f;
 
     [Header("씬 설정")]
     [SerializeField] private string _titleSceneName = "TitleScene";
@@ -50,26 +55,36 @@ public class BattleResultUIController : MonoBehaviour
     }
     private void HandleBattleEnded(bool isVictory, int round, int hitCount, int attackCount, int leftHP)
     {
+        StartCoroutine(ProcessResultSequence(isVictory));
+    }
+    private IEnumerator ProcessResultSequence(bool isVictory)
+    {
+        // 1. 설정한 시간만큼 대기 (게임 상황을 잠시 보여줌)
+        yield return new WaitForSeconds(_delayBeforeResult);
+
+        // 2. 스테이지 정보 갱신
         UpdateStageInfo();
-        // 승리 시 연출
+
+        // 3. 결과에 따른 연출 분기
         if (isVictory)
         {
             if (_renderingPanel != null)
             {
+                // RenderingPanel 내부에서도 시간 설정(_totalDuration)에 따라 블록이 차오름
                 _renderingPanel.StartRendering(() =>
                 {
-                    ShowResultPanel(isVictory);
+                    ShowResultPanel(true);
                 });
             }
             else
             {
-                ShowResultPanel(isVictory);
+                ShowResultPanel(true);
             }
         }
-        // 패배 시 연출
         else
         {
-            ShowResultPanel(isVictory);
+            // 패배 시에도 바로 패널이 뜨는 대신 대기 후 출력
+            ShowResultPanel(false);
         }
     }
     private void UpdateStageInfo()
