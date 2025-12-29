@@ -430,7 +430,7 @@ public class MapSystem
     public void DisableSelectionMode()
     {
         _isSelectionEnabled = false;
-        foreach(int key in _sectors.Keys) ResetSectorColor(key);
+        //foreach(int key in _sectors.Keys) ResetSectorColor(key);
     }
 
     public void HandleSectorClick(int sectorNum)
