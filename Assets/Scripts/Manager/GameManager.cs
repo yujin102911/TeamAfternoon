@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour
     }
     public bool IsSectorSelected => _isSectorSelected;
     public bool IsBattleEnded => _isBattleEnded;
+    public bool IsSequencePlaying { get; set; } = false;
     public bool IsRoundInterrupted { get; private set; }
     #endregion
 
@@ -206,16 +207,17 @@ public class GameManager : MonoBehaviour
         {
             _timelineUI.OnRequestHighlight += _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
-            _battleSystem.OnEnemyAttack += _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyAttackSuccess += _mapVisualController.OnEnemyAttackVisual;
         }
 
         if (_timelineUI != null && _playerVisualController != null)
         {
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerAttack += _playerVisualController.PlayAttackShake;
-            _battleSystem.OnPlayerCure += _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerMeleeAttack += _playerVisualController.PlayAttackShake;
+            _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayCureShake;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
+
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
@@ -223,10 +225,9 @@ public class GameManager : MonoBehaviour
 
         if (_battleSystem != null)
         {
-            _battleSystem.OnPlayerAttack += CountPlayerAttack;
+            _battleSystem.OnPlayerAttackSuccess += CountPlayerAttack;
             _battleSystem.OnPlayerHit += CountPlayerHit;
-            _battleSystem.OnEnemyPurified += HandleEnemyPurified;
-            _battleSystem.UpdateCureGauage += UpdateEnemyImagesWrapper;
+            _battleSystem.OnEnemyDied += HandleEnemyPurified;
         }
 
     }
@@ -238,15 +239,15 @@ public class GameManager : MonoBehaviour
         {
             _timelineUI.OnRequestHighlight -= _mapVisualController.OnRequestHighlight;
             _timelineUI.OnRequestClearHighlight -= () => _mapVisualController.OnRequestClearHighlight();
-            _battleSystem.OnEnemyAttack -= _mapVisualController.OnEnemyAttackVisual;
+            _battleSystem.OnEnemyAttackSuccess -= _mapVisualController.OnEnemyAttackVisual;
         }
 
         if (_timelineUI != null && _playerVisualController != null)
         {
             _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerAttack -= _playerVisualController.PlayAttackShake;
-            _battleSystem.OnPlayerCure -= _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlayAttackShake;
+            _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayCureShake;
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
@@ -255,9 +256,8 @@ public class GameManager : MonoBehaviour
         
         if (_battleSystem != null)
         {
-            _battleSystem.OnPlayerAttack -= CountPlayerAttack;
+            _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
-            _battleSystem.UpdateCureGauage -= UpdateEnemyImagesWrapper;
         }
     }
 
@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
             _mapVisualController.RefreshMapOwnershipVisuals();
         }
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
-        if (FindAnyObjectByType<SceneIntroController>() == null)
+        //if (FindAnyObjectByType<SceneIntroController>() == null)
             //OnIntroCompleted();
         LoadEnemyAtIndex(0, false);
     }
@@ -324,7 +324,6 @@ public class GameManager : MonoBehaviour
         _deckSystem.InitializeDeck(hand);
         
         //시작 연출
-        
         _battleSequenceController.GameStartSequence();
 
         //5섹터 고정 및 게임 시작
@@ -418,18 +417,18 @@ public class GameManager : MonoBehaviour
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
-        _battleSequenceController.PlayCameraEffect(true);
+        //_battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
         //BattleUIManager.Instance.Hide_startBtn();
-        yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
+        //yield return StartCoroutine(_battleSequenceController.Move_HandPanel(false));
         //yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(true));
 
-        if (_battleSystem != null)
-        {
-            UpdateEnemyImagesWrapper(_battleSystem.CurrentCure, _battleSystem.MaxCure);
-        }
+        //if (_battleSystem != null)
+        //{
+        //    UpdateEnemyImagesWrapper(_battleSystem.EnemyHP, _battleSystem.EnemyMaxHP);
+        //}
 
-        yield return StartCoroutine(_battleSequenceController.Slide_Enemy(true));
+        //yield return StartCoroutine(_battleSequenceController.Slide_Enemy(true));
 
         // 타임라인 실행
         if (_timelineManager != null)
@@ -439,7 +438,7 @@ public class GameManager : MonoBehaviour
         }
 
         //yield return StartCoroutine(_battleSequenceController.Move_enemyCardUIs(false));
-        yield return StartCoroutine(_battleSequenceController.Slide_Enemy(false));
+        //yield return StartCoroutine(_battleSequenceController.Slide_Enemy(false));
         if (IsRoundInterrupted)
         {
             HandleRoundInterrupted(); // 적 교체 및 리셋
@@ -471,14 +470,11 @@ public class GameManager : MonoBehaviour
 
         if (_battleSystem != null)
         {
-            _battleSystem.DecayBuffs();
-            _battleSystem.ChooseCureSector();
             _battleSystem.OnRoundEnded();
         }
         UpdateEnemyPatterns();
         PrepareNextHand();
 
-        
     }
     private void PrepareNextHand()
     {
