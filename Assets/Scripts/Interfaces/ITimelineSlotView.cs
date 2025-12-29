@@ -11,5 +11,5 @@ public interface ITimelineSlotView
         bool isPrev
     );
 
-    void SetHoverData(int tick, PlacedBlock block, bool isPrev);
+    void SetHoverData(TimelineUI timeline, int tick, PlacedBlock block, bool isPrev);
 }

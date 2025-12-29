@@ -105,7 +105,7 @@ public class MapSystem
             }
         }
         Vector2 dimensions = new Vector2(_columns, _rows);
-        CreateSectorObjects(gridPositions, dimensions, currentSectorSize);
+        New_CreateSectorObjects(gridPositions, dimensions, currentSectorSize);
         Debug.Log($"[MapSystem] 맵 생성 완료: {mapSize} ({_totalSectors} 섹터)");
     }
 
@@ -205,6 +205,54 @@ public class MapSystem
 
         }
     }
+
+    private void New_CreateSectorObjects(List<Vector2Int> positions, Vector2 dimensions, float size)
+    {
+        if (_config.sectorPrefab == null)
+        {
+            Debug.LogError("섹터 프리팹이 연결되지 않았습니다");
+            return;
+        }
+
+        // 프리팹의 실제 Sprite 크기 가져오기
+        SpriteRenderer prefabSR = _config.sectorPrefab.GetComponent<SpriteRenderer>();
+        if (prefabSR == null)
+        {
+            Debug.LogError("섹터 프리팹에 SpriteRenderer가 없습니다");
+            return;
+        }
+
+        Vector2 tileSize = prefabSR.bounds.size; // ⭐ 실제 월드 단위 크기
+        Vector3 centerPos = _rootTransform.position;
+
+        // 중심 보정값
+        float xOffset = (dimensions.x - 1) * 0.5f;
+        float yOffset = (dimensions.y - 1) * 0.5f;
+
+        for (int i = 0; i < _totalSectors; i++)
+        {
+            int sectorNum = i + 1;
+            Vector2Int gridPos = positions[i];
+
+            float x = centerPos.x + (gridPos.x - xOffset) * tileSize.x;
+            float y = centerPos.y + (gridPos.y - yOffset) * tileSize.y;
+
+            Vector3 worldPos = new Vector3(x, y, 0f);
+
+            GameObject sectorObj = UnityEngine.Object.Instantiate(
+                _config.sectorPrefab,
+                worldPos,
+                Quaternion.identity,
+                _rootTransform
+            );
+
+            sectorObj.name = $"Sector_{sectorNum}";
+
+            _sectors.Add(sectorNum, sectorObj);
+            SetSectorBaseColor(sectorNum, _config.normalColor);
+        }
+    }
+
     #endregion
 
     #region Grid Navigation Logic (이동 계산용)
@@ -235,6 +283,25 @@ public class MapSystem
     #endregion
 
     #region 외부 참조용 함수
+    /// <summary>
+    /// 전체 섹터들의 월드 좌표 리스트 반환
+    /// </summary>
+    public List<Vector3> GetSectorsPosition()
+    {
+        List <Vector3> result = new List<Vector3>();
+
+        for (int i = 0; i < _totalSectors; i++)
+        {
+            if (_sectors.TryGetValue(i + 1, out GameObject obj))
+            {
+                result.Add(obj.transform.position);
+            }
+        }
+ 
+        //Debug.LogWarning($"[MapSystem] 존재하지 않는 섹터 {sectorIndex}의 위치를 요청했습니다");
+        return result;
+    }
+
     public Vector3 GetSectorPosition(int sectorIndex)
     {
         if (_sectors.TryGetValue(sectorIndex, out GameObject obj))

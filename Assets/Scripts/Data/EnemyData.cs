@@ -18,6 +18,10 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private int _maxHP = 50;
 
+    [Header("적 프리펩")]
+    [SerializeField]
+    private GameObject _enemyPrefab;
+
     [Header("적 이미지")]
     [Tooltip("왼쪽 적 스프라이트")]
     [SerializeField]
@@ -42,6 +46,7 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private List<EnemyAbility> _enemyAbilities = new List<EnemyAbility>();
 
+    public GameObject EnemyPrefab => _enemyPrefab;
     public string Enemy_Name => _enemyName;
     public List<EnemyPattern> Patterns => _patterns;
     public int MaxHP => _maxHP;

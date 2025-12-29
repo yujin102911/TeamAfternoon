@@ -23,7 +23,12 @@ public class EnemyVisualController : MonoBehaviour
     public float textLifetime = 1.0f;
     public float floatUpSpeed = 1.0f;
 
+    // 적 애니메이터
+    private Animator _enemyAnimator;
+    private EnemyAttackEffect _enemyAttackEffect;
+
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
+    private List<RuntimeEnemy> _currentEnemies = new List<RuntimeEnemy>();
     private BattleSystem _battleSystem;
 
     private void Awake()
@@ -49,23 +54,40 @@ public class EnemyVisualController : MonoBehaviour
     private void CreateEnemies()
     {
         // 기존 적 제거
-        foreach (EnemyVisual visual  in _visualMap.Values)
+        //foreach (EnemyVisual visual  in _visualMap.Values)
+        //{
+        //    if (visual != null) Destroy(visual.gameObject);
+        //}
+        //_visualMap.Clear();
+
+        //foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
+        //{
+        //    GameObject obj = Instantiate(_enemyPrefab, _enemyContainer);
+        //    EnemyVisual visual = obj.GetComponent<EnemyVisual>();
+
+        //    if (visual != null)
+        //    {
+        //        visual.Initialize(enemy);
+        //        _visualMap.Add(enemy, visual);
+        //    }
+        //}
+
+        for (int i = _enemyContainer.childCount - 1; i >= 0; i--)
         {
-            if (visual != null) Destroy(visual.gameObject);
+            if (_enemyContainer.GetChild(i) != null) Destroy(_enemyContainer.GetChild(i).gameObject);
         }
-        _visualMap.Clear();
 
         foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
         {
-            GameObject obj = Instantiate(_enemyPrefab, _enemyContainer);
-            EnemyVisual visual = obj.GetComponent<EnemyVisual>();
+            GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyContainer);
+            _enemyAnimator = obj.GetComponent<Animator>();
+            _enemyAttackEffect = obj.GetComponent<EnemyAttackEffect>();
 
-            if (visual != null)
-            {
-                visual.Initialize(enemy);
-                _visualMap.Add(enemy, visual);
-            }
+            // 맵 전체 좌표정보 전달
+            if (GameManager.Instance.MapSystem != null)
+                _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
         }
+
         //AlignEnemies();
 
     }
@@ -118,13 +140,29 @@ public class EnemyVisualController : MonoBehaviour
 
     public void PlayDamage(int damage)
     {
+        if (_enemyAnimator != null)
+            _enemyAnimator.SetTrigger("Hurt");
+
         StartCoroutine(ShowEnemyDamage(damage));
+    }
+
+    public void PlayEnemyDie()
+    {
+        if (_enemyAnimator != null)
+            _enemyAnimator.SetTrigger("Die");
+    }
+
+    public void PlayEnemyAttack(List<int> targets)
+    {
+        if (_enemyAttackEffect != null)
+            _enemyAttackEffect.Set_targetSectors(targets);
+
+        if (_enemyAnimator != null)
+            _enemyAnimator.SetTrigger("Attack");
     }
 
     public IEnumerator ShowEnemyDamage(int damage)
     {
-        
-
         SpawnDamageText(damage);
 
         yield return new WaitForSeconds(blinkDuration);

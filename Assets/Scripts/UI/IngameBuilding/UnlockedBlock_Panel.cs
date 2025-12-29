@@ -77,8 +77,10 @@ public class UnlockedBlock_Panel : MonoBehaviour
         int ix = 0;
         foreach (RuntimeBlock block in deck)
         {
-
             GameObject go = Get();
+            go.transform.SetParent(_spawnPoint, false);
+            go.transform.SetSiblingIndex(ix);
+
             DeckBuilding_CellGroupUI uiBlock = go.GetComponent<DeckBuilding_CellGroupUI>();
             if (uiBlock != null) uiBlock.Init(block);
             ix++;

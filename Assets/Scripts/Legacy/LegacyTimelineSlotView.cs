@@ -106,11 +106,12 @@ public class LegacyTimelineSlotView : MonoBehaviour, ITimelineSlotView
         icon.enabled = true;
     }
 
-    public void SetHoverData(int tick, PlacedBlock block, bool isPrev)
+    public void SetHoverData(TimelineUI timeline, int tick, PlacedBlock block, bool isPrev)
     {
         var hover = GetComponent<PlayerSlotHover>();
         if (hover == null) hover = gameObject.AddComponent<PlayerSlotHover>();
 
+        hover.timelineUI = timeline;
         hover.tick = tick;
         hover.placedBlock = block;
         hover.Is_prev = isPrev;

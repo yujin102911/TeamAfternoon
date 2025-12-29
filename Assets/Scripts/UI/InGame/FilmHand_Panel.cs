@@ -79,8 +79,10 @@ public class FilmHand_Panel : MonoBehaviour
         int ix = 0;
         foreach (RuntimeBlock block in hand)
         {
-
             GameObject go = Get();
+            go.transform.SetParent(_spawnPoint, false);
+            go.transform.SetSiblingIndex(ix);
+
             FilmHand_UI uiBlock = go.GetComponent<FilmHand_UI>();
             if (uiBlock != null) uiBlock.Init(block);
             ix++;

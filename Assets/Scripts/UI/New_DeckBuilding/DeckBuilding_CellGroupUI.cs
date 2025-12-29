@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DeckBuilding_CellGroupUI : MonoBehaviour, IPointerClickHandler
+public class DeckBuilding_CellGroupUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public RuntimeBlock R_Block;
 
@@ -20,7 +20,10 @@ public class DeckBuilding_CellGroupUI : MonoBehaviour, IPointerClickHandler
 
     [SerializeField]
     private Image _image; // 선택 강조 이미지
-    private Color _highlightColor = new Color(1f, 1f, 0f, 0.5f); // 강조 색상 (노란색 반투명)
+    [SerializeField]
+    private Color _selectedColor; // 강조 색상
+    [SerializeField]
+    private Color _highlightColor; // 강조 색상
     private Color _originColor;
 
     public bool _isSelected = false; // 선택 상태
@@ -79,7 +82,7 @@ public class DeckBuilding_CellGroupUI : MonoBehaviour, IPointerClickHandler
         // 색변경
         if (_isSelected)
         {
-            _image.color = _highlightColor;
+            _image.color = _selectedColor;
         }
         else
         {
@@ -103,5 +106,19 @@ public class DeckBuilding_CellGroupUI : MonoBehaviour, IPointerClickHandler
             if(_cells[i] == null) continue;
             _cells[i].gameObject.SetActive(false);
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (_isSelected) return;
+
+        _image.color = _highlightColor;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (_isSelected) return;
+
+        _image.color = _originColor;
     }
 }
