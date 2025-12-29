@@ -183,7 +183,10 @@ public class IngameBuildingManager : MonoBehaviour
     {
         _handCountTxt.text = $"My Clip {hand.Count} / {_maxHandCount}";
 
-        
+        if (_buildingHand.Count == 0 && !_buildingPanel.activeSelf)
+        {
+            _bigOpenBtn.gameObject.SetActive(true);
+        }
     }
 
     private void UpdateGameStartButton(List<RuntimeBlock> hand)
