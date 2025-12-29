@@ -96,6 +96,19 @@ public class PlayerVisualController : MonoBehaviour
     }
 
     #region Visual Effects Methods - public
+
+    public void Play_PlayerIdle()
+    {
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Play");
+    }
+
+    public void Stop_PlayerIdle()
+    {
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Pause");
+    }
+
     public void PlayAttackShake()
     {
         if (_playerInstance == null) return;

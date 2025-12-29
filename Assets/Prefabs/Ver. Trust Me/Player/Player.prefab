@@ -100,7 +100,7 @@ Animator:
   m_GameObject: {fileID: 3490674458991014323}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 139a96c0e4063cd43a8516135a149928, type: 2}
+  m_Controller: {fileID: 9100000, guid: aa1e73f20c4e23c40a263d2d58e949a4, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -126,7 +126,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   swordAttackFX: {fileID: 5367672780290435749, guid: b261544ea64d94149912efd5f73f5e11, type: 3}
   bowAttackFX: {fileID: 8641082720682957754, guid: 3291518860887354f9c9fa4b1d3643cb, type: 3}
-  offset: {x: 4, y: 1.7, z: 0}
+  bowChargingFX: {fileID: 0}
+  attackOffset: {x: 0, y: 0, z: 0}
+  chargingOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &5579999250795413977
 GameObject:
   m_ObjectHideFlags: 0

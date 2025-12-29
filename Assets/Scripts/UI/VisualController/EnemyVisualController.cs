@@ -138,6 +138,18 @@ public class EnemyVisualController : MonoBehaviour
         }
     }
 
+    public void Play_EnemyIdle()
+    {
+        if (_enemyAnimator != null)
+            _enemyAnimator.SetTrigger("Play");
+    }
+
+    public void Stop_EnemyIdle()
+    {
+        if (_enemyAnimator != null)
+            _enemyAnimator.SetTrigger("Pause");
+    }
+
     public void PlayDamage(int damage)
     {
         if (_enemyAnimator != null)

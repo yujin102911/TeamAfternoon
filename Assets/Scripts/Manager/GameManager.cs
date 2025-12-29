@@ -438,6 +438,10 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
+            //idle 실행
+            _playerVisualController.Play_PlayerIdle();
+            _enemyVisualController.Play_EnemyIdle();
+
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
@@ -455,6 +459,10 @@ public class GameManager : MonoBehaviour
         }
         IsExecutingRound = false;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 종료 ====");
+
+        //idle 정지
+        _playerVisualController.Stop_PlayerIdle();
+        _enemyVisualController.Stop_EnemyIdle();
     }
     private void HandleRoundInterrupted()
     {
