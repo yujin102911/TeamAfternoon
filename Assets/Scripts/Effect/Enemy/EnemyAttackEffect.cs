@@ -7,6 +7,8 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     [Header("Effect")]
     public GameObject attackFxPrefab;
     [SerializeField] private int initialPoolSize = 10;
+    [SerializeField]
+    private Vector3 _offset = Vector3.zero;
 
     private readonly Queue<GameObject> _effectPool = new Queue<GameObject>();
 
@@ -42,7 +44,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
                 continue;
 
             GameObject fx = GetEffect();
-            fx.transform.position = _worldSectorPos[index - 1];
+            fx.transform.position = _worldSectorPos[index - 1] + _offset;
             fx.SetActive(true);
         }
     }
@@ -61,6 +63,12 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     private GameObject CreateNewEffect()
     {
         GameObject fx = Instantiate(attackFxPrefab, transform);
+        Vector3 parentScale = transform.lossyScale;
+        fx.transform.localScale = new Vector3(
+            fx.transform.localScale.x / parentScale.x,
+            fx.transform.localScale.y / parentScale.y,
+            fx.transform.localScale.z / parentScale.z
+        );
         var autoReturn = fx.GetComponent<EffectAutoReturn>();
         autoReturn.Init(this);
         return fx;
@@ -78,7 +86,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     public void ReturnEffect(GameObject fx)
     {
         fx.SetActive(false);
-        fx.transform.SetParent(transform);
+        fx.transform.SetParent(transform, true);
         _effectPool.Enqueue(fx);
     }
     #endregion
