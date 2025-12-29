@@ -24,6 +24,7 @@ public class MapSystem
 {
     private readonly MapConfiguration _config;
     private readonly Transform _rootTransform;
+    private const int HIGHLIGHT_ORDER = 5;
 
     private bool _isSelectionEnabled = false;
     private int _totalSectors;
@@ -33,6 +34,7 @@ public class MapSystem
 
     private Dictionary<int, GameObject> _sectors = new Dictionary<int, GameObject>();
     private Dictionary<int, Color> _sectorBaseColors = new Dictionary<int, Color>();
+    private Dictionary<int, int> _initialSortingOrders = new Dictionary<int, int>();
 
     public event Action<int> OnSectorSelected;
 
@@ -188,13 +190,19 @@ public class MapSystem
                 sectorObj.name = $"Sector_{sectorNum}";
                 sectorObj.transform.localScale = targetScale;
 
+                SpriteRenderer sr = sectorObj.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                    _initialSortingOrders[sectorNum] = sr.sortingOrder;
+
                 _sectors.Add(sectorNum, sectorObj);
                 SetSectorBaseColor(sectorNum, _config.normalColor);
+
             }
             else
             {
                 Debug.LogError("섹터 프리팹이 연결되지 않았습니다");
             }
+
         }
     }
     #endregion
@@ -263,24 +271,32 @@ public class MapSystem
     // 일시적인 색상으로 설정하는 함수(공격 이펙트, 마우스 오버 등)
     public void SetSectorTempColor(int sectorNum, Color color)
     {
-        UpdateSectorColor(sectorNum, color);
+        UpdateSectorColor(sectorNum, color, true);
     }
     // 일시적인 색상 지우는 함수
     public void ResetSectorColor(int sectorNum)
     {
-        if (_sectorBaseColors.TryGetValue(sectorNum, out Color baseColor))
-            UpdateSectorColor(sectorNum, baseColor);
-        else
             UpdateSectorColor(sectorNum, _config.normalColor);
     }
 
 
-    private void UpdateSectorColor(int sectorNum, Color color)
+    private void UpdateSectorColor(int sectorNum, Color color, bool isHighlight = false)
     {
         if (_sectors.TryGetValue(sectorNum, out GameObject obj))
         {
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-            if (sr != null) sr.color = color;
+            if (sr != null)
+            {
+                sr.color = color;
+                if (isHighlight)
+                {
+                    sr.sortingOrder = HIGHLIGHT_ORDER;
+                }
+                else if (_initialSortingOrders.TryGetValue(sectorNum, out int originalOrder))
+                {
+                    sr.sortingOrder = originalOrder;
+                }
+            }
         }
     }
 
@@ -375,15 +391,4 @@ public class MapSystem
         }
     }
     #endregion
-    public void SetSectorText(int sectorNum, string text)
-    {
-        if (_sectors.TryGetValue(sectorNum, out GameObject obj))
-        {
-            var handler = obj.GetComponent<MapSectorHandler>();
-            if (handler != null)
-            {
-                handler.UpdateText(text);
-            }
-        }
-    }
 }

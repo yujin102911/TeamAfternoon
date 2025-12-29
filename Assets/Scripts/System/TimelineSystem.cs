@@ -33,9 +33,19 @@ public class TimelineSystem
     public event Action<int> OnMeleeAttackRequested;
 
     /// <summary>
-    /// 정화 요청 이벤트 (방향)
+    /// 원거리 공격 요청 이벤트 (데미지)
     /// </summary>
     public event Action<int> OnLongRangeAttackRequested;
+
+    /// <summary>
+    /// 원거리 공격 시작 이벤트 (활 차징 애니매이션 재생)
+    /// </summary>
+    public event Action OnLongRangeAttackStarted;
+
+    /// <summary>
+    /// 원거리 공격 차징 중 이벤트 (2번째)
+    /// </summary>
+    public event Action OnLongRangeAttacking;
 
     /// <summary>
     /// 이동 요청 이벤트 (방향)
@@ -327,17 +337,24 @@ public class TimelineSystem
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
                 OnMoveRequested?.Invoke(dir);
                 break;
-
-            case ActionType.Cure:
-                int cure_power = runtimeBlock.BaseData.CalCulate_CurePower(cardTickIndex);
+            case ActionType.Bow_single:
+            case ActionType.Bow_start:
+                int bow_power = 0;
 
                 if (TimelineManager.Instance.Is_POC)
                 {
-                    cure_power = blockData.AttackDamage;
+                    bow_power = blockData.AttackDamage;
                 }
-                Debug.Log($"블럭내 {cardTickIndex}번째의 정화 액션 발동!! - 정화량: {cure_power}");
+                Debug.Log($"블럭내 {cardTickIndex}번째의 원거리 공격 액션 발동!! - 딜량: {bow_power}");
+                OnLongRangeAttackRequested?.Invoke(bow_power);
+                break;
 
-                OnLongRangeAttackRequested?.Invoke(cure_power);
+            case ActionType.Bow_end:
+                OnLongRangeAttackStarted?.Invoke();
+                break;
+
+            case ActionType.Bow_middle:
+                OnLongRangeAttacking?.Invoke();
                 break;
 
             case ActionType.None:
