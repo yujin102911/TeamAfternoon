@@ -76,7 +76,10 @@ public class BattleUIManager : MonoBehaviour
         bool interactable = !isRoundRunning && isSectorSelected && !isGameOver && !isSequencePlaying;
 
         _startButton.interactable = interactable;
-
+        if (GameManager.Instance.MapSystem != null)
+        {
+            GameManager.Instance.MapSystem.SetAllSectorsVisibility(interactable);
+        }
     }
 
     private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
