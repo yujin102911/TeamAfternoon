@@ -52,16 +52,14 @@ public class PlayerVisualController : MonoBehaviour
     /// 이벤트 구독용 함수
     /// OnMove이벤트가 발행될때마다 호출됨
     /// </summary>
-    public void OnPlayerMoved(int sectorIndex)
+    public void OnPlayerMoved(int sectorIndex, MoveDirection direction)
     {
-        
-
         if (_mapSystem != null)
         {
             Transform targetTransform = _mapSystem.GetSectorTransform(sectorIndex);
             if (targetTransform != null)
             {
-                MoveTo(targetTransform);
+                MoveTo(targetTransform, direction);
             }
         }
     }
@@ -244,18 +242,21 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 내부 이동 함수
     /// </summary>
-    private void MoveTo(Transform targetSector)
+    private void MoveTo(Transform targetSector, MoveDirection direction)
     {
         if (_playerInstance == null) return;
         if (_moveCoroutine != null)
             StopCoroutine(_moveCoroutine);
-        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector));
+        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction));
     }
 
-    private IEnumerator MoveRoutine(Transform targetSector)
+    private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction)
     {
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Run");
+
+        if (_playerRenderer != null)
+            _playerRenderer.flipX = (direction == MoveDirection.Back);
 
         _playerInstance.transform.SetParent(null);
 
@@ -280,6 +281,9 @@ public class PlayerVisualController : MonoBehaviour
         _playerInstance.transform.SetParent(targetSector);
 
         _playerInstance.transform.localPosition = new Vector3(0, _yOffset, 0);
+
+        if (_playerRenderer != null)
+            _playerRenderer.flipX = false;
 
         _moveCoroutine = null;
 
