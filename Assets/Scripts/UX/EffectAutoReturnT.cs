@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EffectAutoReturn<T> : MonoBehaviour
-    where T : class, IEffectPoolOwner
+public class EffectAutoReturn : MonoBehaviour
 {
-    private T _owner;
+    private IEffectPoolOwner _owner;
     private float _lifeTime;
 
-    public void Init(T owner)
+    public void Init(IEffectPoolOwner owner)
     {
         _owner = owner;
     }
