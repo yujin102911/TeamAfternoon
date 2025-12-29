@@ -77,6 +77,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnBlockStarted += HandleBlockStarted;
         _timelineSystem.OnBlockEnded += HandleBlockEnded;
         _timelineSystem.OnBlockTick += HandleBlockTick;
+        _timelineSystem.OnLongRangeAttackStarted += HandleLongRangeAttack_Start;
     }
 
     void OnDestroy()
@@ -90,6 +91,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnBlockStarted -= HandleBlockStarted;
             _timelineSystem.OnBlockEnded -= HandleBlockEnded;
             _timelineSystem.OnBlockTick -= HandleBlockTick;
+            _timelineSystem.OnLongRangeAttackStarted -= HandleLongRangeAttack_Start;
         }
     }
 
@@ -104,6 +106,11 @@ public class TimelineManager : MonoBehaviour
     private void HandleLongRangeAttackRequest(int power)
     {
         _battleSystem.LongRangeAttack(power);
+    }
+
+    private void HandleLongRangeAttack_Start()
+    {
+        _battleSystem.LongRangeAttack_Start();
     }
 
     private void HandleMoveRequest(MoveDirection direction)

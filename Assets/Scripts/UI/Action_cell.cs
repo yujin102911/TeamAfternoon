@@ -105,6 +105,7 @@ public class Action_cell : MonoBehaviour
                 _damageText.text = "";
                 break;
 
+            case ActionType.Bow_single:
             case ActionType.Cure:
                 _backImage.sprite = Bow_back;
                 _actionIcon.sprite = Bow_startIcon;

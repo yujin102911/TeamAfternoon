@@ -60,6 +60,7 @@ public class Description_Cell : MonoBehaviour
                 _descriptionText.text = "지정한 방향으로 1칸 이동합니다.";
                 break;
 
+            case ActionType.Bow_single:
             case ActionType.Bow_start:
                 _colorBack.sprite = Bow_back;
                 _icon.sprite = Bow_startIcon;
