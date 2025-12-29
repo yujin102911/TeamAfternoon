@@ -105,7 +105,7 @@ public class MapSystem
             }
         }
         Vector2 dimensions = new Vector2(_columns, _rows);
-        New_CreateSectorObjects(gridPositions, dimensions, currentSectorSize);
+        CreateSectorObjects(gridPositions, dimensions, currentSectorSize);
         Debug.Log($"[MapSystem] 맵 생성 완료: {mapSize} ({_totalSectors} 섹터)");
     }
 
