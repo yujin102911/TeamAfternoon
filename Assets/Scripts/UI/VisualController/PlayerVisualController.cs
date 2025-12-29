@@ -125,8 +125,8 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_playerInstance == null) return;
 
-        if (_playerAnimator != null) ;
-            //_playerAnimator.SetTrigger("Attack_Sword");
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Attack_Sword");
     }
 
     public void PlayBowCharging()
