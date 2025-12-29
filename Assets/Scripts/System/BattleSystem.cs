@@ -39,7 +39,7 @@ public class BattleSystem
     public event Action<int> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
-    public event Action<int> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
+    public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
     public event Action<List<int>> OnEnemyAttackSuccess; // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
 
     public event Action OnBattleInitialized;
@@ -155,7 +155,7 @@ public class BattleSystem
         {
             _playerCurrentSector = sector;
             Debug.LogWarning("[BattleSystem] 맵 크기(_totalSectors)가 0입니다! 초기화 순서를 확인하세요.");
-            OnPlayerMoved?.Invoke(_playerCurrentSector);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, MoveDirection.None);
             return;
         }   
         int targetSector = sector;
@@ -208,7 +208,7 @@ public class BattleSystem
             if (prevSector != _playerCurrentSector)
             {
                 Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
-                OnPlayerMoved?.Invoke(_playerCurrentSector);
+                OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection);
             }
         }
         else
