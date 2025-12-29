@@ -500,4 +500,10 @@ public class BattleSequenceController : MonoBehaviour
 
         return sprites[index];
     }
+
+    public void StopSlider()
+    {
+        if (_timelineSlider != null)
+            _timelineSlider.Stop();
+    }
 }

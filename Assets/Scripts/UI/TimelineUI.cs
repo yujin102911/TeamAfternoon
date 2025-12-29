@@ -96,7 +96,7 @@ public class TimelineUI : MonoBehaviour
     // events
     public event Action<List<int>> OnRequestHighlight;
     public event Action OnRequestClearHighlight;
-    public event Action<int> OnRequestPreviewPlayer;
+    public event Action<int, ActionType> OnRequestPreviewPlayer;
     public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
@@ -532,21 +532,37 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
+            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+            ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
+
+            ActionType previewAction = ActionType.None;
 
             if (tick % 2 == 1)
             {
-                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
-                OnRequestPreviewPlayer?.Invoke(predictedSector);
+                previewAction = action;
             }
             else
             {
-                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
-                OnRequestPreviewPlayer?.Invoke(predictedSector);
+                if (action == ActionType.Bow_middle || action == ActionType.Bow_end)
+                {
+                    previewAction = ActionType.Bow_middle;
+                }
+                else
+                {
+                    previewAction = ActionType.None;
+                }
 
+            }
+
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+
+            if (tick % 2 == 0) // 적 공격 범위 표시
+            {
                 List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
                 if (attackSectors != null && attackSectors.Count > 0)
                     OnRequestHighlight?.Invoke(attackSectors);
-            }      
+            }
+
         }
     }
 
@@ -566,17 +582,32 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
+            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
+            ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
+
+            ActionType previewAction = ActionType.None;
 
             if (tick % 2 == 1)
             {
-                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
-                OnRequestPreviewPlayer?.Invoke(predictedSector);
+                previewAction = action;
             }
             else
             {
-                int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
-                OnRequestPreviewPlayer?.Invoke(predictedSector);
+                if (action == ActionType.Bow_middle || action == ActionType.Bow_end)
+                {
+                    previewAction = ActionType.Bow_middle;
+                }
+                else
+                {
+                    previewAction = ActionType.None;
+                }
 
+            }
+
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+
+            if (tick % 2 == 0) // 적 공격 범위 표시
+            {
                 List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
                 if (attackSectors != null && attackSectors.Count > 0)
                     OnRequestHighlight?.Invoke(attackSectors);

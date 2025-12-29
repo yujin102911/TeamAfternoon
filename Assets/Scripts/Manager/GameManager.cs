@@ -509,6 +509,10 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _isBattleEnded = true;
         IsExecutingRound = false;
+        if (_battleSequenceController != null)
+        {
+            _battleSequenceController.StopSlider();
+        }
         int _leftPlayerHP = _battleSystem.PlayerHP;
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
 
