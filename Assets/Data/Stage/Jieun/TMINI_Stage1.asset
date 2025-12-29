@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 468bc3f59cbecd1498629b756e3da6cd, type: 3}
+  m_Name: TMINI_Stage1
+  m_EditorClassIdentifier: 
+  _stageNumber: 1
+  _stageName: "<size=34>\uC624\uC988\uC758 \uB9C8\uBC95\uC0AC</size>\n<size=22>The
+    Wonderful Wizard of Oz</size>\n<size=16>by L. Frank Baum</size>"
+  _requestLetter: " \uC800\uB294 \uB9D0 \uC798.. \uBABB\uD574\uC694\n \uAE00\uC528\uB3C4
+    \uC798.. \uBABB\uC368\uC624..\n\uADFC\uB370\uC800\uB294 \uB9E4\uC77C\uBD10\uC694\n
+    <b><color=black>\uC6B8\uACE0\uC787\uB294 \uB3C4\uB85C\uC2DC</b></color>\uB97C\uC624\n\uC774\uC9D1\uC5D0\uC11C\uB294
+    \uB3C4\uB85C\uC2DC\uAC00 \uC5C5\uC11C\uC838\uB3C4 \uC544\uBB34\uB3C4 \uC548\uCC3E\uC544\uC694\n
+    \uB3C4\uB77C\uC640\uB3C4 \uC544\uBB34\uB3C4 \uBC18\uAC00\uC6CC\uC548\uD574\uC624\n\uB3C4\uB85C\uC2DC\uB294
+    \uB3C4\uB9DD\uCCD0\uC368\uC694\n \uADFC\uB370\uB3C4 \uB2E4\uC2DC \uC774\uC9D1\uC73C\uB85C
+    \uBCF4\uB124\uC838\uC368\uC694\n\uADF8\uB2E4\uC74C\uBD80\uD134 \uB3C4\uB85C\uC2DC\uB294
+    \uC804\uD600 \uC6C3\uC9C8\uC548\uD574\uC624\n \uADF8\uB0E5.. \uAC00\uB9CC\uC774
+    \uC787\uC5B4\uC694\n\uC0AC\uC11C\uB2D8\n \uC774\uC138\uC0C1\uC5D0\uC11C <b><color=black>\uB3C4\uB85C\uC2DC\uB294
+    \uD589\uBCF5\uD574\uC9C8\uC218 \uC5C5\uC368</b></color>\uC694\n\uBD80\uD0C1\uC774\uC5D0\uC624\n
+    \uB3C4\uB85C\uC2DC\uAC00 \uC870\uAE08\uC774\uB77C\uB3C4 \uD589\uBCF5\uD574\uC9C8\uC218
+    \uC787\uAC8C\n \uB3C4\uC640\uC8FC\uC0C8\uC694..\n\n<align=\"right\">\uD1A0\uD1A0\uAC00</align>"
+  _sender: '@inailedit.com'
+  _receiver: '@clearrun.fake'
+  _mapSize: 3
+  _sectorTransform:
+  - {x: -1, y: -0.3, z: 0}
+  - {x: 1, y: -0.3, z: 0}
+  - {x: 3, y: -0.3, z: 0}
+  - {x: 5, y: -0.3, z: 0}
+  _enemySpawns:
+  - enemyData: {fileID: 11400000, guid: 6dbb4961a0d394849bc0a90983068186, type: 2}
+    hitSectors: 010000000200000003000000040000000500000006000000070000000800000009000000
+  - enemyData: {fileID: 11400000, guid: 02793d5fb1f0c5844a388e8fe787b62e, type: 2}
+    hitSectors: 010000000200000003000000040000000500000006000000070000000800000009000000
+  - enemyData: {fileID: 11400000, guid: 8a4f93d2c3d758445aaf321f92eaa7a9, type: 2}
+    hitSectors: 0100000002000000030000000400000005000000060000000700000008000000
+  - enemyData: {fileID: 11400000, guid: 477e66d0a4eedf24a9fcfc102a4b836b, type: 2}
+    hitSectors: 0100000002000000030000000400000005000000060000000700000008000000
+  _playerMaxHP: 20
+  _isCleared: 1
+  _isRead: 0
