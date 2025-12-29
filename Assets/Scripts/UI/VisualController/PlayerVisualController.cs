@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -7,6 +8,13 @@ using UnityEngine;
 /// </summary>
 public class PlayerVisualController : MonoBehaviour
 {
+    [System.Serializable]
+    public struct ActionPreviewMapping
+    {
+        public ActionType action;
+        public Sprite visualSprite;
+    }
+
     [Header("설정")]
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private float _moveDuration = 0.35f;
@@ -16,7 +24,8 @@ public class PlayerVisualController : MonoBehaviour
     [Header("프리뷰 설정")]
     [SerializeField] private GameObject _playerGhostPrefab;
     [SerializeField] private float _ghostYOffset = 0.8f;
-
+    [SerializeField] private List<ActionPreviewMapping> _previewMappings;
+ 
     [Header("연출 설정")]
     [SerializeField] private float _hitFlashDuration = 0.2f;
     [SerializeField] private Color _hitColor = Color.red;
@@ -211,7 +220,7 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 고스트 위치 표시
     /// </summary>
-    public void ShowPlayerPreview(int sectorIndex)
+    public void ShowPlayerPreview(int sectorIndex, ActionType action)
     {
         if (_mapSystem == null || sectorIndex <= 0)
         {
@@ -228,6 +237,59 @@ public class PlayerVisualController : MonoBehaviour
             targetPos += _offset;
             _currentGhost.transform.position = targetPos;
             _currentGhost.SetActive(true);
+            if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
+            {
+                int playerSector = GameManager.Instance.BattleSystem.PlayerCurrentSector;
+                int playerOrder = _playerRenderer != null ? _playerRenderer.sortingOrder : 10; // 기본값 10
+
+                SpriteRenderer ghostSR = _currentGhost.GetComponentInChildren<SpriteRenderer>();
+                if (ghostSR == null) ghostSR = _currentGhost.GetComponent<SpriteRenderer>();
+
+                if (ghostSR != null)
+                {
+                    // 섹터 번호가 플레이어보다 작으면 플레이어 뒤로 (-1)
+                    // 섹터 번호가 플레이어와 같거나 크면 플레이어 앞으로 (+1)
+                    if (sectorIndex < playerSector)
+                    {
+                        ghostSR.sortingOrder = playerOrder - 1;
+                    }
+                    else
+                    {
+                        ghostSR.sortingOrder = playerOrder + 1;
+                    }
+                }
+            }
+            UpdateGhostVisual(action);
+        }
+    }
+    private void UpdateGhostVisual(ActionType currentAction)
+    {
+        Sprite targetSprite = null;
+        foreach (ActionPreviewMapping mapping in _previewMappings)
+        {
+            if (mapping.action == currentAction)
+            {
+                targetSprite = mapping.visualSprite;
+                break;
+            }
+        }
+        if (_currentGhost != null)
+        {
+            SpriteRenderer ghostSR = _currentGhost.GetComponentInChildren<SpriteRenderer>();
+            if (ghostSR == null) ghostSR = _currentGhost.GetComponent<SpriteRenderer>();
+
+            if (ghostSR != null)
+            {
+                if (targetSprite != null)
+                {
+                    ghostSR.sprite = targetSprite;
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerVisualController] {currentAction}에 해당하는 프리뷰 스프라이트가 없습니다.");
+                }
+            }
+
         }
     }
     /// <summary>
