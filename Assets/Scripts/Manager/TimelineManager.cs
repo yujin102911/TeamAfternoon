@@ -18,6 +18,9 @@ public class TimelineManager : MonoBehaviour
     public bool Is_One = false;
     public int POC_Damage = 4;
 
+    [Header("타임 스케일")]
+    public float timeScale = 0.5f;
+
     [Header("정화 온오프")]
     public bool Is_Cure = false;
 
@@ -286,8 +289,9 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public IEnumerator ExecuteTimeline()
     {
-        float startTime = Time.time;   // 시작 시간 기록
-
+        float startTime = Time.unscaledTime;   // 시작 시간 기록
+        // 늦추기
+        Time.timeScale = timeScale;
         Debug.Log("[TimelineDirector] 타임라인 실행 시작");
 
         // 라운드 시작 키워드 호출
@@ -366,8 +370,9 @@ public class TimelineManager : MonoBehaviour
             }
         }
 
-        float elapsed = Time.time - startTime;   // 총 실행 시간
+        float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
+        Time.timeScale = 1f;
     }
 
     /// <summary>
