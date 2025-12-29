@@ -489,6 +489,17 @@ public class TimelineManager : MonoBehaviour
         return sectors;
     }
 
+    public ActionType GetActionAtTick(int targetTick)
+    {
+        PlacedBlock placed = _timelineSystem.FindFirstAction(targetTick);
+        if (placed != null)
+        {
+            int cardIndex = placed.GetCardTickIndex(targetTick);
+            return placed.GetBlockData().GetEffectAt(cardIndex);
+        }
+        return ActionType.None;
+    }
+
     public List<int> GetProjectedDangerTicks()
     {
         List<int> dangerTicks = new List<int>();
