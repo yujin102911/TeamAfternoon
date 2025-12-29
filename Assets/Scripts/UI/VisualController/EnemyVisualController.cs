@@ -123,8 +123,6 @@ public class EnemyVisualController : MonoBehaviour
 
     public IEnumerator ShowEnemyDamage(int damage)
     {
-        
-
         SpawnDamageText(damage);
 
         yield return new WaitForSeconds(blinkDuration);

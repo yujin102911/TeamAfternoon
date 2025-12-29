@@ -35,6 +35,9 @@ public class PlayerVisualController : MonoBehaviour
     private Coroutine _moveCoroutine;
     private MapSystem _mapSystem;
 
+    // 플레이어 애니메이터
+    private Animator _playerAnimator;
+
     public Transform CurrentPlayerTransform => _playerInstance != null ? _playerInstance.transform : null;
 
     /// <summary>
@@ -51,6 +54,8 @@ public class PlayerVisualController : MonoBehaviour
     /// </summary>
     public void OnPlayerMoved(int sectorIndex)
     {
+        
+
         if (_mapSystem != null)
         {
             Transform targetTransform = _mapSystem.GetSectorTransform(sectorIndex);
@@ -81,6 +86,8 @@ public class PlayerVisualController : MonoBehaviour
                 _playerInstance = Instantiate(_playerPrefab, targetPos, Quaternion.identity);
                 _playerInstance.transform.SetParent(sectorTr);
 
+                _playerAnimator = _playerInstance.GetComponentInChildren<Animator>();
+
                 _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
                 if (_playerRenderer == null) _playerRenderer = _playerInstance.GetComponent<SpriteRenderer>();
 
@@ -99,22 +106,54 @@ public class PlayerVisualController : MonoBehaviour
 
     public void PlayAttackEffect()
     {
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Attack_Sword");
+
         //트레일 렌더러 코드    
-        if (trailEffectPrefab != null)
-        {
-            GameObject newTrail = Instantiate(
-                trailEffectPrefab,
-                Vector3.zero,
-                Quaternion.identity
-            );
-        }
+        //if (trailEffectPrefab != null)
+        //{
+        //    GameObject newTrail = Instantiate(
+        //        trailEffectPrefab,
+        //        Vector3.zero,
+        //        Quaternion.identity
+        //    );
+        //}
         
+    }
+
+    public void PlaySwordAttack()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null) ;
+            //_playerAnimator.SetTrigger("Attack_Sword");
+    }
+
+    public void PlayBowCharging()
+    {
+        if (_playerInstance == null) return;
+    }
+
+    public void PlayBowAttack()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Attack_Bow");
     }
 
     public void PlayHitEffect()
     {
         if (_playerRenderer == null) return;
-        StartCoroutine(HitFlashRoutine());
+        
+        if (_playerAnimator != null)
+        {
+            _playerAnimator.SetTrigger("Hurt");
+        }
+        else
+        {
+            StartCoroutine(HitFlashRoutine());
+        }
     }
 
     public void PlayCureShake()
@@ -215,6 +254,9 @@ public class PlayerVisualController : MonoBehaviour
 
     private IEnumerator MoveRoutine(Transform targetSector)
     {
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Run");
+
         _playerInstance.transform.SetParent(null);
 
         Vector3 startPosition = _playerInstance.transform.position;
@@ -240,6 +282,9 @@ public class PlayerVisualController : MonoBehaviour
         _playerInstance.transform.localPosition = new Vector3(0, _yOffset, 0);
 
         _moveCoroutine = null;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Run_Stop");
     }
     #endregion
 

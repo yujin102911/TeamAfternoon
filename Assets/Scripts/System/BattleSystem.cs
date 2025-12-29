@@ -169,7 +169,7 @@ public class BattleSystem
         }
         _playerCurrentSector = targetSector;
         Debug.Log($"[BattleSystem] 플레이어 시작 위치 갱신됨: {_playerCurrentSector}");
-        OnPlayerMoved?.Invoke(_playerCurrentSector);
+        //OnPlayerMoved?.Invoke(_playerCurrentSector);
     }
 
     public void MovePlayer(MoveDirection moveDirection) 

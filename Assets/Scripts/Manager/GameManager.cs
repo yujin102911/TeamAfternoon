@@ -214,8 +214,8 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerMoved += _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit += _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerMeleeAttack += _playerVisualController.PlayAttackShake;
-            _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerMeleeAttack += _playerVisualController.PlaySwordAttack;
+            _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
@@ -246,8 +246,8 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerMoved -= _playerVisualController.OnPlayerMoved;
             _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
-            _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlayAttackShake;
-            _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayCureShake;
+            _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlaySwordAttack;
+            _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
