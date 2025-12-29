@@ -10,7 +10,8 @@ public class PlayerVisualController : MonoBehaviour
     [Header("설정")]
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private float _moveDuration = 0.35f;
-    [SerializeField] private float _yOffset = 0.8f;
+    [SerializeField]
+    private Vector3 _offset = Vector3.zero;
 
     [Header("프리뷰 설정")]
     [SerializeField] private GameObject _playerGhostPrefab;
@@ -75,7 +76,7 @@ public class PlayerVisualController : MonoBehaviour
             Transform sectorTr = _mapSystem.GetSectorTransform(sectorIndex);
             if (sectorTr == null) return;
 
-            Vector3 targetPos = sectorTr.position + new Vector3(0, _yOffset, 0);
+            Vector3 targetPos = sectorTr.position + _offset;
             if (_playerInstance != null)
                 Destroy(_playerInstance);
 
@@ -223,7 +224,8 @@ public class PlayerVisualController : MonoBehaviour
         if (_currentGhost != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
-            targetPos.y += _ghostYOffset;
+            //targetPos.y += _ghostYOffset;
+            targetPos += _offset;
             _currentGhost.transform.position = targetPos;
             _currentGhost.SetActive(true);
         }
@@ -271,7 +273,7 @@ public class PlayerVisualController : MonoBehaviour
             // 0 ~ 1 사이의 진행률(t) 계산
             float t = elapsedTime / _moveDuration;
 
-            Vector3 currentDestPos = targetSector.position + new Vector3(0, _yOffset, 0);
+            Vector3 currentDestPos = targetSector.position + _offset;
 
             _playerInstance.transform.position = Vector3.Lerp(startPosition, currentDestPos, t);
             yield return null;
@@ -280,7 +282,7 @@ public class PlayerVisualController : MonoBehaviour
         // 시간 끝나면 목표 지점에 정확히 안착
         _playerInstance.transform.SetParent(targetSector);
 
-        _playerInstance.transform.localPosition = new Vector3(0, _yOffset, 0);
+        _playerInstance.transform.localPosition = _offset;
 
         if (_playerRenderer != null)
             _playerRenderer.flipX = false;
