@@ -219,6 +219,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMeleeAttack += _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
+            _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
@@ -252,6 +253,8 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerHit -= _playerVisualController.PlayHitEffect;
             _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
+            _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
+
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
@@ -438,6 +441,10 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
+            //idle 실행
+            _playerVisualController.Play_PlayerIdle();
+            _enemyVisualController.Play_EnemyIdle();
+
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
@@ -455,6 +462,10 @@ public class GameManager : MonoBehaviour
         }
         IsExecutingRound = false;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 종료 ====");
+
+        //idle 정지
+        _playerVisualController.Stop_PlayerIdle();
+        _enemyVisualController.Stop_EnemyIdle();
     }
     private void HandleRoundInterrupted()
     {
@@ -501,6 +512,11 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _isBattleEnded = true;
         IsExecutingRound = false;
+
+        //idle 정지
+        _playerVisualController.Stop_PlayerIdle();
+        _enemyVisualController.Stop_EnemyIdle();
+
         if (_battleSequenceController != null)
         {
             _battleSequenceController.StopSlider();

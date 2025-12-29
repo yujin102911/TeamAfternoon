@@ -4,6 +4,7 @@ using TMPro;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 using VInspector.Libs;
 
 public class IngameBuildingManager : MonoBehaviour
@@ -181,11 +182,24 @@ public class IngameBuildingManager : MonoBehaviour
     private void Update_HandTxt(List<RuntimeBlock> hand)
     {
         _handCountTxt.text = $"My Clip {hand.Count} / {_maxHandCount}";
+
+        if (_buildingHand.Count == 0 && !_buildingPanel.activeSelf)
+        {
+            _bigOpenBtn.gameObject.SetActive(true);
+        }
     }
 
     private void UpdateGameStartButton(List<RuntimeBlock> hand)
     {
         _gameStartBtn.gameObject.SetActive(hand.Count > 0);
+    }
+
+    public void Check_handCount()
+    {
+        if (_buildingHand.Count == 0)
+        {
+            _bigOpenBtn.gameObject.SetActive(true);
+        }
     }
 
 
@@ -201,7 +215,8 @@ public class IngameBuildingManager : MonoBehaviour
     private void OnClicked_SmallOpen()
     {
         _buildingPanel.SetActive(true);
-        
+        _bigOpenBtn.gameObject.SetActive(false);
+
         OnBuildingDeckChanged?.Invoke(_buildingDeck);
     }
 

@@ -32,6 +32,7 @@ public class BattleSystem
 
     public event Action OnPlayerMeleeAttack; // 근접 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeAttack; // 원거리 공격시 발행되는 이벤트
+    public event Action OnPlayerLongRangeStart; // 원거리 공격시 발행되는 이벤트
 
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
@@ -117,6 +118,11 @@ public class BattleSystem
         OnPlayerLongRangeAttack?.Invoke();
         DamageEnemy(damage );
         OnEnemyHit?.Invoke(damage);
+    }
+
+    public void LongRangeAttack_Start()
+    {
+        OnPlayerLongRangeStart?.Invoke();
     }
 
     private void DamageEnemy(int amount)

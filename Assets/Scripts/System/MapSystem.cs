@@ -407,7 +407,7 @@ public class MapSystem
             Renderer[] renderers = obj.GetComponentsInChildren<Renderer>(true);
             foreach (var r in renderers)
             {
-                if (r.CompareTag("Player")) continue;
+                if (r.CompareTag("Player") || r.CompareTag("Effect")) continue;
                 r.enabled = isVisible;
             }
         }
