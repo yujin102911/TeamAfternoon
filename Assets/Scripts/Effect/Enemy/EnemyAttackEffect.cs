@@ -61,7 +61,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     private GameObject CreateNewEffect()
     {
         GameObject fx = Instantiate(attackFxPrefab, transform);
-        var autoReturn = fx.GetComponent<EffectAutoReturn<EnemyAttackEffect>>();
+        var autoReturn = fx.GetComponent<EffectAutoReturn>();
         autoReturn.Init(this);
         return fx;
     }
