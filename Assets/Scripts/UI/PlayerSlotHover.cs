@@ -114,10 +114,21 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
             {
                 if (TimelineManager.Instance != null)
                 {
-                    TimelineManager.Instance.ToggleBlockDirection(placedBlock, tick);
+                    TimelineManager.Instance.ToggleBlockDirectionForMove(placedBlock, tick);
                     if (timelineUI != null)
                     {
                         timelineUI.ShowPlayerCardTooltip(tick, placedBlock, transform.position, Is_prev);
+                    }
+                }
+            }
+            if (data.GetEffectAt(index) == ActionType.Jump)
+            {
+                if (TimelineManager.Instance != null)
+                {
+                    TimelineManager.Instance.ToggleBlockDirectionForJump(placedBlock, tick);
+                    if (timelineUI != null)
+                    {
+                        timelineUI.ShowPlayerCardTooltip(tick,placedBlock, transform.position, Is_prev);
                     }
                 }
             }

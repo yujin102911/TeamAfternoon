@@ -60,9 +60,4 @@ public class PlacedBlock
         return GetBlockData().moveDirections[index];
     }
 
-    public void ToggleDirection(int tick)
-    {
-        int index = tick - startTick;
-        linkedRuntimeBlock?.ToggleDirections(index);
-    }
 }

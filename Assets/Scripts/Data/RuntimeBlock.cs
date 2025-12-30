@@ -55,7 +55,7 @@ public class RuntimeBlock
             CurrentMoveDirections = (MoveDirection[])BaseData.MoveDirections.Clone();
     }
 
-    public void ToggleDirections(int index)
+    public void ToggleDirectionsForMove(int index)
     {
         if (CurrentMoveDirections == null || index < 0 || index >= CurrentMoveDirections.Length) return;
 
@@ -75,6 +75,25 @@ public class RuntimeBlock
                 break;
             default:
                 CurrentMoveDirections[index] = MoveDirection.Front;
+                break;
+        }
+    }
+    public void ToggleDirectionsForJump(int index)
+    {
+        if (CurrentMoveDirections == null || index < 0 || index >= CurrentMoveDirections.Length) return;
+
+        switch (CurrentMoveDirections[index])
+        {
+            case MoveDirection.DiagonalLu:
+                CurrentMoveDirections[index] = MoveDirection.DiagonalRu; break;
+            case MoveDirection.DiagonalRu:
+                CurrentMoveDirections[index] = MoveDirection.DiagonalRd; break;
+            case MoveDirection.DiagonalRd:
+                CurrentMoveDirections[index] = MoveDirection.DiagonalLd; break;
+            case MoveDirection.DiagonalLd:
+                CurrentMoveDirections[index] = MoveDirection.DiagonalLu; break;
+            default:
+                CurrentMoveDirections[index] = MoveDirection.DiagonalLu;
                 break;
         }
     }

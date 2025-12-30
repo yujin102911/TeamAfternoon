@@ -282,13 +282,20 @@ public class TimelineManager : MonoBehaviour
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
         }
     }
-    public void ToggleBlockDirection(PlacedBlock placedBlock, int tick)
+    public void ToggleBlockDirectionForMove(PlacedBlock placedBlock, int tick)
     {
         if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
         int index = tick - placedBlock.startTick;
-        placedBlock.linkedRuntimeBlock.ToggleDirections(index);
+        placedBlock.linkedRuntimeBlock.ToggleDirectionsForMove(index);
         Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+    public void ToggleBlockDirectionForJump(PlacedBlock placedBlock, int tick)
+    {
+        if (placedBlock == null || placedBlock.linkedRuntimeBlock == null) return;
+        int index = tick - placedBlock.startTick;
+        placedBlock.linkedRuntimeBlock.ToggleDirectionsForJump(index);
+        Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
     }
 
     /// <summary>
@@ -453,7 +460,7 @@ public class TimelineManager : MonoBehaviour
                 BlockData data = placed.GetBlockData();
 
                 // 이동 액션일 경우 시뮬레이션
-                if (data.GetEffectAt(cardIndex) == ActionType.Move)
+                if (data.GetEffectAt(cardIndex) == ActionType.Move || data.GetEffectAt(cardIndex) == ActionType.Jump)
                 {
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
 
@@ -471,6 +478,10 @@ public class TimelineManager : MonoBehaviour
                             case MoveDirection.Back: c -= moveAmount; break;
                             case MoveDirection.Left: r -= moveAmount; break;
                             case MoveDirection.Right: r += moveAmount; break;
+                            case MoveDirection.DiagonalLu: r -= 1; c += 1; break;
+                            case MoveDirection.DiagonalRu: r += 1; c += 1; break;
+                            case MoveDirection.DiagonalLd: r -= 1; c -= 1; break;
+                            case MoveDirection.DiagonalRd: r += 1; c -= 1; break;
                         }
                         if (r >= 0 && r < rows && c >= 0 && c < columns)
                         {
