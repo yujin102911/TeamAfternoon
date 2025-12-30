@@ -342,6 +342,8 @@ public class TimelineManager : MonoBehaviour
             }
         }
 
+        _battleSystem.ResetMeleeStack();
+
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
             // 매 틱마다 방어 초기화하고 시작
