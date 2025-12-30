@@ -598,7 +598,8 @@ public class GameManager : MonoBehaviour
         if (_battleSystem.Enemies.Count ==0) return;
         RuntimeEnemy activeEnemy = _battleSystem.Enemies[0];
 
-        EnemyPattern nextPattern = activeEnemy.GetNextPattern();
+        //EnemyPattern nextPattern = activeEnemy.GetNextPattern(); 순차적으로 가져올거면 아랫줄 주석 처리하고 이거 주석 해제
+        EnemyPattern nextPattern = activeEnemy.GetRandomPattern();
 
         if (nextPattern != null)
         {
