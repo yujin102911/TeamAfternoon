@@ -17,11 +17,22 @@ public class DeckBuilding_Cell : MonoBehaviour
     public Sprite Attack_icon;
     [TabGroup("Attack")]
     public Color Attack_color;
+    [TabGroup("Attack")]
+    public Sprite Attack_bigline;
+    [TabGroup("Attack")]
+    public Sprite Attack_line;
+    [TabGroup("Attack")]
+    public Sprite Attack_endIcon;
 
     [TabGroup("Move")]
     public Sprite Move_icon;
     [TabGroup("Move")]
     public Sprite Move_Di_icon;
+
+    [TabGroup("Jump")]
+    public Sprite Jump_icon;
+    [TabGroup("Jump")]
+    public Sprite Jump_Di_icon;
 
     [TabGroup("Bow")]
     public Sprite Bow_startIcon;
@@ -33,6 +44,9 @@ public class DeckBuilding_Cell : MonoBehaviour
     public Sprite Bow_endIcon;
     [TabGroup("Bow")]
     public Color Bow_color;
+
+    [TabGroup("Guard")]
+    public Sprite Guard_Icon;
 
     public void Clear()
     {
@@ -63,6 +77,11 @@ public class DeckBuilding_Cell : MonoBehaviour
                 _directionIcon.sprite = Move_Di_icon;
                 break;
 
+            case ActionType.Jump:
+                _actionIcon.sprite = Jump_icon;
+                _directionIcon.sprite = Jump_Di_icon;
+                break;
+
             case ActionType.Bow_single:
             case ActionType.Cure:
             case ActionType.Bow_start:
@@ -80,6 +99,13 @@ public class DeckBuilding_Cell : MonoBehaviour
             case ActionType.Bow_end:
                 _actionIcon.sprite = Bow_endIcon;
                 _directionIcon.sprite = Bow_line;
+                break;
+
+            case ActionType.Guard:
+                _actionIcon.sprite = Guard_Icon;
+                _directionIcon.gameObject.SetActive(false);
+                _damageText.color = Attack_color;
+                _damageText.text = "G";
                 break;
 
             default:
