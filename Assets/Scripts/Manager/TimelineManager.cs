@@ -105,9 +105,9 @@ public class TimelineManager : MonoBehaviour
     {
         _battleSystem.MeleeAttack(baseDamage);
     }
-    private void HandleLongRangeAttackRequest(int power)
+    private void HandleLongRangeAttackRequest(int power, bool isChargeRequired)
     {
-        _battleSystem.LongRangeAttack(power);
+        _battleSystem.LongRangeAttack(power, isChargeRequired);
     }
 
     private void HandleLongRangeAttack_Start()

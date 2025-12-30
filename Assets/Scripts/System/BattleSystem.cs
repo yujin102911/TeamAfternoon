@@ -23,6 +23,7 @@ public class BattleSystem
     private int _enemyMaxHP;
 
     private bool _isGuarding = false; // 방어 플래그
+    private bool _isBowCharging = false; // 활 플래그
 
     private int _battleTurnCount = 0;
 
@@ -115,16 +116,25 @@ public class BattleSystem
     /// <summary>
     /// 원거리 공격
     /// </summary>
-    public void LongRangeAttack(int damage)
+    public void LongRangeAttack(int damage, bool isChargeRequired)
     {
+        if (isChargeRequired && !_isBowCharging)
+        {
+            Debug.Log("[BattleSystem] 차징이 취소되어 공격에 실패했습니다.");
+            return;
+        }
         OnPlayerLongRangeAttack?.Invoke();
         DamageEnemy(damage );
         OnEnemyHit?.Invoke(damage);
+        _isBowCharging = false;
     }
 
     public void LongRangeAttack_Start()
     {
         OnPlayerLongRangeStart?.Invoke();
+
+        _isBowCharging = true;
+        Debug.Log("[BattleSystem] 활 차징 시작");
     }
 
     private void DamageEnemy(int amount)
@@ -151,7 +161,11 @@ public class BattleSystem
         {
             Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
         }
-
+        if (_isBowCharging)
+        {
+            _isBowCharging = false;
+            Debug.Log("[BattleSystem] 피격으로 인해 활 차징이 취소되었습니다!");
+        }
         _playerHP = Mathf.Max(0, _playerHP - damage);
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 

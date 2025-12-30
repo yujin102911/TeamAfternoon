@@ -35,7 +35,7 @@ public class TimelineSystem
     /// <summary>
     /// 원거리 공격 요청 이벤트 (데미지)
     /// </summary>
-    public event Action<int> OnLongRangeAttackRequested;
+    public event Action<int, bool> OnLongRangeAttackRequested;
 
     /// <summary>
     /// 원거리 공격 시작 이벤트 (활 차징 애니매이션 재생)
@@ -347,6 +347,8 @@ public class TimelineSystem
                 OnGuardRequested?.Invoke(true);
                 break;
             case ActionType.Bow_single:
+                OnLongRangeAttackRequested?.Invoke(blockData.AttackDamage, false);
+                break;
             case ActionType.Bow_start:
                 int bow_power = 0;
 
@@ -355,7 +357,7 @@ public class TimelineSystem
                     bow_power = blockData.AttackDamage;
                 }
                 Debug.Log($"블럭내 {cardTickIndex}번째의 원거리 공격 액션 발동!! - 딜량: {bow_power}");
-                OnLongRangeAttackRequested?.Invoke(bow_power);
+                OnLongRangeAttackRequested?.Invoke(bow_power, true);
                 break;
 
             case ActionType.Bow_end:
