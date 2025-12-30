@@ -119,11 +119,13 @@ public class BattleSystem
                     // 적 피격 연출
                     OnEnemyHit?.Invoke(damage);
                     Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {damage})");
+                    return true;
+
                 }
             }
         }
         _isSwordCharging = false;
-        return true;
+        return false;
     }
     /// <summary>
     /// 원거리 공격
