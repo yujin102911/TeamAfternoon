@@ -39,6 +39,10 @@ public class BattleSystem
     public event Action OnPlayerLongRangeStart; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeMiddle; // 원거리 공격시 발행되는 이벤트
 
+    public event Action OnStartMelee; // 근접 차징 시작
+    public event Action OnMiddleMelee; // 근접 차징 시작
+    public event Action OnEndMelee; // 근접 차징 시작
+
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
@@ -153,8 +157,15 @@ public class BattleSystem
 
     public void MeleeAttack_Start()
     {
+        OnStartMelee?.Invoke();
+
         _isSwordCharging = true;
         Debug.Log("[BattleSystem] 검 차징 시작");
+    }
+
+    public void MeleeAttack_Middle()
+    {
+        OnMiddleMelee?.Invoke();
     }
 
     private void DamageEnemy(int amount)

@@ -104,6 +104,23 @@ public class Action_cell : MonoBehaviour
                 _backImage.gameObject.SetActive(false);
                 break;
 
+            case ActionType.Sword_start:
+                Attack_startLine.SetActive(true);
+                goto case ActionType.Attack;
+
+            case ActionType.Sword_middle:
+                _backImage.gameObject.SetActive(false);
+                Attack_middleLine.SetActive(true);
+                break;
+
+            case ActionType.Sword_end:
+                ChangeAlpha(_backImage, 0f);
+                _actionIcon.sprite = Attack_startIcon;
+                _directionIcon.gameObject.SetActive(false);
+                _damageText.text = "";
+                Attack_endLine.SetActive(true);
+                break;
+
             case ActionType.Attack:
                 _backImage.sprite = Attack_back;
                 _actionIcon.sprite = Sword_icon;
@@ -179,6 +196,9 @@ public class Action_cell : MonoBehaviour
         Bow_startLine.SetActive(false);
         Bow_middleLine.SetActive(false);
         Bow_endLine.SetActive(false);
+        Attack_startLine.SetActive(false);
+        Attack_middleLine.SetActive(false);
+        Attack_endLine.SetActive(false);
     }
 
     private void ChangeAlpha(Image target, float alpha)

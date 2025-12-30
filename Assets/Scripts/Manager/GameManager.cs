@@ -222,6 +222,11 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
             _battleSystem.OnPlayerLongRangeMiddle += _playerVisualController.PlayBowMiddle;
 
+            //근거리 차징
+            _battleSystem.OnStartMelee += _playerVisualController.PlayMeleeStart;
+            _battleSystem.OnMiddleMelee += _playerVisualController.PlayMeleeMiddle;
+            _battleSystem.OnEndMelee += _playerVisualController.PlayMeleeEnd;
+
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
@@ -257,6 +262,11 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
             _battleSystem.OnPlayerLongRangeMiddle -= _playerVisualController.PlayBowMiddle;
+
+            //근거리 차징
+            _battleSystem.OnStartMelee -= _playerVisualController.PlayMeleeStart;
+            _battleSystem.OnMiddleMelee -= _playerVisualController.PlayMeleeMiddle;
+            _battleSystem.OnEndMelee -= _playerVisualController.PlayMeleeEnd;
 
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
