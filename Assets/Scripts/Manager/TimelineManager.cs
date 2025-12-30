@@ -78,6 +78,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnBlockEnded += HandleBlockEnded;
         _timelineSystem.OnBlockTick += HandleBlockTick;
         _timelineSystem.OnLongRangeAttackStarted += HandleLongRangeAttack_Start;
+        _timelineSystem.OnGuardRequested += HandleGuardRequest;
     }
 
     void OnDestroy()
@@ -92,6 +93,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnBlockEnded -= HandleBlockEnded;
             _timelineSystem.OnBlockTick -= HandleBlockTick;
             _timelineSystem.OnLongRangeAttackStarted -= HandleLongRangeAttack_Start;
+            _timelineSystem.OnGuardRequested -= HandleGuardRequest;
         }
     }
 
@@ -117,7 +119,10 @@ public class TimelineManager : MonoBehaviour
     {
         _battleSystem.MovePlayer(direction);
     }
-
+    private void HandleGuardRequest(bool state)
+    {
+        _battleSystem.SetGuard(state);
+    }
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
     {
@@ -320,6 +325,8 @@ public class TimelineManager : MonoBehaviour
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
+            // 매 틱마다 방어 초기화하고 시작
+            _battleSystem.SetGuard(false);
             if (GameManager.Instance.IsRoundInterrupted)
             {
                 OnCurrentTickChanged?.Invoke(0);

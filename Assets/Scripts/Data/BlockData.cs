@@ -8,6 +8,7 @@ public enum ActionType
     Move,        // 상하좌우 이동
     Jump,        // 대각선 4방향 이동
     Cure,
+    Guard,       // 공격 막기 (이 행동 실행 때 공격 있으면 데미지 0)
     Bow_start,
     Bow_middle,
     Bow_end,
