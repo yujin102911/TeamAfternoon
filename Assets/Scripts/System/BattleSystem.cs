@@ -108,7 +108,14 @@ public class BattleSystem
             return false;
         }
 
-        OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
+        if (isChargeRequired)
+        {
+            OnEndMelee?.Invoke();
+        }
+        else
+        {
+            OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
+        }
 
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)

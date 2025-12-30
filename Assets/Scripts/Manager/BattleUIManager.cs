@@ -12,7 +12,10 @@ public class BattleUIManager : MonoBehaviour
 
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
+    [SerializeField] 
+    private TextMeshProUGUI _stack;
 
+    private BattleSystem battleSystem;
 
     private void Awake()
     {
@@ -23,9 +26,9 @@ public class BattleUIManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
-            BattleSystem battle = GameManager.Instance.BattleSystem;
+            battleSystem = GameManager.Instance.BattleSystem;
 
-            battle.OnBattleInitialized += HandleBattleInitialized;
+            battleSystem.OnBattleInitialized += HandleBattleInitialized;
             //battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
@@ -35,13 +38,18 @@ public class BattleUIManager : MonoBehaviour
         //RefreshSectorSelectionPanel();
     }
 
+    private void Update()
+    {
+        _stack.text = $"현재 근거리 공격 추가 데미지 +{3 * battleSystem.MeleeAttackStack}";
+    }
+
     private void OnDestroy()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
-            BattleSystem battle = GameManager.Instance.BattleSystem;
+            battleSystem = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
-            battle.OnBattleInitialized -= HandleBattleInitialized;
+            battleSystem.OnBattleInitialized -= HandleBattleInitialized;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
