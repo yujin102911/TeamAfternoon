@@ -24,6 +24,7 @@ public class BattleSystem
 
     private bool _isGuarding = false; // 방어 플래그
     private bool _isBowCharging = false; // 활 플래그
+    private bool _isSwordCharging = false; // 검 플래그
 
     private int _battleTurnCount = 0;
 
@@ -92,8 +93,14 @@ public class BattleSystem
     /// <summary>
     /// 근거리 공격
     /// </summary>
-    public void MeleeAttack(int damage)
+    public void MeleeAttack(int damage, bool isChargeRequired)
     {
+        if (isChargeRequired && !_isSwordCharging)
+        {
+            Debug.Log("<color=red>[BattleSystem] 검 차징이 끊겨 공격에 실패했습니다!</color>");
+            return;
+        }
+
         OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
 
         // 공격 위치에 적이 있는지 확인
@@ -113,6 +120,7 @@ public class BattleSystem
                 }
             }
         }
+        _isSwordCharging = false;
     }
     /// <summary>
     /// 원거리 공격
@@ -141,6 +149,12 @@ public class BattleSystem
     public void LongRangeAttack_Middle()
     {
         OnPlayerLongRangeMiddle?.Invoke();
+    }
+
+    public void MeleeAttack_Start()
+    {
+        _isSwordCharging = true;
+        Debug.Log("[BattleSystem] 검 차징 시작");
     }
 
     private void DamageEnemy(int amount)
@@ -172,6 +186,11 @@ public class BattleSystem
         {
             _isBowCharging = false;
             Debug.Log("[BattleSystem] 피격으로 인해 활 차징이 취소되었습니다!");
+        }
+        if (_isSwordCharging)
+        {
+            _isSwordCharging = false;
+            Debug.Log("[BattleSystem] 피격으로 인해 검 차징이ㅣ 취소되었습니다.");
         }
         _playerHP = Mathf.Max(0, _playerHP - damage);
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");

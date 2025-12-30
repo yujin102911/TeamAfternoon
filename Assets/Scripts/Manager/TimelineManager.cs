@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director
@@ -78,6 +77,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnBlockEnded += HandleBlockEnded;
         _timelineSystem.OnBlockTick += HandleBlockTick;
         _timelineSystem.OnLongRangeAttackStarted += HandleLongRangeAttack_Start;
+        _timelineSystem.OnMeleeAttackStarted += HandleMeleeAttack_Start;
         _timelineSystem.OnGuardRequested += HandleGuardRequest;
         _timelineSystem.OnLongRangeAttacking += HandleLongRangeAttack_Middle;
     }
@@ -95,6 +95,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnBlockTick -= HandleBlockTick;
             _timelineSystem.OnLongRangeAttackStarted -= HandleLongRangeAttack_Start;
             _timelineSystem.OnLongRangeAttacking -= HandleLongRangeAttack_Middle;
+            _timelineSystem.OnMeleeAttackStarted -= HandleMeleeAttack_Start;
             _timelineSystem.OnGuardRequested -= HandleGuardRequest;
         }
     }
@@ -103,9 +104,13 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleMeleeAttackRequest(int baseDamage)
+    private void HandleMeleeAttackRequest(int baseDamage, bool isChargeRequired)
     {
-        _battleSystem.MeleeAttack(baseDamage);
+        _battleSystem.MeleeAttack(baseDamage, isChargeRequired);
+    }
+    private void HandleMeleeAttack_Start()
+    {
+        _battleSystem.MeleeAttack_Start();
     }
     private void HandleLongRangeAttackRequest(int power, bool isChargeRequired)
     {
