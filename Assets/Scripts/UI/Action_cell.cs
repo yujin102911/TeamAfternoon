@@ -103,6 +103,7 @@ public class Action_cell : MonoBehaviour
                 _damageText.text = dam.ToString();
                 break;
 
+            case ActionType.Jump:
             case ActionType.Move:
                 _backImage.sprite = Move_back;
                 _actionIcon.sprite = Shoes_icon;
@@ -115,10 +116,10 @@ public class Action_cell : MonoBehaviour
                     case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
 
                         //추후 방향 나오면 연결
-                    //case MoveDirection.Front: _directionIcon.sprite = NE_icon; break;
-                    //case MoveDirection.Right: _directionIcon.sprite = SE_icon; break;
-                    //case MoveDirection.Back: _directionIcon.sprite = SW_icon; break;
-                    //case MoveDirection.Left: _directionIcon.sprite = NW_icon; break;
+                    case MoveDirection.DiagonalRu: _directionIcon.sprite = NW_icon; break;
+                    case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
+                    case MoveDirection.DiagonalLd: _directionIcon.sprite = SE_icon; break;
+                    case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
                 }
 
                 _damageText.text = "";
