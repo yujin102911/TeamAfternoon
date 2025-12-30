@@ -26,6 +26,8 @@ public class BattleSystem
     private bool _isBowCharging = false; // 활 플래그
     private bool _isSwordCharging = false; // 검 플래그
 
+    private int _meleeAttackStack = 0; // 라운드 내 누적 스택
+
     private int _battleTurnCount = 0;
 
     #endregion
@@ -59,6 +61,7 @@ public class BattleSystem
 
     public int TotalDamage;
     public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
+    public int MeleeAttackStack => _meleeAttackStack;
     #endregion
 
     /// <summary>
@@ -92,12 +95,12 @@ public class BattleSystem
     /// <summary>
     /// 근거리 공격
     /// </summary>
-    public void MeleeAttack(int damage, bool isChargeRequired)
+    public bool MeleeAttack(int damage, bool isChargeRequired)
     {
         if (isChargeRequired && !_isSwordCharging)
         {
             Debug.Log("<color=red>[BattleSystem] 검 차징이 끊겨 공격에 실패했습니다!</color>");
-            return;
+            return false;
         }
 
         OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
@@ -120,6 +123,7 @@ public class BattleSystem
             }
         }
         _isSwordCharging = false;
+        return true;
     }
     /// <summary>
     /// 원거리 공격
@@ -149,6 +153,17 @@ public class BattleSystem
     {
         _isSwordCharging = true;
         Debug.Log("[BattleSystem] 검 차징 시작");
+    }
+
+    public void IncreaseMeleeStack()
+    {
+        _meleeAttackStack++;
+        Debug.Log($"[BattleSystme] 근거리 공격 스택 증가. 현재 스택: {_meleeAttackStack}");
+    }
+
+    public void ResetMeleeStack()
+    {
+        _meleeAttackStack = 0;
     }
 
     private void DamageEnemy(int amount)

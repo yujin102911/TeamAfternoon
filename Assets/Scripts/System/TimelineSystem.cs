@@ -30,7 +30,7 @@ public class TimelineSystem
     /// <summary>
     /// 근접 공격 요청 이벤트 (데미지)
     /// </summary>
-    public event Action<int, bool> OnMeleeAttackRequested;
+    public event Action<BlockData, bool> OnMeleeAttackRequested;
 
     /// <summary>
     /// 근접 공격 (검 차징) 시작 이벤트
@@ -337,7 +337,7 @@ public class TimelineSystem
                 Debug.Log($"  → {blockData.BlockName}: 공격 요청 {damage}");
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
-                OnMeleeAttackRequested?.Invoke(damage, false);
+                OnMeleeAttackRequested?.Invoke(blockData, false);
                 break;
 
             case ActionType.Move:
@@ -376,7 +376,7 @@ public class TimelineSystem
                 OnMeleeAttackStarted?.Invoke();
                 break;
             case ActionType.Sword_start:
-                OnMeleeAttackRequested?.Invoke(blockData.AttackDamage, true); 
+                OnMeleeAttackRequested?.Invoke(blockData, true); 
                 break;
             case ActionType.Sword_middle:
                 break;
