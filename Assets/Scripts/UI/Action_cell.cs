@@ -26,7 +26,15 @@ public class Action_cell : MonoBehaviour
     public Sprite Attack_back;
     [TabGroup("Attack")]
     public Sprite Sword_icon;
-    
+    [TabGroup("Attack")]
+    public Sprite Attack_startIcon;
+    [TabGroup("Attack")]
+    public GameObject Attack_startLine;
+    [TabGroup("Attack")]
+    public GameObject Attack_middleLine;
+    [TabGroup("Attack")]
+    public GameObject Attack_endLine;
+
     [TabGroup("Move")]
     public Sprite Move_back;
     [TabGroup("Move")]
@@ -116,9 +124,9 @@ public class Action_cell : MonoBehaviour
                     case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
 
                         //추후 방향 나오면 연결
-                    case MoveDirection.DiagonalRu: _directionIcon.sprite = NW_icon; break;
+                    case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
                     case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
-                    case MoveDirection.DiagonalLd: _directionIcon.sprite = SE_icon; break;
+                    case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
                     case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
                 }
 
@@ -152,6 +160,13 @@ public class Action_cell : MonoBehaviour
                 _directionIcon.gameObject.SetActive(false);
                 _damageText.text = "";
                 Bow_endLine.SetActive(true);
+                break;
+
+            case ActionType.Guard:
+                _backImage.sprite = Guard_Back;
+                _actionIcon.sprite = Guard_Icon;
+                _directionIcon.gameObject.SetActive(false);
+                _damageText.text = "G";
                 break;
 
             default:

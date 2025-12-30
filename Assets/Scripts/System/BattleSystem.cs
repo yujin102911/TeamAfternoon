@@ -156,6 +156,7 @@ public class BattleSystem
         if (_isGuarding)
         {
             Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+            return;
         }
 
         _playerHP = Mathf.Max(0, _playerHP - damage);

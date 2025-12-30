@@ -308,6 +308,7 @@ public class TimelineManager : MonoBehaviour
         int index = tick - placedBlock.startTick;
         placedBlock.linkedRuntimeBlock.ToggleDirectionsForJump(index);
         Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     /// <summary>
