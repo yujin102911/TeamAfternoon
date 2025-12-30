@@ -5,7 +5,8 @@ public enum ActionType
 {
     None,
     Attack,
-    Move,
+    Move,        // 상하좌우 이동
+    Jump,        // 대각선 4방향 이동
     Cure,
     Bow_start,
     Bow_middle,
@@ -16,10 +17,14 @@ public enum ActionType
 public enum MoveDirection
 {
     None,
-    Left,   // 좌로 이동(-열)
-    Right,  // 우로 이동(+열)
-    Front,  // 앞으로 이동(+1)
-    Back,   // 뒤로 이동(-1)
+    Left,      // 좌로 이동(-열)
+    Right,     // 우로 이동(+열)
+    Front,     // 앞으로 이동(+1)
+    Back,      // 뒤로 이동(-1)
+    DiagonalLu, // 대각선 왼쪽 위
+    DiagonalRu, // 대각선 오른쪽 위
+    DiagonalLd, // 대각선 왼쪽 아래
+    DiagonalRd, // 대각선 오른쪽 아래
 }
 
 [CreateAssetMenu(fileName = "New BlockData", menuName = "Data/Block Data")]
@@ -113,27 +118,6 @@ public class BlockData : ScriptableObject
         return false;
     }
 
-    [HideInInspector]
-    public void ToggleMovingDirection(int tickIndex)
-    {
-        if (tickIndex < 0 || tickIndex >= moveDirections.Length) return;
-        if (actionTypes[tickIndex] != ActionType.Move) return;
-
-        moveDirections[tickIndex] = moveDirections[tickIndex] == MoveDirection.Left ?
-                                    MoveDirection.Right : MoveDirection.Left;
-    }
-
-    [HideInInspector]
-    public void InitiailizeMovingDirection()
-    {
-        for (int i = 0; i < moveDirections.Length; i++)
-        {
-            if (actionTypes[i] != ActionType.Move)
-                moveDirections[i] = MoveDirection.None;
-            else
-                moveDirections[i] = MoveDirection.Front;
-        }
-    }
 
     [HideInInspector, ContextMenu("Auto Setup Directions")]
     public void Init()
@@ -143,9 +127,14 @@ public class BlockData : ScriptableObject
 
         for (int i = 0; i < actionTypes.Length; i++)
         {
-            moveDirections[i] = actionTypes[i] == ActionType.Move ?
-                                (moveDirections[i] == MoveDirection.None ? MoveDirection.Front : moveDirections[i])
-                                : MoveDirection.None;
+            ActionType action = actionTypes[i];
+            if (action == ActionType.Move)
+                moveDirections[i] = (moveDirections[i] == MoveDirection.None) ? MoveDirection.Front : moveDirections[i];
+            else if (action == ActionType.Jump)
+                moveDirections[i] = (moveDirections[i] == MoveDirection.None) ? MoveDirection.DiagonalLu : moveDirections[i];
+            else
+                moveDirections[i] = MoveDirection.None;
+
         }
 #if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(this);

@@ -332,6 +332,7 @@ public class TimelineSystem
                 break;
 
             case ActionType.Move:
+            case ActionType.Jump:
                 MoveDirection dir = runtimeBlock.CurrentMoveDirections[cardTickIndex];
                 Debug.Log($"  → {blockData.BlockName}: 이동 요청 ({dir})");
 

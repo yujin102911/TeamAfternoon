@@ -211,6 +211,22 @@ public class BattleSystem
             case MoveDirection.Right:
                 targetRow += moveAmount;
                 break;
+            case MoveDirection.DiagonalLu:
+                targetRow -= moveAmount;
+                targetCol += moveAmount;
+                break;
+            case MoveDirection.DiagonalRu:
+                targetRow += moveAmount;
+                targetCol += moveAmount;
+                break;
+            case MoveDirection.DiagonalLd:
+                targetRow -= moveAmount;
+                targetCol -= moveAmount;
+                break;
+            case MoveDirection.DiagonalRd:
+                targetRow += moveAmount;
+                targetCol -= moveAmount;
+                break;
         }
         int rows = _totalSectors / _columns;
         if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
