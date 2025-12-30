@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 3657491622658751122, guid: 51152bcf794df994a9a4a8881425889e, type: 3}
+  prefab: {fileID: 5653203501623150548, guid: 89392dd2bf4fff24ea215fbf5dddda7e, type: 3}
   initialPoolSize: 10
 --- !u!1 &2647089358829974553
 GameObject:
@@ -126,6 +126,7 @@ Transform:
   m_Children:
   - {fileID: 7994013912877450356}
   - {fileID: 501542299357464017}
+  - {fileID: 3402259975700779261}
   - {fileID: 2666741643168982639}
   - {fileID: 1305607405330609933}
   m_Father: {fileID: 0}
@@ -220,10 +221,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swordAttackFX_pool: {fileID: 6896482959306045180}
+  big_swordAttackFX_pool: {fileID: 3907911133059985757}
   bowAttackFX_pool: {fileID: 7343615441812652499}
   bowChargingFX_pool: {fileID: 5543498246212957680}
   attackOffset: {x: 4, y: 1.7, z: 0}
   chargingOffset: {x: 0.4, y: 0.2, z: 0}
+--- !u!1 &4504062129502801118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3402259975700779261}
+  - component: {fileID: 3907911133059985757}
+  m_Layer: 0
+  m_Name: Big_Sword_Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3402259975700779261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4504062129502801118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 403013117455445336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3907911133059985757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4504062129502801118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3657491622658751122, guid: 51152bcf794df994a9a4a8881425889e, type: 3}
+  initialPoolSize: 10
 --- !u!1 &5579999250795413977
 GameObject:
   m_ObjectHideFlags: 0
