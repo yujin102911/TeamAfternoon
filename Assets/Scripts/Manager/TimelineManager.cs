@@ -104,9 +104,15 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleMeleeAttackRequest(int baseDamage, bool isChargeRequired)
+    private void HandleMeleeAttackRequest(BlockData data, bool isChargeRequired)
     {
-        _battleSystem.MeleeAttack(baseDamage, isChargeRequired);
+        int currentStack = _battleSystem.MeleeAttackStack;
+        int finalDamage = data.CalculateStackedDamage(currentStack);
+        bool isSuccess = _battleSystem.MeleeAttack(finalDamage, isChargeRequired);
+        if (isSuccess)
+        {
+            _battleSystem.IncreaseMeleeStack();
+        }
     }
     private void HandleMeleeAttack_Start()
     {
