@@ -2542,17 +2542,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &687530734 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8414444124638552879, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
-  m_PrefabInstance: {fileID: 1651862668}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &717145985
 GameObject:
   m_ObjectHideFlags: 0
@@ -4569,11 +4558,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1341406121 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5489077725204061661, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
-  m_PrefabInstance: {fileID: 1651862668}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1390408158 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8062059711771284335, guid: 93a7d482f90619a4cbcfe61f219de3f0, type: 3}
@@ -4609,7 +4593,7 @@ Transform:
   m_GameObject: {fileID: 1405611267}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 1.2, z: 0}
+  m_LocalPosition: {x: 4.5, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4725,7 +4709,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 549756303525767335, guid: 00a4521112900644b970b9caa82555f5, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 39
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 549756303525767335, guid: 00a4521112900644b970b9caa82555f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5418,6 +5402,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: _titleSceneName
+      value: RealStageScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: _battleSceneName
+      value: 3 Line_LayOut
+      objectReference: {fileID: 0}
     - target: {fileID: 1762461229189307587, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -6130,17 +6122,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93a7d482f90619a4cbcfe61f219de3f0, type: 3}
---- !u!114 &1756795424 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3391965971820004265, guid: acb3effab5a3e774b95fc5eaf7214c7c, type: 3}
-  m_PrefabInstance: {fileID: 1651862668}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1762984250
 GameObject:
   m_ObjectHideFlags: 0
@@ -8435,9 +8416,9 @@ MonoBehaviour:
   sentenceText: {fileID: 2019473177}
   playerSlotSpacing: 8
   playerSlotWidth: 66
-  tooltipPanel: {fileID: 1341406121}
-  tooltipTitleText: {fileID: 1756795424}
-  tooltipDetailText: {fileID: 687530734}
+  tooltipPanel: {fileID: 5489077724691060794}
+  tooltipTitleText: {fileID: 3391965970326029902}
+  tooltipDetailText: {fileID: 8414444126132528840}
   Player_tooltipPanel: {fileID: 5489077724691060794}
   Player_tooltipTitleText: {fileID: 3391965970326029902}
   Player_tooltipDetailText: {fileID: 8414444126132528840}

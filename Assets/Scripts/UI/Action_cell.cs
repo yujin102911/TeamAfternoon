@@ -40,6 +40,15 @@ public class Action_cell : MonoBehaviour
     [TabGroup("Move")]
     public Sprite Right_icon;
 
+    [TabGroup("Move_2")]
+    public Sprite NE_icon;
+    [TabGroup("Move_2")]
+    public Sprite SE_icon;
+    [TabGroup("Move_2")]
+    public Sprite SW_icon;
+    [TabGroup("Move_2")]
+    public Sprite NW_icon;
+
     [TabGroup("Bow")]
     public Sprite Bow_back;
     [TabGroup("Bow")]
@@ -50,6 +59,11 @@ public class Action_cell : MonoBehaviour
     public GameObject Bow_middleLine;
     [TabGroup("Bow")]
     public GameObject Bow_endLine;
+
+    [TabGroup("Guard")]
+    public Sprite Guard_Back;
+    [TabGroup("Guard")]
+    public Sprite Guard_Icon;
 
     [TabGroup("None")]
     public Sprite Bow_endIcon;
@@ -93,13 +107,18 @@ public class Action_cell : MonoBehaviour
                 _backImage.sprite = Move_back;
                 _actionIcon.sprite = Shoes_icon;
                 
-
                 switch (dir)
                 {
                     case MoveDirection.Front: _directionIcon.sprite = Front_icon; break;
                     case MoveDirection.Right: _directionIcon.sprite = Right_icon; break;
                     case MoveDirection.Back: _directionIcon.sprite = Back_icon; break;
                     case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
+
+                        //추후 방향 나오면 연결
+                    //case MoveDirection.Front: _directionIcon.sprite = NE_icon; break;
+                    //case MoveDirection.Right: _directionIcon.sprite = SE_icon; break;
+                    //case MoveDirection.Back: _directionIcon.sprite = SW_icon; break;
+                    //case MoveDirection.Left: _directionIcon.sprite = NW_icon; break;
                 }
 
                 _damageText.text = "";

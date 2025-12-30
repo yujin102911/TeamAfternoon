@@ -350,7 +350,7 @@ public class TimelineUI : MonoBehaviour
 
         if(tooltipTitleText != null)
         {
-            tooltipTitleText.text = $"책의 방해";
+            tooltipTitleText.text = $"슬라임의 물기";
         }
 
         // 툴팁 텍스트 설정
@@ -440,7 +440,7 @@ public class TimelineUI : MonoBehaviour
                 break;
             case ActionType.Attack:
                 titleText = "근거리 공격";
-                effectText = $"적에게 가장 가까운 열에서 <b>{blockData.attackDamage}피해</b>를 줍니다.";
+                effectText = $"적에게 가장 가까운 열에서만 <b>{blockData.attackDamage}피해</b>를 줍니다.";
                 break;
             case ActionType.Move:
                 titleText = "이동";

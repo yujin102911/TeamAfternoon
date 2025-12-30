@@ -172,15 +172,16 @@ public class TimelineSystem
                 {
                     Debug.Log($"놓인거 {tick}틱 {placed.linkedRuntimeBlock.BaseData.actionTypes[placed.GetCardTickIndex(tick)].ToString()}");
                     Debug.Log($"들고있는거 {darg_block_tick}틱: {block.BaseData.actionTypes[darg_block_tick].ToString()}");
-                    return false;
+                    //return false;
                 }
                 else
                 {
                     
-                    return true;
+                    
                 }
 
-                    
+                return true;
+
             }
         }
         return false;

@@ -109,13 +109,19 @@ public class PlayerVisualController : MonoBehaviour
     public void Play_PlayerIdle()
     {
         if (_playerAnimator != null)
-            _playerAnimator.SetTrigger("Play");
+        {
+            _playerAnimator.enabled = true;
+        }
+            //_playerAnimator.SetTrigger("Play");
     }
 
     public void Stop_PlayerIdle()
     {
         if (_playerAnimator != null)
-            _playerAnimator.SetTrigger("Pause");
+        {
+            _playerAnimator.enabled = false;
+        }
+        //_playerAnimator.SetTrigger("Pause");
     }
 
     public void PlayAttackShake()
@@ -142,6 +148,12 @@ public class PlayerVisualController : MonoBehaviour
         
     }
 
+    public void PlayDeath()
+    {
+        if (_playerInstance == null) return;
+        _playerAnimator.SetTrigger("Death");
+    }
+
     public void PlaySwordAttack()
     {
         if (_playerInstance == null) return;
@@ -154,6 +166,12 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_playerInstance == null) return;
             _playerAnimator.SetTrigger("Charging_Bow");
+    }
+
+    public void PlayBowMiddle()
+    {
+        if (_playerInstance == null) return;
+        _playerAnimator.SetTrigger("Bow_Middle");
     }
 
     public void PlayBowAttack()

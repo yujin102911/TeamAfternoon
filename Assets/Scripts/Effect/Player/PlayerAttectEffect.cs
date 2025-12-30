@@ -35,7 +35,7 @@ public class PlayerAttectEffect : MonoBehaviour
     {
         if(_currentAnimtor != null)
         {
-            _currentAnimtor.SetTrigger("Charging_Lv2");
+            _currentAnimtor.SetTrigger("Charging_Lv3");
 
         }
         else

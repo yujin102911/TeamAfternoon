@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
-using VInspector.Libs;
 
 public class IngameBuildingManager : MonoBehaviour
 {

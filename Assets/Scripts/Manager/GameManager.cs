@@ -220,6 +220,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
             _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
+            _battleSystem.OnPlayerLongRangeMiddle += _playerVisualController.PlayBowMiddle;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
@@ -232,6 +233,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerHit += CountPlayerHit;
             _battleSystem.OnEnemyDied += HandleEnemyPurified;
             _battleSystem.OnEnemyDied += _enemyVisualController.PlayEnemyDie;
+            _battleSystem.OnPlayerDied += _playerVisualController.PlayDeath;
         }
 
     }
@@ -254,6 +256,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
+            _battleSystem.OnPlayerLongRangeMiddle -= _playerVisualController.PlayBowMiddle;
 
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
@@ -266,6 +269,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
             _battleSystem.OnEnemyDied -= _enemyVisualController.PlayEnemyDie;
+            _battleSystem.OnPlayerDied -= _playerVisualController.PlayDeath;
         }
     }
 
@@ -376,6 +380,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.UpdateDangerIndicators();
         OnGameStateChanged?.Invoke();
 
+        _playerVisualController.Stop_PlayerIdle();
     }
 
     /// <summary>
@@ -425,6 +430,10 @@ public class GameManager : MonoBehaviour
         _currentRound++;
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
+        //idle 실행
+        _playerVisualController.Play_PlayerIdle();
+        _enemyVisualController.Play_EnemyIdle();
+
         //_battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
         //BattleUIManager.Instance.Hide_startBtn();
@@ -441,9 +450,7 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
-            //idle 실행
-            _playerVisualController.Play_PlayerIdle();
-            _enemyVisualController.Play_EnemyIdle();
+            
 
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
