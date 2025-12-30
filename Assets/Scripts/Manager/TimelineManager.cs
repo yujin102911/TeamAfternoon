@@ -342,8 +342,6 @@ public class TimelineManager : MonoBehaviour
             }
         }
 
-        _battleSystem.ResetMeleeStack();
-
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
             // 매 틱마다 방어 초기화하고 시작
@@ -415,6 +413,7 @@ public class TimelineManager : MonoBehaviour
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
         Time.timeScale = 1f;
+        _battleSystem.ResetMeleeStack();
     }
 
     /// <summary>
