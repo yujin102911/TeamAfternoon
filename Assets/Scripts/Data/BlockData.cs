@@ -13,6 +13,9 @@ public enum ActionType
     Bow_middle,
     Bow_end,
     Bow_single,
+    Sword_start,    // 검 공격 실행
+    Sword_middle,   // 검 공격 차징 중
+    Sword_end,      // 검 공격 차징 시작
 }
 
 public enum MoveDirection
