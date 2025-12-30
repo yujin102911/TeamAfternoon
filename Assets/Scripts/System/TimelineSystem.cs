@@ -48,6 +48,11 @@ public class TimelineSystem
     public event Action OnLongRangeAttacking;
 
     /// <summary>
+    /// 방어 요청 이벤트 (방어여부)
+    /// </summary>
+    public event Action<bool> OnGuardRequested;
+
+    /// <summary>
     /// 이동 요청 이벤트 (방향)
     /// </summary>
     public event Action<MoveDirection> OnMoveRequested;
@@ -338,6 +343,9 @@ public class TimelineSystem
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
                 OnMoveRequested?.Invoke(dir);
+                break;
+            case ActionType.Guard:
+                OnGuardRequested?.Invoke(true);
                 break;
             case ActionType.Bow_single:
             case ActionType.Bow_start:

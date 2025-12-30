@@ -22,6 +22,8 @@ public class BattleSystem
     private int _enemyHP;
     private int _enemyMaxHP;
 
+    private bool _isGuarding = false; // 방어 플래그
+
     private int _battleTurnCount = 0;
 
     #endregion
@@ -148,6 +150,13 @@ public class BattleSystem
     public void DealDamageToPlayer(int damage)
     {
         if (damage <= 0) return;
+
+        int finalDamage = _isGuarding ? 0 : damage;
+
+        if (_isGuarding)
+        {
+            Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+        }
 
         _playerHP = Mathf.Max(0, _playerHP - damage);
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
@@ -334,5 +343,11 @@ public class BattleSystem
     public void OnRoundEnded()
     {
         _battleTurnCount++;
+    }
+
+    public void SetGuard(bool state)
+    {
+        _isGuarding = state;
+        if (state) Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
     }
 }
