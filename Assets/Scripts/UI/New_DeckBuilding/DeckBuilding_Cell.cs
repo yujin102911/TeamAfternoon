@@ -65,11 +65,22 @@ public class DeckBuilding_Cell : MonoBehaviour
             case ActionType.None:
                 break;
 
+            case ActionType.Sword_start:
             case ActionType.Attack:
                 _actionIcon.sprite = Attack_icon;
                 _directionIcon.gameObject.SetActive(false);
                 _damageText.color = Attack_color;
                 _damageText.text = dam.ToString();
+                break;
+
+            case ActionType.Sword_middle:
+                _actionIcon.sprite = Attack_bigline;
+                _directionIcon.sprite = Attack_line;
+                break;
+
+            case ActionType.Sword_end:
+                _actionIcon.sprite = Attack_endIcon;
+                _directionIcon.sprite = Attack_line;
                 break;
 
             case ActionType.Move:
