@@ -34,6 +34,18 @@ public class EnemyParrying
     }
 }
 
+[System.Serializable]
+public class EnemyStone
+{
+    public int tick;
+
+    public EnemyStone(int t)
+    {
+        tick = t;
+    }
+
+}
+
 // ========================================
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
@@ -48,6 +60,7 @@ public class EnemyPattern : ScriptableObject
 
 
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
+    public List<EnemyStone> stones = new List<EnemyStone>();
     public List<EnemyParrying> parryings = new List<EnemyParrying>();
 
     /// <summary>
@@ -64,5 +77,13 @@ public class EnemyPattern : ScriptableObject
     public EnemyParrying GetParryingAt(int tick)
     {
         return parryings.Find(a => a.tick == tick);
+    }
+
+    /// <summary>
+    /// 특정 틱의 바위 던지기 행동 가져오기
+    /// </summary>
+    public EnemyStone GetStoneAt(int tick)
+    {
+        return stones.Find(a => a.tick == tick);
     }
 }

@@ -18,7 +18,7 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private int _maxHP = 50;
 
-    [Header("적 프리펩")]
+    [Header("적 프리팹")]
     [SerializeField]
     private GameObject _enemyPrefab;
 

@@ -18,6 +18,8 @@ public class BattleSystem
     private int _columns;
 
     private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>(); // 현재 싸우고 있는 적
+    private List<int> _stoneSectors = new List<int>();
+
 
     private int _enemyHP;
     private int _enemyMaxHP;
@@ -53,6 +55,8 @@ public class BattleSystem
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
     public event Action<List<int>> OnEnemyAttackSuccess; // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
+
+    public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
     public event Action OnBattleInitialized;
     #endregion
@@ -154,6 +158,7 @@ public class BattleSystem
         OnEnemyHit?.Invoke(damage);
         _isBowCharging = false;
     }
+
 
     public void LongRangeAttack_Start()
     {
@@ -309,8 +314,14 @@ public class BattleSystem
         int rows = _totalSectors / _columns;
         if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
         {
+            int targetSector = (targetRow * _columns) + targetCol + 1;
+            if (IsSectorBlocked(targetSector))
+            {
+                Debug.Log($"[BattleSystem] {targetSector}번 섹터는 돌에 막혀 이동할 수 없습니다");
+                return;
+            }
             int prevSector = _playerCurrentSector;
-            _playerCurrentSector = (targetRow *  _columns) + targetCol + 1;
+            _playerCurrentSector = targetSector;
             if (prevSector != _playerCurrentSector)
             {
                 Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
@@ -363,6 +374,38 @@ public class BattleSystem
         else
         {
             Debug.Log($"[BattleSystem] 회피 성공! (플레이어 위치: 섹터 {_playerCurrentSector})");
+        }
+    }
+
+    public void ProcessEnemyStone()
+    {
+        List<int> validSectors = new List<int>();
+        for (int i = 1; i <= _totalSectors; i++)
+        {
+            if (i != _playerCurrentSector)
+                validSectors.Add(i);
+        }
+        if (validSectors.Count > 0)
+        {
+            int targetSector = validSectors[Random.Range(0, validSectors.Count)];
+            _stoneSectors.Add(targetSector);
+            Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
+            OnStoneUpdated?.Invoke(_stoneSectors, true);
+        }
+    }
+
+
+    public bool IsSectorBlocked(int sectorIndex)
+    {
+        return _stoneSectors.Contains(sectorIndex);
+    }
+    public void ClearStones()
+    {
+        if (_stoneSectors.Count > 0)
+        {
+            _stoneSectors.Clear();
+            Debug.Log("모든 돌 소멸");
+            OnStoneUpdated?.Invoke(_stoneSectors, false);
         }
     }
 

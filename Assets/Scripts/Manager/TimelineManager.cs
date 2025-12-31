@@ -363,6 +363,11 @@ public class TimelineManager : MonoBehaviour
                 OnCurrentTickChanged?.Invoke(0);
                 break;
             }
+            // 플레이어 행동 끝나는 시점에 돌 다 없애기
+            if (tick == _totalTicks)
+            {
+                _battleSystem.ClearStones();
+            }
 
             yield return new WaitForSeconds(Tick_interval);
             if (GameManager.Instance.IsBattleEnded) yield break;
@@ -384,6 +389,11 @@ public class TimelineManager : MonoBehaviour
                 if (attack != null)
                 {
                     _battleSystem.ProcessEnemyAttack(attack);
+                }
+                EnemyStone stone = _currentEnemyPattern.GetStoneAt(tick);
+                if (stone != null)
+                {
+                    _battleSystem.ProcessEnemyStone();
                 }
 
             }
