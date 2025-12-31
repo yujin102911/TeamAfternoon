@@ -329,6 +329,19 @@ public class TimelineUI : MonoBehaviour
                 Debug.LogWarning($"적 공격 틱 {parrying.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
             }
         }
+
+        foreach (EnemyStone stone in sequence.stones)
+        {
+            if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
+            {
+
+                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, "", Special_Pattern.Stone, null);
+            }
+            else
+            {
+                Debug.LogWarning($"적 돌던지기 틱 {stone.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
+            }
+        }
     }
 
 

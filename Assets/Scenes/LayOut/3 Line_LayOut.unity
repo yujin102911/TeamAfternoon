@@ -7766,6 +7766,7 @@ MonoBehaviour:
   _playerVisualController: {fileID: 2007249489}
   _enemyVisualController: {fileID: 2007249488}
   _battleSequenceController: {fileID: 2007249487}
+  _enemyStoneVisualController: {fileID: 2007249499}
   _startHandSize: 99
   _playerMaxHP: 3
   _mapSize: 0
@@ -8085,6 +8086,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2686350335356439353, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2007249498}
+    - targetCorrespondingSourceObject: {fileID: 2686350335356439353, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2007249499}
   m_SourcePrefab: {fileID: 100100000, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
 --- !u!114 &2007249487 stripped
 MonoBehaviour:
@@ -8183,6 +8187,20 @@ MonoBehaviour:
   _heartContainer: {fileID: 1483979239}
   _enemySlider: {fileID: 1148386585}
   _enemyHPText: {fileID: 1046882721}
+--- !u!114 &2007249499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338402954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aae6326eb5df1a47abb72813b914253, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stonePrefab: {fileID: 2778679926579758238, guid: a8ac1b94376c6bc48af320bfc2936712, type: 3}
+  _offset: {x: 0, y: 0.1, z: 0}
 --- !u!224 &2012591333 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1844091286746474397, guid: 79773d48f389ad045a7ec1070d51c0e1, type: 3}

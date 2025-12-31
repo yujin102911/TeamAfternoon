@@ -347,7 +347,7 @@ public class GameManager : MonoBehaviour
 
 
         //TODO:추후에 8 자리에 최대 턴수 기입
-        OnMemoryUpdate?.Invoke(_currentRound, 8);
+        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -448,7 +448,7 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
-        OnMemoryUpdate?.Invoke(_currentRound, 8);
+        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
