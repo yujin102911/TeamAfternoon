@@ -12,8 +12,16 @@ public class BattleUIManager : MonoBehaviour
 
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
+
+    [Header("메모리 UI")]
     [SerializeField] 
-    private TextMeshProUGUI _stack;
+    private GameObject _memoryObject;
+    [SerializeField]
+    private TextMeshProUGUI _percentTxt;
+    [SerializeField]
+    private TextMeshProUGUI _storageTxt;
+    [SerializeField] 
+    private Slider _memorySlider;
 
     private BattleSystem battleSystem;
 
@@ -33,14 +41,10 @@ public class BattleUIManager : MonoBehaviour
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
+            GameManager.Instance.OnMemoryUpdate += UpdateSlider;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
-    }
-
-    private void Update()
-    {
-        _stack.text = $"현재 근거리 공격 추가 데미지 +{2 * battleSystem.MeleeAttackStack}";
     }
 
     private void OnDestroy()
@@ -50,6 +54,7 @@ public class BattleUIManager : MonoBehaviour
             battleSystem = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
+            GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
@@ -105,5 +110,15 @@ public class BattleUIManager : MonoBehaviour
     public void Hide_startBtn()
     {
         _startButton.gameObject.SetActive(false);
+    }
+
+    private void UpdateSlider(int current, int max)
+    {
+        float slider_size = (float)current / max;
+        float percent = slider_size * 100f;
+
+        _memorySlider.value = slider_size;
+        _percentTxt.text = $"용량 {percent}%";
+        _storageTxt.text = $"{8*current}/{8 * max} <size=20>mb</size>";
     }
 }

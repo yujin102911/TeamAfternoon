@@ -97,6 +97,7 @@ public class GameManager : MonoBehaviour
     public event Action OnGameStateChanged;
     public event Action<int, int, int, int> OnRoundChanged;      // 현재 라인, 총 라인, 현재 적, 총 적
     public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
+    public event Action<int, int> OnMemoryUpdate;
 
     #endregion
 
@@ -336,8 +337,11 @@ public class GameManager : MonoBehaviour
         }
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
         //if (FindAnyObjectByType<SceneIntroController>() == null)
-            //OnIntroCompleted();
-        
+        //OnIntroCompleted();
+
+
+        //TODO:추후에 8 자리에 최대 턴수 기입
+        OnMemoryUpdate?.Invoke(_currentRound, 8);
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -438,6 +442,7 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
+        OnMemoryUpdate?.Invoke(_currentRound, 8);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
