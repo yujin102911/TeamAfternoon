@@ -3,8 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Special_Pattern
+{
+    None,
+    Stone
+}
+
 public class sector_EnemySlot : Enemy_slot
 {
+    [Header("일반 공격")]
+    [SerializeField]
+    private GameObject _attackIcon;
     [SerializeField]
     private Sprite _nomalSector;
     [SerializeField]
@@ -12,29 +21,53 @@ public class sector_EnemySlot : Enemy_slot
     [SerializeField]
     private Image[] _imageSectors;
 
-    public override void Show(Color color, string message, List<int> sectors)
+    [Header("특수 패턴")]
+    [SerializeField]
+    private GameObject _patternIcon;
+    [SerializeField]
+    private Sprite _stoneIcon;
+
+    public override void Show(Color color, string message, Special_Pattern pattern, List<int> sectors)
     {
         Show_Slot();
 
-        for (int i = 0; i < _imageSectors.Length; i++) 
+        _attackIcon.SetActive(false);
+        _patternIcon.SetActive(false);
+
+        switch (pattern)
         {
-            var view_color = _imageSectors[i].color;
-            view_color.a = 1.0f;
+            case Special_Pattern.None:
+                _attackIcon.SetActive(true);
 
-            if (sectors != null)
-            {
-                if (sectors.Contains(i + 1))
+                for (int i = 0; i < _imageSectors.Length; i++)
                 {
-                    _imageSectors[i].sprite = _hitSector;
-                }
-                else
-                {
-                    _imageSectors[i].sprite = _nomalSector;
-                }
-            }
+                    var view_color = _imageSectors[i].color;
+                    view_color.a = 1.0f;
 
-            _imageSectors[i].color = view_color;
+                    if (sectors != null)
+                    {
+                        if (sectors.Contains(i + 1))
+                        {
+                            _imageSectors[i].sprite = _hitSector;
+                        }
+                        else
+                        {
+                            _imageSectors[i].sprite = _nomalSector;
+                        }
+                    }
+
+                    _imageSectors[i].color = view_color;
+                }
+
+                break;
+            
+            case Special_Pattern.Stone:
+                _patternIcon.SetActive(true);
+                _patternIcon.GetComponent<Image>().sprite = _stoneIcon;
+                break;
         }
+
+        
     }
 
     public override void Hide()

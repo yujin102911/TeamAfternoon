@@ -297,7 +297,7 @@ public class TimelineUI : MonoBehaviour
                 //    //text.color = Color.white;
                 //}
 
-                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), attack.targetSectors);
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
             }
             else
             {
