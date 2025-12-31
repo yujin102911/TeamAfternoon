@@ -37,12 +37,8 @@ public class EnemyParrying
 [System.Serializable]
 public class EnemyStone
 {
-    public int tick;
-
-    public EnemyStone(int t)
-    {
-        tick = t;
-    }
+    public int tick = 8;
+    public int count = 1;
 
 }
 

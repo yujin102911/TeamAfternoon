@@ -377,19 +377,25 @@ public class BattleSystem
         }
     }
 
-    public void ProcessEnemyStone()
+    public void ProcessEnemyStone(int count = 1)
     {
         List<int> validSectors = new List<int>();
-        for (int i = 1; i <= _totalSectors; i++)
+        for (int j = 0; j < count; j++)
         {
-            if (i != _playerCurrentSector)
-                validSectors.Add(i);
+            for (int i = 1; i <= _totalSectors; i++)
+            {
+                if (i != _playerCurrentSector && !_stoneSectors.Contains(i))
+                    validSectors.Add(i);
+            }
+            if (validSectors.Count > 0)
+            {
+                int targetSector = validSectors[Random.Range(0, validSectors.Count)];
+                _stoneSectors.Add(targetSector);
+                Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
+            }
         }
-        if (validSectors.Count > 0)
+        if (count > 0)
         {
-            int targetSector = validSectors[Random.Range(0, validSectors.Count)];
-            _stoneSectors.Add(targetSector);
-            Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
             OnStoneUpdated?.Invoke(_stoneSectors, true);
         }
     }
