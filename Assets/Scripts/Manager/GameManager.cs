@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerVisualController _playerVisualController;
     [SerializeField] private EnemyVisualController _enemyVisualController;
     [SerializeField] private BattleSequenceController _battleSequenceController;
+    [SerializeField] private EnemyStoneVisualController _enemyStoneVisualController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -187,6 +188,11 @@ public class GameManager : MonoBehaviour
         if (_enemyVisualController != null)
         {
             _enemyVisualController.Initialize(_battleSystem);
+        }
+
+        if (_enemyStoneVisualController != null)
+        {
+            _enemyStoneVisualController.Initialize(_mapSystem, _battleSystem);
         }
 
         // PlayerVisualController 연결
@@ -501,6 +507,12 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
+        if (currentStageData != null && _currentRound >= currentStageData.LimitRound)
+        {
+            Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            EndBattle(false);
+            return;
+        }
         if (_timelineManager != null)
         {
             _timelineManager.OnRoundEnded();

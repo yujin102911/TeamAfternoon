@@ -20,6 +20,9 @@ public class StageData : ScriptableObject
     [TextArea(3, 20)]
     private string _stageName; //스테이지 이름
 
+    [Header("제한 설정")]
+    [SerializeField] private int _limitRound = 8;
+
     [Header("메일 내용")]
     [Tooltip("클리어 전 보일 의뢰 메일")]
     [SerializeField]
@@ -63,5 +66,6 @@ public class StageData : ScriptableObject
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
     public bool IsRead { get => _isRead; set => _isRead = value; }
     public string RequestLetter => _requestLetter;
+    public int LimitRound => _limitRound;
 
 }
