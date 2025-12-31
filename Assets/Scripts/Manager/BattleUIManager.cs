@@ -40,7 +40,7 @@ public class BattleUIManager : MonoBehaviour
 
     private void Update()
     {
-        _stack.text = $"현재 근거리 공격 추가 데미지 +{3 * battleSystem.MeleeAttackStack}";
+        _stack.text = $"현재 근거리 공격 추가 데미지 +{2 * battleSystem.MeleeAttackStack}";
     }
 
     private void OnDestroy()

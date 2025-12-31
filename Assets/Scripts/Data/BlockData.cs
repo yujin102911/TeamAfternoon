@@ -65,7 +65,7 @@ public class BlockData : ScriptableObject
     public int attackDamage;
 
     [BoxGroup("전투 설정"), LabelText("스택 공격 배수"), MinValue(0)]
-    public float stackMultiflier = 3f;
+    public float stackMultiflier = 2f;
 
     // ───────────────────────────────────────────────
     //  프로퍼티 (Readonly - 인스펙터 숨김)
