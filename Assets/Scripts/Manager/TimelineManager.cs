@@ -393,7 +393,7 @@ public class TimelineManager : MonoBehaviour
                 EnemyStone stone = _currentEnemyPattern.GetStoneAt(tick);
                 if (stone != null)
                 {
-                    _battleSystem.ProcessEnemyStone();
+                    _battleSystem.ProcessEnemyStone(stone.count);
                 }
 
             }
