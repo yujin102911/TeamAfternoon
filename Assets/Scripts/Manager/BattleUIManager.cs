@@ -23,12 +23,22 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] 
     private Slider _memorySlider;
 
+    [Header("아드레날린 UI")]
+    [SerializeField]
+    private Toggle _hitToggle;
+    [SerializeField]
+    private Toggle _eightToggle;
+    [SerializeField]
+    private TextMeshProUGUI _adTxt;
+
     private BattleSystem battleSystem;
 
     private void Awake()
     {
         Instance = this;
     }
+
+    
 
     private void Start()
     {
@@ -59,7 +69,18 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        _hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
+        _eightToggle.isOn = TimelineManager.Instance.Is_Eight;
 
+        
+    }
+
+    public void UpdateStackUI()
+    {
+        _adTxt.text = $"아드레날린 추가뎀 +{battleSystem.MeleeAttackStack}";
+    }
     private void HandleBattleInitialized()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)

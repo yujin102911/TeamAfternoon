@@ -19,6 +19,10 @@ public class sector_EnemySlot : Enemy_slot
     [SerializeField]
     private Sprite _hitSector;
     [SerializeField]
+    private Sprite _stoneSector;
+
+    [Header("3*3 그리드")]
+    [SerializeField]
     private Image[] _imageSectors;
 
     [Header("특수 패턴")]
@@ -53,6 +57,11 @@ public class sector_EnemySlot : Enemy_slot
                         else
                         {
                             _imageSectors[i].sprite = _nomalSector;
+                        }
+
+                        //돌위치 확인
+                        if (GameManager.Instance.BattleSystem.IsSectorBlocked(i+1)) {
+                            _imageSectors[i].sprite = _stoneSector;
                         }
                     }
 
