@@ -115,7 +115,7 @@ public class TimelineManager : MonoBehaviour
         bool isSuccess = _battleSystem.MeleeAttack(finalDamage, isChargeRequired);
         if (isSuccess)
         {
-            _battleSystem.IncreaseMeleeStack();
+            //_battleSystem.IncreaseMeleeStack();
         }
     }
     private void HandleMeleeAttack_Start()
