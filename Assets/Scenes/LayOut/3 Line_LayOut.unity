@@ -2586,7 +2586,7 @@ RectTransform:
   m_Father: {fileID: 89541319}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: -56}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3192,7 +3192,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.000015258789}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &640946023
 MonoBehaviour:
@@ -5057,7 +5057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1140779617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5972,7 +5972,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1287923865
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10039,6 +10039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ef1dc4c886d6504ea0a12d905818419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _skipBuilding: 1
   detailUI: {fileID: 154328654}
   _handCountTxt: {fileID: 270290718}
   _handPanel: {fileID: 1140779616}
@@ -10118,12 +10119,16 @@ PrefabInstance:
       objectReference: {fileID: 27755755}
     - target: {fileID: 1979076862494004251, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       propertyPath: Offset.x
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1979076862494004251, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       propertyPath: Offset.y
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1979076862494004251, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
+      propertyPath: CritTextPrefab
+      value: 
+      objectReference: {fileID: 8065810026165535893, guid: 24de98779bd38de4abe27d03988d35b6, type: 3}
     - target: {fileID: 1979076862494004251, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       propertyPath: _enemyContainer
       value: 
