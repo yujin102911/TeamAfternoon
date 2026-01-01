@@ -112,6 +112,7 @@ public class BattleSystem
 
         _battleTurnCount = 0;
 
+        ResetMeleeStack();
     }
 
     /// <summary>
