@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+// 크리티컬을 위한 구조체
+public struct DamageResult
+{
+    public int damage;
+    public bool isCritical;
+}
+
+
+
 /// <summary>
 /// 전투 로직을 처리하는 System
 /// HP, 데미지 등 전투 관련 계산 담당
@@ -28,7 +37,9 @@ public class BattleSystem
     private bool _isBowCharging = false; // 활 플래그
     private bool _isSwordCharging = false; // 검 플래그
 
-    private int _meleeAttackStack = 0; // 라운드 내 누적 스택
+    private int _meleeAttackStack = 0;              // 라운드 내 누적 스택
+    private float _defualtCriticalChance = 0.3f;    //기본 치명타 확률
+    private float _criticMulti = 0.02f;             //치명타 증가량
 
     private int _battleTurnCount = 0;
 
@@ -37,6 +48,8 @@ public class BattleSystem
     #region Events
     public event Action<int, int> OnPlayerHPChanged;          // 플레이어 HP 변화 시 발행되는 이벤트(UI용)
     public event Action<int, int> OnEnemyHPChanged;
+
+    public event Action<float> OnCriticalChanceChanged;
 
     public event Action OnPlayerMeleeAttack; // 근접 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeAttack; // 원거리 공격시 발행되는 이벤트
@@ -129,14 +142,32 @@ public class BattleSystem
                 //타격 범위인지 확인
                 if(_playerCurrentSector % _columns == 0)
                 {
-                    int final_dam = damage + _meleeAttackStack;
+                    float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+                    if (critChance > 1) 
+                    {
+                        critChance = 1;
+                    }
+
+                    DamageResult result = CalculateDamage(damage, critChance);
+
+                    int final_dam = result.damage;
 
                     DamageEnemy(final_dam);
                     OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
 
                     // 적 피격 연출
                     OnEnemyHit?.Invoke(final_dam);
-                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {final_dam})");
+
+                    if (result.isCritical)
+                    {
+                        Debug.Log($"[BattleSystem] 근거리 치명타 발생!! (데미지는 {final_dam})");
+                    }
+                    else
+                    {
+                        Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {final_dam})");
+                    }
+                        
                     return true;
 
                 }
@@ -157,11 +188,41 @@ public class BattleSystem
         }
         OnPlayerLongRangeAttack?.Invoke();
 
-        int final_dam = damage + _meleeAttackStack;
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        DamageResult result = CalculateDamage(damage, critChance);
+
+        int final_dam = result.damage;
 
         DamageEnemy(final_dam);
         OnEnemyHit?.Invoke(final_dam);
+
+        if (result.isCritical)
+        {
+            Debug.Log($"[BattleSystem] 원거리 치명타 발생!! (데미지는 {final_dam})");
+        }
+
         _isBowCharging = false;
+    }
+
+    public DamageResult CalculateDamage(int baseDamage, float critChance)
+    {
+        bool isCritical = UnityEngine.Random.value < critChance;
+
+        int finalDamage = isCritical
+            ? baseDamage * 2
+            : baseDamage;
+
+        return new DamageResult
+        {
+            damage = finalDamage,
+            isCritical = isCritical
+        };
     }
 
 
@@ -195,11 +256,28 @@ public class BattleSystem
     {
         _meleeAttackStack++;
         Debug.Log($"[BattleSystme] 근거리 공격 스택 증가. 현재 스택: {_meleeAttackStack}");
+
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        OnCriticalChanceChanged?.Invoke(critChance);
     }
 
     public void ResetMeleeStack()
     {
         _meleeAttackStack = 0;
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        OnCriticalChanceChanged?.Invoke(critChance);
     }
 
     private void DamageEnemy(int amount)
@@ -241,7 +319,8 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         //아드레날린 조건 파괴
-        TimelineManager.Instance.Is_Hit = true;
+        //TimelineManager.Instance.Is_Hit = true;
+        ResetMeleeStack();
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         OnPlayerHit?.Invoke();

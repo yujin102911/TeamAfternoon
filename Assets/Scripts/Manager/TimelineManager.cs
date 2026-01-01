@@ -74,6 +74,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem = new TimelineSystem();
 
         // TimelineSystem 이벤트 구독 (중재자 역할)
+        _timelineSystem.OnNoneStarted += HandleNonetick;
         _timelineSystem.OnMeleeAttackRequested += HandleMeleeAttackRequest;
         _timelineSystem.OnLongRangeAttackRequested += HandleLongRangeAttackRequest;
         _timelineSystem.OnMoveRequested += HandleMoveRequest;
@@ -91,6 +92,7 @@ public class TimelineManager : MonoBehaviour
         // 이벤트 구독 해제
         if (_timelineSystem != null)
         {
+            _timelineSystem.OnNoneStarted -= HandleNonetick;
             _timelineSystem.OnMeleeAttackRequested -= HandleMeleeAttackRequest;
             _timelineSystem.OnLongRangeAttackRequested -= HandleLongRangeAttackRequest;
             _timelineSystem.OnMoveRequested -= HandleMoveRequest;
@@ -172,6 +174,9 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleBlockTick(PlacedBlock placed, RuntimeBlock runtime, int tick, ActionType action)
     {
+        //틱당 크리 확률 증가
+        _battleSystem.IncreaseMeleeStack();
+
         // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
         if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
 
@@ -180,7 +185,11 @@ public class TimelineManager : MonoBehaviour
         {
             keyword.OnTick(placed, tick, action, _battleSystem);
         }
+    }
 
+    private void HandleNonetick()
+    {
+        _battleSystem.ResetMeleeStack();
     }
     // ========================================
     // 공개 메서드
@@ -458,25 +467,25 @@ public class TimelineManager : MonoBehaviour
         // 아드레날린 계산
         if (!Is_Hit)
         {
-            _battleSystem.IncreaseMeleeStack();
+            //_battleSystem.IncreaseMeleeStack();
             Is_Hit = false;
         }
 
         if (Is_Eight)
         {
-            _battleSystem.IncreaseMeleeStack();
+            //_battleSystem.IncreaseMeleeStack();
             Is_Eight = false;
         }
 
         if (Is_Hit && !Is_Eight) 
         {
-            _battleSystem.ResetMeleeStack();
+            //_battleSystem.ResetMeleeStack();
             Is_Hit = false;
             Is_Eight = false;
         }
 
         //아드 UI업뎃
-        BattleUIManager.Instance.UpdateStackUI();
+        //BattleUIManager.Instance.UpdateStackUI();
 
         Debug.Log("[TimelineDirector] 라운드 종료 처리 완료");
 

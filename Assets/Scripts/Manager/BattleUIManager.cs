@@ -49,6 +49,8 @@ public class BattleUIManager : MonoBehaviour
             battleSystem.OnBattleInitialized += HandleBattleInitialized;
             //battle.UpdateCureGauage += HandleCureChanged;
 
+            battleSystem.OnCriticalChanceChanged += UpdateStackUI;
+
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
             GameManager.Instance.OnMemoryUpdate += UpdateSlider;
@@ -63,6 +65,7 @@ public class BattleUIManager : MonoBehaviour
         {
             battleSystem = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
+            battleSystem.OnCriticalChanceChanged -= UpdateStackUI;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
             GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
             //battle.UpdateCureGauage -= HandleCureChanged;
@@ -77,9 +80,9 @@ public class BattleUIManager : MonoBehaviour
         
     }
 
-    public void UpdateStackUI()
+    public void UpdateStackUI(float chance)
     {
-        _adTxt.text = $"아드레날린 추가뎀 +{battleSystem.MeleeAttackStack}";
+        _adTxt.text = $"크리티컬 확률: {Mathf.RoundToInt(chance * 100f)}%";
     }
     private void HandleBattleInitialized()
     {
