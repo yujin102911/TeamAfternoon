@@ -59,13 +59,10 @@ public class BattleResultUIController : MonoBehaviour
     }
     private IEnumerator ProcessResultSequence(bool isVictory)
     {
-        // 1. 설정한 시간만큼 대기 (게임 상황을 잠시 보여줌)
         yield return new WaitForSeconds(_delayBeforeResult);
 
-        // 2. 스테이지 정보 갱신
         UpdateStageInfo();
 
-        // 3. 결과에 따른 연출 분기
         if (isVictory)
         {
             if (_renderingPanel != null)

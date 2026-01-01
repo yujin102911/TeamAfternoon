@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// OutLook에 있는 온갖 버튼들을 관리
@@ -54,13 +56,37 @@ public class MailPanel : MonoBehaviour
     public void GenerateStageList()
     {
         foreach (Transform child in _contentArea) Destroy(child.gameObject);
-        var allStages = DataRepository.Instance.stageDatas;
-        foreach (var stage in allStages.Values)
-        {
-            GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
-            StageButton mailBtn = go.GetComponent<StageButton>();
 
-            mailBtn.Setup(stage, DisplayLetterContent);
+        List<StageData> sortedStages = DataRepository.Instance.stageDatas.Values
+            .OrderBy(s => s.StageNumber)
+            .ToList();
+
+        foreach (StageData stage in sortedStages)
+        {
+            bool isAvailable = false;
+            int index = sortedStages.IndexOf(stage);
+
+            if (index == 0)
+            {
+                isAvailable = true;
+            }
+            else
+            {
+                if (sortedStages[index - 1].IsCleared)
+                {
+                    isAvailable = true;
+                }
+            }
+            if (isAvailable)
+            {
+                GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
+                StageButton mailBtn = go.GetComponent<StageButton>();
+                mailBtn.Setup(stage, DisplayLetterContent);
+            }
+            else
+            {
+                break;
+            }
         }
     }
     private void DisplayLetterContent(StageData data)
