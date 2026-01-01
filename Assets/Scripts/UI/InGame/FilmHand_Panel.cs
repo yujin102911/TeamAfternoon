@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
+public enum HandSortType { Length, Action }
 
 public class FilmHand_Panel : MonoBehaviour
 {
@@ -8,6 +11,7 @@ public class FilmHand_Panel : MonoBehaviour
     [SerializeField] private int _initialSize = 10;
 
     private Queue<GameObject> _handPool = new Queue<GameObject>();
+    private HandSortType _currentSortType = HandSortType.Length;
 
     private void Awake()
     {
@@ -76,8 +80,10 @@ public class FilmHand_Panel : MonoBehaviour
             Return(_spawnPoint.GetChild(i).gameObject);
         }
 
+        List<RuntimeBlock> sortedHand = SortBlocks(hand, _currentSortType);
+
         int ix = 0;
-        foreach (RuntimeBlock block in hand)
+        foreach (RuntimeBlock block in sortedHand)
         {
             GameObject go = Get();
             go.transform.SetParent(_spawnPoint, false);
@@ -92,5 +98,30 @@ public class FilmHand_Panel : MonoBehaviour
     public void UpdateHandUI(IReadOnlyList<RuntimeBlock> hand)
     {
         UpdateHandUI(new List<RuntimeBlock>(hand));
+    }
+
+    private List<RuntimeBlock> SortBlocks(List<RuntimeBlock> list, HandSortType type)
+    {
+        var query = list.OrderByDescending(b => b.IsFavorite);
+
+        if (type == HandSortType.Length)
+        {
+            return query.ThenBy(b => b.BaseData.BlockLength)
+                .ThenBy(b => b.BaseData.GetEffectAt(0))
+                .ToList();
+        }
+        else
+        {
+            return query.ThenBy(b => b.BaseData.GetEffectAt(0))
+                .ThenBy(b => b.BaseData.BlockLength)
+                .ToList();
+        }
+    }
+
+    public void SetSortType(int typeIndex)
+    {
+        _currentSortType = (HandSortType)typeIndex;
+        Debug.Log($"{_currentSortType}이 뭔지");
+        UpdateHandUI(new List<RuntimeBlock>(TimelineManager.Instance.CurrentHand));
     }
 }

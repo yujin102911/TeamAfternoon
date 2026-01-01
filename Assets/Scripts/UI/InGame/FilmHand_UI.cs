@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
-     IDragHandler, IEndDragHandler, IDraggableUI
+     IDragHandler, IEndDragHandler, IDraggableUI, IPointerClickHandler
 {
 
     public RuntimeBlock RuntimeBlock => base.runtimeBlock;
@@ -94,5 +95,30 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         ghost = null;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            ToggleFavorite();
+        }
+    }
+
+    private void ToggleFavorite()
+    {
+        if (runtimeBlock == null) return;
+
+        runtimeBlock.IsFavorite = !runtimeBlock.IsFavorite;
+
+        UserGameData userData = GameManager.Instance.UserGameData;
+        Saved_BlockData saved = userData.Unlocked_Blocks.Find(b => b.Owner_blockID == runtimeBlock.BlockID);
+
+        if (saved != null)
+        {
+            saved.IsFavorite = runtimeBlock.IsFavorite;
+            Debug.Log($"[Favorite] 블록 {runtimeBlock.BlockID} : {saved.IsFavorite}");
+        }
+        GetComponentInParent<FilmHand_Panel>().UpdateHandUI(new List<RuntimeBlock>(TimelineManager.Instance.CurrentHand));
     }
 }

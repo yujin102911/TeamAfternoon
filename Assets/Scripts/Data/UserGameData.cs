@@ -32,6 +32,7 @@ public class Saved_BlockData
 {
     public int Owner_blockID;
     public List<int> Attached_Keyword_IDs;
+    public bool IsFavorite; // 즐겨찾기 여부 저장 필드
 }
 
 [System.Serializable]
