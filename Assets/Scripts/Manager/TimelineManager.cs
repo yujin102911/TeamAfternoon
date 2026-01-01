@@ -12,6 +12,10 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("아드레날린 토글")]
+    public bool Is_Hit = false;
+    public bool Is_Eight = false;
+
     [Header("POC 온오프")]
     public bool Is_POC = false;
     public bool Is_One = false;
@@ -450,6 +454,29 @@ public class TimelineManager : MonoBehaviour
 
         // 손패 클리어 (GameDirector가 새로 줄 예정)
         _currentHand.Clear();
+
+        // 아드레날린 계산
+        if (!Is_Hit)
+        {
+            _battleSystem.IncreaseMeleeStack();
+            Is_Hit = false;
+        }
+
+        if (Is_Eight)
+        {
+            _battleSystem.IncreaseMeleeStack();
+            Is_Eight = false;
+        }
+
+        if (Is_Hit && !Is_Eight) 
+        {
+            _battleSystem.ResetMeleeStack();
+            Is_Hit = false;
+            Is_Eight = false;
+        }
+
+        //아드 UI업뎃
+        BattleUIManager.Instance.UpdateStackUI();
 
         Debug.Log("[TimelineDirector] 라운드 종료 처리 완료");
 

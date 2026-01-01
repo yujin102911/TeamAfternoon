@@ -129,12 +129,14 @@ public class BattleSystem
                 //타격 범위인지 확인
                 if(_playerCurrentSector % _columns == 0)
                 {
-                    DamageEnemy(damage);
+                    int final_dam = damage + _meleeAttackStack;
+
+                    DamageEnemy(final_dam);
                     OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
 
                     // 적 피격 연출
-                    OnEnemyHit?.Invoke(damage);
-                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {damage})");
+                    OnEnemyHit?.Invoke(final_dam);
+                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {final_dam})");
                     return true;
 
                 }
@@ -154,8 +156,11 @@ public class BattleSystem
             return;
         }
         OnPlayerLongRangeAttack?.Invoke();
-        DamageEnemy(damage );
-        OnEnemyHit?.Invoke(damage);
+
+        int final_dam = damage + _meleeAttackStack;
+
+        DamageEnemy(final_dam);
+        OnEnemyHit?.Invoke(final_dam);
         _isBowCharging = false;
     }
 
@@ -234,6 +239,9 @@ public class BattleSystem
         }
         _playerHP = Mathf.Max(0, _playerHP - damage);
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
+
+        //아드레날린 조건 파괴
+        TimelineManager.Instance.Is_Hit = true;
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         OnPlayerHit?.Invoke();

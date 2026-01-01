@@ -82,6 +82,26 @@ public class TimelineSystem
     public IReadOnlyList<PlacedBlock> PlacedBlocks => _placedBlocks;
     public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _prevPlacedBlocks;
 
+    private void Check_PlaceBlockLength()
+    {
+        int length = 0;
+        foreach (PlacedBlock block in _placedBlocks)
+        {
+            length += block.linkedRuntimeBlock.BaseData.blockLength;
+        }
+
+        Debug.LogWarning($"[TimelineSystem] 현재 놓인 블럭의 총 길이 {length}");
+
+        if (length == TimelineManager.Instance.TotalTicks)
+        {
+            TimelineManager.Instance.Is_Eight = true;
+        }
+        else
+        {
+            TimelineManager.Instance.Is_Eight = false;
+        }
+    }
+
     /// <summary>
     /// 블록을 배치 시도
     /// </summary>
@@ -113,6 +133,7 @@ public class TimelineSystem
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
+        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 배치: {runtimeBlock.BaseData.BlockName} at T{startTick}-{startTick + length - 1}");
         return true;
@@ -137,6 +158,8 @@ public class TimelineSystem
         }
 
         _placedBlocks.Remove(placedBlock);
+
+        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 제거: {placedBlock.GetBlockData()?.BlockName}");
         return runtimeBlock;
