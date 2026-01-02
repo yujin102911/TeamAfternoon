@@ -399,6 +399,11 @@ public class TimelineManager : MonoBehaviour
                 {
                     _battleSystem.ProcessEnemyStone(stone.count);
                 }
+                EnemyWind wind = _currentEnemyPattern?.GetWindAt(tick);
+                if (wind != null)
+                {
+                    _battleSystem.ProcessEnemyWind(wind);
+                }
 
             }
 

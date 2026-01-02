@@ -42,6 +42,27 @@ public class EnemyStone
 
 }
 
+
+public enum WindDirection
+{
+    Up,
+    Down,
+    Left,
+    Right,
+}
+[System.Serializable]
+public class EnemyWind
+{
+    public int tick;
+    public WindDirection direction;
+
+    public EnemyWind(int t, WindDirection dir)
+    {
+        tick = t;
+        direction = dir;
+    }
+}
+
 // ========================================
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
@@ -50,13 +71,9 @@ public class EnemyPattern : ScriptableObject
 {
     public string Pattern_Name;
 
-    [Header("패턴 대사")]
-    [TextArea(2, 5)]
-    public string Sentence;
-
-
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
     public List<EnemyStone> stones = new List<EnemyStone>();
+    public List<EnemyWind> winds = new List<EnemyWind>();
     public List<EnemyParrying> parryings = new List<EnemyParrying>();
 
     /// <summary>
@@ -81,5 +98,13 @@ public class EnemyPattern : ScriptableObject
     public EnemyStone GetStoneAt(int tick)
     {
         return stones.Find(a => a.tick == tick);
+    }
+
+    /// <summary>
+    /// 특정 틱의 바람 풍 가져오기
+    /// </summary>
+    public EnemyWind GetWindAt(int tick)
+    {
+        return winds.Find(a => a.tick == tick);
     }
 }
