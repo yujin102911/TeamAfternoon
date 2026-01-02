@@ -3335,6 +3335,7 @@ GameObject:
   - component: {fileID: 717145986}
   - component: {fileID: 717145987}
   - component: {fileID: 717145988}
+  - component: {fileID: 717145989}
   m_Layer: 5
   m_Name: TimeLine_Slider
   m_TagString: Untagged
@@ -3429,6 +3430,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _timelineUI: {fileID: 226099885458882376}
   slider: {fileID: 717145987}
+  steps: 17
+--- !u!114 &717145989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717145985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa25feeb48bae924e86dbaf6c6f565e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 717145987}
+  trackRect: {fileID: 779183327}
   steps: 17
 --- !u!1 &718151967
 GameObject:
@@ -3731,7 +3747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &779183327
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3748,8 +3764,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 1.2333}
+  m_SizeDelta: {x: 0, y: 20.9657}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &779183328
 MonoBehaviour:
@@ -3764,7 +3780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10031,6 +10047,7 @@ MonoBehaviour:
   _hitToggle: {fileID: 708390298}
   _eightToggle: {fileID: 1585037396}
   _adTxt: {fileID: 402252357}
+  _sliderHandleBar: {fileID: 2049970429}
 --- !u!114 &1994000754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10887,6 +10904,7 @@ GameObject:
   - component: {fileID: 2049970428}
   - component: {fileID: 2049970430}
   - component: {fileID: 2049970429}
+  - component: {fileID: 2049970431}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -10951,6 +10969,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2049970427}
   m_CullTransparentMesh: 1
+--- !u!114 &2049970431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2049970427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2176b6685a2cfe04dbf8213a0c605f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _image: {fileID: 2049970429}
 --- !u!1 &2091753247
 GameObject:
   m_ObjectHideFlags: 0

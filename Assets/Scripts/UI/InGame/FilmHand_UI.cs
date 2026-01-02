@@ -95,6 +95,9 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         ghost = null;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+
+        if (BattleUIManager.Instance != null)
+            BattleUIManager.Instance.HandleBar_raycastOn();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -110,6 +113,8 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         if (runtimeBlock == null) return;
 
         runtimeBlock.IsFavorite = !runtimeBlock.IsFavorite;
+
+        //여기에 별 아이콘 토글 코드 추가 가능
 
         UserGameData userData = GameManager.Instance.UserGameData;
         Saved_BlockData saved = userData.Unlocked_Blocks.Find(b => b.Owner_blockID == runtimeBlock.BlockID);

@@ -96,6 +96,9 @@ public class DragOn_timeline : MonoBehaviour
         Destroy(ghost);
         ghost = null;
         isDragging = false;
+
+        if(BattleUIManager.Instance != null)
+            BattleUIManager.Instance.HandleBar_raycastOn();
     }
 
     void OnDropFailed()

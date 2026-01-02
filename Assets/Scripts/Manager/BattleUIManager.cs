@@ -31,6 +31,10 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _adTxt;
 
+    [Header("슬라이더 핸들 바")]
+    [SerializeField]
+    private Image _sliderHandleBar;
+
     private BattleSystem battleSystem;
 
     private void Awake()
@@ -144,5 +148,11 @@ public class BattleUIManager : MonoBehaviour
         _memorySlider.value = slider_size;
         _percentTxt.text = $"용량 {percent}%";
         _storageTxt.text = $"{8*current}/{8 * max} <size=20>mb</size>";
+    }
+
+    // 슬라이더 핸들 바 레이캐스트 온
+    public void HandleBar_raycastOn()
+    {
+        _sliderHandleBar.raycastTarget = true;
     }
 }
