@@ -42,7 +42,6 @@ public class StepSlider : MonoBehaviour
 
     void OnStepChanged(int step)
     {
-        Debug.Log($"현재 마디: {step}");
         // 여기서 타임라인 이동 / 애니메이션 프리뷰 등
 
         _timelineUI.Hide_Preview();
