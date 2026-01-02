@@ -55,6 +55,8 @@ public class BattleSystem
     public event Action OnPlayerLongRangeAttack; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeStart; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeMiddle; // 원거리 공격시 발행되는 이벤트
+    public event Action OnPlayerGuard;
+    public event Action OnPlayerIdle;
 
     public event Action OnStartMelee; // 근접 차징 시작
     public event Action OnMiddleMelee; // 근접 차징 시작
@@ -304,6 +306,7 @@ public class BattleSystem
         if (_isGuarding)
         {
             Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+
             return;
         }
         if (_isBowCharging)
@@ -554,6 +557,10 @@ public class BattleSystem
     public void SetGuard(bool state)
     {
         _isGuarding = state;
-        if (state) Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+        if (state)
+        {
+            Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+            OnPlayerGuard?.Invoke();
+        }
     }
 }

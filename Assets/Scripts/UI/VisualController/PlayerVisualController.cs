@@ -198,12 +198,30 @@ public class PlayerVisualController : MonoBehaviour
             _playerAnimator.SetTrigger("Sword_Middle");
     }
 
+
+
     public void PlayMeleeEnd()
     {
         if (_playerInstance == null) return;
 
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Sword_End");
+    }
+
+    public void PlayGuard()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Guard");
+    }
+
+    public void PlayIdle()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Idle");
     }
 
     public void PlayHitEffect()
