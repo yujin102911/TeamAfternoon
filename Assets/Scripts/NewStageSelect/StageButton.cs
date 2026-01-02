@@ -9,33 +9,36 @@ public class StageButton : MonoBehaviour
     [SerializeField] private Sprite _readingSprite;
     [SerializeField] private Sprite _unreadingSprite;
 
-    private StageData _data;
-    private System.Action<StageData> _onSelect;
+    private StageData _stageData;
+    private MailContent _mailData;
+    private System.Action<StageData, MailContent> _onSelect;
 
-    public void Setup(StageData data, System.Action<StageData> onSelect)
+    public void Setup(StageData stage, MailContent mail, System.Action<StageData, MailContent> onSelect)
     {
-        _data = data;
+        _stageData = stage;
+        _mailData = mail;
         _onSelect = onSelect;
 
-        UpdateVisual();
+        Button btn = GetComponent<Button>();
+        btn.onClick.RemoveAllListeners();
 
-        _titleText.text = $"{data.StageName}";
-        GetComponent<Button>().onClick.AddListener(() => {
-            _data.IsRead = true;
+        btn.onClick.AddListener(() => {
+            _mailData.isRead = true;
             UpdateVisual();
-            _onSelect?.Invoke(_data);
+            _onSelect?.Invoke(_stageData, _mailData);
         });
+        UpdateVisual();
     }
 
     public void UpdateVisual()
     {
-        if (_data == null) return;
+        if (_mailData == null) return;
 
         if (_readingIcon != null)
         {
-            _readingIcon.sprite = _data.IsRead ? _readingSprite : _unreadingSprite;
+            _readingIcon.sprite = _mailData.isRead ? _readingSprite : _unreadingSprite;
         }
-        if (_data.IsRead)
+        if (_mailData.isRead)
         {
             _titleText.fontStyle = FontStyles.Normal;
         }
@@ -43,7 +46,7 @@ public class StageButton : MonoBehaviour
         {
             _titleText.fontStyle = FontStyles.Bold;
         }
-        _titleText.text = $"{_data.StageName}";
+        _titleText.text = $"{_mailData.subject}";
 
     }
 

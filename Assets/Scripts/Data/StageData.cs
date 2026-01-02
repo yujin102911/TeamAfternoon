@@ -10,6 +10,32 @@ public struct StageEnemySetup
     public List<int> hitSectors;
 }
 
+/// <summary>
+/// 메일용 구조체
+/// </summary>
+[System.Serializable]
+public class MailContent
+{
+    public string subject;
+    public string sender;
+    public string receiver;
+    [TextArea(5, 20)]
+    public string body;
+    public bool isRead;
+
+    public enum MailUnlockCondition { Always, AfterClear }
+    public MailUnlockCondition unlockCondition;
+}
+
+[System.Serializable]
+public class BoardEntry
+{
+    public string title;
+    [TextArea(10, 20)]
+    public string content;
+    public Sprite illustration;
+}
+
 [CreateAssetMenu(fileName = "New StageData", menuName = "Data/Stage Data")]
 public class StageData : ScriptableObject
 {
@@ -24,16 +50,10 @@ public class StageData : ScriptableObject
     [SerializeField] private int _limitRound = 8;
 
     [Header("메일 내용")]
-    [Tooltip("클리어 전 보일 의뢰 메일")]
-    [SerializeField]
-    [TextArea(5, 20)]
-    private string _requestLetter;
-    [Tooltip("보내는 사람")]
-    [SerializeField]
-    private string _sender = "@inailedit.com";
-    [Tooltip("받는 사람")]
-    [SerializeField]
-    private string _receiver = "@clearrun.fake";
+    [SerializeField] private List<MailContent> _mails = new List<MailContent>();
+
+    [Header("게시판 설정")]
+    [SerializeField] private List<BoardEntry> _boardEntries = new List<BoardEntry>();
 
     [Header("맵 정보")]
     [SerializeField]
@@ -52,20 +72,16 @@ public class StageData : ScriptableObject
     [Header("스테이지 진행도")]
     [SerializeField]
     private bool _isCleared = false;
-    [SerializeField]
-    private bool _isRead = false;
 
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
-    public string Sender => _sender;
-    public string Receiver => _receiver;
+    public List<MailContent> Mails => _mails;
+    public List<BoardEntry > BoardEntries => _boardEntries;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public MapSize MapSize => _mapSize;
     public List<Vector3> SectorPoints => _sectorTransform;
     public int PlayerMaxHP => _playerMaxHP;
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
-    public bool IsRead { get => _isRead; set => _isRead = value; }
-    public string RequestLetter => _requestLetter;
     public int LimitRound => _limitRound;
 
 }

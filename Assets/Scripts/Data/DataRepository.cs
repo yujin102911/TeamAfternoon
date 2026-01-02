@@ -69,10 +69,16 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
         for (int i = 0; i < sortedStages.Count; i++)
         {
             StageData stage = sortedStages[i];
-            bool isAvailable = (i == 0) || sortedStages[i-1].IsCleared;
-            if (isAvailable)
+            bool isStageAvailable = (i == 0) || sortedStages[i-1].IsCleared;
+
+            if (isStageAvailable)
             {
-                if (!stage.IsRead) return true;
+                foreach (MailContent mail in stage.Mails)
+                {
+                    bool isMailUnlocked = (mail.unlockCondition == MailContent.MailUnlockCondition.Always) || (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared);
+                    if (isMailUnlocked && !mail.isRead)
+                        return true;
+                }
             }
             else
             {

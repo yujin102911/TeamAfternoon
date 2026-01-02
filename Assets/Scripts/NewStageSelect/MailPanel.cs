@@ -63,40 +63,43 @@ public class MailPanel : MonoBehaviour
 
         foreach (StageData stage in sortedStages)
         {
-            bool isAvailable = false;
             int index = sortedStages.IndexOf(stage);
+            bool isStageAvailable = (index == 0) || sortedStages[index - 1].IsCleared;
 
-            if (index == 0)
+            if (isStageAvailable)
             {
-                isAvailable = true;
-            }
-            else
-            {
-                if (sortedStages[index - 1].IsCleared)
+                foreach (MailContent mail in stage.Mails)
                 {
-                    isAvailable = true;
+                    bool canShowMail = false;
+                    if (mail.unlockCondition == MailContent.MailUnlockCondition.Always)
+                    {
+                        canShowMail = true;
+                    }
+                    else if (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared)
+                    {
+                        canShowMail = true;
+                    }
+                    if (canShowMail)
+                    {
+                        GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
+                        StageButton mailBtn = go.GetComponent<StageButton>();
+                        mailBtn.Setup(stage, mail, DisplayLetterContent);
+                    }
                 }
             }
-            if (isAvailable)
-            {
-                GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
-                StageButton mailBtn = go.GetComponent<StageButton>();
-                mailBtn.Setup(stage, DisplayLetterContent);
-            }
-            else
-            {
-                break;
-            }
+            else break;
         }
     }
-    private void DisplayLetterContent(StageData data)
+    private void DisplayLetterContent(StageData data, MailContent mail)
     {
+        mail.isRead = true;
         OnMailStatusChanged?.Invoke();
-        if (_senderText != null) _senderText.text = data.Sender;
-        if (_receiverText != null) _receiverText.text = data.Receiver;
-        if (_titleText != null) _titleText.text = data.StageName;
 
-        string rawText = data.RequestLetter;
+        if (_senderText != null) _senderText.text = mail.sender;
+        if (_receiverText != null) _receiverText.text = mail.receiver;
+        if (_titleText != null) _titleText.text = mail.subject;
+
+        string rawText = mail.body;
 
         string linkTag = $"<color=#5865F2><u><link=\"stage_enter:{data.StageNumber}\">";
         string formattedText = rawText.Replace($"[ENTER_LINK]", linkTag + $"던전{data.StageNumber}일차.mp4</link></u></color>");
