@@ -10,7 +10,7 @@ public class BoardItem_UI : MonoBehaviour
 
     public void Setup(BoardEntry entry)
     {
-        if (_thumbnailImage != null) _thumbnailImage.sprite = entry.illustration;
+        //if (_thumbnailImage != null) _thumbnailImage.sprite = entry.illustration;
         if (_titleText != null) _titleText.text = entry.title;
         if (_contextText != null) _contextText.text = entry.content;
     }
