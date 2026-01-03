@@ -804,7 +804,9 @@ public class TimelineUI : MonoBehaviour
             }
         }
 
-        if(_currentSliderTick != -1)
+        Debug.Log(_currentSliderTick);
+
+        if(_currentSliderTick != -1 || _currentSliderTick != 0)
             Show_Preview(_currentSliderTick);
     }
 

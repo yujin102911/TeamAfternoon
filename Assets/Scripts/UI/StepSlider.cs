@@ -95,6 +95,8 @@ public class StepSlider : MonoBehaviour
     {
         slider.interactable = false; // 입력 차단
 
+        _timelineUI.Hide_Preview();
+
         float time = 0f;
         slider.value = slider.maxValue; // 보정
         

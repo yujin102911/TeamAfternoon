@@ -49,6 +49,8 @@ public class Action_cell : MonoBehaviour
     public Sprite Right_icon;
 
     [TabGroup("Move_2")]
+    public Sprite jump_icon;
+    [TabGroup("Move_2")]
     public Sprite NE_icon;
     [TabGroup("Move_2")]
     public Sprite SE_icon;
@@ -129,6 +131,20 @@ public class Action_cell : MonoBehaviour
                 break;
 
             case ActionType.Jump:
+                _backImage.sprite = Move_back;
+                _actionIcon.sprite = jump_icon;
+                switch (dir)
+                {
+                    //추후 방향 나오면 연결
+                    case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
+                    case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
+                    case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
+                    case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
+                }
+
+                _damageText.text = "";
+                break;
+
             case ActionType.Move:
                 _backImage.sprite = Move_back;
                 _actionIcon.sprite = Shoes_icon;
@@ -139,12 +155,6 @@ public class Action_cell : MonoBehaviour
                     case MoveDirection.Right: _directionIcon.sprite = Right_icon; break;
                     case MoveDirection.Back: _directionIcon.sprite = Back_icon; break;
                     case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
-
-                        //추후 방향 나오면 연결
-                    case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
-                    case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
-                    case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
-                    case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
                 }
 
                 _damageText.text = "";
@@ -183,7 +193,7 @@ public class Action_cell : MonoBehaviour
                 _backImage.sprite = Guard_Back;
                 _actionIcon.sprite = Guard_Icon;
                 _directionIcon.gameObject.SetActive(false);
-                _damageText.text = "G";
+                _damageText.text = "";
                 break;
 
             default:
