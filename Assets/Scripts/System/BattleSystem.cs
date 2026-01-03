@@ -507,6 +507,76 @@ public class BattleSystem
         }
     }
 
+    public void ProcessEnemyWind(EnemyWind wind)
+    {
+        if (wind == null) return;
+        Debug.Log("실행됩니다");
+        MoveDirection dir = ConvertWindToMoveDirection(wind.direction);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, wind.direction);
+        if (targetSector != -1 && !IsSectorBlocked(targetSector))
+        {
+            int prevSector = _playerCurrentSector;
+            _playerCurrentSector = targetSector;
+            Debug.Log($"[BattleSystem] 바람에 의해 밀려남 {prevSector} -> {_playerCurrentSector}");
+            OnPlayerMoved?.Invoke(_playerCurrentSector, dir);
+
+        }
+        else
+        {
+            Debug.Log("[BattleSystem] 바람이 불었으나 장애물이나 벽에 막혀 이동하지 못했습니다.");
+        }
+
+    }
+
+    public List<int> GetMovableWindSectors(WindDirection direction)
+    {
+        List<int> movableSectors = new List<int>();
+        for (int i = 1; i <= _totalSectors; i++)
+        {
+            int target = GetWindTargetSector(i, direction);
+            if (target != -1 && !IsSectorBlocked(target))
+            {
+                movableSectors.Add(i);
+            }
+        }
+        return movableSectors;
+    }
+
+    public int GetWindTargetSector(int fromSector, WindDirection direction)
+    {
+        int currentIndex = fromSector - 1;
+        int curRow = currentIndex / _columns;
+        int curCol = currentIndex % _columns;
+
+        int targetRow = curRow;
+        int targetCol = curCol;
+
+        switch (direction)
+        {
+            case WindDirection.Up: targetRow -= 1; break;
+            case WindDirection.Down: targetRow += 1; break;
+            case WindDirection.Left: targetCol -= 1; break;
+            case WindDirection.Right: targetCol += 1; break;
+        }
+        int rows = _totalSectors / _columns;
+        if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
+        {
+            return (targetRow * _columns) + targetCol + 1;
+        }
+        return -1;
+    }
+
+    private MoveDirection ConvertWindToMoveDirection(WindDirection windDir)
+    {
+        return windDir switch
+        {
+            WindDirection.Up => MoveDirection.Left,
+            WindDirection.Down => MoveDirection.Right,
+            WindDirection.Left => MoveDirection.Back,
+            WindDirection.Right => MoveDirection.Front,
+            _ => MoveDirection.None,
+        };
+    }
 
     public bool IsSectorBlocked(int sectorIndex)
     {

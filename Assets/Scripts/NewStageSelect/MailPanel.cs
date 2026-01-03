@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// OutLook에 있는 온갖 버튼들을 관리
@@ -54,23 +56,50 @@ public class MailPanel : MonoBehaviour
     public void GenerateStageList()
     {
         foreach (Transform child in _contentArea) Destroy(child.gameObject);
-        var allStages = DataRepository.Instance.stageDatas;
-        foreach (var stage in allStages.Values)
-        {
-            GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
-            StageButton mailBtn = go.GetComponent<StageButton>();
 
-            mailBtn.Setup(stage, DisplayLetterContent);
+        List<StageData> sortedStages = DataRepository.Instance.stageDatas.Values
+            .OrderBy(s => s.StageNumber)
+            .ToList();
+
+        foreach (StageData stage in sortedStages)
+        {
+            int index = sortedStages.IndexOf(stage);
+            bool isStageAvailable = (index == 0) || sortedStages[index - 1].IsCleared;
+
+            if (isStageAvailable)
+            {
+                foreach (MailContent mail in stage.Mails)
+                {
+                    bool canShowMail = false;
+                    if (mail.unlockCondition == MailContent.MailUnlockCondition.Always)
+                    {
+                        canShowMail = true;
+                    }
+                    else if (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared)
+                    {
+                        canShowMail = true;
+                    }
+                    if (canShowMail)
+                    {
+                        GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
+                        StageButton mailBtn = go.GetComponent<StageButton>();
+                        mailBtn.Setup(stage, mail, DisplayLetterContent);
+                    }
+                }
+            }
+            else break;
         }
     }
-    private void DisplayLetterContent(StageData data)
+    private void DisplayLetterContent(StageData data, MailContent mail)
     {
+        mail.isRead = true;
         OnMailStatusChanged?.Invoke();
-        if (_senderText != null) _senderText.text = data.Sender;
-        if (_receiverText != null) _receiverText.text = data.Receiver;
-        if (_titleText != null) _titleText.text = data.StageName;
 
-        string rawText = data.RequestLetter;
+        if (_senderText != null) _senderText.text = mail.sender;
+        if (_receiverText != null) _receiverText.text = mail.receiver;
+        if (_titleText != null) _titleText.text = mail.subject;
+
+        string rawText = mail.body;
 
         string linkTag = $"<color=#5865F2><u><link=\"stage_enter:{data.StageNumber}\">";
         string formattedText = rawText.Replace($"[ENTER_LINK]", linkTag + $"던전{data.StageNumber}일차.mp4</link></u></color>");

@@ -1,14 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class EnemyPhaseGroup
-{
-    public string PhaseName;
-    public List<EnemyPattern> Patterns = new List<EnemyPattern>();
-    public bool IsLoop = false;
-}
-
 [CreateAssetMenu(fileName = "New EnemyData", menuName = "Data/Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
