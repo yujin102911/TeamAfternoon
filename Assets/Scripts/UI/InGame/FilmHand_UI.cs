@@ -21,8 +21,9 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
     [SerializeField]
     private Image _image;
     private Color _originColor;
+    private bool _isPointerOver = false;
 
-    
+
 
     private void Awake()
     {
@@ -35,6 +36,26 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
     }
+
+    private void Update()
+    {
+        int num = GetNumberKeyDown();
+        if (num >= 1 && num <= 9 && _isPointerOver && TimelineManager.Instance != null)
+        {
+            bool tryPlace = TimelineManager.Instance.TryPlaceBlock(RuntimeBlock, num);
+        }
+    }
+    int GetNumberKeyDown()
+    {
+        for (int i = 0; i <= 9; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0 + i) ||
+                Input.GetKeyDown(KeyCode.Keypad0 + i))
+                return i;
+        }
+        return -1;
+    }
+
 
     private void OnDisable()
     {
@@ -56,12 +77,15 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         if (runtimeBlock == null) return;
         if (eventData.pointerDrag != null) return;
 
+        _isPointerOver = true;
+
         // 색상 변경
         _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        _isPointerOver = false;
         _image.color = _originColor;
     }
 
