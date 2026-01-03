@@ -12,6 +12,10 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("아드레날린 토글")]
+    public bool Is_Hit = false;
+    public bool Is_Eight = false;
+
     [Header("POC 온오프")]
     public bool Is_POC = false;
     public bool Is_One = false;
@@ -79,6 +83,7 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnLongRangeAttackStarted += HandleLongRangeAttack_Start;
         _timelineSystem.OnMeleeAttackStarted += HandleMeleeAttack_Start;
         _timelineSystem.OnGuardRequested += HandleGuardRequest;
+        _timelineSystem.OnLongRangeAttacking += HandleLongRangeAttack_Middle;
     }
 
     void OnDestroy()
@@ -93,6 +98,7 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnBlockEnded -= HandleBlockEnded;
             _timelineSystem.OnBlockTick -= HandleBlockTick;
             _timelineSystem.OnLongRangeAttackStarted -= HandleLongRangeAttack_Start;
+            _timelineSystem.OnLongRangeAttacking -= HandleLongRangeAttack_Middle;
             _timelineSystem.OnMeleeAttackStarted -= HandleMeleeAttack_Start;
             _timelineSystem.OnGuardRequested -= HandleGuardRequest;
         }
@@ -102,9 +108,15 @@ public class TimelineManager : MonoBehaviour
     // TimelineSystem 이벤트 핸들러 (중재자)
     // ========================================
 
-    private void HandleMeleeAttackRequest(int baseDamage, bool isChargeRequired)
+    private void HandleMeleeAttackRequest(BlockData data, bool isChargeRequired)
     {
-        _battleSystem.MeleeAttack(baseDamage, isChargeRequired);
+        int currentStack = _battleSystem.MeleeAttackStack;
+        int finalDamage = data.CalculateStackedDamage(currentStack);
+        bool isSuccess = _battleSystem.MeleeAttack(finalDamage, isChargeRequired);
+        if (isSuccess)
+        {
+            //_battleSystem.IncreaseMeleeStack();
+        }
     }
     private void HandleMeleeAttack_Start()
     {
@@ -118,6 +130,11 @@ public class TimelineManager : MonoBehaviour
     private void HandleLongRangeAttack_Start()
     {
         _battleSystem.LongRangeAttack_Start();
+    }
+
+    private void HandleLongRangeAttack_Middle()
+    {
+        _battleSystem.LongRangeAttack_Middle();
     }
 
     private void HandleMoveRequest(MoveDirection direction)
@@ -306,6 +323,7 @@ public class TimelineManager : MonoBehaviour
         int index = tick - placedBlock.startTick;
         placedBlock.linkedRuntimeBlock.ToggleDirectionsForJump(index);
         Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     /// <summary>
@@ -349,6 +367,11 @@ public class TimelineManager : MonoBehaviour
                 OnCurrentTickChanged?.Invoke(0);
                 break;
             }
+            // 플레이어 행동 끝나는 시점에 돌 다 없애기
+            if (tick == _totalTicks)
+            {
+                _battleSystem.ClearStones();
+            }
 
             yield return new WaitForSeconds(Tick_interval);
             if (GameManager.Instance.IsBattleEnded) yield break;
@@ -370,6 +393,16 @@ public class TimelineManager : MonoBehaviour
                 if (attack != null)
                 {
                     _battleSystem.ProcessEnemyAttack(attack);
+                }
+                EnemyStone stone = _currentEnemyPattern.GetStoneAt(tick);
+                if (stone != null)
+                {
+                    _battleSystem.ProcessEnemyStone(stone.count);
+                }
+                EnemyWind wind = _currentEnemyPattern?.GetWindAt(tick);
+                if (wind != null)
+                {
+                    _battleSystem.ProcessEnemyWind(wind);
                 }
 
             }
@@ -399,6 +432,7 @@ public class TimelineManager : MonoBehaviour
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
         Time.timeScale = 1f;
+        //_battleSystem.ResetMeleeStack();
     }
 
     /// <summary>
@@ -425,6 +459,29 @@ public class TimelineManager : MonoBehaviour
 
         // 손패 클리어 (GameDirector가 새로 줄 예정)
         _currentHand.Clear();
+
+        // 아드레날린 계산
+        if (!Is_Hit)
+        {
+            _battleSystem.IncreaseMeleeStack();
+            Is_Hit = false;
+        }
+
+        if (Is_Eight)
+        {
+            _battleSystem.IncreaseMeleeStack();
+            Is_Eight = false;
+        }
+
+        if (Is_Hit && !Is_Eight) 
+        {
+            _battleSystem.ResetMeleeStack();
+            Is_Hit = false;
+            Is_Eight = false;
+        }
+
+        //아드 UI업뎃
+        BattleUIManager.Instance.UpdateStackUI();
 
         Debug.Log("[TimelineDirector] 라운드 종료 처리 완료");
 

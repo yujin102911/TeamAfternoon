@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "New DataRepository", menuName = "Data/DataRepository")]
 public class DataRepository : SerializedScriptableObject   // ★ SerializedScriptableObject!!
@@ -61,9 +62,28 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
     }
     public bool HasUnreadMail()
     {
-        foreach (var stage in stageDatas.Values)
+        List<StageData> sortedStages = stageDatas.Values
+            .OrderBy(s => s.StageNumber)
+            .ToList();
+        
+        for (int i = 0; i < sortedStages.Count; i++)
         {
-            if (!stage.IsRead) return true;
+            StageData stage = sortedStages[i];
+            bool isStageAvailable = (i == 0) || sortedStages[i-1].IsCleared;
+
+            if (isStageAvailable)
+            {
+                foreach (MailContent mail in stage.Mails)
+                {
+                    bool isMailUnlocked = (mail.unlockCondition == MailContent.MailUnlockCondition.Always) || (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared);
+                    if (isMailUnlocked && !mail.isRead)
+                        return true;
+                }
+            }
+            else
+            {
+                break;
+            }
         }
         return false;
     }

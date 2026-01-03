@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerVisualController _playerVisualController;
     [SerializeField] private EnemyVisualController _enemyVisualController;
     [SerializeField] private BattleSequenceController _battleSequenceController;
+    [SerializeField] private EnemyStoneVisualController _enemyStoneVisualController;
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
@@ -97,6 +98,7 @@ public class GameManager : MonoBehaviour
     public event Action OnGameStateChanged;
     public event Action<int, int, int, int> OnRoundChanged;      // 현재 라인, 총 라인, 현재 적, 총 적
     public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
+    public event Action<int, int> OnMemoryUpdate;
 
     #endregion
 
@@ -188,6 +190,11 @@ public class GameManager : MonoBehaviour
             _enemyVisualController.Initialize(_battleSystem);
         }
 
+        if (_enemyStoneVisualController != null)
+        {
+            _enemyStoneVisualController.Initialize(_mapSystem, _battleSystem);
+        }
+
         // PlayerVisualController 연결
         if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
@@ -220,6 +227,12 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeAttack += _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
             _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
+            _battleSystem.OnPlayerLongRangeMiddle += _playerVisualController.PlayBowMiddle;
+
+            //근거리 차징
+            _battleSystem.OnStartMelee += _playerVisualController.PlayMeleeStart;
+            _battleSystem.OnMiddleMelee += _playerVisualController.PlayMeleeMiddle;
+            _battleSystem.OnEndMelee += _playerVisualController.PlayMeleeEnd;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
@@ -232,6 +245,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerHit += CountPlayerHit;
             _battleSystem.OnEnemyDied += HandleEnemyPurified;
             _battleSystem.OnEnemyDied += _enemyVisualController.PlayEnemyDie;
+            _battleSystem.OnPlayerDied += _playerVisualController.PlayDeath;
         }
 
     }
@@ -254,6 +268,12 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerMeleeAttack -= _playerVisualController.PlaySwordAttack;
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
+            _battleSystem.OnPlayerLongRangeMiddle -= _playerVisualController.PlayBowMiddle;
+
+            //근거리 차징
+            _battleSystem.OnStartMelee -= _playerVisualController.PlayMeleeStart;
+            _battleSystem.OnMiddleMelee -= _playerVisualController.PlayMeleeMiddle;
+            _battleSystem.OnEndMelee -= _playerVisualController.PlayMeleeEnd;
 
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
@@ -266,6 +286,7 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
             _battleSystem.OnEnemyDied -= _enemyVisualController.PlayEnemyDie;
+            _battleSystem.OnPlayerDied -= _playerVisualController.PlayDeath;
         }
     }
 
@@ -322,8 +343,11 @@ public class GameManager : MonoBehaviour
         }
         // 혹시 인트로가 없는 씬인 경우에는 그냥 바로 섹터 선택 모드 진입
         //if (FindAnyObjectByType<SceneIntroController>() == null)
-            //OnIntroCompleted();
-        
+        //OnIntroCompleted();
+
+
+        //TODO:추후에 8 자리에 최대 턴수 기입
+        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -376,6 +400,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.UpdateDangerIndicators();
         OnGameStateChanged?.Invoke();
 
+        _playerVisualController.Stop_PlayerIdle();
     }
 
     /// <summary>
@@ -423,7 +448,12 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
+        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
+
+        //idle 실행
+        _playerVisualController.Play_PlayerIdle();
+        _enemyVisualController.Play_EnemyIdle();
 
         //_battleSequenceController.PlayCameraEffect(true);
         // 전투로 넘어가는 연출 코루틴으로 넣기
@@ -441,9 +471,7 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
-            //idle 실행
-            _playerVisualController.Play_PlayerIdle();
-            _enemyVisualController.Play_EnemyIdle();
+            
 
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
@@ -479,6 +507,12 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
+        if (currentStageData != null && _currentRound >= currentStageData.LimitRound)
+        {
+            Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            EndBattle(false);
+            return;
+        }
         if (_timelineManager != null)
         {
             _timelineManager.OnRoundEnded();
@@ -581,7 +615,8 @@ public class GameManager : MonoBehaviour
         if (_battleSystem.Enemies.Count ==0) return;
         RuntimeEnemy activeEnemy = _battleSystem.Enemies[0];
 
-        EnemyPattern nextPattern = activeEnemy.GetNextPattern();
+        //EnemyPattern nextPattern = activeEnemy.GetNextPattern(); 순차적으로 가져올거면 아랫줄 주석 처리하고 이거 주석 해제
+        EnemyPattern nextPattern = activeEnemy.GetRandomPattern();
 
         if (nextPattern != null)
         {

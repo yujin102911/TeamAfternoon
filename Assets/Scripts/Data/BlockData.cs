@@ -64,6 +64,8 @@ public class BlockData : ScriptableObject
     [BoxGroup("전투 설정"), LabelText("공격 데미지"), MinValue(0)]
     public int attackDamage;
 
+    [BoxGroup("전투 설정"), LabelText("스택 공격 배수"), MinValue(0)]
+    public float stackMultiflier = 2f;
 
     // ───────────────────────────────────────────────
     //  프로퍼티 (Readonly - 인스펙터 숨김)
@@ -103,6 +105,14 @@ public class BlockData : ScriptableObject
         }
 
         return result;
+    }
+
+    [HideInInspector]
+    public int CalculateStackedDamage (int currentStack)
+    {
+        float addDamage = currentStack * stackMultiflier;
+        int finalDamage = attackDamage + Mathf.FloorToInt(addDamage);
+        return finalDamage;
     }
 
     [HideInInspector]

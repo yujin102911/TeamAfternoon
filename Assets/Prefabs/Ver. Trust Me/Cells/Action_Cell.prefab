@@ -211,6 +211,81 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &4251769874501040067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4006291298368396743}
+  - component: {fileID: 1791635394882940753}
+  - component: {fileID: 5854972638981437394}
+  m_Layer: 5
+  m_Name: melee_end
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &4006291298368396743
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4251769874501040067}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7123896944169645863}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 28.7231, y: 0}
+  m_SizeDelta: {x: -57.4464, y: 11}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1791635394882940753
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4251769874501040067}
+  m_CullTransparentMesh: 1
+--- !u!114 &5854972638981437394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4251769874501040067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 7525386589695956080, guid: db4bf47dfa3f3db4f9396f473e09628e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &4314222801427832114
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,6 +511,156 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &7562471896774137374
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 198465661295854595}
+  - component: {fileID: 6613033149888705500}
+  - component: {fileID: 4616048175404936261}
+  m_Layer: 5
+  m_Name: melee_middle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &198465661295854595
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562471896774137374}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7123896944169645863}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 11}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &6613033149888705500
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562471896774137374}
+  m_CullTransparentMesh: 1
+--- !u!114 &4616048175404936261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562471896774137374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 7525386589695956080, guid: db4bf47dfa3f3db4f9396f473e09628e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &7882747051974223735
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 460110158839362809}
+  - component: {fileID: 3147794025417206304}
+  - component: {fileID: 1511298118287841083}
+  m_Layer: 5
+  m_Name: melee_start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &460110158839362809
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7882747051974223735}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7123896944169645863}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -61.4133, y: 0}
+  m_SizeDelta: {x: -123.8798, y: 11}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &3147794025417206304
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7882747051974223735}
+  m_CullTransparentMesh: 1
+--- !u!114 &1511298118287841083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7882747051974223735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 7525386589695956080, guid: db4bf47dfa3f3db4f9396f473e09628e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &8148141235847223948
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,6 +696,9 @@ RectTransform:
   - {fileID: 4439971889498775302}
   - {fileID: 7881944481846052056}
   - {fileID: 6589052135511901345}
+  - {fileID: 198465661295854595}
+  - {fileID: 4006291298368396743}
+  - {fileID: 460110158839362809}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -537,17 +765,27 @@ MonoBehaviour:
   _actionSprite: {fileID: 5164137982114283507, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Attack_back: {fileID: -2649886090722610878, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Sword_icon: {fileID: 1887891317963970727, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
+  Attack_startIcon: {fileID: 3082030150211923480, guid: db4bf47dfa3f3db4f9396f473e09628e, type: 3}
+  Attack_startLine: {fileID: 7882747051974223735}
+  Attack_middleLine: {fileID: 7562471896774137374}
+  Attack_endLine: {fileID: 4251769874501040067}
   Move_back: {fileID: -5401474066610410003, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Shoes_icon: {fileID: 6879257638359005569, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Front_icon: {fileID: -3434186851659467623, guid: a1caa807e5cfc7c4991755d791363a7a, type: 3}
   Back_icon: {fileID: -5293465531582041849, guid: a1caa807e5cfc7c4991755d791363a7a, type: 3}
   Left_icon: {fileID: -1246502456649693745, guid: a1caa807e5cfc7c4991755d791363a7a, type: 3}
   Right_icon: {fileID: 8411434004979928833, guid: a1caa807e5cfc7c4991755d791363a7a, type: 3}
+  NE_icon: {fileID: -4280868331304072217, guid: 653fb0ea81536024ab4d337a9e0ea33f, type: 3}
+  SE_icon: {fileID: 8868355969321006838, guid: 9d870788f365b5e48b52817b84c6c0ae, type: 3}
+  SW_icon: {fileID: -7268512133553459934, guid: c14d4ade73bc8044ca4fb26b0b3583de, type: 3}
+  NW_icon: {fileID: 4546194973288575935, guid: 8de8f0c92642fa049b92d5ab41aa3b33, type: 3}
   Bow_back: {fileID: -3627023378008115256, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Bow_startIcon: {fileID: 5155220728732943998, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
   Bow_startLine: {fileID: 6970265636907658786}
   Bow_middleLine: {fileID: 5249266217035306670}
   Bow_endLine: {fileID: 8860135217309851723}
+  Guard_Back: {fileID: 5535412652238762223, guid: 955d296ba56403644a2664ac9b313bf4, type: 3}
+  Guard_Icon: {fileID: -554068590, guid: a064743e5c91a5248b895627ae6dfd58, type: 3}
   Bow_endIcon: {fileID: -1663894568715412587, guid: 945a7d7020f3c014ca15fcc9f3538998, type: 3}
 --- !u!1 &8860135217309851723
 GameObject:

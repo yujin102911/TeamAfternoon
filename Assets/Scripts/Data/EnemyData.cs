@@ -1,14 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class EnemyPhaseGroup
-{
-    public string PhaseName;
-    public List<EnemyPattern> Patterns = new List<EnemyPattern>();
-    public bool IsLoop = false;
-}
-
 [CreateAssetMenu(fileName = "New EnemyData", menuName = "Data/Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
@@ -18,7 +10,7 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private int _maxHP = 50;
 
-    [Header("적 프리펩")]
+    [Header("적 프리팹")]
     [SerializeField]
     private GameObject _enemyPrefab;
 

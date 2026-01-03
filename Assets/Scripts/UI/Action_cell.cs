@@ -26,7 +26,15 @@ public class Action_cell : MonoBehaviour
     public Sprite Attack_back;
     [TabGroup("Attack")]
     public Sprite Sword_icon;
-    
+    [TabGroup("Attack")]
+    public Sprite Attack_startIcon;
+    [TabGroup("Attack")]
+    public GameObject Attack_startLine;
+    [TabGroup("Attack")]
+    public GameObject Attack_middleLine;
+    [TabGroup("Attack")]
+    public GameObject Attack_endLine;
+
     [TabGroup("Move")]
     public Sprite Move_back;
     [TabGroup("Move")]
@@ -40,6 +48,15 @@ public class Action_cell : MonoBehaviour
     [TabGroup("Move")]
     public Sprite Right_icon;
 
+    [TabGroup("Move_2")]
+    public Sprite NE_icon;
+    [TabGroup("Move_2")]
+    public Sprite SE_icon;
+    [TabGroup("Move_2")]
+    public Sprite SW_icon;
+    [TabGroup("Move_2")]
+    public Sprite NW_icon;
+
     [TabGroup("Bow")]
     public Sprite Bow_back;
     [TabGroup("Bow")]
@@ -50,6 +67,11 @@ public class Action_cell : MonoBehaviour
     public GameObject Bow_middleLine;
     [TabGroup("Bow")]
     public GameObject Bow_endLine;
+
+    [TabGroup("Guard")]
+    public Sprite Guard_Back;
+    [TabGroup("Guard")]
+    public Sprite Guard_Icon;
 
     [TabGroup("None")]
     public Sprite Bow_endIcon;
@@ -82,6 +104,23 @@ public class Action_cell : MonoBehaviour
                 _backImage.gameObject.SetActive(false);
                 break;
 
+            case ActionType.Sword_start:
+                Attack_startLine.SetActive(true);
+                goto case ActionType.Attack;
+
+            case ActionType.Sword_middle:
+                _backImage.gameObject.SetActive(false);
+                Attack_middleLine.SetActive(true);
+                break;
+
+            case ActionType.Sword_end:
+                ChangeAlpha(_backImage, 0f);
+                _actionIcon.sprite = Attack_startIcon;
+                _directionIcon.gameObject.SetActive(false);
+                _damageText.text = "";
+                Attack_endLine.SetActive(true);
+                break;
+
             case ActionType.Attack:
                 _backImage.sprite = Attack_back;
                 _actionIcon.sprite = Sword_icon;
@@ -89,17 +128,23 @@ public class Action_cell : MonoBehaviour
                 _damageText.text = dam.ToString();
                 break;
 
+            case ActionType.Jump:
             case ActionType.Move:
                 _backImage.sprite = Move_back;
                 _actionIcon.sprite = Shoes_icon;
                 
-
                 switch (dir)
                 {
                     case MoveDirection.Front: _directionIcon.sprite = Front_icon; break;
                     case MoveDirection.Right: _directionIcon.sprite = Right_icon; break;
                     case MoveDirection.Back: _directionIcon.sprite = Back_icon; break;
                     case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
+
+                        //추후 방향 나오면 연결
+                    case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
+                    case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
+                    case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
+                    case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
                 }
 
                 _damageText.text = "";
@@ -134,6 +179,13 @@ public class Action_cell : MonoBehaviour
                 Bow_endLine.SetActive(true);
                 break;
 
+            case ActionType.Guard:
+                _backImage.sprite = Guard_Back;
+                _actionIcon.sprite = Guard_Icon;
+                _directionIcon.gameObject.SetActive(false);
+                _damageText.text = "G";
+                break;
+
             default:
                 break;
         }
@@ -144,6 +196,9 @@ public class Action_cell : MonoBehaviour
         Bow_startLine.SetActive(false);
         Bow_middleLine.SetActive(false);
         Bow_endLine.SetActive(false);
+        Attack_startLine.SetActive(false);
+        Attack_middleLine.SetActive(false);
+        Attack_endLine.SetActive(false);
     }
 
     private void ChangeAlpha(Image target, float alpha)

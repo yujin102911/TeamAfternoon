@@ -13,23 +13,45 @@ public class BattleUIManager : MonoBehaviour
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
 
+    [Header("메모리 UI")]
+    [SerializeField] 
+    private GameObject _memoryObject;
+    [SerializeField]
+    private TextMeshProUGUI _percentTxt;
+    [SerializeField]
+    private TextMeshProUGUI _storageTxt;
+    [SerializeField] 
+    private Slider _memorySlider;
+
+    [Header("아드레날린 UI")]
+    [SerializeField]
+    private Toggle _hitToggle;
+    [SerializeField]
+    private Toggle _eightToggle;
+    [SerializeField]
+    private TextMeshProUGUI _adTxt;
+
+    private BattleSystem battleSystem;
 
     private void Awake()
     {
         Instance = this;
     }
 
+    
+
     private void Start()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
-            BattleSystem battle = GameManager.Instance.BattleSystem;
+            battleSystem = GameManager.Instance.BattleSystem;
 
-            battle.OnBattleInitialized += HandleBattleInitialized;
+            battleSystem.OnBattleInitialized += HandleBattleInitialized;
             //battle.UpdateCureGauage += HandleCureChanged;
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
+            GameManager.Instance.OnMemoryUpdate += UpdateSlider;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -39,14 +61,26 @@ public class BattleUIManager : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
         {
-            BattleSystem battle = GameManager.Instance.BattleSystem;
+            battleSystem = GameManager.Instance.BattleSystem;
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
-            battle.OnBattleInitialized -= HandleBattleInitialized;
+            battleSystem.OnBattleInitialized -= HandleBattleInitialized;
+            GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
 
+    private void Update()
+    {
+        _hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
+        _eightToggle.isOn = TimelineManager.Instance.Is_Eight;
 
+        
+    }
+
+    public void UpdateStackUI()
+    {
+        _adTxt.text = $"아드레날린 추가뎀 +{battleSystem.MeleeAttackStack}";
+    }
     private void HandleBattleInitialized()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
@@ -97,5 +131,15 @@ public class BattleUIManager : MonoBehaviour
     public void Hide_startBtn()
     {
         _startButton.gameObject.SetActive(false);
+    }
+
+    private void UpdateSlider(int current, int max)
+    {
+        float slider_size = (float)current / max;
+        float percent = slider_size * 100f;
+
+        _memorySlider.value = slider_size;
+        _percentTxt.text = $"용량 {percent}%";
+        _storageTxt.text = $"{8*current}/{8 * max} <size=20>mb</size>";
     }
 }

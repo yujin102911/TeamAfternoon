@@ -35,8 +35,8 @@ public class TimelineUI : MonoBehaviour
     public Transform playerTimelinePanel;   // 아래쪽: 플레이어 배치
     public Transform descriptionPanel;
 
-    [Header("패턴 대사 UI")]
-    public TextMeshProUGUI sentenceText;
+    //[Header("패턴 대사 UI")]
+    //public TextMeshProUGUI sentenceText;
 
     [Header("플레이어 슬롯 설정")]
     public float playerSlotSpacing = 5f;    // 플레이어 슬롯 간격
@@ -297,7 +297,7 @@ public class TimelineUI : MonoBehaviour
                 //    //text.color = Color.white;
                 //}
 
-                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), attack.targetSectors);
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
             }
             else
             {
@@ -329,6 +329,19 @@ public class TimelineUI : MonoBehaviour
                 Debug.LogWarning($"적 공격 틱 {parrying.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
             }
         }
+
+        foreach (EnemyStone stone in sequence.stones)
+        {
+            if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
+            {
+
+                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, "", Special_Pattern.Stone, null);
+            }
+            else
+            {
+                Debug.LogWarning($"적 돌던지기 틱 {stone.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
+            }
+        }
     }
 
 
@@ -350,7 +363,7 @@ public class TimelineUI : MonoBehaviour
 
         if(tooltipTitleText != null)
         {
-            tooltipTitleText.text = $"책의 방해";
+            tooltipTitleText.text = $"슬라임의 물기";
         }
 
         // 툴팁 텍스트 설정
@@ -440,7 +453,7 @@ public class TimelineUI : MonoBehaviour
                 break;
             case ActionType.Attack:
                 titleText = "근거리 공격";
-                effectText = $"적에게 가장 가까운 열에서 <b>{blockData.attackDamage}피해</b>를 줍니다.";
+                effectText = $"적에게 가장 가까운 열에서만 <b>{blockData.attackDamage}피해</b>를 줍니다.";
                 break;
             case ActionType.Move:
                 titleText = "이동";
@@ -625,14 +638,14 @@ public class TimelineUI : MonoBehaviour
 
     public void OnPatternChanged(EnemyPattern pattern)
     {
-        if (sentenceText == null) return;
-        if (pattern != null)
-            sentenceText.text = pattern.Sentence;
-        else
-        {
-            sentenceText.text = "";
+        //if (sentenceText == null) return;
+        //if (pattern != null)
+        //    sentenceText.text = pattern.Sentence;
+        //else
+        //{
+        //    sentenceText.text = "";
 
-        }
+        //}
     }
 
     /// <summary>

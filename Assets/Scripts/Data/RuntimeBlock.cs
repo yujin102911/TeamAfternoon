@@ -9,6 +9,7 @@ public class RuntimeBlock
     public int BlockID { get; private set; }
     public BlockData BaseData { get; private set; }
     public List<KeywordData> AttachedKeywords { get; private set; } = new List<KeywordData>();
+    public bool IsFavorite { get; set; }
 
     public MoveDirection[] CurrentMoveDirections { get; private set; }
 
@@ -42,6 +43,7 @@ public class RuntimeBlock
 
     public void ApplySavedData(Saved_BlockData saved, DataRepository repo)
     {
+        this.IsFavorite = saved.IsFavorite;
         foreach (int keywordId in saved.Attached_Keyword_IDs)
         {
             if (repo.keywordDatas.TryGetValue(keywordId, out KeywordData keyword))

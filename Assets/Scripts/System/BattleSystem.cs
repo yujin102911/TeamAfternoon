@@ -18,6 +18,8 @@ public class BattleSystem
     private int _columns;
 
     private List<RuntimeEnemy> _enemies = new List<RuntimeEnemy>(); // 현재 싸우고 있는 적
+    private List<int> _stoneSectors = new List<int>();
+
 
     private int _enemyHP;
     private int _enemyMaxHP;
@@ -25,6 +27,8 @@ public class BattleSystem
     private bool _isGuarding = false; // 방어 플래그
     private bool _isBowCharging = false; // 활 플래그
     private bool _isSwordCharging = false; // 검 플래그
+
+    private int _meleeAttackStack = 0; // 라운드 내 누적 스택
 
     private int _battleTurnCount = 0;
 
@@ -37,6 +41,11 @@ public class BattleSystem
     public event Action OnPlayerMeleeAttack; // 근접 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeAttack; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeStart; // 원거리 공격시 발행되는 이벤트
+    public event Action OnPlayerLongRangeMiddle; // 원거리 공격시 발행되는 이벤트
+
+    public event Action OnStartMelee; // 근접 차징 시작
+    public event Action OnMiddleMelee; // 근접 차징 시작
+    public event Action OnEndMelee; // 근접 차징 시작
 
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
@@ -46,6 +55,8 @@ public class BattleSystem
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
     public event Action<List<int>> OnEnemyAttackSuccess; // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
+
+    public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
     public event Action OnBattleInitialized;
     #endregion
@@ -59,6 +70,7 @@ public class BattleSystem
 
     public int TotalDamage;
     public IReadOnlyList<RuntimeEnemy> Enemies => _enemies;
+    public int MeleeAttackStack => _meleeAttackStack;
     #endregion
 
     /// <summary>
@@ -92,15 +104,22 @@ public class BattleSystem
     /// <summary>
     /// 근거리 공격
     /// </summary>
-    public void MeleeAttack(int damage, bool isChargeRequired)
+    public bool MeleeAttack(int damage, bool isChargeRequired)
     {
         if (isChargeRequired && !_isSwordCharging)
         {
             Debug.Log("<color=red>[BattleSystem] 검 차징이 끊겨 공격에 실패했습니다!</color>");
-            return;
+            return false;
         }
 
-        OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
+        if (isChargeRequired)
+        {
+            OnEndMelee?.Invoke();
+        }
+        else
+        {
+            OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
+        }
 
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
@@ -110,16 +129,21 @@ public class BattleSystem
                 //타격 범위인지 확인
                 if(_playerCurrentSector % _columns == 0)
                 {
-                    DamageEnemy(damage);
+                    int final_dam = damage + _meleeAttackStack;
+
+                    DamageEnemy(final_dam);
                     OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
 
                     // 적 피격 연출
-                    OnEnemyHit?.Invoke(damage);
-                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {damage})");
+                    OnEnemyHit?.Invoke(final_dam);
+                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {final_dam})");
+                    return true;
+
                 }
             }
         }
         _isSwordCharging = false;
+        return false;
     }
     /// <summary>
     /// 원거리 공격
@@ -132,10 +156,14 @@ public class BattleSystem
             return;
         }
         OnPlayerLongRangeAttack?.Invoke();
-        DamageEnemy(damage );
-        OnEnemyHit?.Invoke(damage);
+
+        int final_dam = damage + _meleeAttackStack;
+
+        DamageEnemy(final_dam);
+        OnEnemyHit?.Invoke(final_dam);
         _isBowCharging = false;
     }
+
 
     public void LongRangeAttack_Start()
     {
@@ -145,10 +173,33 @@ public class BattleSystem
         Debug.Log("[BattleSystem] 활 차징 시작");
     }
 
+    public void LongRangeAttack_Middle()
+    {
+        OnPlayerLongRangeMiddle?.Invoke();
+    }
+
     public void MeleeAttack_Start()
     {
+        OnStartMelee?.Invoke();
+
         _isSwordCharging = true;
         Debug.Log("[BattleSystem] 검 차징 시작");
+    }
+
+    public void MeleeAttack_Middle()
+    {
+        OnMiddleMelee?.Invoke();
+    }
+
+    public void IncreaseMeleeStack()
+    {
+        _meleeAttackStack++;
+        Debug.Log($"[BattleSystme] 근거리 공격 스택 증가. 현재 스택: {_meleeAttackStack}");
+    }
+
+    public void ResetMeleeStack()
+    {
+        _meleeAttackStack = 0;
     }
 
     private void DamageEnemy(int amount)
@@ -174,6 +225,7 @@ public class BattleSystem
         if (_isGuarding)
         {
             Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+            return;
         }
         if (_isBowCharging)
         {
@@ -187,6 +239,9 @@ public class BattleSystem
         }
         _playerHP = Mathf.Max(0, _playerHP - damage);
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
+
+        //아드레날린 조건 파괴
+        TimelineManager.Instance.Is_Hit = true;
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
         OnPlayerHit?.Invoke();
@@ -267,8 +322,14 @@ public class BattleSystem
         int rows = _totalSectors / _columns;
         if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
         {
+            int targetSector = (targetRow * _columns) + targetCol + 1;
+            if (IsSectorBlocked(targetSector))
+            {
+                Debug.Log($"[BattleSystem] {targetSector}번 섹터는 돌에 막혀 이동할 수 없습니다");
+                return;
+            }
             int prevSector = _playerCurrentSector;
-            _playerCurrentSector = (targetRow *  _columns) + targetCol + 1;
+            _playerCurrentSector = targetSector;
             if (prevSector != _playerCurrentSector)
             {
                 Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
@@ -321,6 +382,114 @@ public class BattleSystem
         else
         {
             Debug.Log($"[BattleSystem] 회피 성공! (플레이어 위치: 섹터 {_playerCurrentSector})");
+        }
+    }
+
+    public void ProcessEnemyStone(int count = 1)
+    {
+        List<int> validSectors = new List<int>();
+        for (int j = 0; j < count; j++)
+        {
+            for (int i = 1; i <= _totalSectors; i++)
+            {
+                if (i != _playerCurrentSector && !_stoneSectors.Contains(i))
+                    validSectors.Add(i);
+            }
+            if (validSectors.Count > 0)
+            {
+                int targetSector = validSectors[Random.Range(0, validSectors.Count)];
+                _stoneSectors.Add(targetSector);
+                Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
+            }
+        }
+        if (count > 0)
+        {
+            OnStoneUpdated?.Invoke(_stoneSectors, true);
+        }
+    }
+
+    public void ProcessEnemyWind(EnemyWind wind)
+    {
+        if (wind == null) return;
+        Debug.Log("실행됩니다");
+        MoveDirection dir = ConvertWindToMoveDirection(wind.direction);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, wind.direction);
+        if (targetSector != -1 && !IsSectorBlocked(targetSector))
+        {
+            int prevSector = _playerCurrentSector;
+            _playerCurrentSector = targetSector;
+            Debug.Log($"[BattleSystem] 바람에 의해 밀려남 {prevSector} -> {_playerCurrentSector}");
+            OnPlayerMoved?.Invoke(_playerCurrentSector, dir);
+
+        }
+        else
+        {
+            Debug.Log("[BattleSystem] 바람이 불었으나 장애물이나 벽에 막혀 이동하지 못했습니다.");
+        }
+
+    }
+
+    public List<int> GetMovableWindSectors(WindDirection direction)
+    {
+        List<int> movableSectors = new List<int>();
+        for (int i = 1; i <= _totalSectors; i++)
+        {
+            int target = GetWindTargetSector(i, direction);
+            if (target != -1 && !IsSectorBlocked(target))
+            {
+                movableSectors.Add(i);
+            }
+        }
+        return movableSectors;
+    }
+
+    public int GetWindTargetSector(int fromSector, WindDirection direction)
+    {
+        int currentIndex = fromSector - 1;
+        int curRow = currentIndex / _columns;
+        int curCol = currentIndex % _columns;
+
+        int targetRow = curRow;
+        int targetCol = curCol;
+
+        switch (direction)
+        {
+            case WindDirection.Up: targetRow -= 1; break;
+            case WindDirection.Down: targetRow += 1; break;
+            case WindDirection.Left: targetCol -= 1; break;
+            case WindDirection.Right: targetCol += 1; break;
+        }
+        int rows = _totalSectors / _columns;
+        if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
+        {
+            return (targetRow * _columns) + targetCol + 1;
+        }
+        return -1;
+    }
+
+    private MoveDirection ConvertWindToMoveDirection(WindDirection windDir)
+    {
+        return windDir switch
+        {
+            WindDirection.Up => MoveDirection.Left,
+            WindDirection.Down => MoveDirection.Right,
+            WindDirection.Left => MoveDirection.Back,
+            WindDirection.Right => MoveDirection.Front,
+            _ => MoveDirection.None,
+        };
+    }
+
+    public bool IsSectorBlocked(int sectorIndex)
+    {
+        return _stoneSectors.Contains(sectorIndex);
+    }
+    public void ClearStones()
+    {
+        if (_stoneSectors.Count > 0)
+        {
+            _stoneSectors.Clear();
+            Debug.Log("모든 돌 소멸");
+            OnStoneUpdated?.Invoke(_stoneSectors, false);
         }
     }
 

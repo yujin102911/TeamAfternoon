@@ -66,4 +66,27 @@ public class RuntimeEnemy
         return pattern;
     }
 
+    public EnemyPattern GetRandomPattern()
+    {
+        if (Data.Patterns == null || Data.Patterns.Count == 0) return null;
+        if (Data.Patterns.Count == 1)
+        {
+            _patternSequenceIndex = 0;
+            CurrentPattern = Data.Patterns[0];
+            return CurrentPattern;
+        }
+
+        int nextIndex = _patternSequenceIndex;
+        while (nextIndex == _patternSequenceIndex)
+        {
+            nextIndex = Random.Range(0, Data.Patterns.Count);
+        }
+
+        _patternSequenceIndex = nextIndex;
+        CurrentPattern = Data.Patterns[_patternSequenceIndex];
+
+        Debug.Log($"{Data.Patterns.Count}개의 패턴 중 {_patternSequenceIndex}번째 패턴");
+        return CurrentPattern;
+    }
+
 }

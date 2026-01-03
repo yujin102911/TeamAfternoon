@@ -30,7 +30,7 @@ public class TimelineSystem
     /// <summary>
     /// 근접 공격 요청 이벤트 (데미지)
     /// </summary>
-    public event Action<int, bool> OnMeleeAttackRequested;
+    public event Action<BlockData, bool> OnMeleeAttackRequested;
 
     /// <summary>
     /// 근접 공격 (검 차징) 시작 이벤트
@@ -82,6 +82,26 @@ public class TimelineSystem
     public IReadOnlyList<PlacedBlock> PlacedBlocks => _placedBlocks;
     public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _prevPlacedBlocks;
 
+    private void Check_PlaceBlockLength()
+    {
+        int length = 0;
+        foreach (PlacedBlock block in _placedBlocks)
+        {
+            length += block.linkedRuntimeBlock.BaseData.blockLength;
+        }
+
+        Debug.LogWarning($"[TimelineSystem] 현재 놓인 블럭의 총 길이 {length}");
+
+        if (length == TimelineManager.Instance.TotalTicks)
+        {
+            TimelineManager.Instance.Is_Eight = true;
+        }
+        else
+        {
+            TimelineManager.Instance.Is_Eight = false;
+        }
+    }
+
     /// <summary>
     /// 블록을 배치 시도
     /// </summary>
@@ -113,6 +133,7 @@ public class TimelineSystem
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
+        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 배치: {runtimeBlock.BaseData.BlockName} at T{startTick}-{startTick + length - 1}");
         return true;
@@ -137,6 +158,8 @@ public class TimelineSystem
         }
 
         _placedBlocks.Remove(placedBlock);
+
+        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 제거: {placedBlock.GetBlockData()?.BlockName}");
         return runtimeBlock;
@@ -182,15 +205,16 @@ public class TimelineSystem
                 {
                     Debug.Log($"놓인거 {tick}틱 {placed.linkedRuntimeBlock.BaseData.actionTypes[placed.GetCardTickIndex(tick)].ToString()}");
                     Debug.Log($"들고있는거 {darg_block_tick}틱: {block.BaseData.actionTypes[darg_block_tick].ToString()}");
-                    return false;
+                    //return false;
                 }
                 else
                 {
                     
-                    return true;
+                    
                 }
 
-                    
+                return true;
+
             }
         }
         return false;
@@ -337,7 +361,7 @@ public class TimelineSystem
                 Debug.Log($"  → {blockData.BlockName}: 공격 요청 {damage}");
 
                 // 이벤트 발행 (Director가 BattleSystem에 전달)
-                OnMeleeAttackRequested?.Invoke(damage, false);
+                OnMeleeAttackRequested?.Invoke(blockData, false);
                 break;
 
             case ActionType.Move:
@@ -376,7 +400,7 @@ public class TimelineSystem
                 OnMeleeAttackStarted?.Invoke();
                 break;
             case ActionType.Sword_start:
-                OnMeleeAttackRequested?.Invoke(blockData.AttackDamage, true); 
+                OnMeleeAttackRequested?.Invoke(blockData, true); 
                 break;
             case ActionType.Sword_middle:
                 break;

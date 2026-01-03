@@ -12,8 +12,7 @@ public class Enemy_slot : MonoBehaviour
     private Image _innerSlot;
     [SerializeField]
     private TextMeshProUGUI _slotText;
-
-    public virtual void Show(Color color, string message, List<int> sectors = null)
+public virtual void Show(Color color, string message, Special_Pattern pattern = Special_Pattern.None, List<int> sectors = null)
     {
         Show_Slot();
 
@@ -25,6 +24,7 @@ public class Enemy_slot : MonoBehaviour
 
         _slotText.text = message;
     }
+    
 
     public virtual void Hide()
     {

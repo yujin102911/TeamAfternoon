@@ -109,13 +109,19 @@ public class PlayerVisualController : MonoBehaviour
     public void Play_PlayerIdle()
     {
         if (_playerAnimator != null)
-            _playerAnimator.SetTrigger("Play");
+        {
+            _playerAnimator.enabled = true;
+        }
+            //_playerAnimator.SetTrigger("Play");
     }
 
     public void Stop_PlayerIdle()
     {
         if (_playerAnimator != null)
-            _playerAnimator.SetTrigger("Pause");
+        {
+            _playerAnimator.enabled = false;
+        }
+        //_playerAnimator.SetTrigger("Pause");
     }
 
     public void PlayAttackShake()
@@ -142,6 +148,12 @@ public class PlayerVisualController : MonoBehaviour
         
     }
 
+    public void PlayDeath()
+    {
+        if (_playerInstance == null) return;
+        _playerAnimator.SetTrigger("Death");
+    }
+
     public void PlaySwordAttack()
     {
         if (_playerInstance == null) return;
@@ -156,12 +168,42 @@ public class PlayerVisualController : MonoBehaviour
             _playerAnimator.SetTrigger("Charging_Bow");
     }
 
+    public void PlayBowMiddle()
+    {
+        if (_playerInstance == null) return;
+        _playerAnimator.SetTrigger("Bow_Middle");
+    }
+
     public void PlayBowAttack()
     {
         if (_playerInstance == null) return;
 
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Attack_Bow");
+    }
+
+    public void PlayMeleeStart()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Sword_Charge");
+    }
+
+    public void PlayMeleeMiddle()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Sword_Middle");
+    }
+
+    public void PlayMeleeEnd()
+    {
+        if (_playerInstance == null) return;
+
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger("Sword_End");
     }
 
     public void PlayHitEffect()

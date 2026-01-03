@@ -3,6 +3,7 @@
 public class PlayerAttectEffect : MonoBehaviour
 {
     [SerializeField] private EffectPool swordAttackFX_pool;
+    [SerializeField] private EffectPool big_swordAttackFX_pool;
     [SerializeField] private EffectPool bowAttackFX_pool;
     [SerializeField] private EffectPool bowChargingFX_pool;
 
@@ -14,6 +15,13 @@ public class PlayerAttectEffect : MonoBehaviour
     public void SpawnSwordAttackEffect()
     {
         var fx = swordAttackFX_pool.GetEffect();
+        fx.transform.position = attackOffset;
+        fx.SetActive(true);
+    }
+
+    public void Spawn_BigSwordAttackEffect()
+    {
+        var fx = big_swordAttackFX_pool.GetEffect();
         fx.transform.position = attackOffset;
         fx.SetActive(true);
     }
@@ -35,7 +43,7 @@ public class PlayerAttectEffect : MonoBehaviour
     {
         if(_currentAnimtor != null)
         {
-            _currentAnimtor.SetTrigger("Charging_Lv2");
+            _currentAnimtor.SetTrigger("Charging_Lv3");
 
         }
         else
