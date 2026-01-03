@@ -146,7 +146,7 @@ public class BattleUIManager : MonoBehaviour
         float percent = slider_size * 100f;
 
         _memorySlider.value = slider_size;
-        _percentTxt.text = $"용량 {percent}%";
+        _percentTxt.text = $"{percent}%";
         _storageTxt.text = $"{8*current}/{8 * max} <size=20>mb</size>";
     }
 
