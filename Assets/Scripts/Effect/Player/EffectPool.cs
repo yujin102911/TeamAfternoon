@@ -55,4 +55,15 @@ public class EffectPool : MonoBehaviour, IEffectPoolOwner
         fx.transform.SetParent(transform, true);
         _effectPool.Enqueue(fx);
     }
+
+    public void ReturnAllEffects()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.gameObject.activeSelf)
+            {
+                ReturnEffect(child.gameObject);
+            }
+        }
+    }
 }

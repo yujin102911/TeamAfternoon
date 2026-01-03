@@ -228,6 +228,11 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess += _playerVisualController.PlayAttackEffect;
             _battleSystem.OnPlayerLongRangeStart += _playerVisualController.PlayBowCharging;
             _battleSystem.OnPlayerLongRangeMiddle += _playerVisualController.PlayBowMiddle;
+            _battleSystem.OnPlayerGuard += _playerVisualController.PlayGuard;
+            _battleSystem.OnPlayerIdle += _playerVisualController.PlayIdle;
+
+            //트리거 변경
+            _battleSystem.OnChangePlayerAnim += _playerVisualController.ChangeAnim;
 
             //근거리 차징
             _battleSystem.OnStartMelee += _playerVisualController.PlayMeleeStart;
@@ -250,6 +255,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void _battleSystem_OnPlayerGuard()
+    {
+        throw new NotImplementedException();
+    }
+
     private void UnSubscribeEvents()
     {
         _mapSystem.OnSectorSelected -= OnStartingSectorSelected;
@@ -269,6 +279,11 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeAttack -= _playerVisualController.PlayBowAttack;
             _battleSystem.OnPlayerLongRangeStart -= _playerVisualController.PlayBowCharging;
             _battleSystem.OnPlayerLongRangeMiddle -= _playerVisualController.PlayBowMiddle;
+            _battleSystem.OnPlayerGuard -= _playerVisualController.PlayGuard;
+            _battleSystem.OnPlayerIdle -= _playerVisualController.PlayIdle;
+
+            //트리거 변경
+            _battleSystem.OnChangePlayerAnim -= _playerVisualController.ChangeAnim;
 
             //근거리 차징
             _battleSystem.OnStartMelee -= _playerVisualController.PlayMeleeStart;

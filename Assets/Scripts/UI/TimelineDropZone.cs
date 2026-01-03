@@ -42,6 +42,9 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
             }
+
+            if (BattleUIManager.Instance != null)
+                BattleUIManager.Instance.HandleBar_raycastOn();
         }
     }
 
@@ -73,6 +76,9 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
                 //Draggable_Block.Instance.Hide();
             }
         }
+
+        if (BattleUIManager.Instance != null)
+            BattleUIManager.Instance.HandleBar_raycastOn();
     }
 
     /// <summary>

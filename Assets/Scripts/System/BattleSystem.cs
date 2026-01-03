@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+// 크리티컬을 위한 구조체
+public struct DamageResult
+{
+    public int damage;
+    public bool isCritical;
+}
+
+
+
 /// <summary>
 /// 전투 로직을 처리하는 System
 /// HP, 데미지 등 전투 관련 계산 담당
@@ -27,10 +36,15 @@ public class BattleSystem
     private bool _isGuarding = false; // 방어 플래그
     private bool _isBowCharging = false; // 활 플래그
     private bool _isSwordCharging = false; // 검 플래그
+    private bool _isPlayerHitThisTurn = false; // 이번 턴에 플레이어가 맞았는지 여부
 
-    private int _meleeAttackStack = 0; // 라운드 내 누적 스택
+    private int _meleeAttackStack = 0;              // 라운드 내 누적 스택
+    private float _defualtCriticalChance = 0.3f;    //기본 치명타 확률
+    private float _criticMulti = 0.02f;             //치명타 증가량
 
     private int _battleTurnCount = 0;
+
+    private int _damageBuffer = 0;
 
     #endregion
 
@@ -38,10 +52,16 @@ public class BattleSystem
     public event Action<int, int> OnPlayerHPChanged;          // 플레이어 HP 변화 시 발행되는 이벤트(UI용)
     public event Action<int, int> OnEnemyHPChanged;
 
+    public event Action<float> OnCriticalChanceChanged;
+
     public event Action OnPlayerMeleeAttack; // 근접 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeAttack; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeStart; // 원거리 공격시 발행되는 이벤트
     public event Action OnPlayerLongRangeMiddle; // 원거리 공격시 발행되는 이벤트
+    public event Action OnPlayerGuard;
+    public event Action OnPlayerIdle;
+
+    public event Action<string> OnChangePlayerAnim; // 플레이어 트리거 변경시 발행되는 이벤트
 
     public event Action OnStartMelee; // 근접 차징 시작
     public event Action OnMiddleMelee; // 근접 차징 시작
@@ -50,7 +70,7 @@ public class BattleSystem
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
-    public event Action<int> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
+    public event Action<int, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
@@ -99,6 +119,7 @@ public class BattleSystem
 
         _battleTurnCount = 0;
 
+        ResetMeleeStack();
     }
 
     /// <summary>
@@ -112,14 +133,9 @@ public class BattleSystem
             return false;
         }
 
-        if (isChargeRequired)
-        {
-            OnEndMelee?.Invoke();
-        }
-        else
-        {
-            OnPlayerMeleeAttack?.Invoke(); // 근거리 공격 애니메이션 이벤트
-        }
+        _damageBuffer = damage;
+
+        
 
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
@@ -129,16 +145,20 @@ public class BattleSystem
                 //타격 범위인지 확인
                 if(_playerCurrentSector % _columns == 0)
                 {
-                    int final_dam = damage + _meleeAttackStack;
 
-                    DamageEnemy(final_dam);
-                    OnPlayerAttackSuccess?.Invoke(); // 플레이어 공격 성공 모션
-
-                    // 적 피격 연출
-                    OnEnemyHit?.Invoke(final_dam);
-                    Debug.Log($"[BattleSystem] 적({enemy.Data.Enemy_Name}) 타격! (데미지는 {final_dam})");
+                    if (isChargeRequired)
+                    {
+                        OnChangePlayerAnim?.Invoke("6_2_SwordEnd");
+                        Debug.Log("[BattleSystem] 검 차징 공격!");
+                    }
+                    else
+                    {
+                        OnChangePlayerAnim?.Invoke("2_2_SwordAttack");  // 플레이어 공격 성공 모션
+                    }
+                        
+                    Debug.Log("[BattleSystem] 적 타격 성공!");
+                        
                     return true;
-
                 }
             }
         }
@@ -155,51 +175,108 @@ public class BattleSystem
             Debug.Log("[BattleSystem] 차징이 취소되어 공격에 실패했습니다.");
             return;
         }
-        OnPlayerLongRangeAttack?.Invoke();
 
-        int final_dam = damage + _meleeAttackStack;
+        _damageBuffer = damage;
+
+        OnChangePlayerAnim?.Invoke("2_3_BowShoot");
+
+        _isBowCharging = false;
+    }
+    /// <summary>
+    /// 적 데미지 연출 실행
+    /// </summary>
+    public void EnemyTakeDamage()
+    {
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        DamageResult result = CalculateDamage(_damageBuffer, critChance);
+
+        int final_dam = result.damage;
 
         DamageEnemy(final_dam);
-        OnEnemyHit?.Invoke(final_dam);
-        _isBowCharging = false;
+        OnEnemyHit?.Invoke(final_dam, result.isCritical);
+    }
+
+    // 데미지 결과 계산
+    public DamageResult CalculateDamage(int baseDamage, float critChance)
+    {
+        bool isCritical = UnityEngine.Random.value < critChance;
+
+        int finalDamage = isCritical
+            ? baseDamage * 2
+            : baseDamage;
+
+        return new DamageResult
+        {
+            damage = finalDamage,
+            isCritical = isCritical
+        };
     }
 
 
     public void LongRangeAttack_Start()
     {
-        OnPlayerLongRangeStart?.Invoke();
-
         _isBowCharging = true;
         Debug.Log("[BattleSystem] 활 차징 시작");
+
+        OnChangePlayerAnim?.Invoke("2_1_BowAttack");
     }
 
     public void LongRangeAttack_Middle()
     {
-        OnPlayerLongRangeMiddle?.Invoke();
+        OnChangePlayerAnim?.Invoke("2_2_BowMiddle");
     }
 
     public void MeleeAttack_Start()
     {
-        OnStartMelee?.Invoke();
-
         _isSwordCharging = true;
         Debug.Log("[BattleSystem] 검 차징 시작");
+
+        OnChangePlayerAnim?.Invoke("6_SwordCharge");
     }
 
     public void MeleeAttack_Middle()
     {
-        OnMiddleMelee?.Invoke();
+        OnChangePlayerAnim?.Invoke("6_1_SwordMiddle");
     }
 
+    /// <summary>
+    /// 치명타 확률 증가
+    /// </summary>
     public void IncreaseMeleeStack()
     {
         _meleeAttackStack++;
         Debug.Log($"[BattleSystme] 근거리 공격 스택 증가. 현재 스택: {_meleeAttackStack}");
+
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        OnCriticalChanceChanged?.Invoke(critChance);
     }
 
+    /// <summary>
+    /// 치명타 확률 초기화
+    /// </summary>
     public void ResetMeleeStack()
     {
         _meleeAttackStack = 0;
+        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
+
+        if (critChance > 1)
+        {
+            critChance = 1;
+        }
+
+        OnCriticalChanceChanged?.Invoke(critChance);
     }
 
     private void DamageEnemy(int amount)
@@ -224,7 +301,6 @@ public class BattleSystem
 
         if (_isGuarding)
         {
-            Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
             return;
         }
         if (_isBowCharging)
@@ -241,15 +317,35 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         //아드레날린 조건 파괴
-        TimelineManager.Instance.Is_Hit = true;
+        ResetMeleeStack();
+    }
 
-        OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
-        OnPlayerHit?.Invoke();
-        if (_playerHP <= 0)
+    public void PlayerTakeDamage()
+    {
+        if (!_isPlayerHitThisTurn)
         {
-            OnPlayerDied?.Invoke();
-            OnPlayerDefeated();
+            return;
         }
+        else
+        {
+            if (_isGuarding)
+            {
+                OnChangePlayerAnim?.Invoke("7_1_GuardSuccess");
+                Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+                _isGuarding = false;
+            }
+            else
+            {
+                OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+                OnChangePlayerAnim?.Invoke("4_Hurt");
+
+                if (_playerHP <= 0)
+                {
+                    OnPlayerDied?.Invoke();
+                    OnPlayerDefeated();
+                }
+            }
+        }   
     }
 
     public void SetPlayerStartPosition(int sector)
@@ -272,7 +368,6 @@ public class BattleSystem
         }
         _playerCurrentSector = targetSector;
         Debug.Log($"[BattleSystem] 플레이어 시작 위치 갱신됨: {_playerCurrentSector}");
-        //OnPlayerMoved?.Invoke(_playerCurrentSector);
     }
 
     public void MovePlayer(MoveDirection moveDirection) 
@@ -371,11 +466,15 @@ public class BattleSystem
     {
         if (attack == null) return;
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
+        
         if (attack.targetSectors != null && attack.targetSectors.Count > 0)
         {
             OnEnemyAttackSuccess?.Invoke(attack.targetSectors);
         }
-        if (IsPlayerHitByAttack(attack))
+
+        _isPlayerHitThisTurn = IsPlayerHitByAttack(attack);
+
+        if (_isPlayerHitThisTurn)
         {
             DealDamageToPlayer(attack.damage);
         }
@@ -543,7 +642,28 @@ public class BattleSystem
 
     public void SetGuard(bool state)
     {
+        if(_isGuarding && !state)
+        {
+            Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 해제!</color>");
+            //
+            OnChangePlayerAnim?.Invoke("7_2_ReleaseGuard");
+        }
+        else if (state)
+        {
+            Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+        }
+
         _isGuarding = state;
-        if (state) Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+        
+    }
+
+    public void Guard()
+    {
+        OnChangePlayerAnim?.Invoke("7_Guard");
+    }
+
+    public void Release_Guard()
+    {
+        //OnChangePlayerAnim?.Invoke("1_Idle");
     }
 }

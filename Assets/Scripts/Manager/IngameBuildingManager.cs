@@ -9,6 +9,11 @@ public class IngameBuildingManager : MonoBehaviour
 {
     public static IngameBuildingManager Instance;
 
+    [Header("덱빌딩 토글")]
+    [SerializeField]
+    private bool _skipBuilding;
+
+
     [Header("블럭 정보창")]
     [SerializeField] 
     private New_DetailPanel detailUI;
@@ -181,7 +186,7 @@ public class IngameBuildingManager : MonoBehaviour
     {
         _handCountTxt.text = $"My Clip {hand.Count} / {_maxHandCount}";
 
-        if (_buildingHand.Count == 0 && !_buildingPanel.activeSelf)
+        if (_buildingHand.Count == 0 && !_buildingPanel.activeSelf && !_skipBuilding)
         {
             _bigOpenBtn.gameObject.SetActive(true);
         }
@@ -189,6 +194,8 @@ public class IngameBuildingManager : MonoBehaviour
 
     private void UpdateGameStartButton(List<RuntimeBlock> hand)
     {
+        if (_skipBuilding) return;
+
         _gameStartBtn.gameObject.SetActive(hand.Count > 0);
     }
 
@@ -223,7 +230,17 @@ public class IngameBuildingManager : MonoBehaviour
         _handPanel.SetActive(false);
 
         if (GameManager.Instance != null)
-            GameManager.Instance.GameStart(_buildingHand);
+        {
+            if (_skipBuilding)
+            {
+                GameManager.Instance.GameStart(_buildingDeck);
+            }
+            else
+            {
+                GameManager.Instance.GameStart(_buildingHand);
+            }
+        }
+            
     }
 
     // 추가 버튼에서 작동

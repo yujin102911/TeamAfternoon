@@ -28,6 +28,11 @@ public class TimelineSystem
     // ========================================
 
     /// <summary>
+    /// none틱 이벤트
+    /// </summary>
+    public event Action OnNoneStarted;
+
+    /// <summary>
     /// 근접 공격 요청 이벤트 (데미지)
     /// </summary>
     public event Action<BlockData, bool> OnMeleeAttackRequested;
@@ -133,8 +138,6 @@ public class TimelineSystem
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
-        Check_PlaceBlockLength();
-
         Debug.Log($"[TimelineSystem] 블록 배치: {runtimeBlock.BaseData.BlockName} at T{startTick}-{startTick + length - 1}");
         return true;
     }
@@ -158,8 +161,6 @@ public class TimelineSystem
         }
 
         _placedBlocks.Remove(placedBlock);
-
-        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 제거: {placedBlock.GetBlockData()?.BlockName}");
         return runtimeBlock;
@@ -305,8 +306,13 @@ public class TimelineSystem
 
         //Debug.Log(placed.linkedRuntimeBlock.BaseData.blockName);
 
-        if (placed == null) return;
-
+        if (placed == null)
+        {
+            OnNoneStarted?.Invoke();
+            Debug.Log("[TimelineSystem] none틱 입니다!!");
+            return;
+        }
+        
         int cardTickIndex = placed.GetCardTickIndex(tick);
         BlockData blockData = placed.GetBlockData();
 

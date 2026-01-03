@@ -13,6 +13,7 @@ public class EnemyVisualController : MonoBehaviour
     [SerializeField] private float _spacing = 2.5f;
 
     public GameObject textPrefab; // 생성될 프리팹
+    public GameObject CritTextPrefab; // 크리티컬 생성될 프리팹
     public Vector3 Offset;
 
     [Header("점멸 설정")]
@@ -125,13 +126,13 @@ public class EnemyVisualController : MonoBehaviour
     //    }
     //}
 
-    private void HandleEnemyHit(RuntimeEnemy enemy)
-    {
-        if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
-            visual.PlayerHitAnimation();
+    //private void HandleEnemyHit(RuntimeEnemy enemy)
+    //{
+    //    if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
+    //        visual.PlayerHitAnimation();
 
-        StartCoroutine(ShowEnemyDamage(_battleSystem.TotalDamage));
-    }
+    //    StartCoroutine(ShowEnemyDamage(_battleSystem.TotalDamage));
+    //}
 
     private void HandleEnemyDead(RuntimeEnemy enemy)
     {
@@ -153,12 +154,12 @@ public class EnemyVisualController : MonoBehaviour
             _enemyAnimator.SetTrigger("Pause");
     }
 
-    public void PlayDamage(int damage)
+    public void PlayDamage(int damage, bool is_crit)
     {
         if (_enemyAnimator != null)
             _enemyAnimator.SetTrigger("Hurt");
 
-        StartCoroutine(ShowEnemyDamage(damage));
+        StartCoroutine(ShowEnemyDamage(damage, is_crit));
     }
 
     public void PlayEnemyDie()
@@ -176,25 +177,32 @@ public class EnemyVisualController : MonoBehaviour
             _enemyAnimator.SetTrigger("Attack");
     }
 
-    public IEnumerator ShowEnemyDamage(int damage)
+    public IEnumerator ShowEnemyDamage(int damage, bool is_crit)
     {
-        //애니메이션과 타이밍을 맞추기 위함
-        yield return new WaitForSecondsRealtime(0.55f);
-
-        SpawnDamageText(damage);
+        SpawnDamageText(damage, is_crit);
 
         yield return new WaitForSeconds(blinkDuration);
     }
 
-    private void SpawnDamageText(int damage)
+    private void SpawnDamageText(int damage, bool is_crit)
     {
         if (textPrefab == null) return;
-        GameObject go = Instantiate(textPrefab, transform.position + Offset, Quaternion.identity);
+        
+        GameObject go = null;
 
-        TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
+        if (is_crit)
+        {
+            go = Instantiate(CritTextPrefab, transform.position + Offset, Quaternion.identity);
+        }
+        else
+        {
+            go = Instantiate(textPrefab, transform.position + Offset, Quaternion.identity);
+        }
+
+            TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.text = "-" + damage.ToString();
+            tmp.text = damage.ToString();
         }
         StartCoroutine(DestroyDamageText(go));
     }

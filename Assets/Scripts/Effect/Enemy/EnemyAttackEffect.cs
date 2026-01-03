@@ -47,6 +47,9 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             fx.transform.position = _worldSectorPos[index - 1] + _offset;
             fx.SetActive(true);
         }
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.PlayerTakeDamage();
     }
 
     #region Pool

@@ -87,6 +87,8 @@ public class TimelineUI : MonoBehaviour
     [TabGroup("Cure")]
     public Sprite[] _cureIcons;
 
+    private int _currentSliderTick = -1;
+
     // 슬롯 저장 (틱 1~18)
     private List<GameObject> enemySlots = new List<GameObject>();
     private List<GameObject> cursorSlots = new List<GameObject>();
@@ -568,6 +570,8 @@ public class TimelineUI : MonoBehaviour
 
             }
 
+            Debug.Log($"[TimelineUI] previewAction: {previewAction}");
+
             OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
@@ -593,6 +597,8 @@ public class TimelineUI : MonoBehaviour
     // 슬라이더에서 호출
     public void Show_Preview(int tick)
     {
+        _currentSliderTick = tick;
+
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
@@ -797,6 +803,9 @@ public class TimelineUI : MonoBehaviour
                 }
             }
         }
+
+        if(_currentSliderTick != -1)
+            Show_Preview(_currentSliderTick);
     }
 
     /// <summary>

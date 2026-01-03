@@ -17,6 +17,9 @@ public class PlayerAttectEffect : MonoBehaviour
         var fx = swordAttackFX_pool.GetEffect();
         fx.transform.position = attackOffset;
         fx.SetActive(true);
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.EnemyTakeDamage();
     }
 
     public void Spawn_BigSwordAttackEffect()
@@ -24,6 +27,9 @@ public class PlayerAttectEffect : MonoBehaviour
         var fx = big_swordAttackFX_pool.GetEffect();
         fx.transform.position = attackOffset;
         fx.SetActive(true);
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.EnemyTakeDamage();
     }
 
     public void SpawnBowAttackEffect()
@@ -37,6 +43,9 @@ public class PlayerAttectEffect : MonoBehaviour
             _currentAnimtor.SetTrigger("Shoot");
             _currentAnimtor = null;
         }
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.EnemyTakeDamage();
     }
 
     public void SpawnBowChargingEffect()
@@ -53,8 +62,14 @@ public class PlayerAttectEffect : MonoBehaviour
             fx.transform.position = transform.position + chargingOffset;
             fx.SetActive(true);
             _currentAnimtor = fx.GetComponent<Animator>();
-        }
+        } 
+    }
 
-            
+    public void ReturnEffects()
+    {
+        swordAttackFX_pool.ReturnAllEffects();
+        big_swordAttackFX_pool.ReturnAllEffects();
+        bowAttackFX_pool.ReturnAllEffects();
+        bowChargingFX_pool.ReturnAllEffects();
     }
 }
