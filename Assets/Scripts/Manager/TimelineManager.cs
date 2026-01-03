@@ -146,6 +146,9 @@ public class TimelineManager : MonoBehaviour
     private void HandleGuardRequest(bool state)
     {
         _battleSystem.SetGuard(state);
+
+        if (state)
+            _battleSystem.Guard();
     }
 
     private void HandleBlockStarted(PlacedBlock placed, RuntimeBlock runtime, int tick)
@@ -190,6 +193,7 @@ public class TimelineManager : MonoBehaviour
     private void HandleNonetick()
     {
         _battleSystem.ResetMeleeStack();
+        _battleSystem.Release_Guard();
     }
     // ========================================
     // 공개 메서드

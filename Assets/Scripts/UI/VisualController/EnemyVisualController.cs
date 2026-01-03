@@ -179,9 +179,6 @@ public class EnemyVisualController : MonoBehaviour
 
     public IEnumerator ShowEnemyDamage(int damage, bool is_crit)
     {
-        //애니메이션과 타이밍을 맞추기 위함
-        yield return new WaitForSecondsRealtime(0.55f);
-
         SpawnDamageText(damage, is_crit);
 
         yield return new WaitForSeconds(blinkDuration);

@@ -231,6 +231,9 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerGuard += _playerVisualController.PlayGuard;
             _battleSystem.OnPlayerIdle += _playerVisualController.PlayIdle;
 
+            //트리거 변경
+            _battleSystem.OnChangePlayerAnim += _playerVisualController.ChangeAnim;
+
             //근거리 차징
             _battleSystem.OnStartMelee += _playerVisualController.PlayMeleeStart;
             _battleSystem.OnMiddleMelee += _playerVisualController.PlayMeleeMiddle;
@@ -278,6 +281,9 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerLongRangeMiddle -= _playerVisualController.PlayBowMiddle;
             _battleSystem.OnPlayerGuard -= _playerVisualController.PlayGuard;
             _battleSystem.OnPlayerIdle -= _playerVisualController.PlayIdle;
+
+            //트리거 변경
+            _battleSystem.OnChangePlayerAnim -= _playerVisualController.ChangeAnim;
 
             //근거리 차징
             _battleSystem.OnStartMelee -= _playerVisualController.PlayMeleeStart;

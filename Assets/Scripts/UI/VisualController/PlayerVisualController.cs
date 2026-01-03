@@ -47,6 +47,7 @@ public class PlayerVisualController : MonoBehaviour
 
     // 플레이어 애니메이터
     private Animator _playerAnimator;
+    private string _currentAnimation = "";
 
     public Transform CurrentPlayerTransform => _playerInstance != null ? _playerInstance.transform : null;
 
@@ -106,6 +107,15 @@ public class PlayerVisualController : MonoBehaviour
 
     #region Visual Effects Methods - public
 
+    public void ChangeAnim(string animation)
+    {
+        if(_playerAnimator != null)
+        {
+            _currentAnimation = animation;
+            _playerAnimator.CrossFade(animation, 0.2f);
+        } 
+    }
+
     public void Play_PlayerIdle()
     {
         if (_playerAnimator != null)
@@ -122,6 +132,12 @@ public class PlayerVisualController : MonoBehaviour
             _playerAnimator.enabled = false;
         }
         //_playerAnimator.SetTrigger("Pause");
+    }
+
+    public void Change_Trigger(string trigger)
+    {
+        if (_playerAnimator != null)
+            _playerAnimator.SetTrigger(trigger);
     }
 
     public void PlayAttackShake()
@@ -390,8 +406,7 @@ public class PlayerVisualController : MonoBehaviour
 
     private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction)
     {
-        if (_playerAnimator != null)
-            _playerAnimator.SetTrigger("Run");
+        ChangeAnim("3_1_ Run");
 
         if (_playerRenderer != null)
             _playerRenderer.flipX = (direction == MoveDirection.Back);

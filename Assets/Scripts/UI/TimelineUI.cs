@@ -568,6 +568,8 @@ public class TimelineUI : MonoBehaviour
 
             }
 
+            Debug.Log($"[TimelineUI] previewAction: {previewAction}");
+
             OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
