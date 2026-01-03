@@ -135,11 +135,7 @@ public class BattleSystem
 
         _damageBuffer = damage;
 
-        if (isChargeRequired)
-        {
-            OnChangePlayerAnim?.Invoke("6_2_SwordEnd");
-            Debug.Log("[BattleSystem] 검 차징 공격!");
-        }
+        
 
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
@@ -149,7 +145,17 @@ public class BattleSystem
                 //타격 범위인지 확인
                 if(_playerCurrentSector % _columns == 0)
                 {
-                    OnChangePlayerAnim?.Invoke("2_2_SwordAttack");  // 플레이어 공격 성공 모션
+
+                    if (isChargeRequired)
+                    {
+                        OnChangePlayerAnim?.Invoke("6_2_SwordEnd");
+                        Debug.Log("[BattleSystem] 검 차징 공격!");
+                    }
+                    else
+                    {
+                        OnChangePlayerAnim?.Invoke("2_2_SwordAttack");  // 플레이어 공격 성공 모션
+                    }
+                        
                     Debug.Log("[BattleSystem] 적 타격 성공!");
                         
                     return true;
