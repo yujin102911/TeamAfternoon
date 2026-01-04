@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -63,6 +64,14 @@ public class EnemyWind
     }
 }
 
+[Serializable]
+public class EnemyDash
+{
+    public int tick;
+    public int targetRow;
+    public int damage;
+}
+
 // ========================================
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
@@ -74,6 +83,7 @@ public class EnemyPattern : ScriptableObject
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
     public List<EnemyStone> stones = new List<EnemyStone>();
     public List<EnemyWind> winds = new List<EnemyWind>();
+    public List<EnemyDash> dashes = new List<EnemyDash>();
     public List<EnemyParrying> parryings = new List<EnemyParrying>();
 
     /// <summary>
@@ -106,5 +116,13 @@ public class EnemyPattern : ScriptableObject
     public EnemyWind GetWindAt(int tick)
     {
         return winds.Find(a => a.tick == tick);
+    }
+
+    /// <summary>
+    /// 특정 틱의 돌진 공격 가져오기
+    /// </summary>
+    public EnemyDash GetDashAt(int tick)
+    {
+        return dashes.Find(a => a.tick == tick);
     }
 }

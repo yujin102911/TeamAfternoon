@@ -43,6 +43,7 @@ public class EnemyVisualController : MonoBehaviour
         _battleSystem = battleSystem;
 
         _battleSystem.OnBattleInitialized += CreateEnemies;
+        _battleSystem.OnEnemySideChanged += HandleSideChanged;
     }
 
     private void OnDestroy()
@@ -139,6 +140,16 @@ public class EnemyVisualController : MonoBehaviour
         if (_visualMap.TryGetValue(enemy, out EnemyVisual visual))
         {
             visual.EnemyDeadColor(enemy);
+        }
+    }
+
+    private void HandleSideChanged(bool isLeft)
+    {
+        float targetX = isLeft ? -5f : 5f;
+        if (visual != null)
+        {
+            SpriteRenderer sr = visual.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) sr.flipX = !isLeft;
         }
     }
 
