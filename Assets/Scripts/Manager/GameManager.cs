@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.Rendering.UI;
 
 /// <summary>
@@ -36,6 +37,9 @@ public class GameManager : MonoBehaviour
 
     [Header("테스트용 스테이지 데이터")]
     [SerializeField] private StageData currentStageData;
+
+    [Header("녹화용")]
+    [SerializeField] private BattleRecorder _recorder;
     #endregion
 
     #region Private Fields
@@ -360,6 +364,10 @@ public class GameManager : MonoBehaviour
         //if (FindAnyObjectByType<SceneIntroController>() == null)
         //OnIntroCompleted();
 
+        if (_recorder != null && currentStageData != null)
+        {
+            _recorder.StartNewRecording(currentStageData.StageNumber);
+        }
 
         //TODO:추후에 8 자리에 최대 턴수 기입
         OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
@@ -463,6 +471,10 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
+        if (_recorder != null && _timelineManager != null)
+        {
+            _recorder.StartNewRound(_currentRound, _timelineManager.CurrentEnemyPattern?.Pattern_Name);
+        }
         OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
@@ -573,9 +585,13 @@ public class GameManager : MonoBehaviour
         int _leftPlayerHP = _battleSystem.PlayerHP;
         Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
 
-        if (victory)
+        if (victory && _recorder != null)
         {
-            if (currentStageData != null)
+            if (victory && _recorder != null)
+            {
+                _recorder.SaveToJson();
+            }
+                if (currentStageData != null)
             {
                 currentStageData.IsCleared = true;
                 Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");

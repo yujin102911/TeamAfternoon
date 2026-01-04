@@ -57,6 +57,7 @@ public class TimelineManager : MonoBehaviour
     public IReadOnlyList<PlacedBlock> PlacedBlocks => _timelineSystem.PlacedBlocks;
     public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _timelineSystem.PrevPlacedBlocks;
     public int TotalTicks => _totalTicks;
+    public EnemyPattern CurrentEnemyPattern => _currentEnemyPattern;
 
     void Awake()
     {
@@ -430,7 +431,19 @@ public class TimelineManager : MonoBehaviour
                 OnCurrentTickChanged?.Invoke(0);
                 break;
             }
+            if (GameManager.Instance != null)
+            {
+                // 현재 전투 중인 적(보통 첫 번째 적)을 참조
+                RuntimeEnemy activeEnemy = _battleSystem.Enemies[0];
 
+                // BattleRecorder에게 현재 배틀 시스템의 상태를 기록하라고 명령
+                // GameManager를 통해 Recorder에 접근하거나 직접 참조
+                var recorder = FindObjectOfType<BattleRecorder>();
+                if (recorder != null)
+                {
+                    recorder.CaptureTick(tick, _battleSystem, activeEnemy);
+                }
+            }
             // 연출 대기
             yield return new WaitForSeconds(Tick_interval);
             // 모든 틱 끝나면 0 으로 신호 보내서 하이라이트 끄기
