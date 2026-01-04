@@ -44,7 +44,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
                 continue;
 
             GameObject fx = GetEffect();
-            fx.transform.position = _worldSectorPos[index - 1] + _offset;
+            fx.transform.position = _worldSectorPos[index + 1] + _offset;
             fx.SetActive(true);
         }
 
