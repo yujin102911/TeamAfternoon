@@ -62,7 +62,7 @@ public class BattleSystem
     public event Action OnPlayerIdle;
 
     public event Action<string> OnChangePlayerAnim; // 플레이어 트리거 변경시 발행되는 이벤트
-    public event Action<string> OnChangeEnemyAnim; // 플레이어 트리거 변경시 발행되는 이벤트
+    public event Action<string> OnChangeEnemyAnim; // 적 트리거 변경시 발행되는 이벤트
 
     public event Action OnStartMelee; // 근접 차징 시작
     public event Action OnMiddleMelee; // 근접 차징 시작
@@ -80,6 +80,7 @@ public class BattleSystem
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
     public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
+    public event Action<bool> OnEnemyDash;          // 적 돌진 이벤트
 
     public event Action OnBattleInitialized;
     #endregion
@@ -516,11 +517,14 @@ public class BattleSystem
 
     }
 
+
+    // 적 돌진 공격 처리
     public void ProcessEnemyDash(EnemyDash dash)
     {
         if (dash == null) return;
 
         List<int> targetSectors = new List<int>();
+
         for (int col = 0; col < _columns; col++)
         {
             foreach (int row in dash.targetRows)
@@ -528,17 +532,26 @@ public class BattleSystem
                 targetSectors.Add((row * _columns) + col + 1);
             }
         }
-        OnEnemyAttackSuccess?.Invoke(targetSectors);
+
+        // 돌진 공격 처리
+        Debug.Log($"[BattleSystem] 적 돌진 공격! 대상 섹터: [{string.Join(", ", targetSectors)}]");
+        //OnEnemyAttackSuccess?.Invoke(targetSectors);
+        foreach (var enemy in _enemies)
+        {
+            OnEnemyDash?.Invoke(enemy.IsLeft);
+        }
+        
 
         if (targetSectors.Contains(_playerCurrentSector))
         {
             DealDamageToPlayer(dash.damage);
             _isPlayerHitThisTurn = true;
         }
+
         foreach (var enemy in _enemies)
         {
             enemy.ToggleSide();
-            OnEnemySideChanged?.Invoke(enemy.IsLeft);
+            //OnEnemySideChanged?.Invoke(enemy.IsLeft);
         }
     }
 

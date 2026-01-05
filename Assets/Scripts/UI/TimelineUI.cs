@@ -265,17 +265,6 @@ public class TimelineUI : MonoBehaviour
         foreach (GameObject slot in enemySlots)
         {
             slot.GetComponent<Enemy_slot>().Hide();
-
-            //Image image = slot.GetComponent<Image>();
-            //TextMeshProUGUI text = slot.GetComponentInChildren<TextMeshProUGUI>();
-            //if (image != null)
-            //{
-            //    image.color = normalColor;
-            //}
-            //if (text != null)
-            //{
-            //    text.text = " "; // 데미지가 없으면 공백 표시
-            //}
         }
 
         if (sequence == null) return;
@@ -285,19 +274,6 @@ public class TimelineUI : MonoBehaviour
         {
             if (attack.tick >= 1 && attack.tick <= enemySlots.Count)
             {
-                //Image image = enemySlots[attack.tick - 1].GetComponent<Image>();
-                //TextMeshProUGUI text = enemySlots[attack.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
-
-                //if (image != null)
-                //{
-                //    image.color = attackColor;
-                //}
-                //if (text != null)
-                //{
-                //    // 데미지 수치를 문자열로 표시
-                //    text.text = attack.damage.ToString();
-                //    //text.color = Color.white;
-                //}
 
                 enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
             }
@@ -311,18 +287,6 @@ public class TimelineUI : MonoBehaviour
         {
             if (parrying.tick >= 1 && parrying.tick <= enemySlots.Count)
             {
-                //Image image = enemySlots[parrying.tick - 1].GetComponent<Image>();
-                //TextMeshProUGUI text = enemySlots[parrying.tick - 1].GetComponentInChildren<TextMeshProUGUI>();
-
-                //if (image != null)
-                //{
-                //    image.color = parryingColor;
-                //}
-                //if (text != null)
-                //{
-                //    text.text = "P";
-                //    //text.color = Color.white;
-                //}
 
                 enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(parryingColor, "P");
             }
@@ -331,7 +295,7 @@ public class TimelineUI : MonoBehaviour
                 Debug.LogWarning($"적 공격 틱 {parrying.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
             }
         }
-
+        // 돌던지기 표시
         foreach (EnemyStone stone in sequence.stones)
         {
             if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
@@ -342,6 +306,21 @@ public class TimelineUI : MonoBehaviour
             else
             {
                 Debug.LogWarning($"적 돌던지기 틱 {stone.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
+            }
+        }
+
+        // 바람표시
+
+        // 대쉬표시
+        foreach (EnemyDash dash in sequence.dashes)
+        {
+            if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
+            {
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.Convert_9sector());
+            }
+            else
+            {
+                Debug.LogWarning($"적 대쉬 틱 {dash.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
             }
         }
     }
@@ -597,8 +576,6 @@ public class TimelineUI : MonoBehaviour
     // 슬라이더에서 호출
     public void Show_Preview(int tick)
     {
-        _currentSliderTick = tick;
-
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
@@ -640,6 +617,11 @@ public class TimelineUI : MonoBehaviour
     {
         OnRequestHidePreview?.Invoke();
         OnRequestClearHighlight?.Invoke();
+    }
+
+    public void SetCurrent_Tick(int tick)
+    {
+        _currentSliderTick = tick;
     }
 
     public void OnPatternChanged(EnemyPattern pattern)
@@ -804,10 +786,17 @@ public class TimelineUI : MonoBehaviour
             }
         }
 
-        Debug.Log(_currentSliderTick);
-
-        if(_currentSliderTick != -1 || _currentSliderTick != 0)
+        if(_currentSliderTick > 0)
+        {
+            Debug.Log($"현재 틱: {_currentSliderTick}");
             Show_Preview(_currentSliderTick);
+        }
+        else
+        {
+            Hide_Preview();
+        }
+
+            
     }
 
     /// <summary>

@@ -9,7 +9,7 @@ public class RuntimeEnemy
 {
     public EnemyData Data { get; private set; }
 
-    public bool IsLeft { get; private set; } = true; // 기본값 : 왼쪽
+    public bool IsLeft { get; private set; } = false; // 기본값 : 오른쪽
 
     public List<int> AttackableSectors { get; private set; }
 

@@ -241,8 +241,11 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnEndMelee += _playerVisualController.PlayMeleeEnd;
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
+            _battleSystem.OnEnemyDash += _enemyVisualController.PlayEnemyDash;
             _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
+
+            _enemyVisualController.OnEnemySideChanged += _playerVisualController.PlayerFlip;
         }
 
         if (_battleSystem != null)
@@ -293,8 +296,11 @@ public class GameManager : MonoBehaviour
 
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
+            _battleSystem.OnEnemyDash -= _enemyVisualController.PlayEnemyDash;
             _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
             _timelineUI.OnRequestHidePreview -= _playerVisualController.HidePlayerPreview;
+
+            _enemyVisualController.OnEnemySideChanged -= _playerVisualController.PlayerFlip;
         }
         
         if (_battleSystem != null)

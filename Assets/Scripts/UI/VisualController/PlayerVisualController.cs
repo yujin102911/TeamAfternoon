@@ -44,6 +44,7 @@ public class PlayerVisualController : MonoBehaviour
 
     private Coroutine _moveCoroutine;
     private MapSystem _mapSystem;
+    private BattleSystem _battleSystem;
 
     // 플레이어 애니메이터
     private Animator _playerAnimator;
@@ -57,11 +58,12 @@ public class PlayerVisualController : MonoBehaviour
     public void Initialize(BattleSystem battleSystem, MapSystem mapSystem)
     {
         _mapSystem = mapSystem;
-        battleSystem.OnEnemySideChanged += (isLeft) =>
-        {
-            if (_playerRenderer != null)
-                _playerRenderer.flipX = !isLeft;
-        };
+        _battleSystem = battleSystem;
+        //battleSystem.OnEnemySideChanged += (isLeft) =>
+        //{
+        //    if (_playerRenderer != null)
+        //        _playerRenderer.flipX = !isLeft;
+        //};
     }
 
     /// <summary>
@@ -111,6 +113,12 @@ public class PlayerVisualController : MonoBehaviour
     }
 
     #region Visual Effects Methods - public
+
+    public void PlayerFlip(bool isLeft)
+    {
+        if (_playerRenderer != null)
+            _playerRenderer.flipX = !isLeft;
+    }
 
     public void ChangeAnim(string animation)
     {

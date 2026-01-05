@@ -44,6 +44,7 @@ public class StepSlider : MonoBehaviour
     {
         // 여기서 타임라인 이동 / 애니메이션 프리뷰 등
 
+        _timelineUI.SetCurrent_Tick(step);
         _timelineUI.Hide_Preview();
 
         if (step != 0)

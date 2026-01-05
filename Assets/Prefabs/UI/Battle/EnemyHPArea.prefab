@@ -309,6 +309,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 549756303525767335}
+  - component: {fileID: 6666413674914470802}
   m_Layer: 5
   m_Name: EnemyHPArea
   m_TagString: Untagged
@@ -337,6 +338,21 @@ RectTransform:
   m_AnchoredPosition: {x: 624.7998, y: 39}
   m_SizeDelta: {x: 174.8596, y: 78.4229}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6666413674914470802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6795634508297735712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75eecb6e06f71874392a09e17c87cf27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  offset: {x: 0, y: -30, z: 0}
+  cam: {fileID: 0}
 --- !u!1 &7970748327424078532
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public enum Special_Pattern
 {
     None,
-    Stone
+    Stone,
+    Wind,
+    Dash
 }
 
 public class sector_EnemySlot : Enemy_slot
@@ -20,6 +22,8 @@ public class sector_EnemySlot : Enemy_slot
     private Sprite _hitSector;
     [SerializeField]
     private Sprite _stoneSector;
+    [SerializeField]
+    private Sprite _dashSector;
 
     [Header("3*3 그리드")]
     [SerializeField]
@@ -74,9 +78,43 @@ public class sector_EnemySlot : Enemy_slot
                 _patternIcon.SetActive(true);
                 _patternIcon.GetComponent<Image>().sprite = _stoneIcon;
                 break;
+
+            case Special_Pattern.Wind:
+                //바람 패턴 구현 예정
+                break;
+            case Special_Pattern.Dash:
+                //대시 패턴 구현 예정
+                _attackIcon.SetActive(true);
+
+                for (int i = 0; i < _imageSectors.Length; i++)
+                {
+                    var view_color = _imageSectors[i].color;
+                    view_color.a = 1.0f;
+
+                    if (sectors != null)
+                    {
+                        if (sectors.Contains(i + 1))
+                        {
+                            _imageSectors[i].sprite = _dashSector;
+                        }
+                        else
+                        {
+                            _imageSectors[i].sprite = _nomalSector;
+                        }
+
+                        //돌위치 확인
+                        if (GameManager.Instance.BattleSystem.IsSectorBlocked(i + 1))
+                        {
+                            _imageSectors[i].sprite = _stoneSector;
+                        }
+                    }
+
+                    _imageSectors[i].color = view_color;
+                }
+                break;
         }
 
-        
+
     }
 
     public override void Hide()
