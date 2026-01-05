@@ -47,7 +47,7 @@ public class EnemyStoneVisualController : MonoBehaviour
 
                 GameObject stoneObj = Instantiate(_stonePrefab, spawnPos, Quaternion.identity);
 
-                SpriteRenderer sr = stoneObj.GetComponent<SpriteRenderer>();
+                SpriteRenderer sr = stoneObj.GetComponentInChildren<SpriteRenderer>();
                 if (sr != null)
                 {
                     sr.sortingOrder = (sectorNum * 10) + 1;
