@@ -522,7 +522,10 @@ public class BattleSystem
         List<int> targetSectors = new List<int>();
         for (int col = 0; col < _columns; col++)
         {
-            targetSectors.Add((dash.targetRow * _columns) + col + 1);
+            foreach (int row in dash.targetRows)
+            {
+                targetSectors.Add((row * _columns) + col + 1);
+            }
         }
         OnEnemyAttackSuccess?.Invoke(targetSectors);
 
