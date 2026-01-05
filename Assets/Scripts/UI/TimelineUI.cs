@@ -261,6 +261,8 @@ public class TimelineUI : MonoBehaviour
     {
         _currentPattern = sequence;
 
+        bool is_left = _currentPattern.Get_Is_left();
+
         // 모든 슬롯 초기화
         foreach (GameObject slot in enemySlots)
         {
@@ -301,7 +303,7 @@ public class TimelineUI : MonoBehaviour
             if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
             {
 
-                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, "", Special_Pattern.Stone, null);
+                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, "", Special_Pattern.Stone, null, is_left);
             }
             else
             {
@@ -310,13 +312,25 @@ public class TimelineUI : MonoBehaviour
         }
 
         // 바람표시
+        foreach (EnemyWind wind in sequence.winds)
+        {
+            if (wind.tick >= 1 && wind.tick <= enemySlots.Count)
+            {
+
+                enemySlots[wind.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, "", Special_Pattern.Wind, null, is_left);
+            }
+            else
+            {
+                Debug.LogWarning($"적 바람 틱 {wind.tick}이 범위를 벗어났습니다 (1~{enemySlots.Count})");
+            }
+        }
 
         // 대쉬표시
         foreach (EnemyDash dash in sequence.dashes)
         {
             if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
             {
-                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.Convert_9sector());
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.Convert_9sector(), is_left);
             }
             else
             {

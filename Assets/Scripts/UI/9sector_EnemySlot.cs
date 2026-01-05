@@ -23,7 +23,9 @@ public class sector_EnemySlot : Enemy_slot
     [SerializeField]
     private Sprite _stoneSector;
     [SerializeField]
-    private Sprite _dashSector;
+    private Sprite _dashRightSector;
+    [SerializeField]
+    private Sprite _dashLeftSector;
 
     [Header("3*3 그리드")]
     [SerializeField]
@@ -34,13 +36,14 @@ public class sector_EnemySlot : Enemy_slot
     private GameObject _patternIcon;
     [SerializeField]
     private Sprite _stoneIcon;
+    [SerializeField]
+    private Sprite _windRightIcon;
+    [SerializeField]
+    private Sprite _windLeftIcon;
 
-    public override void Show(Color color, string message, Special_Pattern pattern, List<int> sectors)
+    public override void Show(Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
     {
         Show_Slot();
-
-        _attackIcon.SetActive(false);
-        _patternIcon.SetActive(false);
 
         switch (pattern)
         {
@@ -81,6 +84,8 @@ public class sector_EnemySlot : Enemy_slot
 
             case Special_Pattern.Wind:
                 //바람 패턴 구현 예정
+                _patternIcon.SetActive(true);
+                _patternIcon.GetComponent<Image>().sprite = is_left ? _windLeftIcon : _windRightIcon;
                 break;
             case Special_Pattern.Dash:
                 //대시 패턴 구현 예정
@@ -95,7 +100,7 @@ public class sector_EnemySlot : Enemy_slot
                     {
                         if (sectors.Contains(i + 1))
                         {
-                            _imageSectors[i].sprite = _dashSector;
+                            _imageSectors[i].sprite = is_left ? _dashLeftSector : _dashRightSector;
                         }
                         else
                         {
@@ -120,6 +125,9 @@ public class sector_EnemySlot : Enemy_slot
     public override void Hide()
     {
         Hide_Slot();
+
+        _attackIcon.SetActive(false);
+        _patternIcon.SetActive(false);
 
         for (int i = 0; i < _imageSectors.Length; i++)
         {

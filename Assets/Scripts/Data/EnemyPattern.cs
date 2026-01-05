@@ -116,6 +116,18 @@ public class EnemyPattern : ScriptableObject
     public List<EnemyDash> dashes = new List<EnemyDash>();
     public List<EnemyParrying> parryings = new List<EnemyParrying>();
 
+    private bool Is_left = false;
+
+    public void Set_Is_left(bool left)
+    {
+        Is_left = left;
+    }
+
+    public bool Get_Is_left()
+    {
+        return Is_left;
+    }
+
     /// <summary>
     /// 특정 틱의 적 공격 가져오기
     /// </summary>
