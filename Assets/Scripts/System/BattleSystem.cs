@@ -496,25 +496,24 @@ public class BattleSystem
         }
     }
 
-    public void ProcessEnemyWind(EnemyWind wind)
+    public void ProcessEnemyWind(WindDirection actualDirection)
     {
-        if (wind == null) return;
-        Debug.Log("실행됩니다");
-        MoveDirection dir = ConvertWindToMoveDirection(wind.direction);
-        int targetSector = GetWindTargetSector(_playerCurrentSector, wind.direction);
+        Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
+        MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
         if (targetSector != -1 && !IsSectorBlocked(targetSector))
         {
             int prevSector = _playerCurrentSector;
             _playerCurrentSector = targetSector;
-            Debug.Log($"[BattleSystem] 바람에 의해 밀려남 {prevSector} -> {_playerCurrentSector}");
-            OnPlayerMoved?.Invoke(_playerCurrentSector, dir);
 
+            Debug.Log($"[BattleSystem] 바람에 의해 밀려남: Sector {prevSector} -> {_playerCurrentSector}");
+
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir);
         }
         else
         {
             Debug.Log("[BattleSystem] 바람이 불었으나 장애물이나 벽에 막혀 이동하지 못했습니다.");
         }
-
     }
 
 
