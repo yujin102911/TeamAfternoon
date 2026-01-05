@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using TMPro;
 
 public enum HandSortType { Length, Action }
 
@@ -29,6 +30,10 @@ public class FilmHand_Panel : MonoBehaviour
     [SerializeField] private Toggle _showAllToggle;
     [SerializeField] private List<Toggle> _filterToggles;
 
+    [Header("정렬 토글 버튼")]
+    [SerializeField] private Button _sortToggleButton;
+    [SerializeField] private TextMeshProUGUI _sortText;
+
     private void Awake()
     {
         InitializePool();
@@ -54,6 +59,13 @@ public class FilmHand_Panel : MonoBehaviour
                 t.onValueChanged.AddListener((on) => OnFilterToggleChanged(idx, on));
             }
         }
+
+        if (_sortToggleButton != null)
+        {
+            _sortToggleButton.onClick.AddListener(ToggleSortType);
+        }
+
+        UpdateSortText();
 
         SetAll(false);
 
@@ -221,8 +233,40 @@ public class FilmHand_Panel : MonoBehaviour
     public void SetSortType(int typeIndex)
     {
         _currentSortType = (HandSortType)typeIndex;
-        Debug.Log($"{_currentSortType}이 뭔지");
+        Debug.Log($"{_currentSortType}");
         UpdateHandUI(new List<RuntimeBlock>(TimelineManager.Instance.CurrentHand));
+    }
+
+    /// <summary>
+    /// 걍 한 버튼으로 정렬방식 토글하는 버튼에 연결
+    /// </summary>
+    public void ToggleSortType()
+    {
+        if (_currentSortType == HandSortType.Length)
+        {
+            _currentSortType = HandSortType.Action;
+            Debug.Log("액션 순 정렬로 변경");
+        }
+        else if(_currentSortType == HandSortType.Action)
+        {
+            _currentSortType= HandSortType.Length;
+            Debug.Log("길이 순 정렬로 변경");
+        }
+        UpdateHandUI(new List<RuntimeBlock>(TimelineManager.Instance.CurrentHand));
+        UpdateSortText();
+            
+    }
+    private void UpdateSortText()
+    {
+        if (_sortText == null) return;
+        if (_currentSortType == HandSortType.Length)
+        {
+            _sortText.text = "길이순 정렬";
+        }
+        else if(_currentSortType == HandSortType.Action)
+        {
+            _sortText.text = "액션순 정렬";
+        }
     }
 
     private bool HasActionType(BlockData data, HandFilterType filter)
