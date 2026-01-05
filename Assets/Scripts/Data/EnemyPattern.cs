@@ -68,7 +68,7 @@ public class EnemyWind
 public class EnemyDash
 {
     public int tick;
-    public int targetRow;
+    public List<int> targetRows;
     public int damage;
 }
 
