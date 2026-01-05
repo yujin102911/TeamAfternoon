@@ -26,6 +26,7 @@ public class EnemyVisualController : MonoBehaviour
     public GameObject textPrefab; // 생성될 프리팹
     public GameObject CritTextPrefab; // 크리티컬 생성될 프리팹
     public Vector3 Offset;
+    public Vector3 Left_Offset;
 
     [Header("점멸 설정")]
     public float blinkDuration = 0.3f;
@@ -41,6 +42,7 @@ public class EnemyVisualController : MonoBehaviour
     private EnemyAttackEffect _enemyAttackEffect;
     private EnemyVisual visual;
 
+    private RuntimeEnemy _runtimeEnemy;
     private string _currentAnimation = "";
 
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
@@ -106,7 +108,8 @@ public class EnemyVisualController : MonoBehaviour
             //기본 우측 소환
             GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyRightPos);
 
-            
+            _runtimeEnemy = enemy;
+
             _currentEnemy = obj;
             _enemyAnimator = obj.GetComponent<Animator>();
             _enemyAttackEffect = obj.GetComponent<EnemyAttackEffect>();
@@ -200,9 +203,14 @@ public class EnemyVisualController : MonoBehaviour
             _enemyAnimator.enabled = false;
     }
 
-    public void PlayEnemyDash(bool isLeft)
+    public void PlayEnemyDash(List<int> targets, bool isLeft)
     {
+        if (_enemyAttackEffect != null)
+            _enemyAttackEffect.Set_targetSectors(targets);
+
         Debug.Log($"적위치{isLeft}");
+
+        _enemyAttackEffect.SpawnAttackEffect();
 
         // 기존 코루틴이 실행 중이면 중지
         if (_dashCoroutine != null)
@@ -249,6 +257,7 @@ public class EnemyVisualController : MonoBehaviour
             if (!hitTriggered && t >= duration * 0.7f)
             {
                 hitTriggered = true;
+                
                 OnEnemySideChanged?.Invoke(isLeft);
             }
 
@@ -305,11 +314,28 @@ public class EnemyVisualController : MonoBehaviour
 
         if (is_crit)
         {
-            go = Instantiate(CritTextPrefab, transform.position + Offset, Quaternion.identity);
+            // 왼쪽일 때는 오프셋 조정
+            if (_runtimeEnemy.IsLeft)
+            {
+                go = Instantiate(CritTextPrefab, transform.position + Offset + Left_Offset, Quaternion.identity);
+            }
+            else
+            {
+                go = Instantiate(CritTextPrefab, transform.position + Offset, Quaternion.identity);
+            }
         }
         else
         {
-            go = Instantiate(textPrefab, transform.position + Offset, Quaternion.identity);
+            // 왼쪽일 때는 오프셋 조정
+            if (_runtimeEnemy.IsLeft)
+            {
+                go = Instantiate(textPrefab, transform.position + Offset + Left_Offset, Quaternion.identity);
+            }
+            else
+            {
+                go = Instantiate(textPrefab, transform.position + Offset, Quaternion.identity);
+            }
+            
         }
 
             TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();

@@ -50,6 +50,8 @@ public class PlayerVisualController : MonoBehaviour
     private Animator _playerAnimator;
     private string _currentAnimation = "";
 
+    private PlayerAttectEffect _playerEffector;
+
     public Transform CurrentPlayerTransform => _playerInstance != null ? _playerInstance.transform : null;
 
     /// <summary>
@@ -102,6 +104,8 @@ public class PlayerVisualController : MonoBehaviour
                 _playerInstance = Instantiate(_playerPrefab, targetPos, Quaternion.identity);
                 _playerInstance.transform.SetParent(sectorTr);
 
+                _playerEffector = _playerInstance.GetComponent<PlayerAttectEffect>();
+
                 _playerAnimator = _playerInstance.GetComponentInChildren<Animator>();
 
                 _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
@@ -119,6 +123,13 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_playerRenderer != null)
             _playerRenderer.flipX = !isLeft;
+
+        Debug.Log($"[PlayerVisualController] 플레이어 플립: {(isLeft ? "왼쪽" : "오른쪽")}");
+
+        if (_playerEffector != null)
+        {
+            _playerEffector.Flip_currentCharge();
+        }
     }
 
     public void ChangeAnim(string animation)
@@ -405,8 +416,20 @@ public class PlayerVisualController : MonoBehaviour
     {
         ChangeAnim("3_1_ Run");
 
+
+        bool is_flip = false;
+
         if (_playerRenderer != null)
-            _playerRenderer.flipX = (direction == MoveDirection.Back);
+        {
+            bool flip = _playerRenderer.flipX;
+
+            if(((direction == MoveDirection.Back) && !flip)
+                || ((direction == MoveDirection.Front) && flip)){
+                _playerRenderer.flipX = !flip;
+                is_flip = true;
+            }
+        }
+            
 
         _playerInstance.transform.SetParent(null);
 
@@ -439,8 +462,8 @@ public class PlayerVisualController : MonoBehaviour
         //if (_playerAnimator != null)
             //_playerAnimator.SetTrigger("Run_Stop");
 
-        if (_playerRenderer != null)
-            _playerRenderer.flipX = false;
+        if (_playerRenderer != null && is_flip)
+            _playerRenderer.flipX = !_playerRenderer.flipX;
     }
 
     // 플레이어 오더 인 레이어 조정

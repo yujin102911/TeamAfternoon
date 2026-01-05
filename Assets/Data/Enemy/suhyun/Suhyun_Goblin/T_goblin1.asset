@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: T_goblin1
   m_EditorClassIdentifier: 
   Pattern_Name: "4\uBC88\uC5D0 \uD55C\uBC88 \uBE612"
-  Sentence: "\uC6C3\uC74C\uC740 \uB298 \uC5B4\uB978\uB4E4\uC758 \uAC83\uC774\uC5C8\uACE0,
-    \uCE68\uBB35\uC740 \uC5B8\uC81C\uB098 \uB3C4\uB85C\uC2DC\uC758 \uBAAB\uC774\uC5C8\uC5B4\uC694."
   attacks:
   - tick: 3
     targetSectors: 03000000
@@ -33,5 +31,11 @@ MonoBehaviour:
     damage: 1
   - tick: 8
     targetSectors: 06000000070000000800000009000000
+    damage: 1
+  stones: []
+  winds: []
+  dashes:
+  - tick: 1
+    targetRows: 01000000
     damage: 1
   parryings: []

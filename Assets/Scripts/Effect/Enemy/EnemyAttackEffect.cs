@@ -15,8 +15,20 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     private List<Vector3> _worldSectorPos = new List<Vector3>();
     private List<int> _targetSectors = new List<int>();
 
+    private Transform effectRoot;
+
     private void Awake()
     {
+        //InitializePool();
+    }
+
+    private void Start()
+    {
+        if(EffectContainer.Instance != null)
+        {
+            effectRoot = EffectContainer.Instance._enemyEffectArea;
+        }
+
         InitializePool();
     }
 
@@ -44,6 +56,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
                 continue;
 
             GameObject fx = GetEffect();
+            fx.transform.SetParent(effectRoot, true); // ⭐ 월드 기준 유지
             fx.transform.position = _worldSectorPos[index - 1] + _offset;
             fx.SetActive(true);
         }
@@ -65,13 +78,13 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
 
     private GameObject CreateNewEffect()
     {
-        GameObject fx = Instantiate(attackFxPrefab, transform);
-        Vector3 parentScale = transform.lossyScale;
-        fx.transform.localScale = new Vector3(
-            fx.transform.localScale.x / parentScale.x,
-            fx.transform.localScale.y / parentScale.y,
-            fx.transform.localScale.z / parentScale.z
-        );
+        GameObject fx = Instantiate(attackFxPrefab, effectRoot);
+        //Vector3 parentScale = transform.lossyScale;
+        //fx.transform.localScale = new Vector3(
+        //    fx.transform.localScale.x / parentScale.x,
+        //    fx.transform.localScale.y / parentScale.y,
+        //    fx.transform.localScale.z / parentScale.z
+        //);
         var autoReturn = fx.GetComponent<EffectAutoReturn>();
         autoReturn.Init(this);
         return fx;
@@ -89,7 +102,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     public void ReturnEffect(GameObject fx)
     {
         fx.SetActive(false);
-        fx.transform.SetParent(transform, true);
+        fx.transform.SetParent(effectRoot, true);
         _effectPool.Enqueue(fx);
     }
     #endregion

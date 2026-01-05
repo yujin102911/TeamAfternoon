@@ -80,7 +80,7 @@ public class BattleSystem
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
     public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
-    public event Action<bool> OnEnemyDash;          // 적 돌진 이벤트
+    public event Action<List<int>, bool> OnEnemyDash;          // 적 돌진 이벤트
 
     public event Action OnBattleInitialized;
     #endregion
@@ -317,6 +317,8 @@ public class BattleSystem
         }
         else
         {
+            _isPlayerHitThisTurn = false;
+
             if (_isGuarding)
             {
                 OnChangePlayerAnim?.Invoke("7_1_GuardSuccess");
@@ -327,6 +329,7 @@ public class BattleSystem
             {
                 OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
                 OnChangePlayerAnim?.Invoke("4_Hurt");
+                Debug.Log("<color=red>[BattleSystem] 플레이어 아야!!!</color>");
 
                 if (_playerHP <= 0)
                 {
@@ -455,7 +458,9 @@ public class BattleSystem
     {
         if (attack == null) return;
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
-        
+
+        _isPlayerHitThisTurn = false;
+
         if (attack.targetSectors != null && attack.targetSectors.Count > 0)
         {
             OnEnemyAttackSuccess?.Invoke(attack.targetSectors);
@@ -465,6 +470,7 @@ public class BattleSystem
 
         if (_isPlayerHitThisTurn)
         {
+            
             DealDamageToPlayer(attack.damage);
         }
         else
@@ -536,16 +542,20 @@ public class BattleSystem
         // 돌진 공격 처리
         Debug.Log($"[BattleSystem] 적 돌진 공격! 대상 섹터: [{string.Join(", ", targetSectors)}]");
         //OnEnemyAttackSuccess?.Invoke(targetSectors);
+
+        _isPlayerHitThisTurn = false;
+
         foreach (var enemy in _enemies)
         {
-            OnEnemyDash?.Invoke(enemy.IsLeft);
+            OnEnemyDash?.Invoke(targetSectors, enemy.IsLeft);
         }
-        
 
-        if (targetSectors.Contains(_playerCurrentSector))
+        _isPlayerHitThisTurn = targetSectors.Contains(_playerCurrentSector);
+
+        if (_isPlayerHitThisTurn)
         {
+            
             DealDamageToPlayer(dash.damage);
-            _isPlayerHitThisTurn = true;
         }
 
         foreach (var enemy in _enemies)
