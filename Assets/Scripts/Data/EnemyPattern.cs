@@ -51,16 +51,33 @@ public enum WindDirection
     Left,
     Right,
 }
+public enum WindType
+{
+    Forward,    // 바람으로 밀기
+    BackWard,   // 바람으로 당기기
+}
 [System.Serializable]
 public class EnemyWind
 {
     public int tick;
-    public WindDirection direction;
+    public WindType windType;
 
-    public EnemyWind(int t, WindDirection dir)
+    public EnemyWind(int t, WindType type)
     {
         tick = t;
-        direction = dir;
+        windType = type;
+    }
+
+    public WindDirection GetDynamicDirection(bool isEnemyLeft)
+    {
+        switch (windType)
+        {
+            case WindType.Forward:
+            default:
+                return isEnemyLeft ? WindDirection.Right : WindDirection.Left;
+            case WindType.BackWard:
+                return isEnemyLeft ? WindDirection.Left : WindDirection.Right;
+        }
     }
 }
 

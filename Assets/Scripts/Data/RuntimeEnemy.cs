@@ -36,11 +36,11 @@ public class RuntimeEnemy
 
         if (!IsLeft)
         {
-            return playerCol == columns - 1;
+            return playerCol == 0;
         }
         else
         {
-            return playerCol == 0;
+            return playerCol == columns - 1;
         }
     }
 
