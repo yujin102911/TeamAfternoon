@@ -79,6 +79,8 @@ public class BattleSystem
 
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
+    public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
+
     public event Action OnBattleInitialized;
     #endregion
 
@@ -141,26 +143,11 @@ public class BattleSystem
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
         {
-            if (enemy.IsHitByAttackFrom(_playerCurrentSector))
+            if (enemy.IsHitByAttackFrom(_playerCurrentSector, _columns))
             {
-                //타격 범위인지 확인
-                if(_playerCurrentSector % _columns == 0)
-                {
+                OnChangePlayerAnim?.Invoke(isChargeRequired ? "6_2_SwordEnd" : "2_2_SwordAttack");
 
-                    if (isChargeRequired)
-                    {
-                        OnChangePlayerAnim?.Invoke("6_2_SwordEnd");
-                        Debug.Log("[BattleSystem] 검 차징 공격!");
-                    }
-                    else
-                    {
-                        OnChangePlayerAnim?.Invoke("2_2_SwordAttack");  // 플레이어 공격 성공 모션
-                    }
-                        
-                    Debug.Log("[BattleSystem] 적 타격 성공!");
-                        
-                    return true;
-                }
+                return true;
             }
         }
         _isSwordCharging = false;
@@ -527,6 +514,29 @@ public class BattleSystem
             Debug.Log("[BattleSystem] 바람이 불었으나 장애물이나 벽에 막혀 이동하지 못했습니다.");
         }
 
+    }
+
+    public void ProcessEnemyDash(EnemyDash dash)
+    {
+        if (dash == null) return;
+
+        List<int> targetSectors = new List<int>();
+        for (int col = 0; col < _columns; col++)
+        {
+            targetSectors.Add((dash.targetRow * _columns) + col + 1);
+        }
+        OnEnemyAttackSuccess?.Invoke(targetSectors);
+
+        if (targetSectors.Contains(_playerCurrentSector))
+        {
+            DealDamageToPlayer(dash.damage);
+            _isPlayerHitThisTurn = true;
+        }
+        foreach (var enemy in _enemies)
+        {
+            enemy.ToggleSide();
+            OnEnemySideChanged?.Invoke(enemy.IsLeft);
+        }
     }
 
     public List<int> GetMovableWindSectors(WindDirection direction)

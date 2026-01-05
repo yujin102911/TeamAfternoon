@@ -45,6 +45,7 @@ public class EnemyVisualController : MonoBehaviour
         _battleSystem = battleSystem;
 
         _battleSystem.OnBattleInitialized += CreateEnemies;
+        _battleSystem.OnEnemySideChanged += HandleSideChanged;
     }
 
     private void OnDestroy()
@@ -149,6 +150,16 @@ public class EnemyVisualController : MonoBehaviour
         {
             _currentAnimation = animation;
             _enemyAnimator.CrossFade(animation, 0.2f);
+        }
+    }
+
+    private void HandleSideChanged(bool isLeft)
+    {
+        float targetX = isLeft ? -5f : 5f;
+        if (visual != null)
+        {
+            SpriteRenderer sr = visual.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) sr.flipX = !isLeft;
         }
     }
 

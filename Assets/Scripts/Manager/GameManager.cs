@@ -196,7 +196,7 @@ public class GameManager : MonoBehaviour
         }
 
         // PlayerVisualController 연결
-        if (_playerVisualController != null) _playerVisualController.Initialize(_mapSystem);
+        if (_playerVisualController != null) _playerVisualController.Initialize(_battleSystem, _mapSystem);
         else Debug.LogError("[GameManager] PlayerVisualController를 찾을 수 없습니다");
 
         Debug.Log("[GameManager] 외부 시스템 연결 및 목표 설정 완료 (Start)");

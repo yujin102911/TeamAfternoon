@@ -417,6 +417,11 @@ public class TimelineManager : MonoBehaviour
                 {
                     _battleSystem.ProcessEnemyWind(wind);
                 }
+                EnemyDash dash = _currentEnemyPattern?.GetDashAt(tick);
+                if (dash != null)
+                {
+                    _battleSystem.ProcessEnemyDash(dash);
+                }
 
             }
 

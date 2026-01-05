@@ -54,9 +54,14 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// GameManager 가 호출
     /// </summary>
-    public void Initialize(MapSystem mapSystem)
+    public void Initialize(BattleSystem battleSystem, MapSystem mapSystem)
     {
         _mapSystem = mapSystem;
+        battleSystem.OnEnemySideChanged += (isLeft) =>
+        {
+            if (_playerRenderer != null)
+                _playerRenderer.flipX = !isLeft;
+        };
     }
 
     /// <summary>

@@ -32,7 +32,7 @@ public class EnemyData : ScriptableObject
 
     [Header("비주얼 설정")]
     [SerializeField]
-    private Color _assignedColor = Color.white; // 기본값 흰색
+    private Color _assignedColor = new Color(1, 1, 1, 0); // 기본값 투명
 
     [Header("적 능력")]
     [SerializeField]

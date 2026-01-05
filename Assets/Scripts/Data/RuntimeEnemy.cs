@@ -9,6 +9,8 @@ public class RuntimeEnemy
 {
     public EnemyData Data { get; private set; }
 
+    public bool IsLeft { get; private set; } = true; // 기본값 : 왼쪽
+
     public List<int> AttackableSectors { get; private set; }
 
     public EnemyPattern CurrentPattern { get; private set; }
@@ -26,11 +28,26 @@ public class RuntimeEnemy
     }
 
     /// <summary>
-    /// 공격 판정 확인
+    /// 공격 판정 확인 (적의 위치에 따라 플레이어의 열 확인_)
     /// </summary>
-    public bool IsHitByAttackFrom (int playerSector)
+    public bool IsHitByAttackFrom (int playerSector, int columns)
     {
-        return AttackableSectors.Contains(playerSector);
+        int playerCol = (playerSector - 1) % columns;
+
+        if (IsLeft)
+        {
+            return playerCol == columns - 1;
+        }
+        else
+        {
+            return playerCol == 0;
+        }
+    }
+
+    public void ToggleSide()
+    {
+        IsLeft = !IsLeft;
+        Debug.Log($"[{Data.Enemy_Name}] 위치 변경: {(IsLeft ? "왼쪽" : "오른쪽")}");
     }
 
     /// <summary>
