@@ -70,6 +70,36 @@ public class EnemyDash
     public int tick;
     public List<int> targetRows;
     public int damage;
+
+    public List<int> Convert_9sector()
+    {
+        List<int> sectors = new List<int>();
+
+        for(int i = 0; i < targetRows.Count; i++)
+        {
+            int row = targetRows[i];
+            switch(row)
+            {
+                case 0:
+                    sectors.Add(1);
+                    sectors.Add(2);
+                    sectors.Add(3);
+                    break;
+                case 1:
+                    sectors.Add(4);
+                    sectors.Add(5);
+                    sectors.Add(6);
+                    break;
+                case 2:
+                    sectors.Add(7);
+                    sectors.Add(8);
+                    sectors.Add(9);
+                    break;
+            }
+        }
+
+        return sectors;
+    }
 }
 
 // ========================================

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,7 +8,17 @@ public class EnemyVisualController : MonoBehaviour
 {
     [Header("설정")]
     [SerializeField] private GameObject _enemyPrefab;
-    [SerializeField] private Transform _enemyContainer;
+    [SerializeField] private Transform _enemyRightPos;
+    [SerializeField] private Transform _enemyLeftPos;
+    [SerializeField] private UIFollowWorldTarget _enemyHealthBar;
+
+    [Header("돌진 연출")]
+    [SerializeField] private Camera targetCamera;
+    [SerializeField] private Vector3 _cameraRightPos;
+    [SerializeField] private Vector3 _cameraLeftPos;
+    [SerializeField] private AnimationCurve dashCurve;
+    [SerializeField] private AnimationCurve cameraDashCurve;
+    private Coroutine _dashCoroutine;
 
     [Header("정렬 설정")]
     [SerializeField] private float _spacing = 2.5f;
@@ -25,13 +36,18 @@ public class EnemyVisualController : MonoBehaviour
     public float floatUpSpeed = 1.0f;
 
     // 적 애니메이터
+    private GameObject _currentEnemy;
     private Animator _enemyAnimator;
     private EnemyAttackEffect _enemyAttackEffect;
     private EnemyVisual visual;
 
+    private string _currentAnimation = "";
+
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private List<RuntimeEnemy> _currentEnemies = new List<RuntimeEnemy>();
     private BattleSystem _battleSystem;
+
+    public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
 
     private void Awake()
     {
@@ -75,14 +91,23 @@ public class EnemyVisualController : MonoBehaviour
         //    }
         //}
 
-        for (int i = _enemyContainer.childCount - 1; i >= 0; i--)
+        for (int i = _enemyRightPos.childCount - 1; i >= 0; i--)
         {
-            if (_enemyContainer.GetChild(i) != null) Destroy(_enemyContainer.GetChild(i).gameObject);
+            if (_enemyRightPos.GetChild(i) != null) Destroy(_enemyRightPos.GetChild(i).gameObject);
+        }
+
+        for (int i = _enemyLeftPos.childCount - 1; i >= 0; i--)
+        {
+            if (_enemyLeftPos.GetChild(i) != null) Destroy(_enemyLeftPos.GetChild(i).gameObject);
         }
 
         foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
         {
-            GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyContainer);
+            //기본 우측 소환
+            GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyRightPos);
+
+            
+            _currentEnemy = obj;
             _enemyAnimator = obj.GetComponent<Animator>();
             _enemyAttackEffect = obj.GetComponent<EnemyAttackEffect>();
 
@@ -91,6 +116,8 @@ public class EnemyVisualController : MonoBehaviour
             // 맵 전체 좌표정보 전달
             if (GameManager.Instance.MapSystem != null)
                 _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
+
+            _enemyHealthBar.SetTarget(obj.transform);
         }
 
         //AlignEnemies();
@@ -142,6 +169,14 @@ public class EnemyVisualController : MonoBehaviour
             visual.EnemyDeadColor(enemy);
         }
     }
+    public void ChangeAnim(string animation)
+    {
+        if (_enemyAnimator != null)
+        {
+            _currentAnimation = animation;
+            _enemyAnimator.CrossFade(animation, 0.2f);
+        }
+    }
 
     private void HandleSideChanged(bool isLeft)
     {
@@ -156,27 +191,95 @@ public class EnemyVisualController : MonoBehaviour
     public void Play_EnemyIdle()
     {
         if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Play");
+            _enemyAnimator.enabled = true;
     }
 
     public void Stop_EnemyIdle()
     {
         if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Pause");
+            _enemyAnimator.enabled = false;
     }
+
+    public void PlayEnemyDash(bool isLeft)
+    {
+        Debug.Log($"적위치{isLeft}");
+
+        // 기존 코루틴이 실행 중이면 중지
+        if (_dashCoroutine != null)
+        {
+            StopCoroutine(_dashCoroutine);
+        }
+
+        _dashCoroutine = StartCoroutine(EnemyDashCoroutine(isLeft));
+    }
+
+    // 대쉬 공격 연출 코루틴
+    private IEnumerator EnemyDashCoroutine(bool isLeft)
+    {
+        bool hitTriggered = false;
+        float duration = 0.25f;   // 돌진 시간
+
+        if (TimelineManager.Instance != null)
+        {
+            duration = TimelineManager.Instance.Tick_interval - 0.1f;
+        }
+
+        float elapsed = 0f;
+
+        Vector3 camera_start = isLeft ? _cameraLeftPos : _cameraRightPos;
+        Vector3 camera_end = isLeft ? _cameraRightPos : _cameraLeftPos;
+
+        targetCamera.transform.position = camera_start;
+
+        Transform startPos = isLeft ? _enemyLeftPos : _enemyRightPos;
+        Transform endPos = isLeft ? _enemyRightPos : _enemyLeftPos;
+
+        _currentEnemy.transform.position = startPos.position;
+
+        ChangeAnim("Dash");
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            float curveT = dashCurve.Evaluate(t);
+            float cameraT = cameraDashCurve.Evaluate(t);
+
+            if (!hitTriggered && t >= duration * 0.7f)
+            {
+                hitTriggered = true;
+                OnEnemySideChanged?.Invoke(isLeft);
+            }
+
+            targetCamera.transform.position =
+    Vector3.Lerp(camera_start, camera_end, cameraT);
+
+            //targetCamera.transform.position =
+            //    Vector3.Lerp(camera_start, camera_end, curveT);
+
+            _currentEnemy.transform.position =
+                Vector3.Lerp(startPos.position, endPos.position, curveT);
+
+            yield return null;
+        }
+
+        targetCamera.transform.position = camera_end;
+        _currentEnemy.transform.position = endPos.position;
+
+        SpriteRenderer sr = _currentEnemy.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.flipX = isLeft;
+
+        ChangeAnim("Idle");
+    }
+
+
 
     public void PlayDamage(int damage, bool is_crit)
     {
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Hurt");
+        ChangeAnim("Hurt");
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
-    }
-
-    public void PlayEnemyDie()
-    {
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Die");
     }
 
     public void PlayEnemyAttack(List<int> targets)
@@ -184,8 +287,7 @@ public class EnemyVisualController : MonoBehaviour
         if (_enemyAttackEffect != null)
             _enemyAttackEffect.Set_targetSectors(targets);
 
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Attack");
+        ChangeAnim("Attack");
     }
 
     public IEnumerator ShowEnemyDamage(int damage, bool is_crit)
