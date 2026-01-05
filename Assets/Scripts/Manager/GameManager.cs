@@ -649,8 +649,6 @@ public class GameManager : MonoBehaviour
             nextPattern = activeEnemy.GetNextPattern();
         }
 
-        //EnemyPattern nextPattern = activeEnemy.GetNextPattern(); 순차적으로 가져올거면 아랫줄 주석 처리하고 이거 주석 해제
-
         if (nextPattern != null)
         {
             activeEnemy.SetPattern(nextPattern);
