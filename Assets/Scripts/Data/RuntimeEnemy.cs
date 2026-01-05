@@ -56,6 +56,7 @@ public class RuntimeEnemy
     public void SetPattern(EnemyPattern pattern)
     {
         CurrentPattern = pattern;
+        CurrentPattern.Set_Is_left(IsLeft);
     }
 
     public void AddHitSectors(List<int> newSectors)
