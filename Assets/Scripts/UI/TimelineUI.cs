@@ -98,7 +98,7 @@ public class TimelineUI : MonoBehaviour
     // events
     public event Action<List<int>> OnRequestHighlight;
     public event Action OnRequestClearHighlight;
-    public event Action<int, ActionType> OnRequestPreviewPlayer;
+    public event Action<int, ActionType, MoveDirection> OnRequestPreviewPlayer;
     public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
@@ -583,7 +583,7 @@ public class TimelineUI : MonoBehaviour
 
             Debug.Log($"[TimelineUI] previewAction: {previewAction}");
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {
@@ -608,6 +608,7 @@ public class TimelineUI : MonoBehaviour
     // 슬라이더에서 호출
     public void Show_Preview(int tick)
     {
+        if (tick == 0) return;
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
@@ -637,7 +638,7 @@ public class TimelineUI : MonoBehaviour
 
             }
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {

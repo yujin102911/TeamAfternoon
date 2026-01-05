@@ -330,7 +330,7 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 고스트 위치 표시
     /// </summary>
-    public void ShowPlayerPreview(int sectorIndex, ActionType action)
+    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None)
     {
         if (_mapSystem == null || sectorIndex <= 0)
         {
@@ -351,6 +351,7 @@ public class PlayerVisualController : MonoBehaviour
             if (ghostSR != null)
             {
                 ghostSR.sortingOrder = (sectorIndex * 10) + 3;
+                ghostSR.flipX = GetFacingFlip(direction);
             }
             UpdateGhostVisual(action);
         }
