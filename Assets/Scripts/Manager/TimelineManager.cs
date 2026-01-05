@@ -534,7 +534,7 @@ public class TimelineManager : MonoBehaviour
             return _battleSystem != null ? _battleSystem.PlayerCurrentSector : 1;
         }
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
-        int columns = _totalColumns > 0 ? _totalColumns : 3;
+        int columns = _totalColumns > 0 ? _totalColumns : 3; // 호옥시 모를 오류 방지
         int rows = _totalSectors / columns;
 
         for (int t = 1; t <= targetTick; t++)
@@ -545,35 +545,31 @@ public class TimelineManager : MonoBehaviour
             {
                 int cardIndex = placed.GetCardTickIndex(t);
                 BlockData data = placed.GetBlockData();
+                ActionType action = data.GetEffectAt(cardIndex);
 
                 // 이동 액션일 경우 시뮬레이션
-                if (data.GetEffectAt(cardIndex) == ActionType.Move || data.GetEffectAt(cardIndex) == ActionType.Jump)
+                if (action == ActionType.Move || action == ActionType.Jump)
                 {
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
-
                     if (dir != MoveDirection.None)
                     {
-                        int moveAmount = 1;
-
-                        int curIdx = currentSimulatedSector - 1;
-                        int r = curIdx / columns;
-                        int c = curIdx % columns;
-
-                        switch (dir)
+                        int nextSector = CalculateNextSector(currentSimulatedSector, dir, columns, rows);
+                        if (nextSector != -1 && !_battleSystem.IsSectorBlocked(nextSector))
                         {
-                            case MoveDirection.Front: c += moveAmount; break;
-                            case MoveDirection.Back: c -= moveAmount; break;
-                            case MoveDirection.Left: r -= moveAmount; break;
-                            case MoveDirection.Right: r += moveAmount; break;
-                            case MoveDirection.DiagonalLu: r -= 1; c += 1; break;
-                            case MoveDirection.DiagonalRu: r += 1; c += 1; break;
-                            case MoveDirection.DiagonalLd: r -= 1; c -= 1; break;
-                            case MoveDirection.DiagonalRd: r += 1; c -= 1; break;
+                            currentSimulatedSector = nextSector;
                         }
-                        if (r >= 0 && r < rows && c >= 0 && c < columns)
-                        {
-                            currentSimulatedSector = (r * columns) + c + 1;
-                        }
+                    }
+                }
+            }
+            if (_currentEnemyPattern != null)
+            {
+                EnemyWind wind = _currentEnemyPattern.GetWindAt(t);
+                if (wind != null)
+                {
+                    int windTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, wind.direction);
+                    if (windTarget != -1 && !_battleSystem.IsSectorBlocked(windTarget))
+                    {
+                        currentSimulatedSector = windTarget;
                     }
                 }
             }
@@ -582,14 +578,55 @@ public class TimelineManager : MonoBehaviour
         return currentSimulatedSector;
     }
 
+    /// <summary>
+    /// 좌표 계산용 헬퍼 함수 (Preview 전용)
+    /// </summary>
+    private int CalculateNextSector(int currentSector, MoveDirection dir, int columns, int rows)
+    {
+        int curIdx = currentSector - 1;
+        int r = curIdx / columns;
+        int c = curIdx % columns;
+
+        switch (dir)
+        {
+            case MoveDirection.Front: c += 1; break;
+            case MoveDirection.Back: c -= 1; break;
+            case MoveDirection.Left: r -= 1; break;
+            case MoveDirection.Right: r += 1; break;
+            case MoveDirection.DiagonalLu: r -= 1; c += 1; break;
+            case MoveDirection.DiagonalRu: r += 1; c += 1; break;
+            case MoveDirection.DiagonalLd: r -= 1; c -= 1; break;
+            case MoveDirection.DiagonalRd: r += 1; c -= 1; break;
+        }
+
+        if (r >= 0 && r < rows && c >= 0 && c < columns)
+            return (r * columns) + 1 + c;
+
+        return -1;
+
+    }
+
     public List<int> GetEnemyAttackSectors(int tick)
     {
         List<int> sectors = new List<int>();
         if (_currentEnemyPattern != null)
         {
+            // 적 일반 공격 섹터 추가
             EnemyAttack attack = _currentEnemyPattern.GetAttackAt(tick);
             if (attack != null && attack.targetSectors != null)
                 sectors.AddRange(attack.targetSectors);
+
+            // 적 돌진 공격 섹터 추가
+            EnemyDash dash = _currentEnemyPattern.GetDashAt(tick);
+            if (dash != null && dash.targetRows != null)
+            {
+                List<int> dashSectors = dash.Convert_9sector();
+                foreach(int sector in dashSectors)
+                {
+                    if (!sectors.Contains(sector))
+                        sectors.Add(sector);
+                }
+            }
         }
         return sectors;
     }
@@ -612,52 +649,42 @@ public class TimelineManager : MonoBehaviour
 
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
 
-        int totalSectors = _totalSectors;
         int columns = _totalColumns;
-        int rows = totalSectors /  columns;
+        int rows = _totalSectors /  columns;
 
         for (int t = 1; t <= _totalTicks; t++)
         {
-            PlacedBlock placed = _timelineSystem.FindFirstAction(t);
-            if (placed != null)
-            {
-                int cardIndex = placed.GetCardTickIndex(t);
-                BlockData data = placed.GetBlockData();
-                if (data.GetEffectAt(cardIndex) == ActionType.Move)
-                {
-                    MoveDirection dir = placed.GetDirectionAt(cardIndex);
-                    int moveAmount = 1;
-                    int curIdx = currentSimulatedSector - 1;
-                    int r = curIdx / columns;
-                    int c = curIdx % columns;
-                    switch (dir)
-                    {
-                        case MoveDirection.Front:
-                            c += moveAmount;
-                            break;
-                        case MoveDirection.Back:
-                            c -= moveAmount;
-                            break;
-                        case MoveDirection.Left:
-                            r -= moveAmount;
-                            break;
-                        case MoveDirection.Right:
-                            r += moveAmount;
-                            break;
-                    }
-                    if (r >= 0 && r < rows && c >= 0 && c < columns)
-                    {
-                        currentSimulatedSector = (r * columns) + c + 1;
-                    }
-                }
-
-            }
+            currentSimulatedSector = SimulatePlayerPosition(t);
+            
             EnemyAttack attack = _currentEnemyPattern.GetAttackAt(t);
             if (attack != null && attack.targetSectors != null)
             {
                 if (attack.targetSectors.Contains(currentSimulatedSector))
+                {
                     dangerTicks.Add(t);
+                    continue;
+                }
             }
+            EnemyDash dash = _currentEnemyPattern.GetDashAt(t);
+            if (dash != null)
+            {
+                bool isHit = false;
+                foreach (int row in dash.targetRows)
+                {
+                    for (int col = 0; col < columns; col++)
+                    {
+                        int dashSector = (row * columns) + col + 1;
+                        if (dashSector == currentSimulatedSector)
+                        {
+                            isHit = true;
+                            break;
+                        }
+                    }
+                    if (isHit) break;
+                }
+                if (isHit) dangerTicks.Add(t);
+            }
+
         }
         return dangerTicks;
 

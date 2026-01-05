@@ -349,8 +349,11 @@ public class TimelineUI : MonoBehaviour
 
         EnemyAttack attack = _currentPattern.GetAttackAt(tick);
         EnemyParrying parrying = _currentPattern.GetParryingAt(tick);
+        EnemyWind wind = _currentPattern.GetWindAt(tick);
+        EnemyDash dash = _currentPattern.GetDashAt(tick);
+        EnemyStone stone = _currentPattern.GetStoneAt(tick);
 
-        if (attack == null && parrying == null)
+        if (attack == null && parrying == null && wind == null && dash == null && stone == null)
         {
             HideTooltip();
             return;
@@ -373,6 +376,18 @@ public class TimelineUI : MonoBehaviour
             {
                 tooltipDetailText.text = $"공격 튕겨내기";
             }
+            if (wind != null)
+            {
+                tooltipDetailText.text = $"불어라 바람 풍";
+            }
+            if (dash != null)
+            {
+                tooltipDetailText.text = $"돌진 공격 후 이동";
+            }
+            if (stone != null)
+            {
+                tooltipDetailText.text = $"돌 던지기: {stone.count}개";
+            }
         }
 
         // 툴팁 위치 설정
@@ -380,10 +395,9 @@ public class TimelineUI : MonoBehaviour
         tooltipPanel.SetActive(true);
 
         // 맵에 공격 섹터 표시
-        if (attack != null && attack.targetSectors != null)
-        {
-            OnRequestHighlight?.Invoke(attack.targetSectors);
-        }
+        List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(tick);
+        if (attackSectors != null && attackSectors.Count > 0)
+            OnRequestHighlight?.Invoke(attackSectors);
     }
 
     /// <summary>
@@ -531,6 +545,10 @@ public class TimelineUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 구 버전 미리보기 함수
+    /// -> 지금은 안씀
+    /// </summary>
     public void OnCursorEnter(int tick)
     {
         if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound)
@@ -598,15 +616,19 @@ public class TimelineUI : MonoBehaviour
 
             ActionType previewAction = ActionType.None;
 
-            if (tick % 2 == 1)
+            if (tick % 2 == 1) // 플레이어 행동 틱
             {
                 previewAction = action;
             }
-            else
+            else // 적 행동 틱
             {
                 if (action == ActionType.Bow_middle || action == ActionType.Bow_end)
                 {
                     previewAction = ActionType.Bow_middle;
+                }
+                else if (action == ActionType.Sword_middle || action == ActionType.Sword_end)
+                {
+                    previewAction = ActionType.Sword_middle;
                 }
                 else
                 {

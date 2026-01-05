@@ -46,6 +46,13 @@ public class EnemyStoneVisualController : MonoBehaviour
                 Vector3 spawnPos = _mapSystem.GetSectorPosition(sectorNum) + _offset;
 
                 GameObject stoneObj = Instantiate(_stonePrefab, spawnPos, Quaternion.identity);
+
+                SpriteRenderer sr = stoneObj.GetComponentInChildren<SpriteRenderer>();
+                if (sr != null)
+                {
+                    sr.sortingOrder = (sectorNum * 10) + 1;
+                }
+
                 stoneObj.transform.SetParent(_mapSystem.GetSectorTransform(sectorNum));
                 stoneObj.name = $"Stone_Sector_{sectorNum}";
 
