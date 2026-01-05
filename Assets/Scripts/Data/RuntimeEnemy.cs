@@ -34,7 +34,7 @@ public class RuntimeEnemy
     {
         int playerCol = (playerSector - 1) % columns;
 
-        if (!IsLeft)
+        if (IsLeft)
         {
             return playerCol == 0;
         }
