@@ -78,6 +78,7 @@ public class PlayerVisualController : MonoBehaviour
             if (targetTransform != null)
             {
                 MoveTo(targetTransform, direction);
+                UpdatePlayerSortingOrder(sectorIndex);
             }
         }
     }
@@ -92,7 +93,6 @@ public class PlayerVisualController : MonoBehaviour
         {
             Transform sectorTr = _mapSystem.GetSectorTransform(sectorIndex);
             if (sectorTr == null) return;
-
             Vector3 targetPos = sectorTr.position + _offset;
             if (_playerInstance != null)
                 Destroy(_playerInstance);
@@ -105,7 +105,8 @@ public class PlayerVisualController : MonoBehaviour
                 _playerAnimator = _playerInstance.GetComponentInChildren<Animator>();
 
                 _playerRenderer = _playerInstance.GetComponentInChildren<SpriteRenderer>();
-                if (_playerRenderer == null) _playerRenderer = _playerInstance.GetComponent<SpriteRenderer>();
+
+                UpdatePlayerSortingOrder(sectorIndex);
 
                 _playerAttackParticle = _playerInstance.GetComponentInChildren<ParticleSystem>();
             }
@@ -340,27 +341,10 @@ public class PlayerVisualController : MonoBehaviour
             targetPos += _offset;
             _currentGhost.transform.position = targetPos;
             _currentGhost.SetActive(true);
-            if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
+            SpriteRenderer ghostSR = _currentGhost.GetComponentInChildren<SpriteRenderer>();
+            if (ghostSR != null)
             {
-                int playerSector = GameManager.Instance.BattleSystem.PlayerCurrentSector;
-                int playerOrder = _playerRenderer != null ? _playerRenderer.sortingOrder : 10; // 기본값 10
-
-                SpriteRenderer ghostSR = _currentGhost.GetComponentInChildren<SpriteRenderer>();
-                if (ghostSR == null) ghostSR = _currentGhost.GetComponent<SpriteRenderer>();
-
-                if (ghostSR != null)
-                {
-                    // 섹터 번호가 플레이어보다 작으면 플레이어 뒤로 (-1)
-                    // 섹터 번호가 플레이어와 같거나 크면 플레이어 앞으로 (+1)
-                    if (sectorIndex < playerSector)
-                    {
-                        ghostSR.sortingOrder = playerOrder - 1;
-                    }
-                    else
-                    {
-                        ghostSR.sortingOrder = playerOrder + 1;
-                    }
-                }
+                ghostSR.sortingOrder = (sectorIndex * 10) + 3;
             }
             UpdateGhostVisual(action);
         }
@@ -379,7 +363,6 @@ public class PlayerVisualController : MonoBehaviour
         if (_currentGhost != null)
         {
             SpriteRenderer ghostSR = _currentGhost.GetComponentInChildren<SpriteRenderer>();
-            if (ghostSR == null) ghostSR = _currentGhost.GetComponent<SpriteRenderer>();
 
             if (ghostSR != null)
             {
@@ -415,6 +398,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_moveCoroutine != null)
             StopCoroutine(_moveCoroutine);
         _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction));
+
     }
 
     private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction)
@@ -457,6 +441,15 @@ public class PlayerVisualController : MonoBehaviour
 
         if (_playerRenderer != null)
             _playerRenderer.flipX = false;
+    }
+
+    // 플레이어 오더 인 레이어 조정
+    private void UpdatePlayerSortingOrder(int sectorIndex)
+    {
+        if (_playerRenderer != null)
+        {
+            _playerRenderer.sortingOrder = (sectorIndex * 10) + 2;
+        }
     }
     #endregion
 
