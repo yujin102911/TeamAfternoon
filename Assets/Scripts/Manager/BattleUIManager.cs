@@ -78,8 +78,8 @@ public class BattleUIManager : MonoBehaviour
 
     private void Update()
     {
-        _hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
-        _eightToggle.isOn = TimelineManager.Instance.Is_Eight;
+        //_hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
+        //_eightToggle.isOn = TimelineManager.Instance.Is_Eight;
 
         
     }

@@ -62,6 +62,7 @@ public class BattleSystem
     public event Action OnPlayerIdle;
 
     public event Action<string> OnChangePlayerAnim; // 플레이어 트리거 변경시 발행되는 이벤트
+    public event Action<string> OnChangeEnemyAnim; // 플레이어 트리거 변경시 발행되는 이벤트
 
     public event Action OnStartMelee; // 근접 차징 시작
     public event Action OnMiddleMelee; // 근접 차징 시작
@@ -288,7 +289,7 @@ public class BattleSystem
         if (_enemyHP <= 0)
         {
             Debug.Log("적 처치 완료");
-            OnEnemyDied?.Invoke();
+            OnChangeEnemyAnim?.Invoke("Die");
             OnEnemyDefeated();
         }
     }

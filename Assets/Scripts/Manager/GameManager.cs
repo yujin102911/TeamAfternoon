@@ -233,6 +233,7 @@ public class GameManager : MonoBehaviour
 
             //트리거 변경
             _battleSystem.OnChangePlayerAnim += _playerVisualController.ChangeAnim;
+            _battleSystem.OnChangeEnemyAnim += _enemyVisualController.ChangeAnim;
 
             //근거리 차징
             _battleSystem.OnStartMelee += _playerVisualController.PlayMeleeStart;
@@ -249,7 +250,6 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess += CountPlayerAttack;
             _battleSystem.OnPlayerHit += CountPlayerHit;
             _battleSystem.OnEnemyDied += HandleEnemyPurified;
-            _battleSystem.OnEnemyDied += _enemyVisualController.PlayEnemyDie;
             _battleSystem.OnPlayerDied += _playerVisualController.PlayDeath;
         }
 
@@ -284,6 +284,7 @@ public class GameManager : MonoBehaviour
 
             //트리거 변경
             _battleSystem.OnChangePlayerAnim -= _playerVisualController.ChangeAnim;
+            _battleSystem.OnChangeEnemyAnim -= _enemyVisualController.ChangeAnim;
 
             //근거리 차징
             _battleSystem.OnStartMelee -= _playerVisualController.PlayMeleeStart;
@@ -300,7 +301,6 @@ public class GameManager : MonoBehaviour
         {
             _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
-            _battleSystem.OnEnemyDied -= _enemyVisualController.PlayEnemyDie;
             _battleSystem.OnPlayerDied -= _playerVisualController.PlayDeath;
         }
     }
@@ -416,6 +416,7 @@ public class GameManager : MonoBehaviour
         OnGameStateChanged?.Invoke();
 
         _playerVisualController.Stop_PlayerIdle();
+        _enemyVisualController.Stop_EnemyIdle();
     }
 
     /// <summary>

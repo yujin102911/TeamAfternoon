@@ -29,6 +29,8 @@ public class EnemyVisualController : MonoBehaviour
     private EnemyAttackEffect _enemyAttackEffect;
     private EnemyVisual visual;
 
+    private string _currentAnimation = "";
+
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private List<RuntimeEnemy> _currentEnemies = new List<RuntimeEnemy>();
     private BattleSystem _battleSystem;
@@ -141,31 +143,32 @@ public class EnemyVisualController : MonoBehaviour
             visual.EnemyDeadColor(enemy);
         }
     }
+    public void ChangeAnim(string animation)
+    {
+        if (_enemyAnimator != null)
+        {
+            _currentAnimation = animation;
+            _enemyAnimator.CrossFade(animation, 0.2f);
+        }
+    }
 
     public void Play_EnemyIdle()
     {
         if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Play");
+            _enemyAnimator.enabled = true;
     }
 
     public void Stop_EnemyIdle()
     {
         if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Pause");
+            _enemyAnimator.enabled = false;
     }
 
     public void PlayDamage(int damage, bool is_crit)
     {
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Hurt");
+        ChangeAnim("Hurt");
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
-    }
-
-    public void PlayEnemyDie()
-    {
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Die");
     }
 
     public void PlayEnemyAttack(List<int> targets)
@@ -173,8 +176,7 @@ public class EnemyVisualController : MonoBehaviour
         if (_enemyAttackEffect != null)
             _enemyAttackEffect.Set_targetSectors(targets);
 
-        if (_enemyAnimator != null)
-            _enemyAnimator.SetTrigger("Attack");
+        ChangeAnim("Attack");
     }
 
     public IEnumerator ShowEnemyDamage(int damage, bool is_crit)
