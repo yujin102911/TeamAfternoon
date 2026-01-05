@@ -415,7 +415,8 @@ public class TimelineManager : MonoBehaviour
                 EnemyWind wind = _currentEnemyPattern?.GetWindAt(tick);
                 if (wind != null)
                 {
-                    _battleSystem.ProcessEnemyWind(wind);
+                    WindDirection actualDirection = wind.GetDynamicDirection(_currentEnemyPattern.Get_Is_left());
+                    _battleSystem.ProcessEnemyWind(actualDirection);
                 }
                 EnemyDash dash = _currentEnemyPattern?.GetDashAt(tick);
                 if (dash != null)
@@ -566,7 +567,9 @@ public class TimelineManager : MonoBehaviour
                 EnemyWind wind = _currentEnemyPattern.GetWindAt(t);
                 if (wind != null)
                 {
-                    int windTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, wind.direction);
+                    WindDirection actualDirection = wind.GetDynamicDirection(_currentEnemyPattern.Get_Is_left());
+                    int windTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, actualDirection);
+
                     if (windTarget != -1 && !_battleSystem.IsSectorBlocked(windTarget))
                     {
                         currentSimulatedSector = windTarget;

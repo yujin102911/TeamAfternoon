@@ -59,11 +59,12 @@ public class PlayerVisualController : MonoBehaviour
     {
         _mapSystem = mapSystem;
         _battleSystem = battleSystem;
-        //battleSystem.OnEnemySideChanged += (isLeft) =>
-        //{
-        //    if (_playerRenderer != null)
-        //        _playerRenderer.flipX = !isLeft;
-        //};
+        _battleSystem.OnEnemySideChanged += HandleEnemySideChanged;
+    }
+
+    public void OnDestroy()
+    {
+        _battleSystem.OnEnemySideChanged -= HandleEnemySideChanged;
     }
 
     /// <summary>
@@ -136,6 +137,7 @@ public class PlayerVisualController : MonoBehaviour
         {
             _playerAnimator.enabled = true;
         }
+        UpdateFacing();
             //_playerAnimator.SetTrigger("Play");
     }
 
@@ -165,7 +167,7 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Attack_Sword");
-
+        UpdateFacing();
         //트레일 렌더러 코드    
         //if (trailEffectPrefab != null)
         //{
@@ -182,32 +184,36 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_playerInstance == null) return;
         _playerAnimator.SetTrigger("Death");
+        UpdateFacing();
     }
 
     public void PlaySwordAttack()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Attack_Sword");
+
     }
 
     public void PlayBowCharging()
     {
         if (_playerInstance == null) return;
+        UpdateFacing() ;
             _playerAnimator.SetTrigger("Charging_Bow");
     }
 
     public void PlayBowMiddle()
     {
         if (_playerInstance == null) return;
+        UpdateFacing();
         _playerAnimator.SetTrigger("Bow_Middle");
     }
 
     public void PlayBowAttack()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Attack_Bow");
     }
@@ -215,7 +221,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayMeleeStart()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Sword_Charge");
     }
@@ -223,7 +229,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayMeleeMiddle()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Sword_Middle");
     }
@@ -233,7 +239,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayMeleeEnd()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Sword_End");
     }
@@ -241,7 +247,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayGuard()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Guard");
     }
@@ -249,7 +255,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayIdle()
     {
         if (_playerInstance == null) return;
-
+        UpdateFacing();
         if (_playerAnimator != null)
             _playerAnimator.SetTrigger("Idle");
     }
@@ -257,7 +263,7 @@ public class PlayerVisualController : MonoBehaviour
     public void PlayHitEffect()
     {
         if (_playerRenderer == null) return;
-        
+        UpdateFacing();
         if (_playerAnimator != null)
         {
             _playerAnimator.SetTrigger("Hurt");
@@ -324,7 +330,7 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 고스트 위치 표시
     /// </summary>
-    public void ShowPlayerPreview(int sectorIndex, ActionType action)
+    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None)
     {
         if (_mapSystem == null || sectorIndex <= 0)
         {
@@ -345,6 +351,7 @@ public class PlayerVisualController : MonoBehaviour
             if (ghostSR != null)
             {
                 ghostSR.sortingOrder = (sectorIndex * 10) + 3;
+                ghostSR.flipX = GetFacingFlip(direction);
             }
             UpdateGhostVisual(action);
         }
@@ -405,8 +412,7 @@ public class PlayerVisualController : MonoBehaviour
     {
         ChangeAnim("3_1_ Run");
 
-        if (_playerRenderer != null)
-            _playerRenderer.flipX = (direction == MoveDirection.Back);
+        UpdateFacing(direction);
 
         _playerInstance.transform.SetParent(null);
 
@@ -437,10 +443,9 @@ public class PlayerVisualController : MonoBehaviour
         _moveCoroutine = null;
 
         //if (_playerAnimator != null)
-            //_playerAnimator.SetTrigger("Run_Stop");
+        //_playerAnimator.SetTrigger("Run_Stop");
 
-        if (_playerRenderer != null)
-            _playerRenderer.flipX = false;
+        UpdateFacing();
     }
 
     // 플레이어 오더 인 레이어 조정
@@ -453,6 +458,54 @@ public class PlayerVisualController : MonoBehaviour
     }
     #endregion
 
+    #region Player Direction Helper Methods
+    private void HandleEnemySideChanged(bool isEnemyLeft)
+    {
+        // 이동 중이 아닐 때 즉시 방향 전환
+        if (_moveCoroutine == null)
+        {
+            UpdateFacing();
+        }
+    }
 
+    /// <summary>
+    /// 플레이어가 바라봐야할 방향을 결정하는 함수
+    /// </summary>
+    private bool GetFacingFlip(MoveDirection direction = MoveDirection.None)
+    {
+        if (_battleSystem == null || _battleSystem.Enemies.Count == 0) return false;
+
+        bool enemyIsLeft = _battleSystem.Enemies[0].IsLeft;
+        bool shouldFaceLeft = enemyIsLeft;
+
+        if (enemyIsLeft) // 적이 왼쪽에 있을 때 기준 (앞으로 이동 -> 뒤로 이동)
+        {
+            if (direction == MoveDirection.Front ||
+                direction == MoveDirection.DiagonalLu ||
+                direction == MoveDirection.DiagonalRu)
+            {
+                shouldFaceLeft = false;
+            }
+        }
+        else // 적이 오른쪽에 있을 때 기준 (뒤로 이동 -> 뒤로 이동)
+        {
+            if (direction == MoveDirection.Back ||
+                direction == MoveDirection.DiagonalLd ||
+                direction == MoveDirection.DiagonalRd)
+            {
+                shouldFaceLeft = true;
+            }
+        }
+
+        return shouldFaceLeft;
+    }
+
+    // 모든 액션 시작 시 호출하여 방향을 고정하는 ㅔㅁ서드
+    public void UpdateFacing(MoveDirection direction = MoveDirection.None)
+    {
+        if (_playerRenderer != null)
+            _playerRenderer.flipX = GetFacingFlip(direction);
+    }
+    #endregion
 
 }
