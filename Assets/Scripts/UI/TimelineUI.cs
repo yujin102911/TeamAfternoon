@@ -639,6 +639,10 @@ public class TimelineUI : MonoBehaviour
                 {
                     previewAction = ActionType.Sword_middle;
                 }
+                else if(action == ActionType.Guard)
+                {
+                    previewAction = ActionType.Guard;
+                }
                 else
                 {
                     previewAction = ActionType.None;
