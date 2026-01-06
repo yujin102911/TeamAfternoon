@@ -27,6 +27,9 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("편집 콤보")]
+    public int Combo;
+
     [Header("자막 메모리 설정")]
     public int Max_memory;
     public int _currentMemory;
@@ -208,7 +211,7 @@ public class TimelineManager : MonoBehaviour
     private void HandleBlockTick(PlacedBlock placed, RuntimeBlock runtime, int tick, ActionType action)
     {
         //틱당 크리 확률 증가
-        //_battleSystem.IncreaseMeleeStack();
+        _battleSystem.IncreaseMeleeStack();
 
         // 특수효과 플래그 처리
         _battleSystem.SetEffectFrag(GetEffectTypeAt(tick));
@@ -417,7 +420,7 @@ public class TimelineManager : MonoBehaviour
 
     public bool CanPlaceEffect(int startTick) 
     {
-        if (_placedEffect[startTick - 1] == null)
+        if (_placedEffect[startTick - 1] == null && Count_Effect())
             return true;
         return false;
     }
@@ -436,6 +439,17 @@ public class TimelineManager : MonoBehaviour
         if (effect != null)
             return effect.cost;
         return 0;
+    }
+
+    private bool Count_Effect()
+    {
+        int count = 0;
+        foreach (Additional_Effect effect in _placedEffect)
+        {
+            if (effect != null)
+                count++;
+        }
+        return count < Combo / 8;
     }
 
     /// <summary>

@@ -97,7 +97,7 @@ public class BattleUIManager : MonoBehaviour
     public void UpdateStackUI(float chance)
     {
         //_adTxt.text = $"크리티컬 확률: {Mathf.RoundToInt(chance * 100f)}%";
-        _adTxt.text = $"편집 콤보: +{(int)chance}";
+        _adTxt.text = $"편집 콤보: +{(int)chance} / 최대 자막수: {(int)chance / 8}";
     }
 
     public void Update_TextSlider(int current, int max)

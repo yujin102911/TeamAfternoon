@@ -286,6 +286,7 @@ public class BattleSystem
             critChance = 1;
         }
 
+        TimelineManager.Instance.Combo = _meleeAttackStack;
         //OnCriticalChanceChanged?.Invoke(critChance);
         OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
@@ -303,6 +304,7 @@ public class BattleSystem
             critChance = 1;
         }
 
+        TimelineManager.Instance.Combo = _meleeAttackStack;
         //OnCriticalChanceChanged?.Invoke(critChance);
         OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }

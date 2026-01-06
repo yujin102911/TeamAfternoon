@@ -3792,7 +3792,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &402252356
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3832,7 +3832,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD3B8\uC9D1 \uCF64\uBCF4 : ??"
+  m_text: "\uD3B8\uC9D1 \uCF64\uBCF4 : ?? / \uCD5C\uB300 \uC790\uB9C9\uC218: ?"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4ebccbda7791e604987027213b41589a, type: 2}
   m_sharedMaterial: {fileID: -5844541311084837005, guid: 4ebccbda7791e604987027213b41589a, type: 2}
@@ -3866,7 +3866,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -3875,7 +3875,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -8944,7 +8944,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1069929827
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10641,7 +10641,7 @@ RectTransform:
   m_Father: {fileID: 1009150478}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -44401,7 +44401,7 @@ MonoBehaviour:
   _startHandSize: 99
   _playerMaxHP: 3
   _mapSize: 0
-  currentStageData: {fileID: 11400000, guid: c92703fd3db9f824882f41cdd30c0368, type: 2}
+  currentStageData: {fileID: 11400000, guid: b01ff9766c0c37a42b4bb49d793ab8b4, type: 2}
 --- !u!114 &1994000751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44414,7 +44414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce20e7bef32d7f847aa1d30853c6bca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Max_memory: 10
+  Combo: 0
+  Max_memory: 999999
   _currentMemory: 0
   Is_Hit: 0
   Is_Eight: 0
