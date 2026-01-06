@@ -23,6 +23,12 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] 
     private Slider _memorySlider;
 
+    [Header("자막 메모리 UI")]
+    [SerializeField]
+    private TextMeshProUGUI _storageTxtMemory;
+    [SerializeField]
+    private Slider _textmemorySlider;
+
     [Header("아드레날린 UI")]
     [SerializeField]
     private Toggle _hitToggle;
@@ -58,6 +64,8 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
             GameManager.Instance.OnMemoryUpdate += UpdateSlider;
+
+            TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider;
         }
         RefreshStartButtonState();
         //RefreshSectorSelectionPanel();
@@ -72,6 +80,8 @@ public class BattleUIManager : MonoBehaviour
             battleSystem.OnCriticalChanceChanged -= UpdateStackUI;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
             GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
+
+            TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
@@ -86,7 +96,16 @@ public class BattleUIManager : MonoBehaviour
 
     public void UpdateStackUI(float chance)
     {
-        _adTxt.text = $"크리티컬 확률: {Mathf.RoundToInt(chance * 100f)}%";
+        //_adTxt.text = $"크리티컬 확률: {Mathf.RoundToInt(chance * 100f)}%";
+        _adTxt.text = $"편집 콤보: +{(int)chance}";
+    }
+
+    public void Update_TextSlider(int current, int max)
+    {
+        float slider_size = (float)current / max;
+
+        _textmemorySlider.value = slider_size;
+        _storageTxtMemory.text = $"{current}/{max}";
     }
     private void HandleBattleInitialized()
     {

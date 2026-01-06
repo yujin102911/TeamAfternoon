@@ -286,7 +286,8 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     /// <summary>
@@ -302,7 +303,8 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     private void DamageEnemy(int amount)
@@ -343,7 +345,7 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         //아드레날린 조건 파괴
-        ResetMeleeStack();
+        //ResetMeleeStack();
     }
 
     public void PlayerTakeDamage()

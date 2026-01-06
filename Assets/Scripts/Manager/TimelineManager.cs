@@ -27,6 +27,10 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("자막 메모리 설정")]
+    public int Max_memory;
+    public int _currentMemory;
+
     [Header("아드레날린 토글")]
     public bool Is_Hit = false;
     public bool Is_Eight = false;
@@ -69,6 +73,7 @@ public class TimelineManager : MonoBehaviour
     public event Action<EnemyPattern> OnEnemyPatternChanged;
     public event Action<int> OnCurrentTickChanged;
     public event Action<IReadOnlyList<Additional_Effect>> OnEffectChanged;
+    public event Action<int, int> OnTextMemoryChanged;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
@@ -89,6 +94,8 @@ public class TimelineManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        _currentMemory = Max_memory;
 
         // TimelineSystem 초기화
         _timelineSystem = new TimelineSystem();
@@ -380,10 +387,13 @@ public class TimelineManager : MonoBehaviour
 
     public bool TryPlaceEffect(Additional_Effect effect, int startTick) 
     {
-        if (CanPlaceEffect(startTick))
+        if (CanPlaceEffect(startTick) && effect.cost <= _currentMemory)
         {
             _placedEffect[startTick - 1] = effect;
+            _currentMemory -= effect.cost;
+
             OnEffectChanged.Invoke(_placedEffect);
+            OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
             return true;
         }
 
@@ -394,12 +404,15 @@ public class TimelineManager : MonoBehaviour
     {
         _placedEffect.Remove(effect);
         OnEffectChanged.Invoke(_placedEffect);
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
     }
 
     public void RemovePlacedEffect_Index(int tick)
     {
+        _currentMemory += _placedEffect[tick - 1].cost;
         _placedEffect[tick - 1] = null;
         OnEffectChanged.Invoke(_placedEffect);
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
     }
 
     public bool CanPlaceEffect(int startTick) 
@@ -612,6 +625,7 @@ public class TimelineManager : MonoBehaviour
         _battleSystem = battleSystem;
         _totalSectors = totalSector;
         _totalColumns = columns;
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
     }
 
     #region Preview Methods - public
