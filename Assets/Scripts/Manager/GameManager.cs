@@ -471,7 +471,17 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
-        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
+        int final_memory = 0;
+
+        foreach (var effect in TimelineManager.Instance.additional_Effects)
+        {
+            if (effect == null) continue;
+            final_memory += effect.cost;
+        }
+
+        _memory += (8 + final_memory);
+
+        OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
@@ -530,15 +540,7 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
-        int final_memory = 0;
-
-        foreach (var effect in TimelineManager.Instance.additional_Effects)
-        {
-            if (effect == null) continue;
-            final_memory += effect.cost;
-        }
-
-        _memory += (8 + final_memory);
+        
 
         if (currentStageData != null && _memory >= 8 * currentStageData.LimitRound)
         {

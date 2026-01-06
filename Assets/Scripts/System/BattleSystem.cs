@@ -136,6 +136,9 @@ public class BattleSystem
     /// <param name="effect"></param>
     public void SetEffectFrag(EffectType effect)
     {
+        _isCritical = false;
+        _isDubleDash = false;
+
         switch (effect)
         {
             case EffectType.Critical:
@@ -143,6 +146,8 @@ public class BattleSystem
                 break;
             case EffectType.Duble_Dash:
                 _isDubleDash = true;
+                break;
+            case EffectType.None:
                 break;
         }
     }
