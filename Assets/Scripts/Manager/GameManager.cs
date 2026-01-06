@@ -479,7 +479,7 @@ public class GameManager : MonoBehaviour
             final_memory += effect.cost;
         }
 
-        _memory += (8 + final_memory);
+        _memory += 8;
 
         OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
