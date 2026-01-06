@@ -8,13 +8,13 @@ using UnityEngine.UI;
 public class TutorialStep
 {
     [TextArea(3, 10)]
-    public string sentence;          // 대사 내용
-    public Vector2 bubblePosition;   // 말풍선 좌표
-    public GameObject targetIcon;    // 하이라이트 아이콘 (직접 클릭 유도용)
+    public string sentence;
+    public Vector2 bubblePosition;
+    public GameObject targetIcon;
 
-    [Header("오브젝트 제어")]
-    public GameObject activeObject;      // 이번 단계 시작 시 켤 오브젝트
-    public GameObject deactivateObject;  // 이번 단계 시작 시 끌 오브젝트
+    [Header("오브젝트 제어 (필요할 때만 사용)")]
+    public GameObject activeObject;      // 비워두면 아무것도 켜지 않습니다.
+    public GameObject deactivateObject;  // 이번 단계 대사가 '나올 때' 꺼질 오브젝트
 }
 
 public class DialogueManager : MonoBehaviour
@@ -40,7 +40,6 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        // 씬 시작 시 튜토리얼 자동 시작
         TriggerTutorial();
     }
 
@@ -58,10 +57,9 @@ public class DialogueManager : MonoBehaviour
         DisplayNextStep();
     }
 
-    // 말풍선에 붙은 버튼이 호출할 함수
     public void OnClickNext()
     {
-        // 하이라이트 대상이 있다면 말풍선 클릭으로 넘기기 방지
+        // 아이콘을 클릭해야 하는 단계(targetIcon 존재)라면 말풍선 클릭 무시
         if (currentHighlight != null) return;
 
         DisplayNextStep();
@@ -69,7 +67,6 @@ public class DialogueManager : MonoBehaviour
 
     public void DisplayNextStep()
     {
-        // 1. 이전 단계 하이라이트 해제
         ResetHighlight();
 
         if (steps.Count == 0)
@@ -78,32 +75,33 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // 2. 현재 단계 데이터 가져오기
         TutorialStep currentStep = steps.Dequeue();
 
-        // 3. 오브젝트 활성화/비활성화 처리 (MSN 패널 제어 등)
+        // 1. 오브젝트 켜기 (비어있으면 무시됨)
         if (currentStep.activeObject != null)
             currentStep.activeObject.SetActive(true);
 
+        // 2. 오브젝트 끄기 
+        // TIP: 아이콘을 더블클릭하자마자 다음 대사로 넘어올 때, 
+        // 그 다음 대사 리스트에 자기 자신(패널)이 deactivateObject로 들어있으면 즉시 꺼집니다.
+        // 그게 아니라면 여기서 정상적으로 작동합니다.
         if (currentStep.deactivateObject != null)
             currentStep.deactivateObject.SetActive(false);
 
-        // 4. UI 갱신
+        // 3. UI 갱신
         dialogueText.text = currentStep.sentence;
         bubbleRect.anchoredPosition = currentStep.bubblePosition;
 
-        // 5. 하이라이트 설정
+        // 4. 하이라이트 설정
         if (currentStep.targetIcon != null)
         {
             SetHighlight(currentStep.targetIcon);
         }
     }
 
-    void SetHighlight(GameObject target)
+    public void SetHighlight(GameObject target)
     {
         currentHighlight = target;
-
-        // 블로커보다 위로 올리기
         Canvas targetCanvas = target.GetComponent<Canvas>();
         if (targetCanvas == null) targetCanvas = target.AddComponent<Canvas>();
 
@@ -122,6 +120,12 @@ public class DialogueManager : MonoBehaviour
             if (c != null) c.overrideSorting = false;
             currentHighlight = null;
         }
+    }
+
+    public void RegisterDynamicTarget(GameObject target)
+    {
+        // 현재 대사 단계에서 하이라이트를 즉시 적용
+        SetHighlight(target);
     }
 
     void EndTutorial()

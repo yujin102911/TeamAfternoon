@@ -53,6 +53,7 @@ public class MailPanel : MonoBehaviour
         if (_bodyScrollRect != null)
             _bodyScrollRect.verticalNormalizedPosition = 1f;
     }
+
     public void GenerateStageList()
     {
         foreach (Transform child in _contentArea) Destroy(child.gameObject);
@@ -60,6 +61,10 @@ public class MailPanel : MonoBehaviour
         List<StageData> sortedStages = DataRepository.Instance.stageDatas.Values
             .OrderBy(s => s.StageNumber)
             .ToList();
+
+        // 튜토리얼 연동을 위한 플래그
+        bool isFirstMailInTutorial = true;
+        DialogueManager dm = FindObjectOfType<DialogueManager>();
 
         foreach (StageData stage in sortedStages)
         {
@@ -79,17 +84,37 @@ public class MailPanel : MonoBehaviour
                     {
                         canShowMail = true;
                     }
+
                     if (canShowMail)
                     {
                         GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
                         StageButton mailBtn = go.GetComponent<StageButton>();
                         mailBtn.Setup(stage, mail, DisplayLetterContent);
+
+                        // [튜토리얼 연동] 
+                        // 현재 튜토리얼 매니저가 활성화되어 있고, 이번이 첫 메일 생성이라면
+                        if (dm != null && dm.bubbleObject.activeSelf && isFirstMailInTutorial)
+                        {
+                            // 1. 생성된 버튼을 하이라이트 (블로커 위로 올림)
+                            dm.SetHighlight(go);
+
+                            // 2. 이 버튼을 누르면 대사도 같이 넘어가도록 이벤트 추가
+                            Button btn = go.GetComponent<Button>();
+                            if (btn != null)
+                            {
+                                btn.onClick.AddListener(() => dm.DisplayNextStep());
+                            }
+
+                            // 3. 한 번만 등록하기 위해 플래그 해제
+                            isFirstMailInTutorial = false;
+                        }
                     }
                 }
             }
             else break;
         }
     }
+
     private void DisplayLetterContent(StageData data, MailContent mail)
     {
         mail.isRead = true;
