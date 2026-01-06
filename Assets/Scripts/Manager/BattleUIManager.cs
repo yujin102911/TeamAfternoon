@@ -142,12 +142,20 @@ public class BattleUIManager : MonoBehaviour
 
     private void UpdateSlider(int current, int max)
     {
-        float slider_size = (float)current / max;
+        int final_memory = 0;
+
+        foreach (var effect in TimelineManager.Instance.additional_Effects)
+        {
+            if(effect == null) continue;
+            final_memory += effect.cost;
+        }
+
+        float slider_size = (float)(8 * current + final_memory) / (8 * max);
         float percent = slider_size * 100f;
 
         _memorySlider.value = slider_size;
         _percentTxt.text = $"{percent}%";
-        _storageTxt.text = $"{8*current}/{8 * max} <size=20>mb</size>";
+        _storageTxt.text = $"{(8*current) + final_memory}/{8 * max} <size=20>mb</size>";
     }
 
     // 슬라이더 핸들 바 레이캐스트 온

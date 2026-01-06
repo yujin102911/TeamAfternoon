@@ -6,8 +6,8 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 {
     public int tickIndex;
     public TimelineUI timelineUI;
-    private Image image;
-    private Color originalColor;
+    public Image image;
+    public Color originalColor;
 
     void Awake()
     {
@@ -48,7 +48,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         }
     }
 
-    public void OnDrop(PointerEventData eventData)
+    public virtual void OnDrop(PointerEventData eventData)
     {
         // 색상 원래대로
         if (image != null)
@@ -84,7 +84,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     /// <summary>
     /// 마우스가 드롭존 위에 있을 때 (스냅 미리보기)
     /// </summary>
-    public void OnPointerEnter(PointerEventData eventData)
+    public virtual void OnPointerEnter(PointerEventData eventData)
     {
 
         RuntimeBlock block_info = null;
@@ -127,7 +127,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public virtual void OnPointerExit(PointerEventData eventData)
     {
         // 색상 원래대로
         if (eventData.pointerDrag != null && image != null
@@ -142,7 +142,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
         }
     }
 
-    bool IsColorSimilar(Color a, Color b, float tolerance = 0.01f)
+    public bool IsColorSimilar(Color a, Color b, float tolerance = 0.01f)
     {
         return
             Mathf.Abs(a.r - b.r) < tolerance &&

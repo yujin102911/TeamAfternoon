@@ -4,6 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum EffectType
+{
+    None,
+    Critical,
+    Duble_Dash
+}
+
+[Serializable]
+public class Additional_Effect
+{
+    public EffectType effectType;
+    public Color effectColor;
+    public int cost;
+}
+
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director
 /// TimelineSystem과 BattleSystem 사이의 중재자
@@ -40,6 +55,8 @@ public class TimelineManager : MonoBehaviour
     private TimelineSystem _timelineSystem;
     private BattleSystem _battleSystem;
 
+    private List<Additional_Effect> _placedEffect = new List<Additional_Effect>();
+
     // 현재 손패 (GameDirector로부터 받음)
     private List<RuntimeBlock> _currentHand = new List<RuntimeBlock>();
 
@@ -51,11 +68,14 @@ public class TimelineManager : MonoBehaviour
     public event Action<IReadOnlyList<PlacedBlock>, IReadOnlyList<PlacedBlock>> OnTimelineChanged;
     public event Action<EnemyPattern> OnEnemyPatternChanged;
     public event Action<int> OnCurrentTickChanged;
+    public event Action<IReadOnlyList<Additional_Effect>> OnEffectChanged;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
     public IReadOnlyList<PlacedBlock> PlacedBlocks => _timelineSystem.PlacedBlocks;
     public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _timelineSystem.PrevPlacedBlocks;
+
+    public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
 
     void Awake()
@@ -85,6 +105,9 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnMeleeAttackStarted += HandleMeleeAttack_Start;
         _timelineSystem.OnGuardRequested += HandleGuardRequest;
         _timelineSystem.OnLongRangeAttacking += HandleLongRangeAttack_Middle;
+
+        // 이펙트 초기화
+        InitializedEffect(_totalTicks);
     }
 
     void OnDestroy()
@@ -178,7 +201,10 @@ public class TimelineManager : MonoBehaviour
     private void HandleBlockTick(PlacedBlock placed, RuntimeBlock runtime, int tick, ActionType action)
     {
         //틱당 크리 확률 증가
-        _battleSystem.IncreaseMeleeStack();
+        //_battleSystem.IncreaseMeleeStack();
+
+        // 특수효과 플래그 처리
+        _battleSystem.SetEffectFrag(GetEffectTypeAt(tick));
 
         // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
         if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
@@ -337,6 +363,66 @@ public class TimelineManager : MonoBehaviour
         placedBlock.linkedRuntimeBlock.ToggleDirectionsForJump(index);
         Debug.Log($"[TimelineManager] 방향 전환: T{tick}");
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+
+    // ========================================
+    // 특수효과 관련
+    // ========================================
+    private void InitializedEffect(int size)
+    {
+        _placedEffect.Clear();
+
+        for (int i = 0; i < size; i++)
+        {
+           _placedEffect.Add(null);
+        }
+    }
+
+    public bool TryPlaceEffect(Additional_Effect effect, int startTick) 
+    {
+        if (CanPlaceEffect(startTick))
+        {
+            _placedEffect[startTick - 1] = effect;
+            OnEffectChanged.Invoke(_placedEffect);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void RemovePlacedEffect(Additional_Effect effect)
+    {
+        _placedEffect.Remove(effect);
+        OnEffectChanged.Invoke(_placedEffect);
+    }
+
+    public void RemovePlacedEffect_Index(int tick)
+    {
+        _placedEffect[tick - 1] = null;
+        OnEffectChanged.Invoke(_placedEffect);
+    }
+
+    public bool CanPlaceEffect(int startTick) 
+    {
+        if (_placedEffect[startTick - 1] == null)
+            return true;
+        return false;
+    }
+
+    public EffectType GetEffectTypeAt(int tick)
+    {
+        Additional_Effect effect = _placedEffect[tick - 1];
+        if (effect != null)
+            return effect.effectType;
+        return EffectType.None;
+    }
+
+    public int GetEffectCostAt(int tick)
+    {
+        Additional_Effect effect = _placedEffect[tick - 1];
+        if (effect != null)
+            return effect.cost;
+        return 0;
     }
 
     /// <summary>
@@ -501,6 +587,10 @@ public class TimelineManager : MonoBehaviour
 
         //아드 UI업뎃
         //BattleUIManager.Instance.UpdateStackUI();
+
+        // 이펙트 클리어
+        InitializedEffect(_totalTicks);
+        OnEffectChanged?.Invoke(_placedEffect);
 
         Debug.Log("[TimelineDirector] 라운드 종료 처리 완료");
 

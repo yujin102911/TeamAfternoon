@@ -46,6 +46,10 @@ public class BattleSystem
 
     private int _damageBuffer = 0;
 
+    //특수효과 플래그
+    private bool _isCritical = false;
+    private bool _isDubleDash = false;
+
     #endregion
 
     #region Events
@@ -127,6 +131,23 @@ public class BattleSystem
     }
 
     /// <summary>
+    /// 플래그 세팅
+    /// </summary>
+    /// <param name="effect"></param>
+    public void SetEffectFrag(EffectType effect)
+    {
+        switch (effect)
+        {
+            case EffectType.Critical:
+                _isCritical = true;
+                break;
+            case EffectType.Duble_Dash:
+                _isDubleDash = true;
+                break;
+        }
+    }
+
+    /// <summary>
     /// 근거리 공격
     /// </summary>
     public bool MeleeAttack(int damage, bool isChargeRequired)
@@ -195,6 +216,13 @@ public class BattleSystem
     public DamageResult CalculateDamage(int baseDamage, float critChance)
     {
         bool isCritical = UnityEngine.Random.value < critChance;
+
+        // 특수효과 플래그 처리(확정 치명타)
+        if (_isCritical) 
+        {
+            isCritical = true;
+            _isCritical = false;
+        }
 
         int finalDamage = isCritical
             ? baseDamage * 2
@@ -367,6 +395,13 @@ public class BattleSystem
         if (moveDirection == MoveDirection.None || _columns <= 0) return;
 
         int moveAmount = 1;
+
+        if(_isDubleDash)
+        {
+            moveAmount = 2;
+            _isDubleDash = false;
+            Debug.Log("[BattleSystem] 더블 대시 효과로 2칸 이동!");
+        }
 
         int currentIndex = _playerCurrentSector - 1;
         int curRow = currentIndex / _columns;

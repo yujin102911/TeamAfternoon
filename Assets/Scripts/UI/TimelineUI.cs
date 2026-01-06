@@ -117,6 +117,7 @@ public class TimelineUI : MonoBehaviour
             TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
             TimelineManager.Instance.OnEnemyPatternChanged += (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
+            TimelineManager.Instance.OnEffectChanged += Update_effectColor;
         }
     }
 
@@ -129,6 +130,7 @@ public class TimelineUI : MonoBehaviour
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
             TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
+            TimelineManager.Instance.OnEffectChanged -= Update_effectColor;
         }
     }
 
@@ -173,6 +175,11 @@ public class TimelineUI : MonoBehaviour
                 }
                 
             }
+        }
+
+        if (!is_enter)
+        {
+            Update_effectColor(TimelineManager.Instance.additional_Effects);
         }
     }
 
@@ -226,17 +233,18 @@ public class TimelineUI : MonoBehaviour
             slot.name = $"PlayerSlot_{tick}";
 
 
-            TimelineDropZone dropZone = null;
+            //TimelineDropZone dropZone = null;
+            Effect_DropZone dropZone = null;
 
             // TODO: New_Layout 확정되면 나중에 지우기
             // 드롭 이벤트 핸들러 추가
             if (New_Layout)
             {
-                dropZone = slot.transform.Find("Image")?.AddComponent<TimelineDropZone>();
+                dropZone = slot.transform.Find("Image")?.AddComponent<Effect_DropZone>();
             }
             else
             {
-                dropZone = slot.AddComponent<TimelineDropZone>();
+                dropZone = slot.AddComponent<Effect_DropZone>();
             }
 
             dropZone.tickIndex = tick;
@@ -834,6 +842,23 @@ public class TimelineUI : MonoBehaviour
         }
 
             
+    }
+
+    public void Update_effectColor(IReadOnlyList<Additional_Effect> additional_Effects)
+    {
+        for(int i = 0; i < playerSlots.Count; i++)
+        {
+            GameObject slotGO = playerSlots[i];
+
+            if (additional_Effects[i] == null)
+            {
+                slotGO.GetComponent<Image>().color = Color.white;
+            }
+            else
+            {
+                slotGO.GetComponent<Image>().color = additional_Effects[i].effectColor;
+            }   
+        }
     }
 
     /// <summary>
