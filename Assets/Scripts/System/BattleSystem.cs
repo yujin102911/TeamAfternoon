@@ -228,10 +228,14 @@ public class BattleSystem
             isCritical = true;
             _isCritical = false;
         }
+        else
+        {
+            isCritical = false;
+        }
 
         int finalDamage = isCritical
-            ? baseDamage * 2
-            : baseDamage;
+                ? baseDamage * 2
+                : baseDamage;
 
         return new DamageResult
         {
