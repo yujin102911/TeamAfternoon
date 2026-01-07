@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 468bc3f59cbecd1498629b756e3da6cd, type: 3}
+  m_Name: 2. Goblin
+  m_EditorClassIdentifier: 
+  _stageNumber: 1
+  _stageName: "\uC883\uBC25 \uD29C\uD1A0\uB9AC\uC5BC\uC774\uC138\uC694"
+  _limitRound: 8
+  _mails:
+  - subject: "[\uC758\uB8B0] \uC9C0\uAE08 \uC99D\uAC70\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4."
+    sender: "\uC6A9\uC0AC <trustme@inailedit.com>"
+    receiver: "\uC601\uC0C1 \uD3B8\uC9D1\uC0AC <editor@clearrun.fake>"
+    body: "\uCE5C\uC560\uD558\uB294 \uD3B8\uC9D1\uC0AC\uB2D8\uAED8,\n\uC548\uB155\uD558\uC138\uC694...\n\uC774\uB807\uAC8C
+      \uBA54\uC77C\uC744 \uB4DC\uB9AC\uAC8C \uB420 \uC904\uC740 \uC815\uB9D0 \uBAB0\uB790\uB294\uB370\uC694...\n\uC624\uB298
+      \uB358\uC804 1\uCE35\uC5D0\uC11C \uC2AC\uB77C\uC784\uACFC \uC804\uD22C\uB97C
+      \uBC8C\uC600\uB2E4\uAC00... \uD604\uC7AC \uC5EC\uB7EC \uC758\uBBF8\uB85C \uACE4\uB780\uD55C
+      \uC0C1\uD669\uC5D0 \uB193\uC778 \uC6A9\uC0AC\uC785\uB2C8\uB2E4.\n\uC2AC\uB77C\uC784\uACFC\uC758
+      \uC804\uD22C \uACB0\uACFC\uB294 \uBB50... \uB124. \uCC38\uD328\uD588\uC2B5\uB2C8\uB2E4.\n\n\uCCA8\uBD80
+      \uD30C\uC77C\n[ENTER_LINK]"
+    isRead: 0
+    unlockCondition: 0
+  - subject: "[\uAC10\uC0AC]"
+    sender: "\uC6A9\uC0AC <trustme@inailedit.com>"
+    receiver: "\uC601\uC0C1 \uD3B8\uC9D1\uC0AC <editor@clearrun.fake>"
+    body: "\uAC10\uC0AC\uD569\uB2C8\uB2E4! \uC9C0\uB9AC\uB294 \uC601\uC0C1\uC774\uC5C8\uC5B4\uC6A9."
+    isRead: 0
+    unlockCondition: 1
+  _boardEntries:
+  - title: "\uC6A9\uC0AC \uCC44\uB110, \uAD6C\uB3C5\uC790 100\uB9CC\uBA85 \uB2EC\uC131"
+    content: "\uC6A9\uC0AC\uAC00 \uBB34\uC0AC\uD788 \uADC0\uD658\uD560 \uACBD\uC6B0
+      \uD6C8\uC7A5 \uC218\uC5EC\uC2DD\uC5D0\uC11C \uACE8\uB4DC \uBC84\uD2BC \uB610\uD55C
+      \uC218\uC5EC\uB420 \uC608\uC815\uC774\uB2E4."
+    illustration: {fileID: 0}
+  - title: "\uC81C\uBAA9 36pt"
+    content: "\uB0B4\uC6A9 24pt"
+    illustration: {fileID: 0}
+  - title: "\uB179\uC544\uB0B4\uB9B0 \uC0B4\uC778\uBC84\uC12F, \uC815\uB9D0 \uBC1C\uD6A8\uC2DD\uD488\uC778\uAC00?"
+    content: "\uC77C\uBC18\uC801\uC73C\uB85C \uD478\uB978\uC0C9\uC73C\uB85C \uBCC0\uD558\uACE0
+      \uBB34\uB978 \uC2DD\uD488\uC740 \uBA39\uC9C0 \uC54A\uB294 \uAC8C \uC0C1\uC2DD\uC774\uB2E4.
+      \uADF8\uB7EC\uB098 \uC6A9\uC0AC\uB294 \uC9C0\uB09C <\uB9C8\uC655\uC131 \uB3C4\uC804\uAE30>
+      \uC5D0\uC11C \uC0B4\uC778\uBC84\uC12F\uC744 \uC12D\uCDE8\uD558\uACE0\uB3C4
+      \uC774\uC0C1\uC774 \uC5C6\uC5C8\uB2E4. \uC5F0\uAD6C\uC9C4\uC740 \uBC84\uC12F\uACFC
+      \uC0B4\uC778\uBC84\uC12F\uC758 \uAD6C\uC870\uB97C \uBD84\uC11D\uD574 \uC77C\uBC18\uC778\uC774
+      \uC12D\uCDE8\uD574\uB3C4 \uC778\uCCB4\uC5D0 \uBB34\uD574\uD55C\uC9C0 \uC54C\uC544\uBCF4\uACE0\uC790
+      \uD55C\uB2E4."
+    illustration: {fileID: 0}
+  _mapSize: 3
+  _sectorTransform:
+  - {x: -1, y: -0.3, z: 0}
+  - {x: 1, y: -0.3, z: 0}
+  - {x: 3, y: -0.3, z: 0}
+  - {x: 5, y: -0.3, z: 0}
+  _enemySpawns:
+  - enemyData: {fileID: 11400000, guid: d36446800f9f595409fbcf71ad760c7d, type: 2}
+    hitSectors: 010000000200000003000000040000000500000006000000070000000800000009000000
+  _playerMaxHP: 20
+  _isCleared: 1
