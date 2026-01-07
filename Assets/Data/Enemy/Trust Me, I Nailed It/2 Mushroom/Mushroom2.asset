@@ -10,27 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021e2050029ab3c42aa4571c60d42650, type: 3}
-  m_Name: Mushroom2
+  m_Name: mushroom2
   m_EditorClassIdentifier: 
   Pattern_Name: "4\uBC88\uC5D0 \uD55C\uBC88 \uBE612"
   attacks:
+  - tick: 1
+    targetSectors: 0600000009000000
+    damage: 1
   - tick: 3
     targetSectors: 030000000500000006000000
     damage: 1
-  - tick: 4
-    targetSectors: 0600000009000000
-    damage: 1
   - tick: 5
-    targetSectors: 02000000030000000800000009000000
+    targetSectors: 010000000500000007000000
     damage: 1
   - tick: 6
-    targetSectors: 02000000030000000800000009000000
-    damage: 1
-  - tick: 7
-    targetSectors: 01000000020000000300000006000000
+    targetSectors: 020000000400000007000000
     damage: 1
   - tick: 8
-    targetSectors: 06000000070000000800000009000000
+    targetSectors: 0100000004000000050000000700000008000000
     damage: 1
   stones: []
   winds: []

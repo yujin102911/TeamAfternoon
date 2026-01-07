@@ -10,26 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021e2050029ab3c42aa4571c60d42650, type: 3}
-  m_Name: mushroom3
+  m_Name: evileye3
   m_EditorClassIdentifier: 
   Pattern_Name: "4\uBC88\uC5D0 \uD55C\uBC88 \uBE612"
+  Sentence: "\uC6C3\uC74C\uC740 \uB298 \uC5B4\uB978\uB4E4\uC758 \uAC83\uC774\uC5C8\uACE0,
+    \uCE68\uBB35\uC740 \uC5B8\uC81C\uB098 \uB3C4\uB85C\uC2DC\uC758 \uBAAB\uC774\uC5C8\uC5B4\uC694."
   attacks:
-  - tick: 2
-    targetSectors: 030000000600000009000000
-    damage: 1
   - tick: 3
-    targetSectors: 010000000200000003000000040000000600000008000000
+    targetSectors: 030000000500000009000000
     damage: 1
   - tick: 5
-    targetSectors: 0100000002000000030000000400000006000000070000000800000009000000
+    targetSectors: 010000000400000007000000
+    damage: 1
+  - tick: 6
+    targetSectors: 020000000500000008000000
     damage: 1
   - tick: 7
-    targetSectors: 05000000
+    targetSectors: 030000000600000009000000
     damage: 1
-  - tick: 8
-    targetSectors: 01000000040000000600000009000000
-    damage: 1
-  stones: []
-  winds: []
-  dashes: []
   parryings: []
