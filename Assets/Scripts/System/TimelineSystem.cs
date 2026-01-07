@@ -99,11 +99,11 @@ public class TimelineSystem
 
         if (length == TimelineManager.Instance.TotalTicks)
         {
-            TimelineManager.Instance.Is_Eight = true;
+            TimelineManager.Instance.QuestOptionState.SetEight(true);
         }
         else
         {
-            TimelineManager.Instance.Is_Eight = false;
+            TimelineManager.Instance.QuestOptionState.SetEight(false);
         }
     }
 

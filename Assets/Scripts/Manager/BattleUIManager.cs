@@ -29,16 +29,6 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private Slider _textmemorySlider;
 
-    [Header("아드레날린 UI")]
-    [SerializeField]
-    private Toggle _hitToggle;
-    [SerializeField]
-    private Toggle _eightToggle;
-    [SerializeField]
-    private Toggle _twiceToggle;
-    [SerializeField]
-    private TextMeshProUGUI _adTxt;
-
     [Header("슬라이더 핸들 바")]
     [SerializeField]
     private Image _sliderHandleBar;
@@ -88,18 +78,10 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        _hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
-        _eightToggle.isOn = TimelineManager.Instance.Is_Eight;
-        _twiceToggle.isOn = TimelineManager.Instance.Is_Twice;
-
-    }
-
     public void UpdateStackUI(float chance)
     {
         //_adTxt.text = $"크리티컬 확률: {Mathf.RoundToInt(chance * 100f)}%";
-        _adTxt.text = $"편집 콤보: +{(int)chance} / 최대 자막수: {(int)chance / 8}";
+        //_adTxt.text = $"편집 콤보: +{(int)chance} / 최대 자막수: {(int)chance / 8}";
     }
 
     public void Update_TextSlider(int current, int max)

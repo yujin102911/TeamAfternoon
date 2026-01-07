@@ -35,11 +35,8 @@ public class TimelineManager : MonoBehaviour
     public int _currentMemory;
     public int Decrease_Mem;
 
-    [Header("아드레날린 토글")]
-    public bool Is_Hit = false;
-    public bool Is_Eight = false;
-    public bool Is_Twice = false;
-    public int Attack_Count = 0;
+    [Header("퀘스트 상태 클래스")]
+    public QuestOptionState QuestOptionState { get; private set; }
 
     [Header("POC 온오프")]
     public bool Is_POC = false;
@@ -101,6 +98,9 @@ public class TimelineManager : MonoBehaviour
             return;
         }
 
+        // QuestOptionState 할당
+        QuestOptionState = new QuestOptionState();
+
         // TimelineSystem 초기화
         _timelineSystem = new TimelineSystem();
 
@@ -137,18 +137,6 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnLongRangeAttacking -= HandleLongRangeAttack_Middle;
             _timelineSystem.OnMeleeAttackStarted -= HandleMeleeAttack_Start;
             _timelineSystem.OnGuardRequested -= HandleGuardRequest;
-        }
-    }
-
-    private void Update()
-    {
-        if(Attack_Count >= 2)
-        {
-            Is_Twice = true;
-        }
-        else
-        {
-            Is_Twice = false;
         }
     }
 
@@ -605,35 +593,27 @@ public class TimelineManager : MonoBehaviour
         // 손패 클리어 (GameDirector가 새로 줄 예정)
         _currentHand.Clear();
 
-        // 아드레날린 계산
-        if (!Is_Hit)
+        // 퀘스트 보상 메모리 처리
+        if (!QuestOptionState.IsHit)
         {
             //_battleSystem.IncreaseMeleeStack();
             _currentMemory -= Decrease_Mem;
         }
 
-        if (Is_Eight)
+        if (QuestOptionState.IsEight)
         {
             //_battleSystem.IncreaseMeleeStack();
             _currentMemory -= Decrease_Mem;
         }
 
-        if (Is_Twice)
+        if (QuestOptionState.IsTwice)
         {
             //_battleSystem.IncreaseMeleeStack();
             _currentMemory -= Decrease_Mem;
         }
 
-        if (Is_Hit && !Is_Eight) 
-        {
-            //_battleSystem.ResetMeleeStack();
-            
-        }
-
-        Is_Hit = false;
-        Is_Eight = false;
-        Is_Twice = false;
-        Attack_Count = 0;
+        // 퀘스트 상태 초기화
+        QuestOptionState.Initialize();
 
         //아드 UI업뎃
         //BattleUIManager.Instance.UpdateStackUI();
