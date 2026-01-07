@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     [Header("데이터 참조")]
     [SerializeField] private DataRepository dataRepository;
-    [SerializeField] private UserGameData userGameData;
+    [SerializeField] private UserGameData userGameData; // TODO: 타이틀씬 생기면 ServiceLocator로부터 받아오도록!
 
     [Header("비주얼 컨트롤러")]
     [SerializeField] private TimelineUI _timelineUI;
@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
-    [SerializeField] private int _playerMaxHP = 20;
+    [SerializeField] private int _playerMaxHP = 3; // 기본값 (-> 정상적으로 실행 시 UserData에서 받아옴)
     [SerializeField] private MapSize _mapSize = MapSize.Grid_3x3;
 
     [Header("테스트용 스테이지 데이터")]
@@ -143,7 +143,23 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Save(userGameData);
+        // 서비스 로케이터가 있다면 (타이틀 씬부터 정상 실행됐다면, 그 데이터 받아옴)
+        // 없다면 인스펙터에 연결된 userData로 세팅
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.CurrentUser != null)
+        {
+            userGameData = ServiceLocator.Instance.CurrentUser;
+            _playerMaxHP = userGameData.MaxHP;
+        }
+        else if (userGameData != null)
+        {
+            _playerMaxHP = userGameData.MaxHP;
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] UserGameData를 찾을 수 없어 기본 체력(3)으로 설정합니다.");
+            _playerMaxHP = 3;
+        }
+
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
@@ -595,15 +611,22 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] 전투 종료 - 승리");
             if (currentStageData != null)
             {
-                currentStageData.IsCleared = true;
-                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
-
-                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
-                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(currentStageData);
-#endif
+                if (ServiceLocator.Instance.CurrentUser != null)
+                {
+                    ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
+                }
             }
+//            if (currentStageData != null)
+//            {
+//                currentStageData.IsCleared = true;
+//                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
+
+//                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
+//                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
+//#if UNITY_EDITOR
+//                UnityEditor.EditorUtility.SetDirty(currentStageData);
+//#endif
+//            }
         }
         else if (victory == EndCondition.Dead)
         {
@@ -615,7 +638,7 @@ public class GameManager : MonoBehaviour
         }
  
             // 현재 돌아가고 있는 모든 코루틴 종료
-            StopAllCoroutines();
+         StopAllCoroutines();
 
          SaveService.Save(userGameData);
 
