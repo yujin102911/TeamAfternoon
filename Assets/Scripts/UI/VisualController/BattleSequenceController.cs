@@ -515,5 +515,7 @@ public class BattleSequenceController : MonoBehaviour
     {
         if (_timelineSlider != null)
             _timelineSlider.Stop();
+        if (_roundSlider != null)
+            _roundSlider.Stop();
     }
 }

@@ -277,13 +277,13 @@ public class HandBlock_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             effectTitle = $"#{keyword.KeywordName}";
             body = $"{keyword.KeywordDescription}";
 
-            CardTooltip.Instance.Show(
-            effectTitle,
-            body,
-            screenPos,
-            cam,
-            index
-            );
+            //CardTooltip.Instance.Show(
+            //effectTitle,
+            //body,
+            //screenPos,
+            //cam,
+            //index
+            //);
 
             index++;
         }

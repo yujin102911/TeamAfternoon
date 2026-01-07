@@ -40,16 +40,14 @@ public class CardTooltip : MonoBehaviour
     }
 
     // ✅ 카메라를 같이 받도록 변경
-    public void Show(string title, string body, Vector2 screenPos, Camera cam, int index)
+    public void Show(string title, string body, Vector2 screenPos, Camera cam)
     {
-        if (keywords[index] != null)
-            keywords[index].Show(title, body);
 
-        //if (titleText != null)
-        //    titleText.text = title;
+        if (titleText != null)
+            titleText.text = title;
 
-        //if (bodyText != null)
-        //    bodyText.text = body;
+        if (bodyText != null)
+            bodyText.text = body;
 
         root.SetActive(true);
 

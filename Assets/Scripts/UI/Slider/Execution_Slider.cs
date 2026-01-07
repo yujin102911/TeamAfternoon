@@ -63,4 +63,14 @@ public class Execution_Slider : MonoBehaviour
 
         _currentTime.text = $"{minutes:00}:{seconds:00}";
     }
+
+    public void Stop()
+    {
+        if (playRoutine != null)
+        {
+            StopCoroutine(playRoutine);
+            playRoutine = null;
+        }
+        slider.interactable = false;
+    }
 }

@@ -179,7 +179,7 @@ public class TimelineUI : MonoBehaviour
 
         if (!is_enter)
         {
-            Update_effectColor(TimelineManager.Instance.additional_Effects);
+            //Update_effectColor(TimelineManager.Instance.additional_Effects);
         }
     }
 
@@ -854,13 +854,17 @@ public class TimelineUI : MonoBehaviour
         {
             GameObject slotGO = playerSlots[i];
 
+            slotGO.GetComponent<Image>().color = Color.white;
+
+            Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
+
             if (additional_Effects[i] == null)
             {
-                slotGO.GetComponent<Image>().color = Color.white;
+                effectLine.Hide();
             }
             else
             {
-                slotGO.GetComponent<Image>().color = additional_Effects[i].effectColor;
+                effectLine.Show(additional_Effects[i]);
             }   
         }
     }
