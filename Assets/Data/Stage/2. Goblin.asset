@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 468bc3f59cbecd1498629b756e3da6cd, type: 3}
-  m_Name: Move Goblin Test
+  m_Name: 2. Goblin
   m_EditorClassIdentifier: 
   _stageNumber: 1
   _stageName: "\uC883\uBC25 \uD29C\uD1A0\uB9AC\uC5BC\uC774\uC138\uC694"
-  _limitRound: 8
+  _limitRound: 4
+  _limitEffect: 2
   _mails:
   - subject: "[\uC758\uB8B0] \uC9C0\uAE08 \uC99D\uAC70\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4."
     sender: "\uC6A9\uC0AC <trustme@inailedit.com>"
@@ -60,7 +61,7 @@ MonoBehaviour:
   - {x: 3, y: -0.3, z: 0}
   - {x: 5, y: -0.3, z: 0}
   _enemySpawns:
-  - enemyData: {fileID: 11400000, guid: 5be92a584f5967c478d1bd40fc7067f6, type: 2}
+  - enemyData: {fileID: 11400000, guid: 52e58098181811d4da2fa76abbe46ba4, type: 2}
     hitSectors: 010000000200000003000000040000000500000006000000070000000800000009000000
   _playerMaxHP: 20
   _isCleared: 1

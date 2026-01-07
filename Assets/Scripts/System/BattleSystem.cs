@@ -46,6 +46,10 @@ public class BattleSystem
 
     private int _damageBuffer = 0;
 
+    //특수효과 플래그
+    private bool _isCritical = false;
+    private bool _isDubleDash = false;
+
     #endregion
 
     #region Events
@@ -127,6 +131,28 @@ public class BattleSystem
     }
 
     /// <summary>
+    /// 플래그 세팅
+    /// </summary>
+    /// <param name="effect"></param>
+    public void SetEffectFrag(EffectType effect)
+    {
+        _isCritical = false;
+        _isDubleDash = false;
+
+        switch (effect)
+        {
+            case EffectType.Critical:
+                _isCritical = true;
+                break;
+            case EffectType.Duble_Dash:
+                _isDubleDash = true;
+                break;
+            case EffectType.None:
+                break;
+        }
+    }
+
+    /// <summary>
     /// 근거리 공격
     /// </summary>
     public bool MeleeAttack(int damage, bool isChargeRequired)
@@ -196,9 +222,20 @@ public class BattleSystem
     {
         bool isCritical = UnityEngine.Random.value < critChance;
 
+        // 특수효과 플래그 처리(확정 치명타)
+        if (_isCritical) 
+        {
+            isCritical = true;
+            _isCritical = false;
+        }
+        else
+        {
+            isCritical = false;
+        }
+
         int finalDamage = isCritical
-            ? baseDamage * 2
-            : baseDamage;
+                ? baseDamage * 2
+                : baseDamage;
 
         return new DamageResult
         {
@@ -249,7 +286,9 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        TimelineManager.Instance.Combo = _meleeAttackStack;
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     /// <summary>
@@ -265,7 +304,8 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     private void DamageEnemy(int amount)
@@ -273,6 +313,7 @@ public class BattleSystem
         _enemyHP = Mathf.Max(0, _enemyHP - amount);
         Debug.Log($"[BattleSystem] 적에게 {amount} 데미지! 남은 HP: {_enemyHP}");
 
+        TimelineManager.Instance.QuestOptionState.IncreaseCount();
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
         if (_enemyHP <= 0)
         {
@@ -306,7 +347,9 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         //아드레날린 조건 파괴
-        ResetMeleeStack();
+        //ResetMeleeStack();
+
+        TimelineManager.Instance.QuestOptionState.SetHit(true);
     }
 
     public void PlayerTakeDamage()
@@ -367,6 +410,13 @@ public class BattleSystem
         if (moveDirection == MoveDirection.None || _columns <= 0) return;
 
         int moveAmount = 1;
+
+        if(_isDubleDash)
+        {
+            moveAmount = 2;
+            _isDubleDash = false;
+            Debug.Log("[BattleSystem] 더블 대시 효과로 2칸 이동!");
+        }
 
         int currentIndex = _playerCurrentSector - 1;
         int curRow = currentIndex / _columns;
