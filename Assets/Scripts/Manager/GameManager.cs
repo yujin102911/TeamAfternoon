@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
 
     public event Action OnGameStateChanged;
     public event Action<int, int, int, int> OnRoundChanged;      // 현재 라인, 총 라인, 현재 적, 총 적
-    public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
+    public event Action<EndCondition> OnBattleEnded; // Victory: 승리, Dead: 사망, RoundOver: 라운드 초과
     public event Action<int, int> OnMemoryUpdate;
 
     #endregion
@@ -493,8 +493,6 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
-            
-
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
@@ -532,7 +530,7 @@ public class GameManager : MonoBehaviour
         if (currentStageData != null && _currentRound >= currentStageData.LimitRound)
         {
             Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
-            EndBattle(false);
+            EndBattle(EndCondition.RoundOver); // 라운드 초과 실패 함수 호출
             return;
         }
         if (_timelineManager != null)
@@ -563,7 +561,7 @@ public class GameManager : MonoBehaviour
         });
     }
 
-    public void EndBattle(bool victory)
+    public void EndBattle(EndCondition victory)
     {
         if (_isBattleEnded) return;
         _isBattleEnded = true;
@@ -578,10 +576,9 @@ public class GameManager : MonoBehaviour
             _battleSequenceController.StopSlider();
         }
         int _leftPlayerHP = _battleSystem.PlayerHP;
-        Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
-
-        if (victory)
+        if (victory == EndCondition.Victory)
         {
+            Debug.Log("[GameManager] 전투 종료 - 승리");
             if (currentStageData != null)
             {
                 currentStageData.IsCleared = true;
@@ -594,12 +591,21 @@ public class GameManager : MonoBehaviour
 #endif
             }
         }
+        else if (victory == EndCondition.Dead)
+        {
+            Debug.Log("[GameManager] 전투 종료 - 패배 (플레이어 사망)");
+        }
+        else if (victory == EndCondition.RoundOver)
+        {
+            Debug.Log("[GameManager] 전투 종료 - 패배 (라운드 초과)");
+        }
+ 
             // 현재 돌아가고 있는 모든 코루틴 종료
             StopAllCoroutines();
 
          SaveService.Save(userGameData);
 
-        OnBattleEnded?.Invoke(victory, _currentRound, _statPlayerHitCount, _statPlayerAttackCount, _leftPlayerHP);
+        OnBattleEnded?.Invoke(victory);
     }
     #endregion
 
@@ -609,8 +615,7 @@ public class GameManager : MonoBehaviour
         if (currentStageData == null || index >= currentStageData.EnemySpawns.Count)
         {
             _bgSprite = null;
-            // 더 이상 적이 없으면 겜 끗
-            EndBattle(true);
+            EndBattle(EndCondition.Victory); // 더 이상 적이 없으면 겜 끗 (승리 호출)
             return;
         }
         StageEnemySetup spawn = currentStageData.EnemySpawns[index];
