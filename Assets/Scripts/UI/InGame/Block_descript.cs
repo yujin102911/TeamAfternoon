@@ -145,13 +145,13 @@ public class Block_descript : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             effectTitle = $"#{keyword.KeywordName}";
             description = $"{keyword.KeywordDescription}";
 
-            CardTooltip.Instance.Show(
-            effectTitle,
-            description,
-            screenPos,
-            cam,
-            index
-            );
+            //CardTooltip.Instance.Show(
+            //effectTitle,
+            //description,
+            //screenPos,
+            //cam,
+            //index
+            //);
 
             index++;
         }

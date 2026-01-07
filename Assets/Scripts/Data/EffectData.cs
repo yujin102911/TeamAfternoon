@@ -6,6 +6,8 @@ using UnityEngine;
 [Serializable]
 public class Additional_Effect
 {
+    public string effectName;
+    public string effectDescription;
     public EffectType effectType;
     public Color effectColor;
     public int cost;
