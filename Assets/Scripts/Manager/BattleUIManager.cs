@@ -35,6 +35,8 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private Toggle _eightToggle;
     [SerializeField]
+    private Toggle _twiceToggle;
+    [SerializeField]
     private TextMeshProUGUI _adTxt;
 
     [Header("슬라이더 핸들 바")]
@@ -88,10 +90,10 @@ public class BattleUIManager : MonoBehaviour
 
     private void Update()
     {
-        //_hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
-        //_eightToggle.isOn = TimelineManager.Instance.Is_Eight;
+        _hitToggle.isOn = !TimelineManager.Instance.Is_Hit;
+        _eightToggle.isOn = TimelineManager.Instance.Is_Eight;
+        _twiceToggle.isOn = TimelineManager.Instance.Is_Twice;
 
-        
     }
 
     public void UpdateStackUI(float chance)

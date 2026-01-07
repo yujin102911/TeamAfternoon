@@ -61,6 +61,18 @@ public class Effect_DropZone : TimelineDropZone, IPointerClickHandler
                 // 배치 가능한지 확인
                 bool canPlace = TimelineManager.Instance.CanPlaceEffect(tickIndex);
 
+                int currentMemory = TimelineManager.Instance._currentMemory + additional_effect_UI.Additional_Effect.cost;
+                int maxMemory = TimelineManager.Instance.Max_memory;
+
+                if (currentMemory > maxMemory)
+                {
+                    canPlace = false;
+                }
+                else
+                {
+                    canPlace = true;
+                }
+
                 if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
             }
         }

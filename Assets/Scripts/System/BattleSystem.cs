@@ -304,7 +304,6 @@ public class BattleSystem
             critChance = 1;
         }
 
-        TimelineManager.Instance.Combo = _meleeAttackStack;
         //OnCriticalChanceChanged?.Invoke(critChance);
         OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
@@ -314,6 +313,7 @@ public class BattleSystem
         _enemyHP = Mathf.Max(0, _enemyHP - amount);
         Debug.Log($"[BattleSystem] 적에게 {amount} 데미지! 남은 HP: {_enemyHP}");
 
+        TimelineManager.Instance.Attack_Count++;
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
         if (_enemyHP <= 0)
         {
@@ -348,6 +348,8 @@ public class BattleSystem
 
         //아드레날린 조건 파괴
         //ResetMeleeStack();
+
+        TimelineManager.Instance.Is_Hit = true;
     }
 
     public void PlayerTakeDamage()
