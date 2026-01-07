@@ -8,16 +8,11 @@ public enum EffectType
 {
     None,
     Critical,
-    Duble_Dash
+    Duble_Dash,
+    Damage_Up
 }
 
-[Serializable]
-public class Additional_Effect
-{
-    public EffectType effectType;
-    public Color effectColor;
-    public int cost;
-}
+
 
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director
@@ -26,6 +21,9 @@ public class Additional_Effect
 public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
+
+    [Header("특수효과 정보")]
+    public EffectData effectData;
 
     [Header("편집 콤보")]
     public int Combo;
@@ -596,20 +594,17 @@ public class TimelineManager : MonoBehaviour
         // 퀘스트 보상 메모리 처리
         if (!QuestOptionState.IsHit)
         {
-            //_battleSystem.IncreaseMeleeStack();
-            _currentMemory -= Decrease_Mem;
+            DecreaseMem();
         }
 
         if (QuestOptionState.IsEight)
         {
-            //_battleSystem.IncreaseMeleeStack();
-            _currentMemory -= Decrease_Mem;
+            DecreaseMem();
         }
 
         if (QuestOptionState.IsTwice)
         {
-            //_battleSystem.IncreaseMeleeStack();
-            _currentMemory -= Decrease_Mem;
+            DecreaseMem();
         }
 
         // 퀘스트 상태 초기화
@@ -628,6 +623,16 @@ public class TimelineManager : MonoBehaviour
         // UI 업데이트
         OnHandChanged?.Invoke(_currentHand);
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
+    }
+
+    private void DecreaseMem()
+    {
+        _currentMemory -= Decrease_Mem;
+
+        if( _currentMemory < 0)
+        {
+            _currentMemory = 0;
+        }
     }
 
     /// <summary>

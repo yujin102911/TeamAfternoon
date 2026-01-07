@@ -48,6 +48,7 @@ public class StageData : ScriptableObject
 
     [Header("제한 설정")]
     [SerializeField] private int _limitRound = 8;
+    [SerializeField] private int _limitEffect = 1;
 
     [Header("메일 내용")]
     [SerializeField] private List<MailContent> _mails = new List<MailContent>();
@@ -84,4 +85,5 @@ public class StageData : ScriptableObject
     public bool IsCleared { get => _isCleared; set => _isCleared = value; }
     public int LimitRound => _limitRound;
 
+    public int LimitEffect => _limitEffect;
 }

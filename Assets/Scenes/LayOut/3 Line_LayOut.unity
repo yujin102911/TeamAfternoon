@@ -10714,13 +10714,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ef8a9f6104198b4990057d3d9f796ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Current_Additional_Effects:
-  - effectType: 1
-    effectColor: {r: 1, g: 0.60045624, b: 0, a: 1}
-    cost: 5
-  - effectType: 2
-    effectColor: {r: 0.23113209, g: 0.92763597, b: 1, a: 1}
-    cost: 2
   _blockPrefab: {fileID: 5198373266893857513, guid: 47b30c08237c1be439ae95f6107c4f4b, type: 3}
   _spawnPoint: {fileID: 1398528092}
   _initialSize: 10
@@ -12671,6 +12664,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1449924747}
   m_CullTransparentMesh: 1
+--- !u!1001 &1452433726
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584507572478325072, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7229061581155117110, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
+      propertyPath: m_Name
+      value: Effect_Pool
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 19c7221f8561e8f48958e710537ede96, type: 3}
 --- !u!1 &1453459986
 GameObject:
   m_ObjectHideFlags: 0
@@ -44983,7 +45033,7 @@ MonoBehaviour:
   mapConfig: {fileID: 11400000, guid: b575a3f158785754e9d4700861016f04, type: 2}
   mapRootTransform: {fileID: 2146667629}
   dataRepository: {fileID: 11400000, guid: e7849bdabae762d48a088fbf961abf75, type: 2}
-  userGameData: {fileID: 11400000, guid: 6ec550701e75a8f4a89e8d8f201f9f54, type: 2}
+  userGameData: {fileID: 11400000, guid: b454de97b9caf9442bf01e502ba4f507, type: 2}
   _timelineUI: {fileID: 226099885458882376}
   _mapVisualController: {fileID: 2007249490}
   _playerVisualController: {fileID: 2007249489}
@@ -44993,7 +45043,7 @@ MonoBehaviour:
   _startHandSize: 99
   _playerMaxHP: 3
   _mapSize: 0
-  currentStageData: {fileID: 11400000, guid: b01ff9766c0c37a42b4bb49d793ab8b4, type: 2}
+  currentStageData: {fileID: 11400000, guid: 3318a159dff68614aa4fdce346f5e1d4, type: 2}
 --- !u!114 &1994000751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45006,6 +45056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce20e7bef32d7f847aa1d30853c6bca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effectData: {fileID: 11400000, guid: a413f30520275c743a415e9d67bbf962, type: 2}
   Combo: 0
   Max_memory: 10
   _currentMemory: 0
@@ -48729,11 +48780,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 184264035594444585, guid: 00bc898b584adb340b93213e7f3ceb5f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -655
+      value: -1142.1
       objectReference: {fileID: 0}
     - target: {fileID: 184264035594444585, guid: 00bc898b584adb340b93213e7f3ceb5f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -85
+      value: -84
       objectReference: {fileID: 0}
     - target: {fileID: 184264035594444585, guid: 00bc898b584adb340b93213e7f3ceb5f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -50757,3 +50808,4 @@ SceneRoots:
   - {fileID: 2146667629}
   - {fileID: 2007249486}
   - {fileID: 2109049447}
+  - {fileID: 1452433726}

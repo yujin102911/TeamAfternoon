@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class Additional_Effect_Panel : MonoBehaviour
 {
-    public List<Additional_Effect> Current_Additional_Effects = new List<Additional_Effect>();
-
     [SerializeField] private GameObject _blockPrefab;  // 풀링할 대상
     [SerializeField] private Transform _spawnPoint;   // 블록이 생성될 위치
     [SerializeField] private int _initialSize = 10;
@@ -18,7 +16,7 @@ public class Additional_Effect_Panel : MonoBehaviour
 
     void Start()
     {
-        UpdateHandUI(Current_Additional_Effects);
+        UpdateHandUI(TimelineManager.Instance.effectData.Effect_DB, GameManager.Instance.CurrentStageData.LimitEffect);
     }
 
     private void InitializePool()
@@ -54,7 +52,7 @@ public class Additional_Effect_Panel : MonoBehaviour
         _handPool.Enqueue(obj);
     }
 
-    public void UpdateHandUI(List<Additional_Effect> hand)
+    public void UpdateHandUI(List<Additional_Effect> hand, int effect_num)
     {
         if (_spawnPoint == null) return;
 
@@ -72,6 +70,12 @@ public class Additional_Effect_Panel : MonoBehaviour
             Additional_effect_UI uiBlock = go.GetComponent<Additional_effect_UI>();
             if (uiBlock != null) uiBlock.Init(effect);
             ix++;
+
+            // effect_num 개수까지만 표시
+            if (ix >= effect_num)
+                return;
         }
+
+        
     }
 }

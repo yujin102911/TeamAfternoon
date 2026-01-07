@@ -24,6 +24,10 @@ public class Additional_EffectCell : MonoBehaviour
                 Image.color = additional_Effect.effectColor;
                 txt.text = "Duble_Dash";
                 break;
+            case EffectType.Damage_Up:
+                Image.color = additional_Effect.effectColor;
+                txt.text = "단데증";
+                break;
         }
     }
 
