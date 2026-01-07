@@ -319,7 +319,7 @@ public class BattleSystem
         {
             Debug.Log("적 처치 완료");
             OnChangeEnemyAnim?.Invoke("Die");
-            OnEnemyDefeated();
+            OnEnemyDefeated(); 
         }
     }
 
@@ -698,13 +698,13 @@ public class BattleSystem
     private void OnEnemyDefeated()
     {
         Debug.Log("[BattleSystem] 적 처치!");
-        GameManager.Instance?.EndBattle(true);
+        GameManager.Instance?.EndBattle(EndCondition.Victory); // 적 사망 승리 호출
     }
 
     private void OnPlayerDefeated()
     {
         Debug.Log("[BattleSystem] 플레이어 사망...");
-        GameManager.Instance?.EndBattle(false);
+        GameManager.Instance?.EndBattle(EndCondition.Dead); // 플레이어 사망 패배 호출
     }
     /// <summary>
     /// 디버그용: 현재 전투 상태 출력
