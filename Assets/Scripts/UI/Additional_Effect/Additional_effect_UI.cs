@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using TMPro;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -22,7 +25,13 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     private Color _originColor;
     private bool _isPointerOver = false;
 
-    
+    [Header("텍스트 설정")]
+    [SerializeField]
+    private TextMeshProUGUI costText;
+    [SerializeField]
+    private TextMeshProUGUI nameText;
+
+    private RectTransform rectTransform;
 
     private void Awake()
     {
@@ -33,6 +42,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
+        rectTransform = GetComponent<RectTransform>();
     }
 
     private void Update()
@@ -61,6 +71,9 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         Additional_Effect = _Effect;
         cell.Update_CellVisual(Additional_Effect);
+
+        nameText.text = Additional_Effect.effectName;
+        costText.text = $"메모리 {Additional_Effect.cost}소모";
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -72,12 +85,19 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         // 색상 변경
         _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+        Set_Descript_Text();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _isPointerOver = false;
         _image.color = _originColor;
+
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -113,5 +133,27 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
+    }
+
+    private void Set_Descript_Text()
+    {
+        if(CardTooltip.Instance != null)
+        {
+            string title = Additional_Effect.effectName;
+            string body = Additional_Effect.effectDescription;
+
+            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+            // 카드 Rect의 오른쪽 중앙 월드 좌표
+            Vector3 worldBottomCenter = rectTransform.TransformPoint(
+                new Vector3(rectTransform.rect.width * 0.6f, rectTransform.rect.height * 0.5f, 0f)
+            );
+
+            // 월드 → 스크린 좌표
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+            CardTooltip.Instance.Show(title, body, screenPos, Camera.main);
+        }
     }
 }

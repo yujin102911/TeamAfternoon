@@ -49,6 +49,7 @@ public class BattleSystem
     //특수효과 플래그
     private bool _isCritical = false;
     private bool _isDubleDash = false;
+    private bool _isDamageUp = false;
 
     #endregion
 
@@ -138,6 +139,7 @@ public class BattleSystem
     {
         _isCritical = false;
         _isDubleDash = false;
+        _isDamageUp = false;
 
         switch (effect)
         {
@@ -146,6 +148,9 @@ public class BattleSystem
                 break;
             case EffectType.Duble_Dash:
                 _isDubleDash = true;
+                break;
+            case EffectType.Damage_Up:
+                _isDamageUp = true;
                 break;
             case EffectType.None:
                 break;
@@ -228,14 +233,14 @@ public class BattleSystem
             isCritical = true;
             _isCritical = false;
         }
-        else
-        {
-            isCritical = false;
-        }
 
         int finalDamage = isCritical
                 ? baseDamage * 2
                 : baseDamage;
+
+        finalDamage = _isDamageUp
+                ? finalDamage + 5
+                : finalDamage;
 
         return new DamageResult
         {

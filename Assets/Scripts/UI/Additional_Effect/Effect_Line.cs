@@ -1,9 +1,8 @@
 ﻿using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Additional_EffectCell : MonoBehaviour
+public class Effect_Line : MonoBehaviour
 {
     [SerializeField]
     private Image _back;
@@ -14,7 +13,7 @@ public class Additional_EffectCell : MonoBehaviour
     [SerializeField]
     private Sprite _dashBack;
     [TabGroup("Dash")]
-    [SerializeField] 
+    [SerializeField]
     private Sprite _dubleDashIcon;
 
     [TabGroup("Attack")]
@@ -24,12 +23,14 @@ public class Additional_EffectCell : MonoBehaviour
     [SerializeField]
     private Sprite _damageUpIcon;
 
-    public void Update_CellVisual(Additional_Effect additional_Effect)
+    public void Show(Additional_Effect additional_Effect)
     {
+        this.gameObject.SetActive(true);
+
         switch (additional_Effect.effectType)
         {
             case EffectType.None:
-                Clear_CellVisual();
+                Hide();
                 break;
             case EffectType.Critical:
                 //Image.color = additional_Effect.effectColor;
@@ -46,9 +47,8 @@ public class Additional_EffectCell : MonoBehaviour
         }
     }
 
-    public void Clear_CellVisual()
+    public void Hide()
     {
-        
+        this.gameObject.SetActive(false);
     }
-
 }
