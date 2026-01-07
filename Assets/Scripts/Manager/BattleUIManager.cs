@@ -123,7 +123,7 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
-    private void RefreshStartButtonState(bool isVictory, int a, int b, int c, int d)
+    private void RefreshStartButtonState(EndCondition victory)
     {
         _startButton.interactable = false;
         //Hide_startBtn();

@@ -305,4 +305,9 @@ public class FilmHand_Panel : MonoBehaviour
         };
     }
 
+    public void ClearAllFilters()
+    {
+        SetAll(false);
+    }
+
 }

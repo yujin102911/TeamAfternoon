@@ -42,7 +42,7 @@ public class GameResultUI : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnBattleEnded += HandleBattleEnded;
+            //GameManager.Instance.OnBattleEnded += HandleBattleEnded;
         }
     }
 
@@ -50,7 +50,7 @@ public class GameResultUI : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnBattleEnded -= HandleBattleEnded;
+            //GameManager.Instance.OnBattleEnded -= HandleBattleEnded;
         }
     }
 

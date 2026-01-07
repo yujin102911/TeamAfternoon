@@ -57,6 +57,9 @@ public class MailPanel : MonoBehaviour
     {
         foreach (Transform child in _contentArea) Destroy(child.gameObject);
 
+        UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
+        if (currentUser == null) return;
+
         List<StageData> sortedStages = DataRepository.Instance.stageDatas.Values
             .OrderBy(s => s.StageNumber)
             .ToList();
@@ -64,45 +67,42 @@ public class MailPanel : MonoBehaviour
         foreach (StageData stage in sortedStages)
         {
             int index = sortedStages.IndexOf(stage);
-            bool isStageAvailable = (index == 0) || sortedStages[index - 1].IsCleared;
+            bool isStageAvailable = (index == 0) || currentUser.IsStageCleared(sortedStages[index - 1].StageNumber);
 
             if (isStageAvailable)
             {
-                foreach (MailContent mail in stage.Mails)
+                for (int m = 0; m < stage.Mails.Count; m++)
                 {
+                    MailContent mail = stage.Mails[m];
                     bool canShowMail = false;
+
                     if (mail.unlockCondition == MailContent.MailUnlockCondition.Always)
-                    {
                         canShowMail = true;
-                    }
-                    else if (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared)
-                    {
+                    else if (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && currentUser.IsStageCleared(stage.StageNumber))
                         canShowMail = true;
-                    }
+
                     if (canShowMail)
                     {
                         GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
                         StageButton mailBtn = go.GetComponent<StageButton>();
-                        mailBtn.Setup(stage, mail, DisplayLetterContent);
+                        mailBtn.Setup(stage, m, mail, DisplayLetterContent);
                     }
                 }
             }
             else break;
         }
     }
-    private void DisplayLetterContent(StageData data, MailContent mail)
+    private void DisplayLetterContent(StageData data, int mailIndex, MailContent mail)
     {
-        mail.isRead = true;
+        ServiceLocator.Instance.CurrentUser.SetMailRead(data.StageNumber, mailIndex);
         OnMailStatusChanged?.Invoke();
 
         if (_senderText != null) _senderText.text = mail.sender;
         if (_receiverText != null) _receiverText.text = mail.receiver;
         if (_titleText != null) _titleText.text = mail.subject;
 
-        string rawText = mail.body;
-
         string linkTag = $"<color=#5865F2><u><link=\"stage_enter:{data.StageNumber}\">";
-        string formattedText = rawText.Replace($"[ENTER_LINK]", linkTag + $"던전{data.StageNumber}일차.mp4</link></u></color>");
+        string formattedText = mail.body.Replace($"[ENTER_LINK]", linkTag + $"던전{data.StageNumber}일차.mp4</link></u></color>");
 
         _mailContextText.text = formattedText;
         if (_bodyScrollRect != null)

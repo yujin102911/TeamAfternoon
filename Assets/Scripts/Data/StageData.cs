@@ -21,7 +21,6 @@ public class MailContent
     public string receiver;
     [TextArea(5, 20)]
     public string body;
-    public bool isRead;
 
     public enum MailUnlockCondition { Always, AfterClear }
     public MailUnlockCondition unlockCondition;
@@ -65,14 +64,6 @@ public class StageData : ScriptableObject
     [SerializeField]
     private List<StageEnemySetup> _enemySpawns = new List<StageEnemySetup>();
 
-    [Header("체력 설정")]
-    [SerializeField]
-    private int _playerMaxHP = 20;
-
-    [Header("스테이지 진행도")]
-    [SerializeField]
-    private bool _isCleared = false;
-
     public int StageNumber => _stageNumber;
     public string StageName => _stageName;
     public List<MailContent> Mails => _mails;
@@ -80,8 +71,6 @@ public class StageData : ScriptableObject
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
     public MapSize MapSize => _mapSize;
     public List<Vector3> SectorPoints => _sectorTransform;
-    public int PlayerMaxHP => _playerMaxHP;
-    public bool IsCleared { get => _isCleared; set => _isCleared = value; }
     public int LimitRound => _limitRound;
 
 }
