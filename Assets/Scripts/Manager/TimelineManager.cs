@@ -4,6 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum EffectType
+{
+    None,
+    Critical,
+    Duble_Dash
+}
+
+[Serializable]
+public class Additional_Effect
+{
+    public EffectType effectType;
+    public Color effectColor;
+    public int cost;
+}
+
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director
 /// TimelineSystem과 BattleSystem 사이의 중재자
@@ -12,9 +27,19 @@ public class TimelineManager : MonoBehaviour
 {
     public static TimelineManager Instance { get; private set; }
 
+    [Header("편집 콤보")]
+    public int Combo;
+
+    [Header("자막 메모리 설정")]
+    public int Max_memory;
+    public int _currentMemory;
+    public int Decrease_Mem;
+
     [Header("아드레날린 토글")]
     public bool Is_Hit = false;
     public bool Is_Eight = false;
+    public bool Is_Twice = false;
+    public int Attack_Count = 0;
 
     [Header("POC 온오프")]
     public bool Is_POC = false;
@@ -40,6 +65,8 @@ public class TimelineManager : MonoBehaviour
     private TimelineSystem _timelineSystem;
     private BattleSystem _battleSystem;
 
+    private List<Additional_Effect> _placedEffect = new List<Additional_Effect>();
+
     // 현재 손패 (GameDirector로부터 받음)
     private List<RuntimeBlock> _currentHand = new List<RuntimeBlock>();
 
@@ -51,11 +78,15 @@ public class TimelineManager : MonoBehaviour
     public event Action<IReadOnlyList<PlacedBlock>, IReadOnlyList<PlacedBlock>> OnTimelineChanged;
     public event Action<EnemyPattern> OnEnemyPatternChanged;
     public event Action<int> OnCurrentTickChanged;
+    public event Action<IReadOnlyList<Additional_Effect>> OnEffectChanged;
+    public event Action<int, int> OnTextMemoryChanged;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
     public IReadOnlyList<PlacedBlock> PlacedBlocks => _timelineSystem.PlacedBlocks;
     public IReadOnlyList<PlacedBlock> PrevPlacedBlocks => _timelineSystem.PrevPlacedBlocks;
+
+    public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
 
     void Awake()
@@ -85,6 +116,9 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnMeleeAttackStarted += HandleMeleeAttack_Start;
         _timelineSystem.OnGuardRequested += HandleGuardRequest;
         _timelineSystem.OnLongRangeAttacking += HandleLongRangeAttack_Middle;
+
+        // 이펙트 초기화
+        InitializedEffect(_totalTicks);
     }
 
     void OnDestroy()
@@ -103,6 +137,18 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnLongRangeAttacking -= HandleLongRangeAttack_Middle;
             _timelineSystem.OnMeleeAttackStarted -= HandleMeleeAttack_Start;
             _timelineSystem.OnGuardRequested -= HandleGuardRequest;
+        }
+    }
+
+    private void Update()
+    {
+        if(Attack_Count >= 2)
+        {
+            Is_Twice = true;
+        }
+        else
+        {
+            Is_Twice = false;
         }
     }
 
@@ -179,6 +225,9 @@ public class TimelineManager : MonoBehaviour
     {
         //틱당 크리 확률 증가
         _battleSystem.IncreaseMeleeStack();
+
+        // 특수효과 플래그 처리
+        _battleSystem.SetEffectFrag(GetEffectTypeAt(tick));
 
         // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
         if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
@@ -339,6 +388,83 @@ public class TimelineManager : MonoBehaviour
         OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
+    // ========================================
+    // 특수효과 관련
+    // ========================================
+    private void InitializedEffect(int size)
+    {
+        _placedEffect.Clear();
+
+        for (int i = 0; i < size; i++)
+        {
+           _placedEffect.Add(null);
+        }
+    }
+
+    public bool TryPlaceEffect(Additional_Effect effect, int startTick) 
+    {
+        if (CanPlaceEffect(startTick) && effect.cost + _currentMemory <= Max_memory)
+        {
+            _placedEffect[startTick - 1] = effect;
+            _currentMemory += effect.cost;
+
+            OnEffectChanged.Invoke(_placedEffect);
+            OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void RemovePlacedEffect(Additional_Effect effect)
+    {
+        _placedEffect.Remove(effect);
+        OnEffectChanged.Invoke(_placedEffect);
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+    }
+
+    public void RemovePlacedEffect_Index(int tick)
+    {
+        _currentMemory -= _placedEffect[tick - 1].cost;
+        _placedEffect[tick - 1] = null;
+        OnEffectChanged.Invoke(_placedEffect);
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+    }
+
+    public bool CanPlaceEffect(int startTick) 
+    {
+        if (_placedEffect[startTick - 1] == null)
+            return true;
+        return false;
+    }
+
+    public EffectType GetEffectTypeAt(int tick)
+    {
+        Additional_Effect effect = _placedEffect[tick - 1];
+        if (effect != null)
+            return effect.effectType;
+        return EffectType.None;
+    }
+
+    public int GetEffectCostAt(int tick)
+    {
+        Additional_Effect effect = _placedEffect[tick - 1];
+        if (effect != null)
+            return effect.cost;
+        return 0;
+    }
+
+    private bool Count_Effect()
+    {
+        int count = 0;
+        foreach (Additional_Effect effect in _placedEffect)
+        {
+            if (effect != null)
+                count++;
+        }
+        return count < Combo / 8;
+    }
+
     /// <summary>
     /// 타임라인 실행
     /// </summary>
@@ -483,24 +609,39 @@ public class TimelineManager : MonoBehaviour
         if (!Is_Hit)
         {
             //_battleSystem.IncreaseMeleeStack();
-            Is_Hit = false;
+            _currentMemory -= Decrease_Mem;
         }
 
         if (Is_Eight)
         {
             //_battleSystem.IncreaseMeleeStack();
-            Is_Eight = false;
+            _currentMemory -= Decrease_Mem;
+        }
+
+        if (Is_Twice)
+        {
+            //_battleSystem.IncreaseMeleeStack();
+            _currentMemory -= Decrease_Mem;
         }
 
         if (Is_Hit && !Is_Eight) 
         {
             //_battleSystem.ResetMeleeStack();
-            Is_Hit = false;
-            Is_Eight = false;
+            
         }
+
+        Is_Hit = false;
+        Is_Eight = false;
+        Is_Twice = false;
+        Attack_Count = 0;
 
         //아드 UI업뎃
         //BattleUIManager.Instance.UpdateStackUI();
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+
+        // 이펙트 클리어
+        InitializedEffect(_totalTicks);
+        OnEffectChanged?.Invoke(_placedEffect);
 
         Debug.Log("[TimelineDirector] 라운드 종료 처리 완료");
 
@@ -522,6 +663,7 @@ public class TimelineManager : MonoBehaviour
         _battleSystem = battleSystem;
         _totalSectors = totalSector;
         _totalColumns = columns;
+        OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
     }
 
     #region Preview Methods - public

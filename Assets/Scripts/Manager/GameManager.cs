@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private int _currentEnemyIndex = 0;
+    private int _memory = 0;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
@@ -470,7 +471,17 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
-        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
+        int final_memory = 0;
+
+        foreach (var effect in TimelineManager.Instance.additional_Effects)
+        {
+            if (effect == null) continue;
+            final_memory += effect.cost;
+        }
+
+        _memory += 8;
+
+        OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
@@ -529,12 +540,16 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
-        if (currentStageData != null && _currentRound >= currentStageData.LimitRound)
+        
+
+        if (currentStageData != null && _memory >= 8 * currentStageData.LimitRound)
         {
-            Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            //Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            Debug.Log($"[GameManager] 제한 메모리 ({8 * currentStageData.LimitRound}) 도달. 패배");
             EndBattle(false);
             return;
         }
+
         if (_timelineManager != null)
         {
             _timelineManager.OnRoundEnded();
