@@ -1,19 +1,37 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 public class PlayerAttectEffect : MonoBehaviour
 {
-    [SerializeField] private EffectPool swordAttackFX_pool;
-    [SerializeField] private EffectPool big_swordAttackFX_pool;
-    [SerializeField] private EffectPool bowAttackFX_pool;
-    [SerializeField] private EffectPool bowChargingFX_pool;
-
-    [SerializeField] private Vector3 attackOffset;
-    [SerializeField] private Vector3 _leftOffset;
+    [SerializeField] 
+    private Vector3 attackOffset;
+    [SerializeField] 
+    private Vector3 _leftOffset;
     [SerializeField]
     private Vector3 _rightOffset;
-    
+
+    [TabGroup("Sword")]
+    [SerializeField] private EffectPool swordAttackFX_pool;
+
+    [TabGroup("Big_Sword")]
+    [SerializeField] private EffectPool big_swordAttackFX_pool;
+
+    [TabGroup("Bow")]
+    [SerializeField] private EffectPool bowAttackFX_pool;
+
+    [TabGroup("Bow_charging")]
+    [SerializeField] private EffectPool bowChargingFX_pool;
+    [TabGroup("Bow_charging")]
     [SerializeField] private Vector3 charging_rightOffset;
+    [TabGroup("Bow_charging")]
     [SerializeField] private Vector3 charging_leftOffset;
+
+    [TabGroup("Guard")]
+    [SerializeField] private EffectPool guard_pool;
+    [TabGroup("Guard")]
+    [SerializeField] private Vector3 guard_rightOffset;
+    [TabGroup("Guard")]
+    [SerializeField] private Vector3 guard_leftOffset;
 
     private Animator _currentAnimtor;
     private SpriteRenderer _sr;
@@ -103,6 +121,26 @@ public class PlayerAttectEffect : MonoBehaviour
             //fx.SetActive(true);
             _currentAnimtor = fx.GetComponent<Animator>();
         } 
+    }
+
+    // 가드 이펙트
+    public void GuardEffect()
+    {
+        var fx = guard_pool.GetEffect();
+
+        // true면 좌측 방향
+        if (_sr.flipX)
+        {
+            fx.transform.position = transform.position + guard_leftOffset;
+            fx.GetComponent<EffectAutoReturn>().Flip();
+        }
+        else
+        {
+            fx.transform.position = transform.position + guard_rightOffset;
+        }
+
+        fx.SetActive(true);
+
     }
 
     public void ReturnEffects()
