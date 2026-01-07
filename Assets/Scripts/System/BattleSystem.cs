@@ -233,10 +233,15 @@ public class BattleSystem
             isCritical = true;
             _isCritical = false;
         }
+        else
+        {
+            //이거 없으면 크리터짐
+            isCritical = false;
+        }
 
-        int finalDamage = isCritical
-                ? baseDamage * 2
-                : baseDamage;
+            int finalDamage = isCritical
+                    ? baseDamage * 2
+                    : baseDamage;
 
         finalDamage = _isDamageUp
                 ? finalDamage + 5
