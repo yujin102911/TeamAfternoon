@@ -683,10 +683,17 @@ public class TimelineManager : MonoBehaviour
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
                     if (dir != MoveDirection.None)
                     {
-                        int nextSector = CalculateNextSector(currentSimulatedSector, dir, columns, rows, moveAmount);
-                        if (nextSector != -1 && !_battleSystem.IsSectorBlocked(nextSector))
+                        for (int i = 0; i < moveAmount; i++)
                         {
-                            currentSimulatedSector = nextSector;
+                            int nextSector = CalculateNextSector(currentSimulatedSector, dir, columns, rows, 1);
+                            if (nextSector != -1 && !_battleSystem.IsSectorBlocked(nextSector))
+                            {
+                                currentSimulatedSector = nextSector;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
                 }
