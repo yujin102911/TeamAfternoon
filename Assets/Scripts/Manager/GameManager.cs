@@ -259,8 +259,14 @@ public class GameManager : MonoBehaviour
 
             _battleSystem.OnEnemyHit += _enemyVisualController.PlayDamage;
             _battleSystem.OnEnemyDash += _enemyVisualController.PlayEnemyDash;
-            _timelineUI.OnRequestPreviewPlayer += _playerVisualController.ShowPlayerPreview;
-            _timelineUI.OnRequestHidePreview += _playerVisualController.HidePlayerPreview;
+            _timelineUI.OnRequestPreviewPlayer += (sector, action, dir, isEnemyLeft) => {
+                _playerVisualController.ShowPlayerPreview(sector, action, dir, isEnemyLeft);
+                _enemyVisualController.PreviewFlip(isEnemyLeft);
+            };
+            _timelineUI.OnRequestHidePreview += () => {
+                _playerVisualController.HidePlayerPreview();
+                _enemyVisualController.RestoreActualSide();
+            };
 
             _enemyVisualController.OnEnemySideChanged += _playerVisualController.PlayerFlip;
         }
@@ -314,8 +320,14 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnEnemyHit -= _enemyVisualController.PlayDamage;
             _battleSystem.OnPlayerAttackSuccess -= _playerVisualController.PlayAttackEffect;
             _battleSystem.OnEnemyDash -= _enemyVisualController.PlayEnemyDash;
-            _timelineUI.OnRequestPreviewPlayer -= _playerVisualController.ShowPlayerPreview;
-            _timelineUI.OnRequestHidePreview -= _playerVisualController.HidePlayerPreview;
+            _timelineUI.OnRequestPreviewPlayer -= (sector, action, dir, isEnemyLeft) => {
+                _playerVisualController.ShowPlayerPreview(sector, action, dir, isEnemyLeft);
+                _enemyVisualController.PreviewFlip(isEnemyLeft);
+            };
+            _timelineUI.OnRequestHidePreview -= () => {
+                _playerVisualController.HidePlayerPreview();
+                _enemyVisualController.RestoreActualSide();
+            };
 
             _enemyVisualController.OnEnemySideChanged -= _playerVisualController.PlayerFlip;
         }
