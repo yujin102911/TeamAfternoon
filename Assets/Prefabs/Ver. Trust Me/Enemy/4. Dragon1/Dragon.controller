@@ -14,7 +14,7 @@ AnimatorStateMachine:
     m_Position: {x: 180, y: -30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4601619354797529516}
-    m_Position: {x: -100, y: 130, z: 0}
+    m_Position: {x: -20, y: 130, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4516635299516955205}
     m_Position: {x: 190, y: 60, z: 0}
@@ -33,6 +33,9 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: -4123574501403954423}
     m_Position: {x: 72.06717, y: 253.33963, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 4749404052070583288}
+    m_Position: {x: -240, y: 110, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -319,6 +322,32 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 97d0df19ec3988944b8e03abf8293968, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
+--- !u!1102 &4749404052070583288
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sturn
+  m_Speed: 0.375
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: 1710ad43fc827f344a234c6cc6e0a47a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
