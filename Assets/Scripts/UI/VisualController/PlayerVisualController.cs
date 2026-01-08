@@ -349,8 +349,12 @@ public class PlayerVisualController : MonoBehaviour
             return;
         }
 
+        if (_playerInstance != null)
+            _playerInstance.SetActive(false);
+
         if (_currentGhost == null && _playerGhostPrefab != null)
             _currentGhost = Instantiate(_playerGhostPrefab);
+
         if (_currentGhost != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
@@ -403,6 +407,9 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_currentGhost != null)
             _currentGhost.SetActive(false);
+
+        if (_playerInstance != null)
+            _playerInstance.SetActive(true);
     }
     #endregion
 
