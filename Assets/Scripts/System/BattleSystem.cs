@@ -561,10 +561,17 @@ public class BattleSystem
 
             Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
         }
+
+        OnChangeEnemyAnim?.Invoke("Stone");
         if (count > 0)
         {
-            OnStoneUpdated?.Invoke(_stoneSectors, true);
+            //OnStoneUpdated?.Invoke(_stoneSectors, true);
         }
+    }
+
+    public void SpawnStone()
+    {
+        OnStoneUpdated?.Invoke(_stoneSectors, true);
     }
 
     public void ProcessEnemyWind(WindDirection actualDirection)

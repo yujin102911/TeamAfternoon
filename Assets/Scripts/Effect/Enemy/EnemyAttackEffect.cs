@@ -65,6 +65,12 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             GameManager.Instance.BattleSystem.PlayerTakeDamage();
     }
 
+    public void SpawnStoneAnim()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.SpawnStone();
+    }
+
     #region Pool
     private void InitializePool()
     {
