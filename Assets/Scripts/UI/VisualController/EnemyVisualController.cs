@@ -120,7 +120,7 @@ public class EnemyVisualController : MonoBehaviour
             if (GameManager.Instance.MapSystem != null)
                 _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
 
-            _enemyHealthBar.SetTarget(obj.transform);
+            _enemyHealthBar.SetTarget(obj.transform, enemy.Data.HPBarOffset);
         }
 
         //AlignEnemies();
