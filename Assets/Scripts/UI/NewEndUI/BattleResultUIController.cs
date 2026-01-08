@@ -204,6 +204,13 @@ public class BattleResultUIController : MonoBehaviour
             yield return null;
         }
         yield return new WaitForSeconds(0.5f);
+
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.CurrentUser != null)
+        {
+            SaveService.Save(ServiceLocator.Instance.CurrentUser);
+            Debug.Log("[BattleResultUIController] 연출 종료 및 씬 전환 전 최종 저장 완료");
+        }
+
         if (asyncLoad != null)
             asyncLoad.allowSceneActivation = true;
 
