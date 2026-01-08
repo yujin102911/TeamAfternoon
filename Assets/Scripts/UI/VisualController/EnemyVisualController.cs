@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyVisualController : MonoBehaviour
@@ -174,6 +175,12 @@ public class EnemyVisualController : MonoBehaviour
     }
     public void ChangeAnim(string animation)
     {
+        // 기절 별 이펙트 숨기기
+        if (_currentAnimation == "Sturn" && _currentAnimation != animation)
+        {
+            _enemyAttackEffect.Hide_Star();
+        }
+
         if (_enemyAnimator != null)
         {
             _currentAnimation = animation;
@@ -284,9 +291,16 @@ public class EnemyVisualController : MonoBehaviour
 
 
 
-    public void PlayDamage(int damage, bool is_crit)
+    public void PlayDamage(int damage, bool is_crit, bool is_sturn)
     {
-        ChangeAnim("Hurt");
+        if(is_sturn)
+        {
+            ChangeAnim("Sturn");
+        }
+        else
+        {
+            ChangeAnim("Hurt");
+        }
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
     }

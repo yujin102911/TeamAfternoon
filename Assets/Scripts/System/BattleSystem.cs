@@ -78,7 +78,7 @@ public class BattleSystem
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
-    public event Action<int, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
+    public event Action<int, bool, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
@@ -204,6 +204,7 @@ public class BattleSystem
                 {
                     _isSturnSuccess = true;
                     Debug.Log("<color=yellow>[BattleSystem] 적이 기절했습니다!</color>");
+                    //OnChangeEnemyAnim?.Invoke("Sturn");
                     _isSturn = false;
                 }
 
@@ -247,7 +248,7 @@ public class BattleSystem
         int final_dam = result.damage;
 
         DamageEnemy(final_dam);
-        OnEnemyHit?.Invoke(final_dam, result.isCritical);
+        OnEnemyHit?.Invoke(final_dam, result.isCritical, _isSturnSuccess);
     }
 
     // 데미지 결과 계산
