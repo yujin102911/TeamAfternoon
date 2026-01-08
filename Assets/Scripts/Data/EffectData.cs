@@ -3,6 +3,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EffectType
+{
+    None,
+    Critical,
+    Duble_Dash,
+    Damage_Up,
+    Sturn
+}
+
+
 [Serializable]
 public class Additional_Effect
 {

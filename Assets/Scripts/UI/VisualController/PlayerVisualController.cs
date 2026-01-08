@@ -437,6 +437,8 @@ public class PlayerVisualController : MonoBehaviour
         Vector3 startPosition = _playerInstance.transform.position;
         float elapsedTime = 0f;
 
+        _moveDuration = TimelineManager.Instance.Tick_interval * 0.85f;
+
         // 정해진 시간(_moveDuration) 동안 루프
         while (elapsedTime < _moveDuration)
         {
@@ -456,9 +458,9 @@ public class PlayerVisualController : MonoBehaviour
 
         _playerInstance.transform.localPosition = _offset;
 
-        
-
         _moveCoroutine = null;
+
+        ChangeAnim("1_Idle");
 
         //if (_playerAnimator != null)
         //_playerAnimator.SetTrigger("Run_Stop");

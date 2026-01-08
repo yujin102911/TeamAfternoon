@@ -16,10 +16,12 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     private List<int> _targetSectors = new List<int>();
 
     private Transform effectRoot;
+    private SpriteRenderer _sr;
 
     private void Awake()
     {
         //InitializePool();
+        _sr = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -58,11 +60,23 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             GameObject fx = GetEffect();
             fx.transform.SetParent(effectRoot, true); // ⭐ 월드 기준 유지
             fx.transform.position = _worldSectorPos[index - 1] + _offset;
+            
+            if (_sr.flipX)
+            {
+                fx.GetComponent<EffectAutoReturn>().Flip();
+            }
+
             fx.SetActive(true);
         }
 
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.PlayerTakeDamage();
+    }
+
+    public void SpawnStoneAnim()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.SpawnStone();
     }
 
     #region Pool
@@ -92,8 +106,12 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
 
     private GameObject GetEffect()
     {
-        if (_effectPool.Count > 0)
-            return _effectPool.Dequeue();
+        if(_effectPool.Count > 0)
+        {
+            GameObject fx = _effectPool.Dequeue();
+            fx.GetComponent<EffectAutoReturn>().ResetState();
+            return fx;
+        }
 
         // 부족하면 확장
         return CreateNewEffect();

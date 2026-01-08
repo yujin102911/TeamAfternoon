@@ -4,15 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum EffectType
-{
-    None,
-    Critical,
-    Duble_Dash,
-    Damage_Up
-}
-
-
 
 /// <summary>
 /// 손패와 타임라인 배치를 관리하는 Director

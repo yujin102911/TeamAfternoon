@@ -23,6 +23,20 @@ public class Effect_Line : MonoBehaviour
     [SerializeField]
     private Sprite _damageUpIcon;
 
+    [TabGroup("Critical")]
+    [SerializeField]
+    private Sprite _criticBack;
+    [TabGroup("Critical")]
+    [SerializeField]
+    private Sprite _criticIcon;
+
+    [TabGroup("Sturn")]
+    [SerializeField]
+    private Sprite _sturnBack;
+    [TabGroup("Sturn")]
+    [SerializeField]
+    private Sprite _sturnIcon;
+
     public void Show(Additional_Effect additional_Effect)
     {
         this.gameObject.SetActive(true);
@@ -33,8 +47,8 @@ public class Effect_Line : MonoBehaviour
                 Hide();
                 break;
             case EffectType.Critical:
-                //Image.color = additional_Effect.effectColor;
-                //txt.text = "crit";
+                _back.sprite = _criticBack;
+                _icon.sprite = _criticIcon;
                 break;
             case EffectType.Duble_Dash:
                 _back.sprite = _dashBack;
@@ -43,6 +57,10 @@ public class Effect_Line : MonoBehaviour
             case EffectType.Damage_Up:
                 _back.sprite = _damageBack;
                 _icon.sprite = _damageUpIcon;
+                break;
+            case EffectType.Sturn:
+                _back.sprite = _sturnBack;
+                _icon.sprite = _sturnIcon;
                 break;
         }
     }

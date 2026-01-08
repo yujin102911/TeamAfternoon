@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 31.8, y: -20.4}
-  m_SizeDelta: {x: 23, y: 23}
+  m_SizeDelta: {x: 33, y: 33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2828152646739518191
 CanvasRenderer:
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1278918721680471549, guid: 5d9875765a7af3145991b820d36455ae, type: 3}
+  m_Sprite: {fileID: 1952709830, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -765,10 +765,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _back: {fileID: 3594722093020228687}
   _icon: {fileID: 4698451032739315942}
-  _dashBack: {fileID: -4007266148716356647, guid: 5d9875765a7af3145991b820d36455ae, type: 3}
-  _dubleDashIcon: {fileID: 1433535900, guid: 5d9875765a7af3145991b820d36455ae, type: 3}
-  _damageBack: {fileID: 5724691431602207145, guid: 5d9875765a7af3145991b820d36455ae, type: 3}
-  _damageUpIcon: {fileID: -1278918721680471549, guid: 5d9875765a7af3145991b820d36455ae, type: 3}
+  _dashBack: {fileID: -8006117825268981899, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _dubleDashIcon: {fileID: -1850614339, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _damageBack: {fileID: -1206427427223022810, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _damageUpIcon: {fileID: 1952709830, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _criticBack: {fileID: -7285214950813050877, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _criticIcon: {fileID: 274227334, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _sturnBack: {fileID: 5535085523768173922, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _sturnIcon: {fileID: -150750127, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
 --- !u!1 &8148141235847223948
 GameObject:
   m_ObjectHideFlags: 0
