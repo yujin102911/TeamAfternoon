@@ -33,6 +33,47 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private Image _sliderHandleBar;
 
+    [Header("배속 버튼")]
+    [SerializeField]
+    private Button _speedButton;
+    [SerializeField]
+    private Image _speedButtonIcon;
+    [SerializeField]
+    private Sprite[] _speedSprites;
+    private int _currentSpeedIndex = 0;
+
+    private void StartSpeedButton()
+    {
+        if (_speedButton != null)
+        {
+            _currentSpeedIndex = 0;
+            _speedButtonIcon.sprite = _speedSprites[_currentSpeedIndex];
+            _speedButton.onClick.AddListener(() =>
+            {
+                if (TimelineManager.Instance != null)
+                {
+                    _currentSpeedIndex++;
+
+                    switch(_currentSpeedIndex % _speedSprites.Length)
+                    {
+                        case 0:
+                            TimelineManager.Instance.SetTimeScale(1.0f);
+                            _speedButtonIcon.sprite = _speedSprites[0];
+                            break;
+                        case 1:
+                            TimelineManager.Instance.SetTimeScale(1.5f);
+                            _speedButtonIcon.sprite = _speedSprites[1];
+                            break;
+                        case 2:
+                            TimelineManager.Instance.SetTimeScale(2.0f);
+                            _speedButtonIcon.sprite = _speedSprites[2];
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
     private BattleSystem battleSystem;
 
     private void Awake()
@@ -60,6 +101,7 @@ public class BattleUIManager : MonoBehaviour
             TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider;
         }
         RefreshStartButtonState();
+        StartSpeedButton();
         //RefreshSectorSelectionPanel();
     }
 
@@ -89,7 +131,7 @@ public class BattleUIManager : MonoBehaviour
         float slider_size = (float)current / max;
 
         _textmemorySlider.value = slider_size;
-        _storageTxtMemory.text = $"{current}/{max}";
+        _storageTxtMemory.text = $"{current}/{max} <size=20>mb</size>";
     }
     private void HandleBattleInitialized()
     {
