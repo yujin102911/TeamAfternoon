@@ -129,6 +129,7 @@ Transform:
   - {fileID: 3402259975700779261}
   - {fileID: 2666741643168982639}
   - {fileID: 1305607405330609933}
+  - {fileID: 4013695088495175203}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3703533085662057934
@@ -220,12 +221,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ecaca743f38db04a8cbe7a1617beab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackOffset: {x: 4, y: 1.7, z: 0}
+  _leftOffset: {x: -2, y: 1.7, z: 0}
+  _rightOffset: {x: 4, y: 1.7, z: 0}
   swordAttackFX_pool: {fileID: 6896482959306045180}
   big_swordAttackFX_pool: {fileID: 3907911133059985757}
   bowAttackFX_pool: {fileID: 7343615441812652499}
   bowChargingFX_pool: {fileID: 5543498246212957680}
-  attackOffset: {x: 4, y: 1.7, z: 0}
-  chargingOffset: {x: 0.4, y: 0.2, z: 0}
+  charging_rightOffset: {x: 0.4, y: 0.2, z: 0}
+  charging_leftOffset: {x: -0.4, y: 0.2, z: 0}
+  guard_pool: {fileID: 9221995711467449730}
+  guard_rightOffset: {x: 0.25, y: 0, z: 0}
+  guard_leftOffset: {x: -0.25, y: 0, z: 0}
 --- !u!1 &4504062129502801118
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,6 +366,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &6321176382724236749
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4013695088495175203}
+  - component: {fileID: 9221995711467449730}
+  m_Layer: 0
+  m_Name: Guard_Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4013695088495175203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6321176382724236749}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 403013117455445336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9221995711467449730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6321176382724236749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 8390921018927628229, guid: 9757cec2683bb144e93d8de908b31333, type: 3}
+  initialPoolSize: 10
 --- !u!1 &8364783360388946747
 GameObject:
   m_ObjectHideFlags: 0

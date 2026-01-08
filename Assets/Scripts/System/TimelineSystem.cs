@@ -99,11 +99,11 @@ public class TimelineSystem
 
         if (length == TimelineManager.Instance.TotalTicks)
         {
-            TimelineManager.Instance.Is_Eight = true;
+            TimelineManager.Instance.QuestOptionState.SetEight(true);
         }
         else
         {
-            TimelineManager.Instance.Is_Eight = false;
+            TimelineManager.Instance.QuestOptionState.SetEight(false);
         }
     }
 
@@ -138,6 +138,9 @@ public class TimelineSystem
         _placedBlocks.Add(placedBlock);
         _blockMap[placedBlock] = runtimeBlock;
 
+        // 길이 체크
+        Check_PlaceBlockLength();
+
         Debug.Log($"[TimelineSystem] 블록 배치: {runtimeBlock.BaseData.BlockName} at T{startTick}-{startTick + length - 1}");
         return true;
     }
@@ -161,6 +164,9 @@ public class TimelineSystem
         }
 
         _placedBlocks.Remove(placedBlock);
+
+        // 길이 체크
+        Check_PlaceBlockLength();
 
         Debug.Log($"[TimelineSystem] 블록 제거: {placedBlock.GetBlockData()?.BlockName}");
         return runtimeBlock;

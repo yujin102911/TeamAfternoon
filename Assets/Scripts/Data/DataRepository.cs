@@ -60,8 +60,14 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
     {
         return stageDatas.TryGetValue(id, out var data) ? data : null;
     }
+
+    // 스테이지 데이터에 있는 메일들을 유저데이터 기준으로 읽었는지 안읽었는지 반환
+    // 그때까지의 진행도 포함한
     public bool HasUnreadMail()
     {
+        UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
+        if (currentUser == null) return false;
+
         List<StageData> sortedStages = stageDatas.Values
             .OrderBy(s => s.StageNumber)
             .ToList();
@@ -69,21 +75,47 @@ public class DataRepository : SerializedScriptableObject   // ★ SerializedScri
         for (int i = 0; i < sortedStages.Count; i++)
         {
             StageData stage = sortedStages[i];
-            bool isStageAvailable = (i == 0) || sortedStages[i-1].IsCleared;
+            bool isStageAvailable = (i == 0) || currentUser.IsStageCleared(sortedStages[i-1].StageNumber);
 
             if (isStageAvailable)
             {
-                foreach (MailContent mail in stage.Mails)
+                for (int m = 0; m < stage.Mails.Count; m++)
                 {
-                    bool isMailUnlocked = (mail.unlockCondition == MailContent.MailUnlockCondition.Always) || (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && stage.IsCleared);
-                    if (isMailUnlocked && !mail.isRead)
+                    MailContent mail = stage.Mails[m];
+                    bool isMailUnlocked = (mail.unlockCondition == MailContent.MailUnlockCondition.Always) ||
+                        (mail.unlockCondition == MailContent.MailUnlockCondition.AfterClear && currentUser.IsStageCleared(stage.StageNumber));
+                    if (isMailUnlocked && !currentUser.IsMailRead(stage.StageNumber, m))
                         return true;
                 }
+                
             }
             else
             {
                 break;
             }
+        }
+        return false;
+    }
+
+    public bool HasUnreadBoard()
+    {
+        UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
+        if (currentUser == null) return false;
+
+        List<StageData> sortedStages = stageDatas.Values
+            .OrderBy(s => s.StageNumber)
+            .ToList();
+
+        for (int i = 0; i < sortedStages.Count; i++)
+        {
+            StageData stage = sortedStages[i];
+            bool isStageAvailable = (i == 0) || currentUser.IsStageCleared(sortedStages[i - 1].StageNumber);
+            if (isStageAvailable)
+            {
+                if (!currentUser.IsBoardRead(stage.StageNumber))
+                    return true;
+            }
+            else break;
         }
         return false;
     }

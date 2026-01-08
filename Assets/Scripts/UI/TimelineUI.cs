@@ -98,7 +98,7 @@ public class TimelineUI : MonoBehaviour
     // events
     public event Action<List<int>> OnRequestHighlight;
     public event Action OnRequestClearHighlight;
-    public event Action<int, ActionType> OnRequestPreviewPlayer;
+    public event Action<int, ActionType, MoveDirection> OnRequestPreviewPlayer;
     public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
@@ -117,6 +117,7 @@ public class TimelineUI : MonoBehaviour
             TimelineManager.Instance.OnEnemyPatternChanged += DisplayEnemySequence;
             TimelineManager.Instance.OnEnemyPatternChanged += (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged += UpdateCursor;
+            TimelineManager.Instance.OnEffectChanged += Update_effectColor;
         }
     }
 
@@ -129,6 +130,7 @@ public class TimelineUI : MonoBehaviour
             TimelineManager.Instance.OnEnemyPatternChanged -= DisplayEnemySequence;
             TimelineManager.Instance.OnEnemyPatternChanged -= (pattern) => UpdateDangerIndicators();
             TimelineManager.Instance.OnCurrentTickChanged -= UpdateCursor;
+            TimelineManager.Instance.OnEffectChanged -= Update_effectColor;
         }
     }
 
@@ -173,6 +175,11 @@ public class TimelineUI : MonoBehaviour
                 }
                 
             }
+        }
+
+        if (!is_enter)
+        {
+            //Update_effectColor(TimelineManager.Instance.additional_Effects);
         }
     }
 
@@ -226,17 +233,18 @@ public class TimelineUI : MonoBehaviour
             slot.name = $"PlayerSlot_{tick}";
 
 
-            TimelineDropZone dropZone = null;
+            //TimelineDropZone dropZone = null;
+            Effect_DropZone dropZone = null;
 
             // TODO: New_Layout 확정되면 나중에 지우기
             // 드롭 이벤트 핸들러 추가
             if (New_Layout)
             {
-                dropZone = slot.transform.Find("Image")?.AddComponent<TimelineDropZone>();
+                dropZone = slot.transform.Find("Image")?.AddComponent<Effect_DropZone>();
             }
             else
             {
-                dropZone = slot.AddComponent<TimelineDropZone>();
+                dropZone = slot.AddComponent<Effect_DropZone>();
             }
 
             dropZone.tickIndex = tick;
@@ -583,7 +591,7 @@ public class TimelineUI : MonoBehaviour
 
             Debug.Log($"[TimelineUI] previewAction: {previewAction}");
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {
@@ -608,6 +616,7 @@ public class TimelineUI : MonoBehaviour
     // 슬라이더에서 호출
     public void Show_Preview(int tick)
     {
+        if (tick == 0) return;
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
@@ -630,6 +639,10 @@ public class TimelineUI : MonoBehaviour
                 {
                     previewAction = ActionType.Sword_middle;
                 }
+                else if(action == ActionType.Guard)
+                {
+                    previewAction = ActionType.Guard;
+                }
                 else
                 {
                     previewAction = ActionType.None;
@@ -637,7 +650,7 @@ public class TimelineUI : MonoBehaviour
 
             }
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction);
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {
@@ -833,6 +846,27 @@ public class TimelineUI : MonoBehaviour
         }
 
             
+    }
+
+    public void Update_effectColor(IReadOnlyList<Additional_Effect> additional_Effects)
+    {
+        for(int i = 0; i < playerSlots.Count; i++)
+        {
+            GameObject slotGO = playerSlots[i];
+
+            slotGO.GetComponent<Image>().color = Color.white;
+
+            Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
+
+            if (additional_Effects[i] == null)
+            {
+                effectLine.Hide();
+            }
+            else
+            {
+                effectLine.Show(additional_Effects[i]);
+            }   
+        }
     }
 
     /// <summary>

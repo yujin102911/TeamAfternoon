@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Sirenix.OdinInspector;
 
 /// <summary>
 /// 적의 한 틱 공격 정보
@@ -51,16 +53,33 @@ public enum WindDirection
     Left,
     Right,
 }
+public enum WindType
+{
+    Forward,    // 바람으로 밀기
+    BackWard,   // 바람으로 당기기
+}
 [System.Serializable]
 public class EnemyWind
 {
     public int tick;
-    public WindDirection direction;
+    public WindType windType;
 
-    public EnemyWind(int t, WindDirection dir)
+    public EnemyWind(int t, WindType type)
     {
         tick = t;
-        direction = dir;
+        windType = type;
+    }
+
+    public WindDirection GetDynamicDirection(bool isEnemyLeft)
+    {
+        switch (windType)
+        {
+            case WindType.Forward:
+            default:
+                return isEnemyLeft ? WindDirection.Right : WindDirection.Left;
+            case WindType.BackWard:
+                return isEnemyLeft ? WindDirection.Left : WindDirection.Right;
+        }
     }
 }
 
@@ -106,6 +125,8 @@ public class EnemyDash
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
 [CreateAssetMenu(fileName = "New Enemy Pattern", menuName = "Data/Enemy/Enemy Pattern")]
+[InfoBox("중복된 틱이 감지되었습니다! 한 틱에는 하나의 행동만 설정할 수 있습니다.\n중복된 틱: $DuplicateTicksString",
+    InfoMessageType.Error, "HasOverlappingTicks")]
 public class EnemyPattern : ScriptableObject
 {
     public string Pattern_Name;
@@ -167,4 +188,40 @@ public class EnemyPattern : ScriptableObject
     {
         return dashes.Find(a => a.tick == tick);
     }
+
+    #region Odin 유효성 검사 로직
+    /// <summary>
+    /// 중복된 틱이 있는지 확인하는 함수 (InfoBox 표시 조건)
+    /// </summary>
+    private bool HasOverlappingTicks()
+    {
+        return GetDuplicateTicks().Any();
+    }
+
+    /// <summary>
+    /// 중복된 틱 번호들을 문자열로 반환 (InfoBox 메시지용)
+    /// </summary>
+    private string DuplicateTicksString => string.Join(", ", GetDuplicateTicks());
+
+    /// <summary>
+    /// 모든 리스트의 틱을 수집하여 중복된 번호 리스트를 반환
+    /// </summary>
+    private List<int> GetDuplicateTicks()
+    {
+        List<int> allTicks = new List<int>();
+
+        // 모든 리스트의 틱 정보를 수집
+        if (attacks != null) allTicks.AddRange(attacks.Select(a => a.tick));
+        if (stones != null) allTicks.AddRange(stones.Select(s => s.tick));
+        if (winds != null) allTicks.AddRange(winds.Select(w => w.tick));
+        if (dashes != null) allTicks.AddRange(dashes.Select(d => d.tick));
+        if (parryings != null) allTicks.AddRange(parryings.Select(p => p.tick));
+
+        // 1개 이상 존재하는 틱 번호만 추출
+        return allTicks.GroupBy(t => t)
+                       .Where(g => g.Count() > 1)
+                       .Select(g => g.Key)
+                       .ToList();
+    }
+    #endregion
 }

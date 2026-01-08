@@ -46,6 +46,11 @@ public class BattleSystem
 
     private int _damageBuffer = 0;
 
+    //특수효과 플래그
+    private bool _isCritical = false;
+    private bool _isDubleDash = false;
+    private bool _isDamageUp = false;
+
     #endregion
 
     #region Events
@@ -80,7 +85,7 @@ public class BattleSystem
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
 
     public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
-    public event Action<bool> OnEnemyDash;          // 적 돌진 이벤트
+    public event Action<List<int>, bool> OnEnemyDash;          // 적 돌진 이벤트
 
     public event Action OnBattleInitialized;
     #endregion
@@ -124,6 +129,32 @@ public class BattleSystem
         _battleTurnCount = 0;
 
         ResetMeleeStack();
+    }
+
+    /// <summary>
+    /// 플래그 세팅
+    /// </summary>
+    /// <param name="effect"></param>
+    public void SetEffectFrag(EffectType effect)
+    {
+        _isCritical = false;
+        _isDubleDash = false;
+        _isDamageUp = false;
+
+        switch (effect)
+        {
+            case EffectType.Critical:
+                _isCritical = true;
+                break;
+            case EffectType.Duble_Dash:
+                _isDubleDash = true;
+                break;
+            case EffectType.Damage_Up:
+                _isDamageUp = true;
+                break;
+            case EffectType.None:
+                break;
+        }
     }
 
     /// <summary>
@@ -196,9 +227,20 @@ public class BattleSystem
     {
         bool isCritical = UnityEngine.Random.value < critChance;
 
+        // 특수효과 플래그 처리(확정 치명타)
+        if (_isCritical) 
+        {
+            isCritical = true;
+            _isCritical = false;
+        }
+
         int finalDamage = isCritical
-            ? baseDamage * 2
-            : baseDamage;
+                ? baseDamage * 2
+                : baseDamage;
+
+        finalDamage = _isDamageUp
+                ? finalDamage + 5
+                : finalDamage;
 
         return new DamageResult
         {
@@ -249,7 +291,9 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        TimelineManager.Instance.Combo = _meleeAttackStack;
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     /// <summary>
@@ -265,7 +309,8 @@ public class BattleSystem
             critChance = 1;
         }
 
-        OnCriticalChanceChanged?.Invoke(critChance);
+        //OnCriticalChanceChanged?.Invoke(critChance);
+        OnCriticalChanceChanged?.Invoke(_meleeAttackStack);
     }
 
     private void DamageEnemy(int amount)
@@ -273,12 +318,13 @@ public class BattleSystem
         _enemyHP = Mathf.Max(0, _enemyHP - amount);
         Debug.Log($"[BattleSystem] 적에게 {amount} 데미지! 남은 HP: {_enemyHP}");
 
+        TimelineManager.Instance.QuestOptionState.IncreaseCount();
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
         if (_enemyHP <= 0)
         {
             Debug.Log("적 처치 완료");
             OnChangeEnemyAnim?.Invoke("Die");
-            OnEnemyDefeated();
+            OnEnemyDefeated(); 
         }
     }
 
@@ -306,7 +352,9 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어가 {damage} 데미지 받음! 남은 HP: {_playerHP}/{_playerMaxHP}");
 
         //아드레날린 조건 파괴
-        ResetMeleeStack();
+        //ResetMeleeStack();
+
+        TimelineManager.Instance.QuestOptionState.SetHit(true);
     }
 
     public void PlayerTakeDamage()
@@ -317,6 +365,8 @@ public class BattleSystem
         }
         else
         {
+            _isPlayerHitThisTurn = false;
+
             if (_isGuarding)
             {
                 OnChangePlayerAnim?.Invoke("7_1_GuardSuccess");
@@ -327,6 +377,7 @@ public class BattleSystem
             {
                 OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
                 OnChangePlayerAnim?.Invoke("4_Hurt");
+                Debug.Log("<color=red>[BattleSystem] 플레이어 아야!!!</color>");
 
                 if (_playerHP <= 0)
                 {
@@ -364,6 +415,13 @@ public class BattleSystem
         if (moveDirection == MoveDirection.None || _columns <= 0) return;
 
         int moveAmount = 1;
+
+        if(_isDubleDash)
+        {
+            moveAmount = 2;
+            _isDubleDash = false;
+            Debug.Log("[BattleSystem] 더블 대시 효과로 2칸 이동!");
+        }
 
         int currentIndex = _playerCurrentSector - 1;
         int curRow = currentIndex / _columns;
@@ -455,7 +513,9 @@ public class BattleSystem
     {
         if (attack == null) return;
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
-        
+
+        _isPlayerHitThisTurn = false;
+
         if (attack.targetSectors != null && attack.targetSectors.Count > 0)
         {
             OnEnemyAttackSuccess?.Invoke(attack.targetSectors);
@@ -465,6 +525,7 @@ public class BattleSystem
 
         if (_isPlayerHitThisTurn)
         {
+            
             DealDamageToPlayer(attack.damage);
         }
         else
@@ -476,19 +537,24 @@ public class BattleSystem
     public void ProcessEnemyStone(int count = 1)
     {
         List<int> validSectors = new List<int>();
-        for (int j = 0; j < count; j++)
+        for (int i = 1; i <= _totalSectors; i++)
         {
-            for (int i = 1; i <= _totalSectors; i++)
+            if (i != _playerCurrentSector && !_stoneSectors.Contains(i))
             {
-                if (i != _playerCurrentSector && !_stoneSectors.Contains(i))
-                    validSectors.Add(i);
+                validSectors.Add(i);
             }
-            if (validSectors.Count > 0)
-            {
-                int targetSector = validSectors[Random.Range(0, validSectors.Count)];
-                _stoneSectors.Add(targetSector);
-                Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
-            }
+        }
+        int stonesToSpawn = Mathf.Min(count, validSectors.Count);
+        for (int j = 0; j < stonesToSpawn; j++)
+        {
+            int randomIndex = Random.Range(0, validSectors.Count);
+            int targetSector = validSectors[randomIndex];
+
+            _stoneSectors.Add(targetSector);
+
+            validSectors.RemoveAt(randomIndex);
+
+            Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
         }
         if (count > 0)
         {
@@ -496,25 +562,24 @@ public class BattleSystem
         }
     }
 
-    public void ProcessEnemyWind(EnemyWind wind)
+    public void ProcessEnemyWind(WindDirection actualDirection)
     {
-        if (wind == null) return;
-        Debug.Log("실행됩니다");
-        MoveDirection dir = ConvertWindToMoveDirection(wind.direction);
-        int targetSector = GetWindTargetSector(_playerCurrentSector, wind.direction);
+        Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
+        MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
         if (targetSector != -1 && !IsSectorBlocked(targetSector))
         {
             int prevSector = _playerCurrentSector;
             _playerCurrentSector = targetSector;
-            Debug.Log($"[BattleSystem] 바람에 의해 밀려남 {prevSector} -> {_playerCurrentSector}");
-            OnPlayerMoved?.Invoke(_playerCurrentSector, dir);
 
+            Debug.Log($"[BattleSystem] 바람에 의해 밀려남: Sector {prevSector} -> {_playerCurrentSector}");
+
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir);
         }
         else
         {
             Debug.Log("[BattleSystem] 바람이 불었으나 장애물이나 벽에 막혀 이동하지 못했습니다.");
         }
-
     }
 
 
@@ -536,16 +601,20 @@ public class BattleSystem
         // 돌진 공격 처리
         Debug.Log($"[BattleSystem] 적 돌진 공격! 대상 섹터: [{string.Join(", ", targetSectors)}]");
         //OnEnemyAttackSuccess?.Invoke(targetSectors);
+
+        _isPlayerHitThisTurn = false;
+
         foreach (var enemy in _enemies)
         {
-            OnEnemyDash?.Invoke(enemy.IsLeft);
+            OnEnemyDash?.Invoke(targetSectors, enemy.IsLeft);
         }
-        
 
-        if (targetSectors.Contains(_playerCurrentSector))
+        _isPlayerHitThisTurn = targetSectors.Contains(_playerCurrentSector);
+
+        if (_isPlayerHitThisTurn)
         {
+            
             DealDamageToPlayer(dash.damage);
-            _isPlayerHitThisTurn = true;
         }
 
         foreach (var enemy in _enemies)
@@ -634,13 +703,13 @@ public class BattleSystem
     private void OnEnemyDefeated()
     {
         Debug.Log("[BattleSystem] 적 처치!");
-        GameManager.Instance?.EndBattle(true);
+        GameManager.Instance?.EndBattle(EndCondition.Victory); // 적 사망 승리 호출
     }
 
     private void OnPlayerDefeated()
     {
         Debug.Log("[BattleSystem] 플레이어 사망...");
-        GameManager.Instance?.EndBattle(false);
+        GameManager.Instance?.EndBattle(EndCondition.Dead); // 플레이어 사망 패배 호출
     }
     /// <summary>
     /// 디버그용: 현재 전투 상태 출력

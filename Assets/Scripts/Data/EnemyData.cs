@@ -1,6 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public enum PatternSelectionType
+{
+    Sequential,      // 순차
+    Random,          // 랜덤
+}
+
 [CreateAssetMenu(fileName = "New EnemyData", menuName = "Data/Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
@@ -26,7 +32,9 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private Sprite _bgSprite;
 
-    [Header("패턴 리스트 (순서대로 반복)")]
+    [Header("패턴")]
+    [SerializeField]
+    private PatternSelectionType _selectionType = PatternSelectionType.Random;
     [SerializeField]
     private List<EnemyPattern> _patterns = new List<EnemyPattern>();
 
@@ -47,5 +55,6 @@ public class EnemyData : ScriptableObject
     public Sprite BackGroundSprite => _bgSprite;
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
     public Color AssignedColor => _assignedColor;
+    public PatternSelectionType SelectionType => _selectionType;
 
 }

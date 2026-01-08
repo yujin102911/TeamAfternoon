@@ -28,6 +28,10 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField]
     private StepSlider _timelineSlider;
 
+    [Header("타임라인 슬라이더")]
+    [SerializeField]
+    private Execution_Slider _roundSlider;
+
     [Header("배경 전환 연출")]
     [SerializeField] private RectTransform bgCurrent;
     [SerializeField] private RectTransform bgNext;
@@ -108,10 +112,16 @@ public class BattleSequenceController : MonoBehaviour
         baseOrthoSize = targetCamera.orthographicSize;
     }
 
+    private void Start()
+    {
+        _roundSlider.Initialize(GameManager.Instance.CurrentStageData.LimitRound);
+    }
+
     //슬라이더 연출
     public void PlaySlider()
     {
         _timelineSlider.Play(TimelineManager.Instance.Tick_interval * 16);
+        _roundSlider.Play(TimelineManager.Instance.Tick_interval * 16);
     }
 
     /// <summary>
@@ -505,5 +515,7 @@ public class BattleSequenceController : MonoBehaviour
     {
         if (_timelineSlider != null)
             _timelineSlider.Stop();
+        if (_roundSlider != null)
+            _roundSlider.Stop();
     }
 }

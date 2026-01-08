@@ -43,7 +43,12 @@ public class EffectPool : MonoBehaviour, IEffectPoolOwner
     public GameObject GetEffect()
     {
         if (_effectPool.Count > 0)
-            return _effectPool.Dequeue();
+        {
+            GameObject fx = _effectPool.Dequeue();
+            fx.GetComponent<EffectAutoReturn>().ResetState();
+            return fx;
+        }
+            
 
         // 부족하면 확장
         return CreateNewEffect();

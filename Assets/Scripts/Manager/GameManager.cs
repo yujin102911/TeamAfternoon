@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     [Header("데이터 참조")]
     [SerializeField] private DataRepository dataRepository;
-    [SerializeField] private UserGameData userGameData;
+    [SerializeField] private UserGameData userGameData; // TODO: 타이틀씬 생기면 ServiceLocator로부터 받아오도록!
 
     [Header("비주얼 컨트롤러")]
     [SerializeField] private TimelineUI _timelineUI;
@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
     [Header("게임 설정")]
     [SerializeField] private int _startHandSize = 5;
-    [SerializeField] private int _playerMaxHP = 20;
+    [SerializeField] private int _playerMaxHP = 3; // 기본값 (-> 정상적으로 실행 시 UserData에서 받아옴)
     [SerializeField] private MapSize _mapSize = MapSize.Grid_3x3;
 
     [Header("테스트용 스테이지 데이터")]
@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
 
     private int _currentRound = 0;
     private int _currentEnemyIndex = 0;
+    private int _memory = 0;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
@@ -97,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     public event Action OnGameStateChanged;
     public event Action<int, int, int, int> OnRoundChanged;      // 현재 라인, 총 라인, 현재 적, 총 적
-    public event Action<bool, int, int, int, int> OnBattleEnded; // True: 승리 False: 패배
+    public event Action<EndCondition> OnBattleEnded; // Victory: 승리, Dead: 사망, RoundOver: 라운드 초과
     public event Action<int, int> OnMemoryUpdate;
 
     #endregion
@@ -142,7 +143,23 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        SaveService.Save(userGameData);
+        // 서비스 로케이터가 있다면 (타이틀 씬부터 정상 실행됐다면, 그 데이터 받아옴)
+        // 없다면 인스펙터에 연결된 userData로 세팅
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.CurrentUser != null)
+        {
+            userGameData = ServiceLocator.Instance.CurrentUser;
+            _playerMaxHP = userGameData.MaxHP;
+        }
+        else if (userGameData != null)
+        {
+            _playerMaxHP = userGameData.MaxHP;
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] UserGameData를 찾을 수 없어 기본 체력(3)으로 설정합니다.");
+            _playerMaxHP = 3;
+        }
+
         if (mapRootTransform == null) mapRootTransform = this.transform;
 
         _deckSystem = new DeckSystem(dataRepository, userGameData);
@@ -470,7 +487,17 @@ public class GameManager : MonoBehaviour
         IsExecutingRound = true;
         IsRoundInterrupted = false;
         _currentRound++;
-        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
+        int final_memory = 0;
+
+        foreach (var effect in TimelineManager.Instance.additional_Effects)
+        {
+            if (effect == null) continue;
+            final_memory += effect.cost;
+        }
+
+        _memory += 8;
+
+        OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
@@ -493,8 +520,6 @@ public class GameManager : MonoBehaviour
         // 타임라인 실행
         if (_timelineManager != null)
         {
-            
-
             _battleSequenceController.PlaySlider();
             yield return StartCoroutine(_timelineManager.ExecuteTimeline());
         }
@@ -529,12 +554,15 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
-        if (currentStageData != null && _currentRound >= currentStageData.LimitRound)
+        
+
+        if (currentStageData != null && _memory >= 8 * currentStageData.LimitRound)
         {
             Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
-            EndBattle(false);
+            EndBattle(EndCondition.RoundOver); // 라운드 초과 실패 함수 호출
             return;
         }
+
         if (_timelineManager != null)
         {
             _timelineManager.OnRoundEnded();
@@ -563,7 +591,7 @@ public class GameManager : MonoBehaviour
         });
     }
 
-    public void EndBattle(bool victory)
+    public void EndBattle(EndCondition victory)
     {
         if (_isBattleEnded) return;
         _isBattleEnded = true;
@@ -578,28 +606,43 @@ public class GameManager : MonoBehaviour
             _battleSequenceController.StopSlider();
         }
         int _leftPlayerHP = _battleSystem.PlayerHP;
-        Debug.Log($"[GameManager] 전투 종료 - {(victory ? "승리" : "패배")}");
-
-        if (victory)
+        if (victory == EndCondition.Victory)
         {
+            Debug.Log("[GameManager] 전투 종료 - 승리");
             if (currentStageData != null)
             {
-                currentStageData.IsCleared = true;
-                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
-
-                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
-                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(currentStageData);
-#endif
+                if (ServiceLocator.Instance.CurrentUser != null)
+                {
+                    ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
+                }
             }
+//            if (currentStageData != null)
+//            {
+//                currentStageData.IsCleared = true;
+//                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
+
+//                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
+//                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
+//#if UNITY_EDITOR
+//                UnityEditor.EditorUtility.SetDirty(currentStageData);
+//#endif
+//            }
         }
+        else if (victory == EndCondition.Dead)
+        {
+            Debug.Log("[GameManager] 전투 종료 - 패배 (플레이어 사망)");
+        }
+        else if (victory == EndCondition.RoundOver)
+        {
+            Debug.Log("[GameManager] 전투 종료 - 패배 (라운드 초과)");
+        }
+ 
             // 현재 돌아가고 있는 모든 코루틴 종료
-            StopAllCoroutines();
+         StopAllCoroutines();
 
          SaveService.Save(userGameData);
 
-        OnBattleEnded?.Invoke(victory, _currentRound, _statPlayerHitCount, _statPlayerAttackCount, _leftPlayerHP);
+        OnBattleEnded?.Invoke(victory);
     }
     #endregion
 
@@ -609,8 +652,7 @@ public class GameManager : MonoBehaviour
         if (currentStageData == null || index >= currentStageData.EnemySpawns.Count)
         {
             _bgSprite = null;
-            // 더 이상 적이 없으면 겜 끗
-            EndBattle(true);
+            EndBattle(EndCondition.Victory); // 더 이상 적이 없으면 겜 끗 (승리 호출)
             return;
         }
         StageEnemySetup spawn = currentStageData.EnemySpawns[index];
@@ -637,8 +679,17 @@ public class GameManager : MonoBehaviour
         if (_battleSystem.Enemies.Count ==0) return;
         RuntimeEnemy activeEnemy = _battleSystem.Enemies[0];
 
-        //EnemyPattern nextPattern = activeEnemy.GetNextPattern(); 순차적으로 가져올거면 아랫줄 주석 처리하고 이거 주석 해제
-        EnemyPattern nextPattern = activeEnemy.GetRandomPattern();
+        PatternSelectionType selectionType = activeEnemy.Data.SelectionType;
+        EnemyPattern nextPattern = null;
+
+        if (selectionType == PatternSelectionType.Random)
+        { 
+            nextPattern = activeEnemy.GetRandomPattern();
+        }
+        else if (selectionType == PatternSelectionType.Sequential)
+        {
+            nextPattern = activeEnemy.GetNextPattern();
+        }
 
         if (nextPattern != null)
         {
