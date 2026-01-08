@@ -12,12 +12,17 @@ public class PlayerAttectEffect : MonoBehaviour
 
     [TabGroup("Sword")]
     [SerializeField] private EffectPool swordAttackFX_pool;
-
-    [TabGroup("Big_Sword")]
+    [TabGroup("Sword")]
+    [SerializeField] private EffectPool swordEnfoceFX_pool;
+    [TabGroup("Sword")]
     [SerializeField] private EffectPool big_swordAttackFX_pool;
+    [TabGroup("Sword")]
+    [SerializeField] private EffectPool Enfocebig_swordAttackFX_pool;
 
     [TabGroup("Bow")]
     [SerializeField] private EffectPool bowAttackFX_pool;
+    [TabGroup("Bow")]
+    [SerializeField] private EffectPool Enforce_bowAttackFX_pool;
 
     [TabGroup("Bow_charging")]
     [SerializeField] private EffectPool bowChargingFX_pool;
@@ -56,33 +61,53 @@ public class PlayerAttectEffect : MonoBehaviour
 
         fx.SetActive(true);
     }
-
-    public void SpawnSwordAttackEffect()
+    public void SpawnSwordEffect(int Pool_ID)
     {
-        var fx = swordAttackFX_pool.GetEffect();
-        Flip_setPos(fx);
-        //fx.transform.position = attackOffset;
-        //fx.SetActive(true);
+        GameObject fx = null;
+
+        switch (Pool_ID)
+        {
+            case 0:
+                fx = swordAttackFX_pool.GetEffect();
+                break;
+            case 1:
+                fx = swordEnfoceFX_pool.GetEffect();
+                break;
+            case 2:
+                fx = big_swordAttackFX_pool.GetEffect();
+                break;
+            case 3:
+                fx = Enfocebig_swordAttackFX_pool.GetEffect();
+                break;
+            default:
+                break;
+        }
+
+        if(fx != null)
+            Flip_setPos(fx);
 
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.EnemyTakeDamage();
     }
 
-    public void Spawn_BigSwordAttackEffect()
+    public void SpawnBowEffect(int Pool_ID)
     {
-        var fx = big_swordAttackFX_pool.GetEffect();
-        Flip_setPos(fx);
-        //fx.transform.position = attackOffset;
-        //fx.SetActive(true);
+        GameObject fx = null;
 
-        if (GameManager.Instance != null)
-            GameManager.Instance.BattleSystem.EnemyTakeDamage();
-    }
+        switch (Pool_ID)
+        {
+            case 0:
+                fx = bowAttackFX_pool.GetEffect();
+                break;
+            case 1:
+                fx = Enforce_bowAttackFX_pool.GetEffect();
+                break;
+            default:
+                break;
+        }
 
-    public void SpawnBowAttackEffect()
-    {
-        var fx = bowAttackFX_pool.GetEffect();
-        Flip_setPos(fx);
+        if (fx != null)
+            Flip_setPos(fx);
 
         if (_currentAnimtor != null)
         {

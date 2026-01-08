@@ -188,7 +188,16 @@ public class BattleSystem
         {
             if (enemy.IsHitByAttackFrom(_playerCurrentSector, _columns))
             {
-                OnChangePlayerAnim?.Invoke(isChargeRequired ? "6_2_SwordEnd" : "2_2_SwordAttack");
+
+                if (isChargeRequired)
+                {
+                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "6_3_EnforceCharge" : "6_2_SwordEnd");
+                }
+                else
+                {
+                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_Sword_Enforce" : "2_2_SwordAttack");
+                }
+                    
 
                 // 기절 플래그 처리
                 if(_isSturn)
@@ -217,7 +226,7 @@ public class BattleSystem
 
         _damageBuffer = damage;
 
-        OnChangePlayerAnim?.Invoke("2_3_BowShoot");
+        OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_1_Enforce BowShoot" : "2_3_BowShoot");
 
         _isBowCharging = false;
     }
