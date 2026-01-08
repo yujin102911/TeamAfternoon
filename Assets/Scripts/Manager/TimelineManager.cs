@@ -738,10 +738,12 @@ public class TimelineManager : MonoBehaviour
                 if (wind != null)
                 {
                     WindDirection actualDirection = wind.GetDynamicDirection(currentSimulatedIsLeft);
-                    int windTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, actualDirection);
-
-                    if (windTarget != -1 && !_battleSystem.IsSectorBlocked(windTarget))
-                        currentSimulatedSector = windTarget;
+                    int nextWindTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, actualDirection);
+                    while (nextWindTarget != -1 && !_battleSystem.IsSectorBlocked(nextWindTarget))
+                    {
+                        currentSimulatedSector = nextWindTarget;
+                        nextWindTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, actualDirection);
+                    }
                 }
 
                 EnemyDash dash = _currentEnemyPattern.GetDashAt(t);

@@ -558,13 +558,20 @@ public class BattleSystem
     {
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
         MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+
+        int currentPos = _playerCurrentSector;
         int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
-        if (targetSector != -1 && !IsSectorBlocked(targetSector))
+
+        while(targetSector != -1 && !IsSectorBlocked(targetSector))
+        {
+            currentPos = targetSector;
+            targetSector = GetWindTargetSector(currentPos, actualDirection);
+        }
+
+        if (currentPos !=  _playerCurrentSector)
         {
             int prevSector = _playerCurrentSector;
-            _playerCurrentSector = targetSector;
-
-            Debug.Log($"[BattleSystem] 바람에 의해 밀려남: Sector {prevSector} -> {_playerCurrentSector}");
+            _playerCurrentSector = currentPos;
 
             OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir);
         }
