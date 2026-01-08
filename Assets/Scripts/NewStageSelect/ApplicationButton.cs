@@ -111,6 +111,7 @@ public class ApplicationButton : MonoBehaviour
         {
             _applicationPanel.gameObject.transform.position = _panelPosition;
             _applicationPanel.SetActive(true);
+            _applicationPanel.transform.SetAsLastSibling();
         }
         Debug.Log("더블 클릭");
     }

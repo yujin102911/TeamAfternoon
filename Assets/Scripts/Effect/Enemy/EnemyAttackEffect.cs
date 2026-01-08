@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
 {
+    [Header("Sturn")]
+    public GameObject SturnFx_Prefab;
+    public GameObject Second_StarPrefab;
+
     [Header("Effect")]
     public GameObject attackFxPrefab;
     [SerializeField] private int initialPoolSize = 10;
@@ -30,6 +34,8 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
         {
             effectRoot = EffectContainer.Instance._enemyEffectArea;
         }
+
+        Hide_Star();
 
         InitializePool();
     }
@@ -77,6 +83,32 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     {
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.SpawnStone();
+    }
+
+    public void Show_Star()
+    {
+        SturnFx_Prefab.SetActive(true);
+    }
+
+    public void Show_Star_Flip()
+    {
+        if(_sr.flipX)
+        {
+            SturnFx_Prefab.SetActive(true);
+        }
+        else
+        {
+            Second_StarPrefab.SetActive(true);
+        }
+    }
+
+    public void Hide_Star()
+    {
+        if (SturnFx_Prefab != null)
+            SturnFx_Prefab.SetActive(false);
+
+        if(Second_StarPrefab != null)
+            Second_StarPrefab.SetActive(false);
     }
 
     #region Pool
