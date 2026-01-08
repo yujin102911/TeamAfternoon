@@ -341,7 +341,7 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 고스트 위치 표시
     /// </summary>
-    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None)
+    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None, bool isEnemyLeft = false)
     {
         if (_mapSystem == null || sectorIndex <= 0)
         {
@@ -366,7 +366,7 @@ public class PlayerVisualController : MonoBehaviour
             if (ghostSR != null)
             {
                 ghostSR.sortingOrder = (sectorIndex * 10) + 3;
-                ghostSR.flipX = GetFacingFlip(direction);
+                ghostSR.flipX = GetFacingFlipWithSide(isEnemyLeft, direction);
             }
             UpdateGhostVisual(action);
         }
@@ -515,6 +515,23 @@ public class PlayerVisualController : MonoBehaviour
             }
         }
 
+        return shouldFaceLeft;
+    }
+
+    private bool GetFacingFlipWithSide(bool isEnemyLeft, MoveDirection direction)
+    {
+        bool shouldFaceLeft = isEnemyLeft;
+
+        if (isEnemyLeft)
+        {
+            if (direction == MoveDirection.Front || direction == MoveDirection.DiagonalLu || direction == MoveDirection.DiagonalRu)
+                shouldFaceLeft = false;
+        }
+        else
+        {
+            if (direction == MoveDirection.Back || direction == MoveDirection.DiagonalLd || direction == MoveDirection.DiagonalRd)
+                shouldFaceLeft = true;
+        }
         return shouldFaceLeft;
     }
 
