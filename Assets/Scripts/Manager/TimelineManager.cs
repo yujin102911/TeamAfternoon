@@ -667,6 +667,8 @@ public class TimelineManager : MonoBehaviour
 
         for (int t = 1; t <= targetTick; t++)
         {
+            EffectType currentTickEffect = GetEffectTypeAt(t);
+            int moveAmount = (currentTickEffect == EffectType.Duble_Dash) ? 2 : 1;
             PlacedBlock placed = _timelineSystem.FindFirstAction(t);
 
             if (placed != null)
@@ -681,10 +683,17 @@ public class TimelineManager : MonoBehaviour
                     MoveDirection dir = placed.GetDirectionAt(cardIndex);
                     if (dir != MoveDirection.None)
                     {
-                        int nextSector = CalculateNextSector(currentSimulatedSector, dir, columns, rows);
-                        if (nextSector != -1 && !_battleSystem.IsSectorBlocked(nextSector))
+                        for (int i = 0; i < moveAmount; i++)
                         {
-                            currentSimulatedSector = nextSector;
+                            int nextSector = CalculateNextSector(currentSimulatedSector, dir, columns, rows, 1);
+                            if (nextSector != -1 && !_battleSystem.IsSectorBlocked(nextSector))
+                            {
+                                currentSimulatedSector = nextSector;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -711,7 +720,7 @@ public class TimelineManager : MonoBehaviour
     /// <summary>
     /// 좌표 계산용 헬퍼 함수 (Preview 전용)
     /// </summary>
-    private int CalculateNextSector(int currentSector, MoveDirection dir, int columns, int rows)
+    private int CalculateNextSector(int currentSector, MoveDirection dir, int columns, int rows, int moveAmount)
     {
         int curIdx = currentSector - 1;
         int r = curIdx / columns;
@@ -719,14 +728,14 @@ public class TimelineManager : MonoBehaviour
 
         switch (dir)
         {
-            case MoveDirection.Front: c += 1; break;
-            case MoveDirection.Back: c -= 1; break;
-            case MoveDirection.Left: r -= 1; break;
-            case MoveDirection.Right: r += 1; break;
-            case MoveDirection.DiagonalLu: r -= 1; c += 1; break;
-            case MoveDirection.DiagonalRu: r += 1; c += 1; break;
-            case MoveDirection.DiagonalLd: r -= 1; c -= 1; break;
-            case MoveDirection.DiagonalRd: r += 1; c -= 1; break;
+            case MoveDirection.Front: c += moveAmount; break;
+            case MoveDirection.Back: c -= moveAmount; break;
+            case MoveDirection.Left: r -= moveAmount; break;
+            case MoveDirection.Right: r += moveAmount; break;
+            case MoveDirection.DiagonalLu: r -= moveAmount; c += moveAmount; break;
+            case MoveDirection.DiagonalRu: r += moveAmount; c += moveAmount; break;
+            case MoveDirection.DiagonalLd: r -= moveAmount; c -= moveAmount; break;
+            case MoveDirection.DiagonalRd: r += moveAmount; c -= moveAmount; break;
         }
 
         if (r >= 0 && r < rows && c >= 0 && c < columns)

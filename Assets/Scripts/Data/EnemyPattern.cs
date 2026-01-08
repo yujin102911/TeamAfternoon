@@ -125,8 +125,8 @@ public class EnemyDash
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
 [CreateAssetMenu(fileName = "New Enemy Pattern", menuName = "Data/Enemy/Enemy Pattern")]
-[InfoBox("중복된 틱이 감지되었습니다! 한 틱에는 하나의 행동만 설정할 수 있습니다.\n중복된 틱: $DuplicateTicksString",
-    InfoMessageType.Error, "HasOverlappingTicks")]
+[InfoBox("중복된 틱이 감지되었습니다! 한 틱에는 하나의 행동만 설정할 수 있습니다.\n중복된 틱: @$value.DuplicateTicksString",
+    InfoMessageType.Error, "@$value.HasOverlappingTicks()")]
 public class EnemyPattern : ScriptableObject
 {
     public string Pattern_Name;

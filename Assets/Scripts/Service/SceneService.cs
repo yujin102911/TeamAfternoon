@@ -15,6 +15,7 @@ public class SceneService
         Debug.Log($"[SceneService] Load -> {sceneName} (prev: {current})");
     }
 
+    /// <summary> 씬 로드 (비동기) </summary>
     public AsyncOperation LoadAsync(string sceneName)
     {
         string current = SceneManager.GetActiveScene().name;
