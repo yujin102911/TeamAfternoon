@@ -32,15 +32,21 @@ public class BattleResultUIController : MonoBehaviour
     [Header("연출 설정")]
     [SerializeField] private float _delayBeforeResult = 1.5f;
 
+    [Header("Day 연출 설정")]
+    [SerializeField] private CanvasGroup _fadeCanvasGroup;
+    [SerializeField] private TextMeshProUGUI _dayCountText;
+    [SerializeField] private float _countUpDuration = 1.0f; 
+    [SerializeField] private float _waitInBlack = 0.5f;
+
     [Header("씬 설정")]
-    [SerializeField] private string _titleSceneName = "TitleScene";
+    [SerializeField] private string _mainSceneName = "MainScene";
     [SerializeField] private string _battleSceneName = "BattleScene";
 
     private void Awake()
     {
         if (_victoryHomeButton != null)
         {
-            _victoryHomeButton.onClick.AddListener(GoToTitle);
+            _victoryHomeButton.onClick.AddListener(GoToTitleVictory);
         }
         if (_deadDefeatHomeButton != null)
         {
@@ -132,9 +138,16 @@ public class BattleResultUIController : MonoBehaviour
         GameManager.SelectedStageID = 0;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
-            ServiceLocator.Instance.Scene.Load(_titleSceneName);
+            ServiceLocator.Instance.Scene.Load(_mainSceneName);
         }
     }
+
+    public void GoToTitleVictory()
+    {
+        _victoryHomeButton.interactable = false;
+        StartCoroutine(ClearSequenceAndLoadAsync());
+    }
+
     public void RetryStage()
     {
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
@@ -142,6 +155,69 @@ public class BattleResultUIController : MonoBehaviour
             ServiceLocator.Instance.Scene.Load(_battleSceneName);
         }
     }
+
+    #region Coroutine
+
+    private IEnumerator ClearSequenceAndLoadAsync()
+    {
+        int currentDay = 0;
+        int nextDay = 1;
+        AsyncOperation asyncLoad = null;
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
+        {
+            asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(_mainSceneName);
+            asyncLoad.allowSceneActivation = false; // 로딩이 끝나도 바로 씬을 바꾸지 않음
+        }
+        if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
+        {
+            currentDay = GameManager.Instance.CurrentStageData.StageNumber;
+            nextDay = currentDay + 1;
+            _dayCountText.text = $"Day {currentDay:D2}";
+        }
+        if (_fadeCanvasGroup != null)
+        {
+            _fadeCanvasGroup.gameObject.SetActive(true);
+            float elapsed = 0f;
+            while (elapsed < _countUpDuration)
+            {
+                elapsed += Time.deltaTime;
+                _fadeCanvasGroup.alpha = Mathf.Clamp01(elapsed / _countUpDuration);
+                yield return null;
+            }
+        }
+
+        float e = 0f;
+        while (e < _countUpDuration)
+        {
+            e += Time.deltaTime;
+            int displayDay = (int)Mathf.Lerp(currentDay, nextDay, e/_countUpDuration);
+            if (_dayCountText != null)
+                _dayCountText.text = $"Day {displayDay:D2}";
+
+            yield return null;
+        }
+        if (_dayCountText != null) _dayCountText.text = $"Day {nextDay:D2}";
+        
+        yield return new WaitForSeconds(_waitInBlack);
+        while (asyncLoad != null && asyncLoad.progress < 0.9f)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.5f);
+
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.CurrentUser != null)
+        {
+            SaveService.Save(ServiceLocator.Instance.CurrentUser);
+            Debug.Log("[BattleResultUIController] 연출 종료 및 씬 전환 전 최종 저장 완료");
+        }
+
+        if (asyncLoad != null)
+            asyncLoad.allowSceneActivation = true;
+
+    }
+
+    #endregion
+
 
     [Button("승리 연출 테스트", ButtonSizes.Medium)]
     private void TestVictory() => HandleBattleEnded(EndCondition.Victory);

@@ -428,65 +428,57 @@ public class BattleSystem
             Debug.Log("[BattleSystem] 더블 대시 효과로 2칸 이동!");
         }
 
-        int currentIndex = _playerCurrentSector - 1;
+        int currentSector = _playerCurrentSector;
+        bool movedAtLeastOnce = false;
+
+        for (int i = 0; i < moveAmount; i++)
+        {
+            int nextSector = GetNextStepSector(currentSector, moveDirection);
+
+            if (nextSector != -1 && !IsSectorBlocked(nextSector))
+            {
+                currentSector = nextSector;
+                movedAtLeastOnce = true;
+            }
+            else
+            {
+                Debug.Log($"[BattleSystem] {i + 1}번째 이동 시도 중 차단됨 (Sector: {nextSector})");
+                break;
+            }
+        }
+        if (movedAtLeastOnce)
+        {
+            Debug.Log($"[BattleSystem] 이동 결과: {_playerCurrentSector} -> {currentSector}");
+            _playerCurrentSector = currentSector;
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection);
+        }
+    }
+
+    private int GetNextStepSector(int fromSector, MoveDirection dir)
+    {
+        int currentIndex = fromSector - 1;
         int curRow = currentIndex / _columns;
         int curCol = currentIndex % _columns;
 
         int targetRow = curRow;
         int targetCol = curCol;
 
-        switch (moveDirection)
+        switch (dir)
         {
-            case MoveDirection.Front:
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.Back:
-                targetCol -= moveAmount;
-                break;
-            case MoveDirection.Left:
-                targetRow -= moveAmount;
-                break;
-            case MoveDirection.Right:
-                targetRow += moveAmount;
-                break;
-            case MoveDirection.DiagonalLu:
-                targetRow -= moveAmount;
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.DiagonalRu:
-                targetRow += moveAmount;
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.DiagonalLd:
-                targetRow -= moveAmount;
-                targetCol -= moveAmount;
-                break;
-            case MoveDirection.DiagonalRd:
-                targetRow += moveAmount;
-                targetCol -= moveAmount;
-                break;
+            case MoveDirection.Front: targetCol += 1; break;
+            case MoveDirection.Back: targetCol -= 1; break;
+            case MoveDirection.Left: targetRow -= 1; break;
+            case MoveDirection.Right: targetRow += 1; break;
+            case MoveDirection.DiagonalLu: targetRow -= 1; targetCol += 1; break;
+            case MoveDirection.DiagonalRu: targetRow += 1; targetCol += 1; break;
+            case MoveDirection.DiagonalLd: targetRow -= 1; targetCol -= 1; break;
+            case MoveDirection.DiagonalRd: targetRow += 1; targetCol -= 1; break;
         }
         int rows = _totalSectors / _columns;
         if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
-        {
-            int targetSector = (targetRow * _columns) + targetCol + 1;
-            if (IsSectorBlocked(targetSector))
-            {
-                Debug.Log($"[BattleSystem] {targetSector}번 섹터는 돌에 막혀 이동할 수 없습니다");
-                return;
-            }
-            int prevSector = _playerCurrentSector;
-            _playerCurrentSector = targetSector;
-            if (prevSector != _playerCurrentSector)
-            {
-                Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
-                OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection);
-            }
-        }
-        else
-        {
-            Debug.Log("[BattleSystem]이동 불가");
-        }
+            return (targetRow * _columns) + targetCol + 1;
+
+        return -1;
     }
 
     bool IsAdjacent(int from, int to)
