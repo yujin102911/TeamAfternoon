@@ -2,12 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using VInspector;
 
 public class TimelineUI : MonoBehaviour
 {
@@ -98,7 +96,7 @@ public class TimelineUI : MonoBehaviour
     // events
     public event Action<List<int>> OnRequestHighlight;
     public event Action OnRequestClearHighlight;
-    public event Action<int, ActionType, MoveDirection> OnRequestPreviewPlayer;
+    public event Action<int, ActionType, MoveDirection, bool> OnRequestPreviewPlayer; // 몇번 섹터, 무슨 행동, 어느 방향, 적 어디쪽?
     public event Action OnRequestHidePreview;
 
     // 현재 적 시퀀스
@@ -591,7 +589,7 @@ public class TimelineUI : MonoBehaviour
 
             Debug.Log($"[TimelineUI] previewAction: {previewAction}");
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
+            //OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {
@@ -620,9 +618,13 @@ public class TimelineUI : MonoBehaviour
         if (TimelineManager.Instance != null)
         {
             int new_tick = (tick - 1) / 2 + 1;
-            int predictedSector = TimelineManager.Instance.SimulatePlayerPosition(new_tick);
-            ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
 
+            var simState = TimelineManager.Instance.SimulateStateAtTick(new_tick);
+
+            int predictedSector = simState.sector;
+            bool simIsLeft = simState.isEnemyLeft;
+
+            ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
             ActionType previewAction = ActionType.None;
 
             if (tick % 2 == 1) // 플레이어 행동 틱
@@ -650,7 +652,7 @@ public class TimelineUI : MonoBehaviour
 
             }
 
-            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None);
+            OnRequestPreviewPlayer?.Invoke(predictedSector, previewAction, MoveDirection.None, simIsLeft);
 
             if (tick % 2 == 0) // 적 공격 범위 표시
             {

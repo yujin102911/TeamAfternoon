@@ -359,4 +359,42 @@ public class EnemyVisualController : MonoBehaviour
         Destroy(go);
     }
 
+    #region Preview Methods
+    public void PreviewFlip(bool isLeft)
+    {
+        if (_currentEnemy != null)
+        {
+            SpriteRenderer sr = _currentEnemy.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null ) sr.flipX = !isLeft;
+
+            Transform targetTr = isLeft ? _enemyLeftPos : _enemyRightPos;
+            _currentEnemy.transform.position = targetTr.position;
+        }
+
+        if (targetCamera != null)
+        {
+            targetCamera.transform.position = isLeft ? _cameraLeftPos : _cameraRightPos;
+        }
+    }
+
+    public void RestoreActualSide()
+    {
+        if (_runtimeEnemy != null && _currentEnemy != null)
+        {
+            bool actualIsLeft = _runtimeEnemy.IsLeft;
+
+            SpriteRenderer sr = _currentEnemy.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) sr.flipX = !actualIsLeft;
+
+            Transform targetTr = actualIsLeft ? _enemyLeftPos : _enemyRightPos;
+            _currentEnemy.transform.position = targetTr.position;
+
+            if (targetCamera != null)
+            {
+                targetCamera.transform.position = actualIsLeft ? _cameraLeftPos : _cameraRightPos;
+            }
+        }
+    }
+    #endregion
+
 }
