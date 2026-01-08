@@ -50,6 +50,8 @@ public class BattleSystem
     private bool _isCritical = false;
     private bool _isDubleDash = false;
     private bool _isDamageUp = false;
+    private bool _isSturn = false;
+    private bool _isSturnSuccess = false;
 
     #endregion
 
@@ -141,6 +143,12 @@ public class BattleSystem
         _isDubleDash = false;
         _isDamageUp = false;
 
+        // 스턴 관련
+        _isSturn = false;
+        _isSturnSuccess = false;
+
+        Debug.Log("<color=green>[BattleSystem] 플래그 세팅!</color>");
+
         switch (effect)
         {
             case EffectType.Critical:
@@ -151,6 +159,9 @@ public class BattleSystem
                 break;
             case EffectType.Damage_Up:
                 _isDamageUp = true;
+                break;
+            case EffectType.Sturn:
+                _isSturn = true;
                 break;
             case EffectType.None:
                 break;
@@ -178,6 +189,14 @@ public class BattleSystem
             if (enemy.IsHitByAttackFrom(_playerCurrentSector, _columns))
             {
                 OnChangePlayerAnim?.Invoke(isChargeRequired ? "6_2_SwordEnd" : "2_2_SwordAttack");
+
+                // 기절 플래그 처리
+                if(_isSturn)
+                {
+                    _isSturnSuccess = true;
+                    Debug.Log("<color=yellow>[BattleSystem] 적이 기절했습니다!</color>");
+                    _isSturn = false;
+                }
 
                 return true;
             }
@@ -509,6 +528,14 @@ public class BattleSystem
     public void ProcessEnemyAttack(EnemyAttack attack)
     {
         if (attack == null) return;
+
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
+
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
 
         _isPlayerHitThisTurn = false;
@@ -591,6 +618,13 @@ public class BattleSystem
     public void ProcessEnemyDash(EnemyDash dash)
     {
         if (dash == null) return;
+
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
 
         List<int> targetSectors = new List<int>();
 
