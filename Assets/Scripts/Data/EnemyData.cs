@@ -16,6 +16,10 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private int _maxHP = 50;
 
+    [Header("HP바 오프셋")]
+    [SerializeField]
+    private Vector2 _hpBarOffset = new Vector2(0, -150.0f);
+
     [Header("적 프리팹")]
     [SerializeField]
     private GameObject _enemyPrefab;
@@ -56,5 +60,7 @@ public class EnemyData : ScriptableObject
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
     public Color AssignedColor => _assignedColor;
     public PatternSelectionType SelectionType => _selectionType;
+
+    public Vector2 HPBarOffset => _hpBarOffset;
 
 }

@@ -35,8 +35,9 @@ public class UIFollowWorldTarget : MonoBehaviour
         rectTransform.anchoredPosition = localPos + offset;
     }
 
-    public void SetTarget(Transform newTarget)
+    public void SetTarget(Transform newTarget, Vector2 hp_offset)
     {
         target = newTarget;
+        offset = hp_offset;
     }
 }
