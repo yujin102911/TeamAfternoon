@@ -71,8 +71,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         Additional_Effect = _Effect;
         cell.Update_CellVisual(Additional_Effect);
 
-        nameText.text = Additional_Effect.effectName;
-        costText.text = $"메모리 {Additional_Effect.cost}소모";
+        nameText.text = Additional_Effect.effectName + ".mfx";
+        costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
     }
 
     public void OnPointerEnter(PointerEventData eventData)
