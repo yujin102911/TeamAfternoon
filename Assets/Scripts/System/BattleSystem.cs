@@ -81,7 +81,7 @@ public class BattleSystem
     public event Action<int, bool, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
-    public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
+    public event Action<int, MoveDirection, bool> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
     public event Action<List<int>> OnEnemyAttackSuccess; // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
 
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
@@ -428,7 +428,7 @@ public class BattleSystem
         {
             _playerCurrentSector = sector;
             Debug.LogWarning("[BattleSystem] 맵 크기(_totalSectors)가 0입니다! 초기화 순서를 확인하세요.");
-            OnPlayerMoved?.Invoke(_playerCurrentSector, MoveDirection.None);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, MoveDirection.None, false);
             return;
         }   
         int targetSector = sector;
@@ -479,7 +479,7 @@ public class BattleSystem
         {
             Debug.Log($"[BattleSystem] 이동 결과: {_playerCurrentSector} -> {currentSector}");
             _playerCurrentSector = currentSector;
-            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection, false);
         }
     }
 
@@ -608,6 +608,8 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
         MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
 
+        OnChangeEnemyAnim?.Invoke("Wind");
+
         int currentPos = _playerCurrentSector;
         int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
 
@@ -622,7 +624,7 @@ public class BattleSystem
             int prevSector = _playerCurrentSector;
             _playerCurrentSector = currentPos;
 
-            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir, true);
         }
         else
         {

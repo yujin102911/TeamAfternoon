@@ -336,7 +336,7 @@ public class TimelineUI : MonoBehaviour
         {
             if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
             {
-                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.Convert_9sector(), is_left);
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
             }
             else
             {
@@ -367,7 +367,28 @@ public class TimelineUI : MonoBehaviour
 
         if(tooltipTitleText != null)
         {
-            tooltipTitleText.text = $"슬라임의 물기";
+            if (attack != null)
+            {
+                tooltipTitleText.text = _currentPattern.Pattern_Name;
+            }
+            if (parrying != null)
+            {
+                tooltipTitleText.text = $"공격 튕겨내기";
+            }
+            if (wind != null)
+            {
+                tooltipTitleText.text = $"바람 생성";
+            }
+            if (dash != null)
+            {
+                tooltipTitleText.text = $"돌진 공격";
+            }
+            if (stone != null)
+            {
+                tooltipTitleText.text = $"바위 생성";
+            }
+
+            
         }
 
         // 툴팁 텍스트 설정
@@ -384,15 +405,15 @@ public class TimelineUI : MonoBehaviour
             }
             if (wind != null)
             {
-                tooltipDetailText.text = $"불어라 바람 풍";
+                tooltipDetailText.text = $"적이 바라보는 방향 끝까지 밀어냅니다.";
             }
             if (dash != null)
             {
-                tooltipDetailText.text = $"돌진 공격 후 이동";
+                tooltipDetailText.text = $"돌진 공격 후 자리가 바뀝니다.";
             }
             if (stone != null)
             {
-                tooltipDetailText.text = $"돌 던지기: {stone.count}개";
+                tooltipDetailText.text = $"랜덤한 위치에 바위가 {stone.count}개 생성됩니다.";
             }
         }
 

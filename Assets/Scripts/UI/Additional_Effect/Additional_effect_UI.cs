@@ -46,16 +46,16 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void Update()
     {
-        //if(TimelineManager.Instance.Combo < Additional_Effect.cost)
-        //{
-        //    canvasGroup.alpha = 0.5f;
-        //    canvasGroup.blocksRaycasts = false;
-        //}
-        //else
-        //{
-        //    canvasGroup.alpha = 1f;
-        //    canvasGroup.blocksRaycasts = true;
-        //}
+        if (TimelineManager.Instance._currentMemory + Additional_Effect.cost > TimelineManager.Instance.Max_memory)
+        {
+            canvasGroup.alpha = 0.5f;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
+        }
     }
 
     private void OnDisable()

@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingOrder: 4
   m_Sprite: {fileID: 6938520712645083327, guid: 3325a952fa4f1b143bef792f85140bac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 0.78125}
@@ -126,6 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SturnFx_Prefab: {fileID: 4712530472492129826}
+  Second_StarPrefab: {fileID: 0}
   attackFxPrefab: {fileID: 5861857816582915578, guid: 6576172479936dd49bb256b685070896, type: 3}
   initialPoolSize: 30
   _offset: {x: 0, y: 0, z: 0}
@@ -164,7 +165,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1378726384871548685, guid: d18e06a21af0b634bbc7ab88d8b3b66a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.079
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1378726384871548685, guid: d18e06a21af0b634bbc7ab88d8b3b66a, type: 3}
       propertyPath: m_LocalPosition.y
