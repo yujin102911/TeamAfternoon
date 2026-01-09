@@ -295,13 +295,10 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerHit += CountPlayerHit;
             _battleSystem.OnEnemyDied += HandleEnemyPurified;
             _battleSystem.OnPlayerDied += _playerVisualController.PlayDeath;
+
+            _battleSystem.OnEnemyWind += _mapVisualController.Play_WindEffect;
         }
 
-    }
-
-    private void _battleSystem_OnPlayerGuard()
-    {
-        throw new NotImplementedException();
     }
 
     private void UnSubscribeEvents()
@@ -355,6 +352,8 @@ public class GameManager : MonoBehaviour
             _battleSystem.OnPlayerAttackSuccess -= CountPlayerAttack;
             _battleSystem.OnPlayerHit -= CountPlayerHit;
             _battleSystem.OnPlayerDied -= _playerVisualController.PlayDeath;
+
+            _battleSystem.OnEnemyWind -= _mapVisualController.Play_WindEffect;
         }
     }
 
