@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [Header("맵 구성")]
     [SerializeField] private MapConfiguration mapConfig;
     [SerializeField] private Transform mapRootTransform;
+    [SerializeField] private Transform _backgroundTransform;
 
     [Header("데이터 참조")]
     [SerializeField] private DataRepository dataRepository;
@@ -173,6 +174,14 @@ public class GameManager : MonoBehaviour
             {
                 currentStageData = selectedStage;
                 Debug.Log($"[GameManager] 스테이지 {SelectedStageID} 데이터를 로드했습니다");
+
+                // 맵 생성
+                GameObject mapObj = currentStageData.EnemySpawns[0].enemyData.EnemyBackPrefab;
+                if (mapObj != null && _backgroundTransform != null)
+                {
+                    Instantiate(mapObj, _backgroundTransform);
+                    Debug.Log($"[GameManager] 스테이지 배경 오브젝트를 생성했습니다");
+                }
             }
             else
             {
@@ -182,8 +191,17 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogWarning($"[GameManager] 선택된 스테이지 ID가 없습니다");
+
+            // 맵 생성
+            GameObject mapObj = currentStageData.EnemySpawns[0].enemyData.EnemyBackPrefab;
+            if (mapObj != null && _backgroundTransform != null)
+            {
+                Instantiate(mapObj, _backgroundTransform);
+                Debug.Log($"[GameManager] 인스펙터 데이터로 스테이지 배경 오브젝트를 생성했습니다");
+            }
         }
 
+        
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 /// <summary>
@@ -450,7 +451,7 @@ public class TimelineManager : MonoBehaviour
     {
         float startTime = Time.unscaledTime;   // 시작 시간 기록
         // 늦추기
-        Time.timeScale = timeScale;
+        //Time.timeScale = timeScale;
         Debug.Log("[TimelineDirector] 타임라인 실행 시작");
 
         // 라운드 시작 키워드 호출
@@ -554,7 +555,7 @@ public class TimelineManager : MonoBehaviour
 
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
         //_battleSystem.ResetMeleeStack();
     }
 
@@ -644,6 +645,12 @@ public class TimelineManager : MonoBehaviour
     }
 
     #region Preview Methods - public
+
+    public void SetTimeScale(float _time)
+    {
+        Time.timeScale = _time;
+    }
+
     /// <summary>
     /// 특정 틱의 플레이어의 위치를 시뮬레이션해 반환하는 함수
     /// </summary>

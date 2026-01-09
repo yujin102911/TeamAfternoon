@@ -73,14 +73,14 @@ public class PlayerVisualController : MonoBehaviour
     /// 이벤트 구독용 함수
     /// OnMove이벤트가 발행될때마다 호출됨
     /// </summary>
-    public void OnPlayerMoved(int sectorIndex, MoveDirection direction)
+    public void OnPlayerMoved(int sectorIndex, MoveDirection direction, bool is_wind = false)
     {
         if (_mapSystem != null)
         {
             Transform targetTransform = _mapSystem.GetSectorTransform(sectorIndex);
             if (targetTransform != null)
             {
-                MoveTo(targetTransform, direction);
+                MoveTo(targetTransform, direction, is_wind);
                 UpdatePlayerSortingOrder(sectorIndex);
             }
         }
@@ -417,20 +417,29 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 내부 이동 함수
     /// </summary>
-    private void MoveTo(Transform targetSector, MoveDirection direction)
+    private void MoveTo(Transform targetSector, MoveDirection direction, bool is_wind = false)
     {
         if (_playerInstance == null) return;
         if (_moveCoroutine != null)
             StopCoroutine(_moveCoroutine);
-        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction));
+        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction, is_wind));
 
     }
 
-    private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction)
+    private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction, bool is_wind)
     {
-        ChangeAnim("3_1_ Run");
+        if (is_wind)
+        {
+            ChangeAnim("8_Wind");
+        }
+        else
+        {
+            ChangeAnim("3_1_ Run");
+            UpdateFacing(direction);
+        }
+            
 
-        UpdateFacing(direction);
+        
 
         _playerInstance.transform.SetParent(null);
 
