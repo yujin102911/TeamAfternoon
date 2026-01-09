@@ -75,6 +75,7 @@ public class TimelineManager : MonoBehaviour
 
     public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
+    public int TotalColumns => _totalColumns;
 
     void Awake()
     {
@@ -769,7 +770,7 @@ public class TimelineManager : MonoBehaviour
             EnemyDash dash = _currentEnemyPattern.GetDashAt(tick);
             if (dash != null && dash.targetRows != null)
             {
-                List<int> dashSectors = dash.Convert_9sector();
+                List<int> dashSectors = dash.GetTargetSectors(_totalColumns);
                 foreach(int sector in dashSectors)
                 {
                     if (!sectors.Contains(sector))
