@@ -37,6 +37,8 @@ public class AppLauncher : MonoBehaviour
         _loadingPanel.SetActive(true);
         foreach (var block in _progressBlocks) block.SetActive(false);
 
+        ServiceLocator.Instance.Cursor.StartAnimation("Loading");
+
         AsyncOperation op = ServiceLocator.Instance.Scene.LoadAsync(sceneName);
 
         StartCoroutine(UpdateLoadingBlocks(op));
@@ -94,6 +96,8 @@ public class AppLauncher : MonoBehaviour
                 yield return null;
             }
         }
+
+        ServiceLocator.Instance.Cursor.StopAnimation();
 
         op.allowSceneActivation = true;
     }
