@@ -230,6 +230,15 @@ public class TimelineUI : MonoBehaviour
             GameObject slot = Instantiate(playerSlotPrefab, playerTimelinePanel);
             slot.name = $"PlayerSlot_{tick}";
 
+            ITimelineSlotView slotView = slot.GetComponent<ITimelineSlotView>();
+
+            // 호버 핸들러 추가/업데이트
+            slotView.SetHoverData(
+                this,
+                tick,
+                null,
+                isPrev: false
+            );
 
             //TimelineDropZone dropZone = null;
             Effect_DropZone dropZone = null;
@@ -897,6 +906,18 @@ public class TimelineUI : MonoBehaviour
                 effectLine.Show(additional_Effects[i]);
             }   
         }
+    }
+
+    public void Hover_EffectUI(int tick, bool is_enter)
+    {
+        
+
+        // 특수효과가 없는 틱은 무시
+        if (TimelineManager.Instance.CanPlaceEffect(tick)) return;
+
+        GameObject slotGO = playerSlots[tick];
+        Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
+        effectLine.Hover(is_enter);
     }
 
     /// <summary>

@@ -30,6 +30,11 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     [SerializeField]
     private TextMeshProUGUI nameText;
 
+    [Header("자물쇠")]
+    [SerializeField]
+    private GameObject _lock;
+    private bool _isLocked = false;
+
     private RectTransform rectTransform;
 
     private void Awake()
@@ -44,17 +49,19 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         rectTransform = GetComponent<RectTransform>();
     }
 
-    private void Update()
+    private void Start()
     {
-        if (TimelineManager.Instance._currentMemory + Additional_Effect.cost > TimelineManager.Instance.Max_memory)
+        if (TimelineManager.Instance != null)
         {
-            canvasGroup.alpha = 0.5f;
-            canvasGroup.blocksRaycasts = false;
+            TimelineManager.Instance.OnTextMemoryChanged += SetAlpha;
         }
-        else
+    }
+
+    private void OnDestroy()
+    {
+        if (TimelineManager.Instance != null)
         {
-            canvasGroup.alpha = 1f;
-            canvasGroup.blocksRaycasts = true;
+            TimelineManager.Instance.OnTextMemoryChanged -= SetAlpha;
         }
     }
 
@@ -73,6 +80,23 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         nameText.text = Additional_Effect.effectName + ".mfx";
         costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
+    }
+
+    public void SetLock(bool isLocked)
+    {
+        _isLocked = isLocked;
+        _lock.SetActive(_isLocked);
+
+        if (isLocked)
+        {
+            cell.GetComponent<CanvasGroup>().alpha = 0.5f;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            cell.GetComponent<CanvasGroup>().alpha = 1.0f;
+            canvasGroup.blocksRaycasts = true;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -153,6 +177,22 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
 
             CardTooltip.Instance.Show(title, body, screenPos, Camera.main);
+        }
+    }
+
+    private void SetAlpha(int current, int max)
+    {
+        if(_isLocked) return;
+
+        if (current + Additional_Effect.cost > max)
+        {
+            canvasGroup.alpha = 0.5f;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
         }
     }
 }
