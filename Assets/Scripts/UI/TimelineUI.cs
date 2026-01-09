@@ -336,7 +336,7 @@ public class TimelineUI : MonoBehaviour
         {
             if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
             {
-                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.Convert_9sector(), is_left);
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
             }
             else
             {
