@@ -59,7 +59,11 @@ public class BoardPanel : MonoBehaviour
             if (isUnlocked)
             {
                 GameObject go = Instantiate(_dayButtonPrefab, _sidebarArea);
-                go.GetComponent<BoardButton>().Setup(stage, this);
+                BoardButton btn = go.GetComponent<BoardButton>();
+
+                btn.Setup(stage, this);
+                _spawnedButtons.Add(btn);
+
                 lastAvailableStage = stage;
             }
             else break;
