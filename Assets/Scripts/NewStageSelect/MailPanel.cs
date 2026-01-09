@@ -84,6 +84,8 @@ public class MailPanel : MonoBehaviour
                     if (canShowMail)
                     {
                         GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
+                        go.transform.SetAsFirstSibling();
+
                         StageButton mailBtn = go.GetComponent<StageButton>();
                         mailBtn.Setup(stage, m, mail, DisplayLetterContent);
                     }
