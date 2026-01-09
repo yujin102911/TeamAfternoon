@@ -88,6 +88,7 @@ public class BattleSystem
 
     public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
     public event Action<List<int>, bool> OnEnemyDash;          // 적 돌진 이벤트
+    public event Action<bool> OnEnemyWind;          // 적 돌진 이벤트
 
     public event Action OnBattleInitialized;
     #endregion
@@ -609,6 +610,12 @@ public class BattleSystem
         MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
 
         OnChangeEnemyAnim?.Invoke("Wind");
+        
+
+        foreach (var enemy in _enemies)
+        {
+            OnEnemyWind?.Invoke(enemy.IsLeft);
+        }
 
         int currentPos = _playerCurrentSector;
         int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);

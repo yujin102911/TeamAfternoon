@@ -47,6 +47,10 @@ public class TimelineManager : MonoBehaviour
     [SerializeField] private int _totalSectors = 8;
     private int _totalColumns = 0;
 
+    [Header("맵 비주얼 컨트롤러")]
+    [SerializeField]
+    private MapVisualController _mapVisualController;
+
 
     // System
     private TimelineSystem _timelineSystem;
@@ -207,6 +211,8 @@ public class TimelineManager : MonoBehaviour
 
         // 특수효과 플래그 처리
         _battleSystem.SetEffectFrag(GetEffectTypeAt(tick));
+
+        
 
         // 만약 이 키워드가 잔상에 붙어있는 키워드면 실행 안함
         if (_timelineSystem.PrevPlacedBlocks.Contains(placed)) return;
@@ -468,6 +474,7 @@ public class TimelineManager : MonoBehaviour
         {
             // 매 틱마다 방어 초기화하고 시작
             _battleSystem.SetGuard(false);
+            _mapVisualController.Stop_WindEffect();
             if (GameManager.Instance.IsRoundInterrupted)
             {
                 OnCurrentTickChanged?.Invoke(0);
