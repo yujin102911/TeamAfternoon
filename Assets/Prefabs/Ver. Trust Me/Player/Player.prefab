@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 501542299357464017}
   - component: {fileID: 6896482959306045180}
   m_Layer: 0
-  m_Name: Sword_Pool
+  m_Name: 0. Sword_Pool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -126,8 +126,11 @@ Transform:
   m_Children:
   - {fileID: 7994013912877450356}
   - {fileID: 501542299357464017}
+  - {fileID: 7851194185605229249}
   - {fileID: 3402259975700779261}
+  - {fileID: 2211703929405135757}
   - {fileID: 2666741643168982639}
+  - {fileID: 1577269775503647564}
   - {fileID: 1305607405330609933}
   - {fileID: 4013695088495175203}
   m_Father: {fileID: 0}
@@ -225,8 +228,11 @@ MonoBehaviour:
   _leftOffset: {x: -2, y: 1.7, z: 0}
   _rightOffset: {x: 4, y: 1.7, z: 0}
   swordAttackFX_pool: {fileID: 6896482959306045180}
+  swordEnfoceFX_pool: {fileID: 867188778646381065}
   big_swordAttackFX_pool: {fileID: 3907911133059985757}
+  Enfocebig_swordAttackFX_pool: {fileID: 217968330047422666}
   bowAttackFX_pool: {fileID: 7343615441812652499}
+  Enforce_bowAttackFX_pool: {fileID: 645419363435376453}
   bowChargingFX_pool: {fileID: 5543498246212957680}
   charging_rightOffset: {x: 0.4, y: 0.2, z: 0}
   charging_leftOffset: {x: -0.4, y: 0.2, z: 0}
@@ -244,7 +250,7 @@ GameObject:
   - component: {fileID: 3402259975700779261}
   - component: {fileID: 3907911133059985757}
   m_Layer: 0
-  m_Name: Big_Sword_Pool
+  m_Name: 2. Big_Sword_Pool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,6 +284,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 3657491622658751122, guid: 51152bcf794df994a9a4a8881425889e, type: 3}
+  initialPoolSize: 10
+--- !u!1 &4759239913768758421
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7851194185605229249}
+  - component: {fileID: 867188778646381065}
+  m_Layer: 0
+  m_Name: 1. Sword_Enforce_Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7851194185605229249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4759239913768758421}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 403013117455445336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &867188778646381065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4759239913768758421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3657491622658751122, guid: cee1ef9132100774fbb7efd55be018d5, type: 3}
   initialPoolSize: 10
 --- !u!1 &5579999250795413977
 GameObject:
@@ -366,6 +418,98 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &5774998274096937731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2211703929405135757}
+  - component: {fileID: 217968330047422666}
+  m_Layer: 0
+  m_Name: 3. BigEnforce_Sword_Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2211703929405135757
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5774998274096937731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 403013117455445336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &217968330047422666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5774998274096937731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3657491622658751122, guid: bfd4b98ad801c2640845d015c58b2e95, type: 3}
+  initialPoolSize: 10
+--- !u!1 &5781059482647795376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1577269775503647564}
+  - component: {fileID: 645419363435376453}
+  m_Layer: 0
+  m_Name: 1. Enforce Bow_Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1577269775503647564
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5781059482647795376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 403013117455445336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &645419363435376453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5781059482647795376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee371a9e08706f4b9a0e687cf54f15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 8641082720682957754, guid: d061fa6347e0b084ba2d071274bbd47a, type: 3}
+  initialPoolSize: 10
 --- !u!1 &6321176382724236749
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,7 +567,7 @@ GameObject:
   - component: {fileID: 2666741643168982639}
   - component: {fileID: 7343615441812652499}
   m_Layer: 0
-  m_Name: Bow_Pool
+  m_Name: 0. Bow_Pool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

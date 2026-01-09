@@ -1,6 +1,5 @@
 ﻿using System;
 using TMPro;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -47,16 +46,16 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void Update()
     {
-        //if(TimelineManager.Instance.Combo < Additional_Effect.cost)
-        //{
-        //    canvasGroup.alpha = 0.5f;
-        //    canvasGroup.blocksRaycasts = false;
-        //}
-        //else
-        //{
-        //    canvasGroup.alpha = 1f;
-        //    canvasGroup.blocksRaycasts = true;
-        //}
+        if (TimelineManager.Instance._currentMemory + Additional_Effect.cost > TimelineManager.Instance.Max_memory)
+        {
+            canvasGroup.alpha = 0.5f;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
+        }
     }
 
     private void OnDisable()
@@ -72,8 +71,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         Additional_Effect = _Effect;
         cell.Update_CellVisual(Additional_Effect);
 
-        nameText.text = Additional_Effect.effectName;
-        costText.text = $"메모리 {Additional_Effect.cost}소모";
+        nameText.text = Additional_Effect.effectName + ".mfx";
+        costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
     }
 
     public void OnPointerEnter(PointerEventData eventData)

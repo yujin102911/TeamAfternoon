@@ -73,14 +73,14 @@ public class PlayerVisualController : MonoBehaviour
     /// 이벤트 구독용 함수
     /// OnMove이벤트가 발행될때마다 호출됨
     /// </summary>
-    public void OnPlayerMoved(int sectorIndex, MoveDirection direction)
+    public void OnPlayerMoved(int sectorIndex, MoveDirection direction, bool is_wind = false)
     {
         if (_mapSystem != null)
         {
             Transform targetTransform = _mapSystem.GetSectorTransform(sectorIndex);
             if (targetTransform != null)
             {
-                MoveTo(targetTransform, direction);
+                MoveTo(targetTransform, direction, is_wind);
                 UpdatePlayerSortingOrder(sectorIndex);
             }
         }
@@ -341,7 +341,7 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 고스트 위치 표시
     /// </summary>
-    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None)
+    public void ShowPlayerPreview(int sectorIndex, ActionType action, MoveDirection direction = MoveDirection.None, bool isEnemyLeft = false)
     {
         if (_mapSystem == null || sectorIndex <= 0)
         {
@@ -349,8 +349,12 @@ public class PlayerVisualController : MonoBehaviour
             return;
         }
 
+        if (_playerInstance != null)
+            _playerInstance.SetActive(false);
+
         if (_currentGhost == null && _playerGhostPrefab != null)
             _currentGhost = Instantiate(_playerGhostPrefab);
+
         if (_currentGhost != null)
         {
             Vector3 targetPos = _mapSystem.GetSectorPosition(sectorIndex);
@@ -362,7 +366,7 @@ public class PlayerVisualController : MonoBehaviour
             if (ghostSR != null)
             {
                 ghostSR.sortingOrder = (sectorIndex * 10) + 3;
-                ghostSR.flipX = GetFacingFlip(direction);
+                ghostSR.flipX = GetFacingFlipWithSide(isEnemyLeft, direction);
             }
             UpdateGhostVisual(action);
         }
@@ -403,6 +407,9 @@ public class PlayerVisualController : MonoBehaviour
     {
         if (_currentGhost != null)
             _currentGhost.SetActive(false);
+
+        if (_playerInstance != null)
+            _playerInstance.SetActive(true);
     }
     #endregion
 
@@ -410,25 +417,36 @@ public class PlayerVisualController : MonoBehaviour
     /// <summary>
     /// 내부 이동 함수
     /// </summary>
-    private void MoveTo(Transform targetSector, MoveDirection direction)
+    private void MoveTo(Transform targetSector, MoveDirection direction, bool is_wind = false)
     {
         if (_playerInstance == null) return;
         if (_moveCoroutine != null)
             StopCoroutine(_moveCoroutine);
-        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction));
+        _moveCoroutine = StartCoroutine(MoveRoutine(targetSector, direction, is_wind));
 
     }
 
-    private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction)
+    private IEnumerator MoveRoutine(Transform targetSector, MoveDirection direction, bool is_wind)
     {
-        ChangeAnim("3_1_ Run");
+        if (is_wind)
+        {
+            ChangeAnim("8_Wind");
+        }
+        else
+        {
+            ChangeAnim("3_1_ Run");
+            UpdateFacing(direction);
+        }
+            
 
-        UpdateFacing(direction);
+        
 
         _playerInstance.transform.SetParent(null);
 
         Vector3 startPosition = _playerInstance.transform.position;
         float elapsedTime = 0f;
+
+        _moveDuration = TimelineManager.Instance.Tick_interval * 0.85f;
 
         // 정해진 시간(_moveDuration) 동안 루프
         while (elapsedTime < _moveDuration)
@@ -449,9 +467,9 @@ public class PlayerVisualController : MonoBehaviour
 
         _playerInstance.transform.localPosition = _offset;
 
-        
-
         _moveCoroutine = null;
+
+        ChangeAnim("1_Idle");
 
         //if (_playerAnimator != null)
         //_playerAnimator.SetTrigger("Run_Stop");
@@ -508,6 +526,23 @@ public class PlayerVisualController : MonoBehaviour
             }
         }
 
+        return shouldFaceLeft;
+    }
+
+    private bool GetFacingFlipWithSide(bool isEnemyLeft, MoveDirection direction)
+    {
+        bool shouldFaceLeft = isEnemyLeft;
+
+        if (isEnemyLeft)
+        {
+            if (direction == MoveDirection.Front || direction == MoveDirection.DiagonalLu || direction == MoveDirection.DiagonalRu)
+                shouldFaceLeft = false;
+        }
+        else
+        {
+            if (direction == MoveDirection.Back || direction == MoveDirection.DiagonalLd || direction == MoveDirection.DiagonalRd)
+                shouldFaceLeft = true;
+        }
         return shouldFaceLeft;
     }
 

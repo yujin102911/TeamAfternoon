@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyVisualController : MonoBehaviour
@@ -120,7 +121,7 @@ public class EnemyVisualController : MonoBehaviour
             if (GameManager.Instance.MapSystem != null)
                 _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
 
-            _enemyHealthBar.SetTarget(obj.transform);
+            _enemyHealthBar.SetTarget(obj.transform, enemy.Data.HPBarOffset);
         }
 
         //AlignEnemies();
@@ -174,6 +175,12 @@ public class EnemyVisualController : MonoBehaviour
     }
     public void ChangeAnim(string animation)
     {
+        // 기절 별 이펙트 숨기기
+        if (_currentAnimation == "Sturn" && _currentAnimation != animation)
+        {
+            _enemyAttackEffect.Hide_Star();
+        }
+
         if (_enemyAnimator != null)
         {
             _currentAnimation = animation;
@@ -284,9 +291,16 @@ public class EnemyVisualController : MonoBehaviour
 
 
 
-    public void PlayDamage(int damage, bool is_crit)
+    public void PlayDamage(int damage, bool is_crit, bool is_sturn)
     {
-        ChangeAnim("Hurt");
+        if(is_sturn)
+        {
+            ChangeAnim("Sturn");
+        }
+        else
+        {
+            ChangeAnim("Hurt");
+        }
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
     }
@@ -358,5 +372,43 @@ public class EnemyVisualController : MonoBehaviour
         }
         Destroy(go);
     }
+
+    #region Preview Methods
+    public void PreviewFlip(bool isLeft)
+    {
+        if (_currentEnemy != null)
+        {
+            SpriteRenderer sr = _currentEnemy.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null ) sr.flipX = !isLeft;
+
+            Transform targetTr = isLeft ? _enemyLeftPos : _enemyRightPos;
+            _currentEnemy.transform.position = targetTr.position;
+        }
+
+        if (targetCamera != null)
+        {
+            targetCamera.transform.position = isLeft ? _cameraLeftPos : _cameraRightPos;
+        }
+    }
+
+    public void RestoreActualSide()
+    {
+        if (_runtimeEnemy != null && _currentEnemy != null)
+        {
+            bool actualIsLeft = _runtimeEnemy.IsLeft;
+
+            SpriteRenderer sr = _currentEnemy.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) sr.flipX = !actualIsLeft;
+
+            Transform targetTr = actualIsLeft ? _enemyLeftPos : _enemyRightPos;
+            _currentEnemy.transform.position = targetTr.position;
+
+            if (targetCamera != null)
+            {
+                targetCamera.transform.position = actualIsLeft ? _cameraLeftPos : _cameraRightPos;
+            }
+        }
+    }
+    #endregion
 
 }

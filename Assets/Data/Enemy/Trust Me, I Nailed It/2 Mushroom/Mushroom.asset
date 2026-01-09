@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemyName: mushroom
   _maxHP: 30
+  _hpBarOffset: {x: 0, y: -150}
   _enemyPrefab: {fileID: 4739842050036389759, guid: 4c1516c292df4c34687757dbd38c2df8, type: 3}
+  _enemyBackPrefab: {fileID: 3868124720146053707, guid: 44a2f5125ee6db04aaf0842e64f4ab61, type: 3}
   _leftEnemySprites:
   - {fileID: -3271028359936961726, guid: e75af879ffd5b0f499c5720430879ff6, type: 3}
   - {fileID: 1145440639053887824, guid: e97cd5853d6b9884abd2ed6376821efe, type: 3}
@@ -32,6 +34,7 @@ MonoBehaviour:
   _patterns:
   - {fileID: 11400000, guid: 3f7ccb19598e5494faf01162dd22cd19, type: 2}
   - {fileID: 11400000, guid: 0c64bc2430c7115429c33a5c98d23e1d, type: 2}
+  - {fileID: 11400000, guid: 551b881cb441bae4285eb5d4e9ca43a2, type: 2}
   - {fileID: 11400000, guid: b6d1bb22d5787c548abbc899e363d8cf, type: 2}
   _assignedColor: {r: 1, g: 1, b: 1, a: 0}
   _enemyAbilities: []

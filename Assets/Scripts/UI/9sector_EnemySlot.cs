@@ -29,7 +29,11 @@ public class sector_EnemySlot : Enemy_slot
 
     [Header("3*3 그리드")]
     [SerializeField]
-    private Image[] _imageSectors;
+    private Image[] _nomalSectors;
+
+    [Header("4*3 그리드")]
+    [SerializeField]
+    private Image[] _bigSectors;
 
     [Header("특수 패턴")]
     [SerializeField]
@@ -41,9 +45,20 @@ public class sector_EnemySlot : Enemy_slot
     [SerializeField]
     private Sprite _windLeftIcon;
 
-    public override void Show(Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
+    private Image[] _imageSectors;
+
+    public override void Show(bool is_normal, Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
     {
         Show_Slot();
+
+        if (is_normal)
+        {
+            _imageSectors = _nomalSectors;
+        }
+        else
+        {
+            _imageSectors = _bigSectors;
+        }
 
         switch (pattern)
         {
@@ -129,12 +144,21 @@ public class sector_EnemySlot : Enemy_slot
         _attackIcon.SetActive(false);
         _patternIcon.SetActive(false);
 
-        for (int i = 0; i < _imageSectors.Length; i++)
+        foreach(var sector in _nomalSectors)
         {
-            var color = _imageSectors[i].color;
+            var color = sector.color;
             color.a = 0f;
-            _imageSectors[i].sprite = _nomalSector;
-            _imageSectors[i].color = color;
+            sector.sprite = _nomalSector;
+            sector.color = color;
+        }
+
+
+        foreach (var sector in _bigSectors)
+        {
+            var color = sector.color;
+            color.a = 0f;
+            sector.sprite = _nomalSector;
+            sector.color = color;
         }
     }
 }

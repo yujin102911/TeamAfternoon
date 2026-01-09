@@ -32,10 +32,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7967034536500287338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 52, y: 52}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 34, y: -20}
+  m_SizeDelta: {x: 33, y: 33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1902340252352085177
 CanvasRenderer:
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8182433594332183985, guid: 8df0ecad56defc749bd31166a384c0bf, type: 3}
+  m_Sprite: {fileID: -150750127, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 2068460026680468635}
   - component: {fileID: 586957153606543618}
   - component: {fileID: 7363931101091727027}
+  - component: {fileID: 6510977064345872766}
   m_Layer: 5
   m_Name: Effect_cell
   m_TagString: Untagged
@@ -112,7 +113,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 104, y: 104}
+  m_SizeDelta: {x: 137, y: 137}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2068460026680468635
 CanvasRenderer:
@@ -142,7 +143,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -4339543596857407545, guid: 8cd55b95ba14b544b9a50b0d04c431c2, type: 3}
+  m_Sprite: {fileID: 5535085523768173922, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -166,7 +167,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _back: {fileID: 586957153606543618}
   _icon: {fileID: 5916191351091434598}
-  _dashBack: {fileID: 6775953802285234519, guid: 8cd55b95ba14b544b9a50b0d04c431c2, type: 3}
-  _dubleDashIcon: {fileID: -5303196243826169843, guid: 8df0ecad56defc749bd31166a384c0bf, type: 3}
-  _damageBack: {fileID: -4339543596857407545, guid: 8cd55b95ba14b544b9a50b0d04c431c2, type: 3}
-  _damageUpIcon: {fileID: -8182433594332183985, guid: 8df0ecad56defc749bd31166a384c0bf, type: 3}
+  _dashBack: {fileID: -8006117825268981899, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _dubleDashIcon: {fileID: -1850614339, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _damageBack: {fileID: -1206427427223022810, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _damageUpIcon: {fileID: 1952709830, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _criticBack: {fileID: -7285214950813050877, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _criticIcon: {fileID: 274227334, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _sturnBack: {fileID: 5535085523768173922, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+  _sturnIcon: {fileID: -150750127, guid: 4a883e796c6a3044498a8e7a04e1542f, type: 3}
+--- !u!225 &6510977064345872766
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4773672169210653192}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0

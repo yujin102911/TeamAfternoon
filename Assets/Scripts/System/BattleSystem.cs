@@ -50,6 +50,8 @@ public class BattleSystem
     private bool _isCritical = false;
     private bool _isDubleDash = false;
     private bool _isDamageUp = false;
+    private bool _isSturn = false;
+    private bool _isSturnSuccess = false;
 
     #endregion
 
@@ -76,10 +78,10 @@ public class BattleSystem
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
-    public event Action<int, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
+    public event Action<int, bool, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
-    public event Action<int, MoveDirection> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
+    public event Action<int, MoveDirection, bool> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
     public event Action<List<int>> OnEnemyAttackSuccess; // 적이 공격할 때 발행되는 이벤트(섹터반짝용)
 
     public event Action<List<int>, bool> OnStoneUpdated; // 돌 던질때, 혹은 사라질때 발행되는 이벤트 (사라질때 false, 생길때 true)
@@ -141,6 +143,12 @@ public class BattleSystem
         _isDubleDash = false;
         _isDamageUp = false;
 
+        // 스턴 관련
+        _isSturn = false;
+        _isSturnSuccess = false;
+
+        Debug.Log("<color=green>[BattleSystem] 플래그 세팅!</color>");
+
         switch (effect)
         {
             case EffectType.Critical:
@@ -151,6 +159,9 @@ public class BattleSystem
                 break;
             case EffectType.Damage_Up:
                 _isDamageUp = true;
+                break;
+            case EffectType.Sturn:
+                _isSturn = true;
                 break;
             case EffectType.None:
                 break;
@@ -177,7 +188,25 @@ public class BattleSystem
         {
             if (enemy.IsHitByAttackFrom(_playerCurrentSector, _columns))
             {
-                OnChangePlayerAnim?.Invoke(isChargeRequired ? "6_2_SwordEnd" : "2_2_SwordAttack");
+
+                if (isChargeRequired)
+                {
+                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "6_3_EnforceCharge" : "6_2_SwordEnd");
+                }
+                else
+                {
+                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_Sword_Enforce" : "2_2_SwordAttack");
+                }
+                    
+
+                // 기절 플래그 처리
+                if(_isSturn)
+                {
+                    _isSturnSuccess = true;
+                    Debug.Log("<color=yellow>[BattleSystem] 적이 기절했습니다!</color>");
+                    //OnChangeEnemyAnim?.Invoke("Sturn");
+                    _isSturn = false;
+                }
 
                 return true;
             }
@@ -198,7 +227,7 @@ public class BattleSystem
 
         _damageBuffer = damage;
 
-        OnChangePlayerAnim?.Invoke("2_3_BowShoot");
+        OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_1_Enforce BowShoot" : "2_3_BowShoot");
 
         _isBowCharging = false;
     }
@@ -219,7 +248,7 @@ public class BattleSystem
         int final_dam = result.damage;
 
         DamageEnemy(final_dam);
-        OnEnemyHit?.Invoke(final_dam, result.isCritical);
+        OnEnemyHit?.Invoke(final_dam, result.isCritical, _isSturnSuccess);
     }
 
     // 데미지 결과 계산
@@ -233,10 +262,15 @@ public class BattleSystem
             isCritical = true;
             _isCritical = false;
         }
+        else
+        {
+            //이거 없으면 크리터짐
+            isCritical = false;
+        }
 
-        int finalDamage = isCritical
-                ? baseDamage * 2
-                : baseDamage;
+            int finalDamage = isCritical
+                    ? baseDamage * 2
+                    : baseDamage;
 
         finalDamage = _isDamageUp
                 ? finalDamage + 5
@@ -394,7 +428,7 @@ public class BattleSystem
         {
             _playerCurrentSector = sector;
             Debug.LogWarning("[BattleSystem] 맵 크기(_totalSectors)가 0입니다! 초기화 순서를 확인하세요.");
-            OnPlayerMoved?.Invoke(_playerCurrentSector, MoveDirection.None);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, MoveDirection.None, false);
             return;
         }   
         int targetSector = sector;
@@ -423,65 +457,57 @@ public class BattleSystem
             Debug.Log("[BattleSystem] 더블 대시 효과로 2칸 이동!");
         }
 
-        int currentIndex = _playerCurrentSector - 1;
+        int currentSector = _playerCurrentSector;
+        bool movedAtLeastOnce = false;
+
+        for (int i = 0; i < moveAmount; i++)
+        {
+            int nextSector = GetNextStepSector(currentSector, moveDirection);
+
+            if (nextSector != -1 && !IsSectorBlocked(nextSector))
+            {
+                currentSector = nextSector;
+                movedAtLeastOnce = true;
+            }
+            else
+            {
+                Debug.Log($"[BattleSystem] {i + 1}번째 이동 시도 중 차단됨 (Sector: {nextSector})");
+                break;
+            }
+        }
+        if (movedAtLeastOnce)
+        {
+            Debug.Log($"[BattleSystem] 이동 결과: {_playerCurrentSector} -> {currentSector}");
+            _playerCurrentSector = currentSector;
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection, false);
+        }
+    }
+
+    private int GetNextStepSector(int fromSector, MoveDirection dir)
+    {
+        int currentIndex = fromSector - 1;
         int curRow = currentIndex / _columns;
         int curCol = currentIndex % _columns;
 
         int targetRow = curRow;
         int targetCol = curCol;
 
-        switch (moveDirection)
+        switch (dir)
         {
-            case MoveDirection.Front:
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.Back:
-                targetCol -= moveAmount;
-                break;
-            case MoveDirection.Left:
-                targetRow -= moveAmount;
-                break;
-            case MoveDirection.Right:
-                targetRow += moveAmount;
-                break;
-            case MoveDirection.DiagonalLu:
-                targetRow -= moveAmount;
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.DiagonalRu:
-                targetRow += moveAmount;
-                targetCol += moveAmount;
-                break;
-            case MoveDirection.DiagonalLd:
-                targetRow -= moveAmount;
-                targetCol -= moveAmount;
-                break;
-            case MoveDirection.DiagonalRd:
-                targetRow += moveAmount;
-                targetCol -= moveAmount;
-                break;
+            case MoveDirection.Front: targetCol += 1; break;
+            case MoveDirection.Back: targetCol -= 1; break;
+            case MoveDirection.Left: targetRow -= 1; break;
+            case MoveDirection.Right: targetRow += 1; break;
+            case MoveDirection.DiagonalLu: targetRow -= 1; targetCol += 1; break;
+            case MoveDirection.DiagonalRu: targetRow += 1; targetCol += 1; break;
+            case MoveDirection.DiagonalLd: targetRow -= 1; targetCol -= 1; break;
+            case MoveDirection.DiagonalRd: targetRow += 1; targetCol -= 1; break;
         }
         int rows = _totalSectors / _columns;
         if (targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < _columns)
-        {
-            int targetSector = (targetRow * _columns) + targetCol + 1;
-            if (IsSectorBlocked(targetSector))
-            {
-                Debug.Log($"[BattleSystem] {targetSector}번 섹터는 돌에 막혀 이동할 수 없습니다");
-                return;
-            }
-            int prevSector = _playerCurrentSector;
-            _playerCurrentSector = targetSector;
-            if (prevSector != _playerCurrentSector)
-            {
-                Debug.Log($"[BattleSystem] 이동 성공 {prevSector} -> {_playerCurrentSector}");
-                OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection);
-            }
-        }
-        else
-        {
-            Debug.Log("[BattleSystem]이동 불가");
-        }
+            return (targetRow * _columns) + targetCol + 1;
+
+        return -1;
     }
 
     bool IsAdjacent(int from, int to)
@@ -512,6 +538,14 @@ public class BattleSystem
     public void ProcessEnemyAttack(EnemyAttack attack)
     {
         if (attack == null) return;
+
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
+
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
 
         _isPlayerHitThisTurn = false;
@@ -556,25 +590,41 @@ public class BattleSystem
 
             Debug.Log($"[BattleSystem] 적이 {targetSector}번 섹터에 돌을 던졌습니다");
         }
+
+        OnChangeEnemyAnim?.Invoke("Stone");
         if (count > 0)
         {
-            OnStoneUpdated?.Invoke(_stoneSectors, true);
+            //OnStoneUpdated?.Invoke(_stoneSectors, true);
         }
+    }
+
+    public void SpawnStone()
+    {
+        OnStoneUpdated?.Invoke(_stoneSectors, true);
     }
 
     public void ProcessEnemyWind(WindDirection actualDirection)
     {
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
         MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+
+        OnChangeEnemyAnim?.Invoke("Wind");
+
+        int currentPos = _playerCurrentSector;
         int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
-        if (targetSector != -1 && !IsSectorBlocked(targetSector))
+
+        while(targetSector != -1 && !IsSectorBlocked(targetSector))
+        {
+            currentPos = targetSector;
+            targetSector = GetWindTargetSector(currentPos, actualDirection);
+        }
+
+        if (currentPos !=  _playerCurrentSector)
         {
             int prevSector = _playerCurrentSector;
-            _playerCurrentSector = targetSector;
+            _playerCurrentSector = currentPos;
 
-            Debug.Log($"[BattleSystem] 바람에 의해 밀려남: Sector {prevSector} -> {_playerCurrentSector}");
-
-            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir, true);
         }
         else
         {
@@ -587,6 +637,13 @@ public class BattleSystem
     public void ProcessEnemyDash(EnemyDash dash)
     {
         if (dash == null) return;
+
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
 
         List<int> targetSectors = new List<int>();
 

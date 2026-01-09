@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 6312163974082741016}
   - component: {fileID: 7881533792082575848}
   - component: {fileID: 1540312762581204534}
+  - component: {fileID: 8704224415171263061}
   m_Layer: 5
   m_Name: SidebarButtonPrefab
   m_TagString: Untagged
@@ -271,3 +272,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _buttonTitleText: {fileID: 4053191080088809793}
+  regul: {fileID: 11400000, guid: 4a853867acc19b34d875d02b8423914e, type: 2}
+  bold: {fileID: 11400000, guid: 4ebccbda7791e604987027213b41589a, type: 2}
+  _hoverScale: 1.05
+  _animationSpeed: 10
+--- !u!114 &8704224415171263061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7447374870814246146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb4b37d64cae8e48b39ba9c02d90f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverCursor: {fileID: 2800000, guid: 885b258f2beb1474a87405a076a2489e, type: 3}
+  hotSpot: {x: 0, y: 0}

@@ -16,9 +16,17 @@ public class EnemyData : ScriptableObject
     [SerializeField]
     private int _maxHP = 50;
 
+    [Header("HP바 오프셋")]
+    [SerializeField]
+    private Vector2 _hpBarOffset = new Vector2(0, -150.0f);
+
     [Header("적 프리팹")]
     [SerializeField]
     private GameObject _enemyPrefab;
+
+    [Header("적 배경 프리펩")]
+    [SerializeField]
+    private GameObject _enemyBackPrefab;
 
     [Header("적 이미지")]
     [Tooltip("왼쪽 적 스프라이트")]
@@ -47,6 +55,7 @@ public class EnemyData : ScriptableObject
     private List<EnemyAbility> _enemyAbilities = new List<EnemyAbility>();
 
     public GameObject EnemyPrefab => _enemyPrefab;
+    public GameObject EnemyBackPrefab => _enemyBackPrefab;
     public string Enemy_Name => _enemyName;
     public List<EnemyPattern> Patterns => _patterns;
     public int MaxHP => _maxHP;
@@ -56,5 +65,7 @@ public class EnemyData : ScriptableObject
     public List<EnemyAbility> Enemy_Abilities => _enemyAbilities;
     public Color AssignedColor => _assignedColor;
     public PatternSelectionType SelectionType => _selectionType;
+
+    public Vector2 HPBarOffset => _hpBarOffset;
 
 }

@@ -90,30 +90,18 @@ public class EnemyDash
     public List<int> targetRows;
     public int damage;
 
-    public List<int> Convert_9sector()
+    public List<int> GetTargetSectors(int columns)
     {
         List<int> sectors = new List<int>();
 
-        for(int i = 0; i < targetRows.Count; i++)
+        if (targetRows == null) return sectors;
+
+        foreach (int row in targetRows)
         {
-            int row = targetRows[i];
-            switch(row)
+            for (int col = 0; col < columns; col++)
             {
-                case 0:
-                    sectors.Add(1);
-                    sectors.Add(2);
-                    sectors.Add(3);
-                    break;
-                case 1:
-                    sectors.Add(4);
-                    sectors.Add(5);
-                    sectors.Add(6);
-                    break;
-                case 2:
-                    sectors.Add(7);
-                    sectors.Add(8);
-                    sectors.Add(9);
-                    break;
+                int sectorNum = (row * columns) + col + 1;
+                sectors.Add(sectorNum);
             }
         }
 
@@ -125,8 +113,8 @@ public class EnemyDash
 // 적 시퀀스 (한 라운드 8틱 패턴)
 // ========================================
 [CreateAssetMenu(fileName = "New Enemy Pattern", menuName = "Data/Enemy/Enemy Pattern")]
-[InfoBox("중복된 틱이 감지되었습니다! 한 틱에는 하나의 행동만 설정할 수 있습니다.\n중복된 틱: $DuplicateTicksString",
-    InfoMessageType.Error, "HasOverlappingTicks")]
+[InfoBox("중복된 틱이 감지되었습니다! 한 틱에는 하나의 행동만 설정할 수 있습니다.\n중복된 틱: @$value.DuplicateTicksString",
+    InfoMessageType.Error, "@$value.HasOverlappingTicks()")]
 public class EnemyPattern : ScriptableObject
 {
     public string Pattern_Name;
