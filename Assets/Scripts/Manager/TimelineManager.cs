@@ -663,7 +663,7 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public int SimulatePlayerPosition(int targetTick)
     {
-        return SimulateStateAtTick(targetTick).sector;
+        return SimulateStateAtTick(targetTick, true).sector;
     }
 
     /// <summary>
@@ -697,7 +697,7 @@ public class TimelineManager : MonoBehaviour
     /// <summary>
     /// 특정 틱 시점의 플레이어 섹터와 적의 위치 반환
     /// </summary>
-    public (int sector, bool isEnemyLeft) SimulateStateAtTick(int targetTick)
+    public (int sector, bool isEnemyLeft) SimulateStateAtTick(int targetTick, bool includeLastEnemyAction)
     {
         if (_battleSystem == null || _battleSystem.Enemies.Count == 0)
             return (1, false);
@@ -738,7 +738,7 @@ public class TimelineManager : MonoBehaviour
                     }
                 }
             }
-            if (_currentEnemyPattern != null)
+            if (_currentEnemyPattern != null && (t < targetTick || includeLastEnemyAction))
             {
                 EnemyWind wind = _currentEnemyPattern.GetWindAt(t);
                 if (wind != null)

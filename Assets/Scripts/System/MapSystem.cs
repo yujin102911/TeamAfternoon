@@ -31,6 +31,7 @@ public class MapSystem
 
     private int _columns;
     private int _rows;
+    private int _startPosition;
 
     private Dictionary<int, GameObject> _sectors = new Dictionary<int, GameObject>();
     private Dictionary<int, Color> _sectorBaseColors = new Dictionary<int, Color>();
@@ -79,10 +80,12 @@ public class MapSystem
             case MapSize.Grid_3x3:
                 _columns = 3;
                 _rows = 3;
+                _startPosition = 5;
                 break;
             case MapSize.Grid_4x3:
                 _columns = 4;
                 _rows = 3;
+                _startPosition = 7;
                 break;
             case MapSize.Sectors_4:
                 _totalSectors = 4;
@@ -441,7 +444,7 @@ public class MapSystem
 
     public void Handle_SetSector(int sectorNum)
     {
-        OnSectorSelected?.Invoke(sectorNum);
+        OnSectorSelected?.Invoke(_startPosition);
     }
 
     public void HandleSectorHover(int sectorNum, bool isEnter)
