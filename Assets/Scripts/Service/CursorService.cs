@@ -53,4 +53,9 @@ public class CursorService
         }
     }
 
+    public void SetCursorConfined(bool isConfined)
+    {
+        Cursor.lockState = isConfined ? CursorLockMode.Confined : CursorLockMode.None;
+    }
+
 }

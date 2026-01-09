@@ -32,6 +32,14 @@ public class ServiceLocator : MonoBehaviour
         Cursor = new CursorService(this, cursorAnimations);
     }
 
+    private void Start()
+    {
+        if (Cursor != null)
+        {
+            Cursor.SetCursorConfined(true);
+        }
+    }
+
     public void CreateNewGame(Difficulty mode)
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
