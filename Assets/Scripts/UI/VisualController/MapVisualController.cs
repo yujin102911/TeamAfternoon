@@ -9,6 +9,8 @@ using System.Collections.Generic;
 public class MapVisualController : MonoBehaviour
 {
     [SerializeField] private UIEffectPool effectPool;
+    [SerializeField]
+    private GameObject WindEffect;
 
     private MapSystem _mapSystem;
     private BattleSystem _battleSystem;
@@ -141,5 +143,17 @@ public class MapVisualController : MonoBehaviour
         return _mapConfig != null ? _mapConfig.normalColor : Color.white;
     }
     #endregion
+
+    public void Play_WindEffect(bool is_left)
+    {
+        WindEffect.GetComponent<SpriteRenderer>().flipX = is_left;
+        WindEffect.SetActive(true);
+    }
+
+    public void Stop_WindEffect()
+    {
+        if( WindEffect.activeSelf)
+            WindEffect.SetActive(false);
+    }
 
 }

@@ -5558,6 +5558,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 587670578}
   m_CullTransparentMesh: 1
+--- !u!1001 &598113890
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3494140005073752156, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_Name
+      value: "\uBC14\uB78C\uD14C\uC2A4\uD2B83_0"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3494140005073752156, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.4215757
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.5494
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.92
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3972738225048367907, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
 --- !u!1 &606971723
 GameObject:
   m_ObjectHideFlags: 0
@@ -7489,6 +7554,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825525748}
   m_CullTransparentMesh: 1
+--- !u!1 &829984714 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3494140005073752156, guid: 92352f6f544fdff428a355c2770d1728, type: 3}
+  m_PrefabInstance: {fileID: 598113890}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &835420153
 GameObject:
   m_ObjectHideFlags: 0
@@ -46868,6 +46938,7 @@ MonoBehaviour:
   Tick_interval: 1
   _totalTicks: 8
   _totalSectors: 8
+  _mapVisualController: {fileID: 2007249490}
 --- !u!4 &1994000752
 Transform:
   m_ObjectHideFlags: 0
@@ -47362,6 +47433,10 @@ PrefabInstance:
       propertyPath: generatedTexture
       value: 
       objectReference: {fileID: 2142109940}
+    - target: {fileID: 8214370545068926648, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
+      propertyPath: WindEffect
+      value: 
+      objectReference: {fileID: 829984714}
     - target: {fileID: 8214370545068926648, guid: b5dc6d83af60d444ba6c565ad312ad85, type: 3}
       propertyPath: effectPool
       value: 
@@ -52773,3 +52848,4 @@ SceneRoots:
   - {fileID: 2007249486}
   - {fileID: 2109049447}
   - {fileID: 1452433726}
+  - {fileID: 598113890}
