@@ -132,7 +132,7 @@ public class TitleUI : MonoBehaviour
     // 진짜로 새 게임을 생성하고 씬을 넘기는 최종 단계
     private void StartNewGameFinal()
     {
-        _confirmPopup.SetActive(false);
+        //_confirmPopup.SetActive(false);
 
         // 드롭다운 값 읽기 (0: Easy, 1: Hard 등)
         Difficulty selectedMode = (Difficulty)_difficultyDropdown.value;

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class ApplicationButton : MonoBehaviour
     , IPointerClickHandler
     , ISelectHandler, IDeselectHandler
+    , IPointerEnterHandler, IPointerExitHandler 
     //, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Image _image;
@@ -14,6 +15,9 @@ public class ApplicationButton : MonoBehaviour
     [SerializeField] private GameObject _applicationPanel;
     [SerializeField] private Vector2 _panelPosition;
 
+    private bool _isHovering = false;
+    private bool _isSelected = false;
+
     private void Awake()
     {
         _image = GetComponent<Image>();
@@ -21,6 +25,18 @@ public class ApplicationButton : MonoBehaviour
         {
             _selectedImage.gameObject.SetActive(false);
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _isHovering = true;
+        UpdateVisualState();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _isHovering = false;
+        UpdateVisualState();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -36,21 +52,18 @@ public class ApplicationButton : MonoBehaviour
     }
     public void OnSelect(BaseEventData eventData)
     {
-        Debug.Log("선택됨: 시각적 효과 시작");
-        if (_selectedImage != null)
-            _selectedImage.gameObject.SetActive(true);
+        _isSelected = true;
+        UpdateVisualState();
     }
     public void OnDeselect(BaseEventData eventData)
     {
-        Debug.Log("선택 취소됨: 시각적 효과 제거");
-        if (_selectedImage != null)
-            _selectedImage.gameObject.SetActive(false);
+        _isSelected = false;
+        UpdateVisualState();
     }
 
     private void OnSingleClick()
     {
         EventSystem.current.SetSelectedGameObject(gameObject);
-        Debug.Log("단일 클릭");
     }
     private void OnDoubleClick()
     {
@@ -60,8 +73,31 @@ public class ApplicationButton : MonoBehaviour
             _applicationPanel.SetActive(true);
             _applicationPanel.transform.SetAsLastSibling();
         }
-        Debug.Log("더블 클릭");
     }
+    private void UpdateVisualState()
+    {
+        if (_selectedImage == null) return;
 
+        if (_isHovering)
+        {
+            _selectedImage.gameObject.SetActive(true );
+            SetAlpha(0.3f);
+        }
+        else if(_isSelected)
+        {
+             _selectedImage.gameObject.SetActive(true ) ;
+            SetAlpha(0.5f);
+        }
+        else
+        {
+            _selectedImage.gameObject.SetActive(false);
+        }
+    }
+    private void SetAlpha(float alpha)
+    {
+        Color color = _selectedImage.color;
+        color.a = alpha;
+        _selectedImage.color = color;
+    }
 
 }
