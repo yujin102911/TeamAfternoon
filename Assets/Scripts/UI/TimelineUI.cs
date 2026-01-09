@@ -656,7 +656,9 @@ public class TimelineUI : MonoBehaviour
         {
             int new_tick = (tick - 1) / 2 + 1;
 
-            var simState = TimelineManager.Instance.SimulateStateAtTick(new_tick);
+            bool includeEnemyAction = (tick % 2 == 0);
+
+            var simState = TimelineManager.Instance.SimulateStateAtTick(new_tick, includeEnemyAction);
 
             int predictedSector = simState.sector;
             bool simIsLeft = simState.isEnemyLeft;

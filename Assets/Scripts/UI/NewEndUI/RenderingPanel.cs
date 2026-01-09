@@ -31,6 +31,7 @@ public class RenderingPanel : MonoBehaviour
     public void StartRendering(Action onComplete)
     {
         gameObject.SetActive(true);
+        ServiceLocator.Instance.Cursor.StartAnimation("Loading");
         StartCoroutine(AnimateProgressBar(onComplete));
     }
 
@@ -47,6 +48,9 @@ public class RenderingPanel : MonoBehaviour
             _progressBlocks[i].SetActive(true);
         }
         yield return new WaitForSeconds(0.5f);
+
+        ServiceLocator.Instance.Cursor.StopAnimation();
+
         onComplete?.Invoke();
         gameObject.SetActive(false);
     }
