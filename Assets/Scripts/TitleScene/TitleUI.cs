@@ -66,14 +66,6 @@ public class TitleUI : MonoBehaviour
         // 이어하기 버튼 활성화 상태 체크
         bool hasSave = SaveService.HasSaveData();
         _continueButton.interactable = hasSave;
-        if (hasSave)
-        {
-            _continueButton.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
-        }
-        else
-        {
-            _continueButton.GetComponent<Image>().color = new Color32(217, 217, 217, 255);
-        }
     }
 
     #region Main Button Logic
