@@ -40,6 +40,14 @@ public enum SoundID
     SFX_Cure,
     SFX_Spell_Write,
     SFX_Spell_Cancle,
-    SFX_Execute
+    SFX_Execute,
+
+    // Player
+    Player_hit,
+    Player_Sword,
+    Player_Sword2,
+    Player_Bow,
+    Player_Bow2,
+    Player_Bow3
 
 }
