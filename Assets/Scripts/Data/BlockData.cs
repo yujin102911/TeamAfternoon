@@ -5,17 +5,17 @@ public enum ActionType
 {
     None,
     Attack,
+    Sword_start,    // 검 공격 실행
+    Sword_middle,   // 검 공격 차징 중
+    Sword_end,      // 검 공격 차징 시작
+    Bow_single,
+    Bow_start,
+    Bow_middle,
+    Bow_end,
     Move,        // 상하좌우 이동
     Jump,        // 대각선 4방향 이동
     Cure,
     Guard,       // 공격 막기 (이 행동 실행 때 공격 있으면 데미지 0)
-    Bow_start,
-    Bow_middle,
-    Bow_end,
-    Bow_single,
-    Sword_start,    // 검 공격 실행
-    Sword_middle,   // 검 공격 차징 중
-    Sword_end,      // 검 공격 차징 시작
 }
 
 public enum MoveDirection
