@@ -48,6 +48,14 @@ public enum SoundID
     Player_Sword2,
     Player_Bow,
     Player_Bow2,
-    Player_Bow3
+    Player_Bow3,
+
+    // Enemy
+    EnemyHurt_0,
+    EnemyHurt_1,
+    EnemyHurt_2,
+    EnemyHurt_3,
+    EnemyHurt_4,
+    EnemyHurt_5
 
 }
