@@ -1983,6 +1983,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2108,6 +2109,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f06ab6162acc1114cb540cc53704ee7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetAspect: 1.7777778
 --- !u!1 &561872026
 GameObject:
   m_ObjectHideFlags: 0
@@ -5393,7 +5407,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6928960794035724339, guid: 9e7fabe86c3b20b46928b6884a5a9449, type: 3}
     m_PressedSprite: {fileID: -5672113766235225542, guid: 9e7fabe86c3b20b46928b6884a5a9449, type: 3}
     m_SelectedSprite: {fileID: -7889223667662900811, guid: 9e7fabe86c3b20b46928b6884a5a9449, type: 3}
-    m_DisabledSprite: {fileID: 1011195404308427451, guid: 9e7fabe86c3b20b46928b6884a5a9449, type: 3}
+    m_DisabledSprite: {fileID: -5672113766235225542, guid: 9e7fabe86c3b20b46928b6884a5a9449, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -6486,6 +6500,8 @@ MonoBehaviour:
   _masterSlider: {fileID: 1964927628}
   _bgmSlider: {fileID: 1198580676}
   _sfxSlider: {fileID: 1324265939}
+  resolutionDropdown: {fileID: 0}
+  fullscreenToggle: {fileID: 0}
 --- !u!114 &1606799185
 MonoBehaviour:
   m_ObjectHideFlags: 0
