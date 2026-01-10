@@ -121,6 +121,8 @@ public class EnemyVisualController : MonoBehaviour
             if (GameManager.Instance.MapSystem != null)
                 _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
 
+            _enemyAttackEffect.Set_StageNum(GameManager.Instance.CurrentStageData.StageNumber);
+
             _enemyHealthBar.SetTarget(obj.transform, enemy.Data.HPBarOffset);
         }
 
