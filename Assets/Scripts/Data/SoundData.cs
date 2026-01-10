@@ -56,6 +56,13 @@ public enum SoundID
     EnemyHurt_2,
     EnemyHurt_3,
     EnemyHurt_4,
-    EnemyHurt_5
+    EnemyHurt_5,
+
+    EnemyEffect_0,
+    EnemyEffect_1,
+    EnemyEffect_2,
+    EnemyEffect_3,
+    EnemyEffect_4,
+    EnemyEffect_5
 
 }
