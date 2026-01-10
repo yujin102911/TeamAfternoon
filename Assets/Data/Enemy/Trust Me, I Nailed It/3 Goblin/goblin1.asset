@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Pattern_Name: "\uC288\uC288\uC288\uC289"
   attacks:
-  - tick: 3
+  - tick: 2
     targetSectors: 0300000004000000060000000700000009000000
     damage: 1
   - tick: 4
@@ -31,5 +31,8 @@ MonoBehaviour:
     damage: 1
   stones: []
   winds: []
-  dashes: []
+  dashes:
+  - tick: 3
+    targetRows: 00000000
+    damage: 1
   parryings: []
