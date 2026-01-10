@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class StageLinkHandler : MonoBehaviour
     , IPointerClickHandler, IPointerMoveHandler, IPointerExitHandler
@@ -14,6 +15,12 @@ public class StageLinkHandler : MonoBehaviour
     [SerializeField] private Color32 _hoverColor = Color.white;
     private Color32 _normalColor = new Color32(88, 101, 242, 255);
 
+    [Header("입장 불가 패널")]
+    [SerializeField] private GameObject _cantPanel;
+    [SerializeField] private Button _closeCantPanelButton;
+    [SerializeField] private Vector2 _panelPosition;
+    [SerializeField] private GameObject _cantPopup;
+
     private TextMeshProUGUI _tmpText;
     private Canvas _canvas;
     private int _currentHoverLinkIndex = -1;
@@ -22,11 +29,15 @@ public class StageLinkHandler : MonoBehaviour
     {
         _tmpText = GetComponent<TextMeshProUGUI>();
         _canvas = GetComponent<Canvas>();
+        if (_closeCantPanelButton != null)
+        {
+            _closeCantPanelButton.onClick.AddListener(CloseCantPanel);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        int linkIndex = TMP_TextUtilities.FindIntersectingLink(_tmpText, eventData.position, null);
+        int linkIndex = GetLinkIndex(eventData);
         if (linkIndex != -1)
         {
             string linkID = _tmpText.textInfo.linkInfo[linkIndex].GetLinkID();
@@ -48,7 +59,7 @@ public class StageLinkHandler : MonoBehaviour
         UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
         if (currentUser != null && currentUser.IsStageCleared(stageNum))
         {
-            // 팝업 띄우기
+            OpenCantPanel();
         }
         else
         {
@@ -133,5 +144,33 @@ public class StageLinkHandler : MonoBehaviour
         }
         _tmpText.UpdateVertexData(TMP_VertexDataUpdateFlags.All);
     }
+
+    #region 기간 만료 패널용 함수 *^^*
+    private void CloseCantPanel()
+    {
+        if (_cantPanel != null)
+        {
+            _cantPanel.SetActive(false);
+        }
+    }
+
+    private void OpenCantPanel()
+    {
+        if (_cantPanel != null)
+        {
+            _cantPanel.SetActive(true);
+            _cantPanel.transform.SetAsLastSibling();
+        }
+        if (_cantPopup != null)
+        {
+            RectTransform rt = _cantPopup.GetComponent<RectTransform>();
+
+            rt.anchorMin = _panelPosition;
+            rt.anchorMax = _panelPosition;
+
+            rt.anchoredPosition = Vector2.zero;
+        }
+    }
+    #endregion
 
 }
