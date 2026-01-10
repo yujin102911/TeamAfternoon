@@ -39,8 +39,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
             }
             else
             {
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
+
             }
 
             if (BattleUIManager.Instance != null)
@@ -70,8 +69,6 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 
             if (success)
             {
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.Play(SoundID.SFX_Spell_Write);
                 //블록 배치 성공 시 드래그 블록 숨기기
                 //Draggable_Block.Instance.Hide();
             }
