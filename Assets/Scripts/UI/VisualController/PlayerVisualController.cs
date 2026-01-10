@@ -139,7 +139,10 @@ public class PlayerVisualController : MonoBehaviour
         {
             _currentAnimation = animation;
             _playerAnimator.CrossFade(animation, 0.2f);
-        } 
+        }
+
+        if (animation == "4_Hurt" && SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Player_hit);
     }
 
     public void Play_PlayerIdle()
