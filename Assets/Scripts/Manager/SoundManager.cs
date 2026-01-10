@@ -57,6 +57,18 @@ public class SoundManager : MonoBehaviour
         LoadAndApplySettings();
     }
 
+    private void Update()
+    {
+        if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+        {
+            Play(SoundID.UI_Click);
+        }
+        else if(Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+        {
+            Play(SoundID.UI_Click2);
+        }
+    }
+
     private void LoadAndApplySettings()
     {
         // 저장된 값이 없으면 기본값 0.8f(80%) 사용

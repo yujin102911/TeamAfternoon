@@ -34,9 +34,6 @@ public class StageScene_Manager : MonoBehaviour
                 }
             }
         }
-
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.BGM_Title);
     }
 
     private void SetStage_btn()
