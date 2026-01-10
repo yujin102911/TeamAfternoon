@@ -33,6 +33,14 @@ public class StartPanel : MonoBehaviour
         _creditButton.onClick.AddListener(OpenCredit);
         CloseMenu();
     }
+
+    private void Start()
+    {
+        // 타이틀 브금
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.BGM_Stage);
+    }
+
     private void Update()
     {
         if (_timeText != null)
