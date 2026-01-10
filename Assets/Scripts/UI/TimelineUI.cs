@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -51,7 +52,7 @@ public class TimelineUI : MonoBehaviour
     public TextMeshProUGUI Player_tooltipDetailText;      // 툴팁 설명
 
     [SerializeField]
-    private Vector3 tooltipOffset = new Vector3(10f, 10f, 0f);
+    private Vector2 tooltipOffset = new Vector3(10f, 10f);
 
     [Header("색상 설정")]
     public Color normalColor = Color.white;
@@ -101,6 +102,13 @@ public class TimelineUI : MonoBehaviour
 
     // 현재 적 시퀀스
     private EnemyPattern _currentPattern;
+
+    private Canvas canvas;
+
+    private void Awake()
+    {
+        canvas = GetComponentInParent<Canvas>();
+    }
 
     void Start()
     {
@@ -381,30 +389,31 @@ public class TimelineUI : MonoBehaviour
             return;
         }
 
-        if(tooltipTitleText != null)
+        string title = "";
+        string body = "";
+
+        if (tooltipTitleText != null)
         {
             if (attack != null)
             {
-                tooltipTitleText.text = _currentPattern.Pattern_Name;
+                title = _currentPattern.Pattern_Name;
             }
             if (parrying != null)
             {
-                tooltipTitleText.text = $"공격 튕겨내기";
+                title = $"공격 튕겨내기";
             }
             if (wind != null)
             {
-                tooltipTitleText.text = $"바람 생성";
+                title = $"바람 생성";
             }
             if (dash != null)
             {
-                tooltipTitleText.text = $"돌진 공격";
+                title = $"돌진 공격";
             }
             if (stone != null)
             {
-                tooltipTitleText.text = $"바위 생성";
-            }
-
-            
+                title = $"바위 생성";
+            } 
         }
 
         // 툴팁 텍스트 설정
@@ -413,29 +422,43 @@ public class TimelineUI : MonoBehaviour
             if (attack != null)
             {
                 string sectors = string.Join(", ", attack.targetSectors);
-                tooltipDetailText.text = $"<color=#D94036>♥</color> -{attack.damage}";
+                body = $"<color=#D94036>♥</color> -{attack.damage}";
             }
             if (parrying != null)
             {
-                tooltipDetailText.text = $"공격 튕겨내기";
+                body = $"공격 튕겨내기";
             }
             if (wind != null)
             {
-                tooltipDetailText.text = $"적이 바라보는 방향 끝까지 밀어냅니다.";
+                body = $"적이 바라보는 방향 끝까지 밀어냅니다.";
             }
             if (dash != null)
             {
-                tooltipDetailText.text = $"돌진 공격 후 자리가 바뀝니다.";
+                body = $"돌진 공격 후 자리가 바뀝니다.";
             }
             if (stone != null)
             {
-                tooltipDetailText.text = $"랜덤한 위치에 바위가 {stone.count}개 생성됩니다.";
+                body = $"랜덤한 위치에 바위가 {stone.count}개 생성됩니다.";
             }
         }
 
         // 툴팁 위치 설정
-        tooltipPanel.transform.position = position + tooltipOffset;
-        tooltipPanel.SetActive(true);
+        if (CardTooltip.Instance != null) 
+        {
+            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+            // 카드 Rect의 오른쪽 중앙 월드 좌표
+            Vector3 worldBottomCenter = position;
+
+            // 월드 → 스크린 좌표
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+            CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+        }
+        
+        //tooltipPanel.transform.position = position + tooltipOffset;
+        //tooltipPanel.SetActive(true);
 
         // 맵에 공격 섹터 표시
         List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(tick);
@@ -453,6 +476,11 @@ public class TimelineUI : MonoBehaviour
             tooltipPanel.SetActive(false);
         }
 
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
+
         OnRequestClearHighlight?.Invoke();
     }
 
@@ -461,6 +489,11 @@ public class TimelineUI : MonoBehaviour
         if (Player_tooltipPanel != null)
         {
             Player_tooltipPanel.SetActive(false);
+        }
+
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
         }
 
         OnRequestClearHighlight?.Invoke();
@@ -493,6 +526,10 @@ public class TimelineUI : MonoBehaviour
 
         string titleText = "";
         string effectText = "";
+
+        string title = "";
+        string body = "";
+
         switch (effect)
         {
             case ActionType.None:
@@ -545,15 +582,30 @@ public class TimelineUI : MonoBehaviour
                 Player_tooltipTitleText.text = $"{blockData.blockName} ({cardTickIndex + 1}/{blockData.blockLength})";
                 Player_tooltipTitleText.text = titleText;
                 Player_tooltipDetailText.text = $"{effectText}\n<b>우클릭:</b> 영상 제거";
+
+                title = titleText;
+                body = $"{effectText}\n<b>우클릭:</b> 영상 제거";
             }
-
-            
-
         }
 
         // 툴팁 위치 설정
-        Player_tooltipPanel.transform.position = position + tooltipOffset;
-        Player_tooltipPanel.SetActive(true);
+        if (CardTooltip.Instance != null)
+        {
+            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+            // 카드 Rect의 오른쪽 중앙 월드 좌표
+            Vector3 worldBottomCenter = position;
+
+            // 월드 → 스크린 좌표
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+            CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+        }
+
+
+        //Player_tooltipPanel.transform.position = position;
+        //Player_tooltipPanel.SetActive(true);
     }
 
     /// <summary>

@@ -17,6 +17,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     private GameObject ghost;
     private Canvas canvas;
     private CanvasGroup canvasGroup;
+    private RectTransform canvasRect;
+    private RectTransform ghostRect;
 
     [Header("마우스 호버 설정")]
     [SerializeField]
@@ -46,6 +48,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
+        canvasRect = canvas.GetComponent<RectTransform>();
         rectTransform = GetComponent<RectTransform>();
     }
 
@@ -129,11 +132,12 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         // 드래그용 복제 생성
         ghost = Instantiate(dragGhostPrefab, canvas.transform);
-        ghost.transform.position = transform.position;
+        ghostRect = ghost.GetComponent<RectTransform>();
 
         // 드래그 복제본 초기화 세팅
         ghost.GetComponent<Additional_EffectCell>().Update_CellVisual(Additional_Effect);
 
+        UpdateGhostPosition(eventData);
 
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
@@ -143,7 +147,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnDrag(PointerEventData eventData)
     {
         if (ghost != null)
-            ghost.transform.position = eventData.position;
+            UpdateGhostPosition(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -156,6 +160,21 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
+    }
+
+    // 위치변환 함수
+    private void UpdateGhostPosition(PointerEventData eventData)
+    {
+        Vector2 localPoint;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            eventData.position,
+            canvas.worldCamera,   // ⭐ Camera 모드에서는 반드시 필요
+            out localPoint
+        );
+
+        ghostRect.localPosition = localPoint;
     }
 
     private void Set_Descript_Text()
