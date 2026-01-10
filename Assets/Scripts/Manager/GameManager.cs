@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
             userGameData = ServiceLocator.Instance.CurrentUser;
             _playerMaxHP = userGameData.MaxHP;
         }
-        else if (userGameData != null)
+        else if (userGameData != null) // 여기서 Tutorial의 유저데이터로 설정 가능
         {
             _playerMaxHP = userGameData.MaxHP;
         }

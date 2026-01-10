@@ -50,6 +50,8 @@ public class UserGameData : ScriptableObject
             Cleared_Stage_IDs.Add(stageID);
     }
 
+
+    #region 메일 헬퍼 함수
     /// <summary>
     /// 메일 읽음 여부 확인하는 헬퍼 함수
     /// </summary>
