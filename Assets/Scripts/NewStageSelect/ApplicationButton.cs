@@ -18,6 +18,8 @@ public class ApplicationButton : MonoBehaviour
     private bool _isHovering = false;
     private bool _isSelected = false;
 
+    private Canvas canvas;
+
     private void Awake()
     {
         _image = GetComponent<Image>();
@@ -25,6 +27,8 @@ public class ApplicationButton : MonoBehaviour
         {
             _selectedImage.gameObject.SetActive(false);
         }
+
+        canvas = GetComponentInParent<Canvas>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -69,7 +73,12 @@ public class ApplicationButton : MonoBehaviour
     {
         if (_applicationPanel != null)
         {
-            _applicationPanel.gameObject.transform.position = _panelPosition;
+            RectTransform rt = _applicationPanel.GetComponent<RectTransform>();
+
+            rt.anchorMin = _panelPosition;
+            rt.anchorMax = _panelPosition;
+
+            rt.anchoredPosition = Vector2.zero;
             _applicationPanel.SetActive(true);
             _applicationPanel.transform.SetAsLastSibling();
         }
@@ -100,4 +109,19 @@ public class ApplicationButton : MonoBehaviour
         _selectedImage.color = color;
     }
 
+    // 화면 비율에 맞는 위치 변환
+    private Vector2 Convert_position(Vector3 v3)
+    {
+        Vector2 localPoint;
+        Vector2 v2 = new Vector2(v3.x, v3.y);
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.GetComponent<RectTransform>(),
+            v2,
+            canvas.worldCamera,   // ⭐ Camera 모드에서는 반드시 필요
+            out localPoint
+        );
+
+        return localPoint;
+    }
 }

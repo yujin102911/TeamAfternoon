@@ -14,8 +14,6 @@ public class PlayerTimeLineSlotView : MonoBehaviour, ITimelineSlotView
         var hover = GetComponent<PlayerSlotHover>();
         if (hover != null)
         {
-            hover.timelineUI = null;
-            hover.tick = -1;
             hover.placedBlock = null;
             hover.Is_prev = false;
         }  

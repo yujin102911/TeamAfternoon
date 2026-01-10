@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingPanel : MonoBehaviour
@@ -10,6 +12,13 @@ public class SettingPanel : MonoBehaviour
     [SerializeField] private Slider _masterSlider;
     [SerializeField] private Slider _bgmSlider;
     [SerializeField] private Slider _sfxSlider;
+
+    [Header("해상도 설정")]
+    [SerializeField] private TMP_Dropdown resolutionDropdown;
+    [SerializeField] private Toggle fullscreenToggle;
+
+    private Resolution[] resolutions;
+    private List<string> options = new List<string>();
 
     private void Awake()
     {

@@ -69,4 +69,17 @@ public class Effect_Line : MonoBehaviour
     {
         this.gameObject.SetActive(false);
     }
+
+    public void Hover(bool is_enter)
+    {
+
+        if(is_enter)
+        {
+            _back.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+        }
+        else
+        {
+            _back.color = Color.white;
+        }
+    }
 }
