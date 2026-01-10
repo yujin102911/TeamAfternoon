@@ -26,7 +26,7 @@ public class StageLinkHandler : MonoBehaviour
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        int linkIndex = TMP_TextUtilities.FindIntersectingLink(_tmpText, eventData.position, null);
+        int linkIndex = GetLinkIndex(eventData);
         if (linkIndex != -1)
         {
             string linkID = _tmpText.textInfo.linkInfo[linkIndex].GetLinkID();
@@ -45,6 +45,7 @@ public class StageLinkHandler : MonoBehaviour
 
     private void HandleStageLinkClick(int stageNum)
     {
+        Debug.Log("클릭됨");
         UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
         if (currentUser != null && currentUser.IsStageCleared(stageNum))
         {
