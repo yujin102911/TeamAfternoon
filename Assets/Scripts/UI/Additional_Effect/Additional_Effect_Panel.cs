@@ -69,11 +69,21 @@ public class Additional_Effect_Panel : MonoBehaviour
             GameObject go = Get();
             Additional_effect_UI uiBlock = go.GetComponent<Additional_effect_UI>();
             if (uiBlock != null) uiBlock.Init(effect);
-            ix++;
+            
 
             // effect_num 개수까지만 표시
             if (ix >= effect_num)
-                return;
+            {
+                uiBlock.SetLock(true);
+                //return;
+            }
+            else
+            {
+                uiBlock.SetLock(false);
+            }
+
+            ix++;
+
         }
 
         

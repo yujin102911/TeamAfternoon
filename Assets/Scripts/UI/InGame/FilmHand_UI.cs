@@ -15,6 +15,9 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
     private Canvas canvas;
     private CanvasGroup canvasGroup;
 
+    private RectTransform canvasRect;
+    private RectTransform ghostRect;
+
     private RectTransform rectTransform;
 
     [Header("마우스 호버 설정")]
@@ -34,6 +37,7 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+        canvasRect = canvas.GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
@@ -95,11 +99,12 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
         // 드래그용 복제 생성
         ghost = Instantiate(dragGhostPrefab, canvas.transform);
-        ghost.transform.position = transform.position;
+        ghostRect = ghost.GetComponent<RectTransform>();
 
         // 드래그 복제본 초기화 세팅
         ghost.GetComponent<Film_UI>().Show(runtimeBlock);
 
+        UpdateGhostPosition(eventData);
 
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
@@ -109,7 +114,7 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
     public void OnDrag(PointerEventData eventData)
     {
         if (ghost != null)
-            ghost.transform.position = eventData.position;
+            UpdateGhostPosition(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -122,6 +127,21 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
+    }
+
+    // 위치변환 함수
+    private void UpdateGhostPosition(PointerEventData eventData)
+    {
+        Vector2 localPoint;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            eventData.position,
+            canvas.worldCamera,   // ⭐ Camera 모드에서는 반드시 필요
+            out localPoint
+        );
+
+        ghostRect.localPosition = localPoint;
     }
 
     public void OnPointerClick(PointerEventData eventData)

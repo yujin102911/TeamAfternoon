@@ -695,7 +695,7 @@ MonoBehaviour:
   _initialDelay: 1
   _delayBetweenLogos: 1
   _finalDelay: 0.5
-  _titleSceneName: Title_Scene
+  _titleSceneName: 1_Title_Scene
 --- !u!1 &1733260876
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +802,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   easyModeTemplate: {fileID: 11400000, guid: 544ecce3d31bb554586b09c68e66abc0, type: 2}
   hardModeTemplate: {fileID: 11400000, guid: f8a50728151ddff43afc20838d65d579, type: 2}
+  cursorAnimations:
+  - Name: Loading
+    Frames:
+    - {fileID: 2800000, guid: 84345a7dc5e6fa0439111ed47e448a5c, type: 3}
+    - {fileID: 2800000, guid: 117693403bd3bec438f714057befffcf, type: 3}
+    - {fileID: 2800000, guid: fdb0a9dbeb2ab6a4cb191d9aec9e8c2f, type: 3}
+    - {fileID: 2800000, guid: 0fac39d8f731d8d468b78ec0b692f8db, type: 3}
+    - {fileID: 2800000, guid: 813d1e303d5d98c43aca88c39600998c, type: 3}
+    - {fileID: 2800000, guid: cf82e298fbc66314ca79218917558676, type: 3}
+    - {fileID: 2800000, guid: cf9ab5efe6e8cc441928fd9899e6203f, type: 3}
+    - {fileID: 2800000, guid: f1de56ffa66a5584b8755ec2eb48dfb6, type: 3}
+    - {fileID: 2800000, guid: 2dfcdf8d6252eed418c44f8334360cbc, type: 3}
+    - {fileID: 2800000, guid: 7ec1beb24e8051a42a7b736423fc1740, type: 3}
+    - {fileID: 2800000, guid: f2132b292543e9142835dd35f776a459, type: 3}
+    - {fileID: 2800000, guid: 7329d37e608183e44979df45dc56fc11, type: 3}
+    - {fileID: 2800000, guid: d6dd9273e226f9e4ebaddd40733fcc33, type: 3}
+    - {fileID: 2800000, guid: 177a8ae83eba029439c9520d2e496835, type: 3}
+    FPS: 10
+    Hotspot: {x: 0, y: 0}
 --- !u!4 &1784985701
 Transform:
   m_ObjectHideFlags: 0

@@ -45,12 +45,14 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (eventData.pointerDrag == null)
         {
             Update_UIUX(true);
+            timelineUI.Hover_EffectUI(tick, true);
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         Update_UIUX(false);
+        timelineUI.Hover_EffectUI(tick, false);
     }
 
     public void OnBeginDrag(PointerEventData eventData)

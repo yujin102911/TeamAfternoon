@@ -25,6 +25,8 @@ public class DragOn_timeline : MonoBehaviour
     private GameObject ghost;
     public RuntimeBlock draggingBlock;
     private Canvas canvas;
+    private RectTransform canvasRect;
+    private RectTransform ghostRect;
 
     public bool isDragging;
 
@@ -49,14 +51,15 @@ public class DragOn_timeline : MonoBehaviour
 
         draggingBlock = e.block;
         canvas = e.canvas;
+        canvasRect = canvas.GetComponent<RectTransform>();
 
         // 레이아웃에 따른 프리펩 선정
         GameObject prefab = New_Layout ? New_Layout_ghost : _ghostPrefab;
 
         ghost = Instantiate(prefab, canvas.transform);
-        ghost.transform.position = e.startWorldPos;
+        ghostRect = ghost.GetComponent<RectTransform>();
 
-        if(ghost.GetComponent<Draggable_Block>() != null)
+        if (ghost.GetComponent<Draggable_Block>() != null)
         {
             ghost.GetComponent<Draggable_Block>().Show(draggingBlock);
         }
@@ -65,6 +68,7 @@ public class DragOn_timeline : MonoBehaviour
             ghost.GetComponent<Film_UI>().Show(draggingBlock);
         }
 
+        UpdateGhostPosition(e.startWorldPos);
 
         if (SoundManager.Instance != null)
             SoundManager.Instance.Play(SoundID.SFX_Spell_Cancle);
@@ -75,7 +79,8 @@ public class DragOn_timeline : MonoBehaviour
         if (!isDragging) return;
         if (ghost == null) return;
 
-        ghost.transform.position = Input.mousePosition;
+        //ghost.transform.position = Input.mousePosition;
+        UpdateGhostPosition(Input.mousePosition);
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -99,6 +104,22 @@ public class DragOn_timeline : MonoBehaviour
 
         if(BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
+    }
+
+    // 위치변환 함수
+    private void UpdateGhostPosition(Vector3 v3)
+    {
+        Vector2 localPoint;
+        Vector2 v2 = new Vector2(v3.x, v3.y);
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            v2,
+            canvas.worldCamera,   // ⭐ Camera 모드에서는 반드시 필요
+            out localPoint
+        );
+
+        ghostRect.localPosition = localPoint;
     }
 
     void OnDropFailed()
