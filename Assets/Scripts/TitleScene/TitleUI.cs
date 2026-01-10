@@ -74,6 +74,10 @@ public class TitleUI : MonoBehaviour
         {
             _continueButton.GetComponent<Image>().color = new Color32(217, 217, 217, 255);
         }
+
+        // 타이틀 브금
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.BGM_Title);
     }
 
     #region Main Button Logic

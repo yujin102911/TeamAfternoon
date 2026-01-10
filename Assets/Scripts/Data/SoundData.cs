@@ -24,7 +24,9 @@ public enum SoundID
 {
     // BGM
     BGM_Title,
+    BGM_Stage,
     BGM_Battle,
+    BGM_Boss,
 
     // UI
     UI_Click,

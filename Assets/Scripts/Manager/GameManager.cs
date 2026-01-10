@@ -129,6 +129,14 @@ public class GameManager : MonoBehaviour
         LateInitialize();
         SubscribeEvents();
         LoadEnemyAtIndex(0, false);
+
+        // 베틀씬 사운드
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.Play(SoundID.BGM_Battle);
+            Debug.Log("함");
+        }
+            
     }
 
     private void OnDestroy()
@@ -438,8 +446,7 @@ public class GameManager : MonoBehaviour
             _mapSystem.EnableSelectionMode();
         });
 
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.BGM_Battle);
+        
     }
 
     private void HandleEnemyPurified()
