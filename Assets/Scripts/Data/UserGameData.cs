@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -36,6 +37,26 @@ public class UserGameData : ScriptableObject
     public List<int> Read_Board_Stage_IDs = new List<int>();
 
     #region Helper Methods
+    #region 클립 헬퍼 함수
+    public void AddUnlockedBlock(int blockID, List<int> keywordIDs = null)
+    {
+        if (Unlocked_Blocks.Any(b => b.Owner_blockID == blockID))
+        {
+            Debug.LogWarning($"Block {blockID}는 이미 해금되어 있습니다");
+            return;
+        }
+        Saved_BlockData newBlock = new Saved_BlockData
+        {
+            Owner_blockID = blockID,
+            Attached_Keyword_IDs = keywordIDs ?? new List<int>(),
+            IsFavorite = false,
+        };
+        Unlocked_Blocks.Add(newBlock);
+        Debug.Log($"[UserData] 새로운 블록 해금: {blockID}");
+    }
+    #endregion
+
+    #region 스테이지 헬퍼 함수
     /// <summary>
     /// 특정 스테이지를 클리어 했는지 확인하는 헬퍼 함수
     /// </summary>
@@ -49,7 +70,9 @@ public class UserGameData : ScriptableObject
         if (!Cleared_Stage_IDs.Contains (stageID)) 
             Cleared_Stage_IDs.Add(stageID);
     }
+    #endregion
 
+    #region 메일 헬퍼 함수
     /// <summary>
     /// 메일 읽음 여부 확인하는 헬퍼 함수
     /// </summary>
@@ -65,9 +88,9 @@ public class UserGameData : ScriptableObject
         if (!Read_Mail_Keys.Contains (key))
             Read_Mail_Keys .Add (key);
     }
+    #endregion
 
-
-    // =================게시판 헬퍼 함수 =========
+    #region 보드 헬퍼 함수
     public bool IsBoardRead(int stageID) => Read_Board_Stage_IDs .Contains (stageID);
 
     public void SetBoardRead(int stageID)
@@ -75,6 +98,7 @@ public class UserGameData : ScriptableObject
         if (!Read_Board_Stage_IDs.Contains(stageID))
             Read_Board_Stage_IDs.Add(stageID);
     }
+    #endregion
     #endregion
 }
 

@@ -7,6 +7,9 @@ public class FixedAspectCamera : MonoBehaviour
 
     private Camera cam;
 
+    private int lastW;
+    private int lastH;
+
     void Awake()
     {
         cam = GetComponent<Camera>();
@@ -18,19 +21,30 @@ public class FixedAspectCamera : MonoBehaviour
         if (cam == null)
             cam = GetComponent<Camera>();
 
-        UpdateCameraRect();
+        //UpdateCameraRect();
     }
 
     void Update()
     {
         // 창 크기 바뀌는 에디터 / 런타임 대응
-        UpdateCameraRect();
+        if (Screen.width != lastW || Screen.height != lastH)
+        {
+            lastW = Screen.width;
+            lastH = Screen.height;
+            UpdateCameraRect();
+        }
     }
 
     void UpdateCameraRect()
     {
+        if (Screen.height <= 0 || Screen.width <= 0)
+            return;
+
         float windowAspect = (float)Screen.width / Screen.height;
         float scaleHeight = windowAspect / targetAspect;
+
+        if (float.IsNaN(scaleHeight) || float.IsInfinity(scaleHeight))
+            return;
 
         if (scaleHeight < 1f)
         {

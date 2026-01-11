@@ -15,6 +15,8 @@ public class StepSlider : MonoBehaviour
 
     private Coroutine playRoutine;
 
+    public event System.Action<int> OnStepSelected;
+
     void Start()
     {
         slider.minValue = 0;
@@ -52,6 +54,7 @@ public class StepSlider : MonoBehaviour
             
             _timelineUI.Show_Preview(step);
         }
+        OnStepSelected?.Invoke(step);
     }
 
     public void Play(float duration)

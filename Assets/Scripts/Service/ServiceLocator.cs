@@ -15,6 +15,7 @@ public class ServiceLocator : MonoBehaviour
     [SerializeField] private UserGameData easyModeTemplate;
     [SerializeField] private UserGameData hardModeTemplate;
 
+
     [Header("커서 애니메이션 설정")]
     [SerializeField] private List<CursorAnimation> cursorAnimations;
 
@@ -40,11 +41,20 @@ public class ServiceLocator : MonoBehaviour
         }
     }
 
-    public void CreateNewGame(Difficulty mode)
+    /// <summary>
+    /// 튜토리얼 전용 유저데이터를 생성하는 함수 (저장 X)
+    /// </summary>
+    public void CreateNewTutorial(Difficulty mode)
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
         CurrentUser = Instantiate(template);
-
+    }
+    
+    /// <summary>
+    /// 현재의 UserData를 저장하는 함수
+    /// </summary>
+    public void SaveNowUserData()
+    {
         SaveService.Save(CurrentUser);
     }
 

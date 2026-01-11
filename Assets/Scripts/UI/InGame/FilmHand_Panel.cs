@@ -34,6 +34,9 @@ public class FilmHand_Panel : MonoBehaviour
     [SerializeField] private Button _sortToggleButton;
     [SerializeField] private TextMeshProUGUI _sortText;
 
+    // 튜토 전용 이벤트
+    public event System.Action<HashSet<HandFilterType>> OnFilterChanged;
+
     private void Awake()
     {
         InitializePool();
@@ -98,6 +101,8 @@ public class FilmHand_Panel : MonoBehaviour
         _syncing = false;
 
         UpdateHandUI(TimelineManager.Instance.CurrentHand);
+
+        OnFilterChanged?.Invoke(_activeFilters);
     }
 
     private void OnDestroy()
@@ -133,6 +138,7 @@ public class FilmHand_Panel : MonoBehaviour
         _syncing = false;
 
         UpdateHandUI(TimelineManager.Instance.CurrentHand);
+        OnFilterChanged?.Invoke(_activeFilters);
     }
 
     private void InitializePool()
@@ -309,5 +315,8 @@ public class FilmHand_Panel : MonoBehaviour
     {
         SetAll(false);
     }
+
+    #region 튜토리얼 전용 함수
+    #endregion
 
 }
