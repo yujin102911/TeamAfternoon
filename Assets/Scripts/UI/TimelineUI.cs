@@ -98,6 +98,7 @@ public class TimelineUI : MonoBehaviour
     public event Action OnRequestClearHighlight;
     public event Action<int, ActionType, MoveDirection, bool> OnRequestPreviewPlayer; // 몇번 섹터, 무슨 행동, 어느 방향, 적 어디쪽?
     public event Action OnRequestHidePreview;
+    public event Action<int> OnEnemySlotHovered; // 어떤 틱에 호버됐는지 전달
 
     // 현재 적 시퀀스
     private EnemyPattern _currentPattern;
@@ -1010,4 +1011,12 @@ public class TimelineUI : MonoBehaviour
             }
         }
     }
+
+    #region 튜토리얼용 메서드
+    public void NotifyEnemySlotHover(int tick)
+    {
+        OnEnemySlotHovered?.Invoke(tick);
+    }
+    #endregion
+
 }

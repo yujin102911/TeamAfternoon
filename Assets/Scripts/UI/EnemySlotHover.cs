@@ -16,6 +16,7 @@ public class EnemySlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (timelineUI != null)
         {
             timelineUI.ShowEnemyAttackTooltip(tick, transform.position);
+            timelineUI.NotifyEnemySlotHover(tick);
         }
     }
 

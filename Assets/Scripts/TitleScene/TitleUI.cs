@@ -35,7 +35,8 @@ public class TitleUI : MonoBehaviour
     [SerializeField] private Button _confirmNoButton;
 
     [Header("씬 설정")]
-    [SerializeField] private string _nextSceneName = "DesktopScene";
+    [SerializeField] private string _withoutTutorialScene = "DesktopScene";
+    [SerializeField] private string _tutorialScene = "TutorialScene";
 
 
     private void Awake()
@@ -110,7 +111,7 @@ public class TitleUI : MonoBehaviour
         Debug.Log("[TitleUI] 기존 데이터를 불러와 게임을 이어갑니다.");
         if (ServiceLocator.Instance.LoadGame())
         {
-            ServiceLocator.Instance.Scene.Load(_nextSceneName);
+            ServiceLocator.Instance.Scene.Load(_withoutTutorialScene);
         }
     }
 
@@ -142,6 +143,8 @@ public class TitleUI : MonoBehaviour
     }
 
     // 진짜로 새 게임을 생성하고 씬을 넘기는 최종 단계
+    // -> 새 게임을 생성해서 계약서에 싸인하는 씬으로 넘어가도록 설정
+    // 이때 생성된 UserData는 저장되지 않음
     private void StartNewGameFinal()
     {
         //_confirmPopup.SetActive(false);
@@ -149,8 +152,9 @@ public class TitleUI : MonoBehaviour
         // 드롭다운 값 읽기 (0: Easy, 1: Hard 등)
         Difficulty selectedMode = (Difficulty)_difficultyDropdown.value;
 
-        ServiceLocator.Instance.CreateNewGame(selectedMode);
-        ServiceLocator.Instance.Scene.Load(_nextSceneName);
+        //ServiceLocator.Instance.CreateNewGame(selectedMode);
+        ServiceLocator.Instance.CreateNewTutorial(selectedMode);
+        ServiceLocator.Instance.Scene.Load(_tutorialScene);
     }
 
     #endregion
