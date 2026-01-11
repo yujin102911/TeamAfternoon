@@ -85,12 +85,37 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
         // 색상 변경
         _image.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+        if (CardTooltip.Instance != null) 
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
+
+            RectTransform rt = transform as RectTransform;
+            if (rt == null) return;
+
+            // ✅ Rect 내부의 (0.9, 0.9) 지점(정규화) -> 로컬 좌표로 변환
+            Vector2 rectSize = rt.rect.size;
+            Vector2 localPoint = new Vector2(
+                (0.9f - rt.pivot.x) * rectSize.x,
+                (0.9f - rt.pivot.y) * rectSize.y
+            );
+
+            // ✅ 로컬 -> 월드 -> 스크린
+            Vector3 worldPoint = rt.TransformPoint(localPoint);
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldPoint);
+
+            CardTooltip.Instance.ShowAction(RuntimeBlock, screenPos, cam);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _isPointerOver = false;
         _image.color = _originColor;
+        CardTooltip.Instance.Hide();
     }
 
     public void OnBeginDrag(PointerEventData eventData)

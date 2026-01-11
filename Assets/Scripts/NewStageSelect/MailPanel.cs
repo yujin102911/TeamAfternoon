@@ -86,6 +86,8 @@ public class MailPanel : MonoBehaviour
                         GameObject go = Instantiate(_mailButtonPrefab, _contentArea);
                         go.transform.SetAsFirstSibling();
 
+                        go.name = $"Mail_Stage{stage.StageNumber}_Index{m}";
+
                         StageButton mailBtn = go.GetComponent<StageButton>();
                         mailBtn.Setup(stage, m, mail, DisplayLetterContent);
                     }
@@ -110,6 +112,11 @@ public class MailPanel : MonoBehaviour
         if (_bodyScrollRect != null)
         {
             _bodyScrollRect.verticalNormalizedPosition = 1f; // 1은 맨 위, 0은 맨 아래
+        }
+        if (NailController.Instance != null)
+        {
+            string signal = $"Mail_Read_{data.StageNumber}_{mailIndex}";
+            NailController.Instance.CompleteStepBySignal(signal);
         }
     }
 }
