@@ -169,7 +169,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     {
         if (SoundManager.Instance == null) return;
 
-        switch (stage_num)
+        switch (stage_num - 1)
         {
             case 0:
                 SoundManager.Instance.Play(SoundID.EnemyEffect_0);
