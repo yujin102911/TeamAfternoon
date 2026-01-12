@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.UI;
 
 public enum HandSortType { Length, Action }
 
@@ -33,6 +34,9 @@ public class FilmHand_Panel : MonoBehaviour
     [Header("정렬 토글 버튼")]
     [SerializeField] private Button _sortToggleButton;
     [SerializeField] private TextMeshProUGUI _sortText;
+    [SerializeField]
+    private LocalizedString _sort;
+
 
     // 튜토 전용 이벤트
     public event System.Action<HashSet<HandFilterType>> OnFilterChanged;
@@ -41,6 +45,20 @@ public class FilmHand_Panel : MonoBehaviour
     {
         InitializePool();
     }
+
+    private void OnEnable()
+    {
+        _sort.StringChanged += OnSortChanged;
+
+        _sort.RefreshString();
+    }
+
+    private void OnDisable()
+    {
+        _sort.StringChanged -= OnSortChanged;
+    }
+
+    private void OnSortChanged(string value) => _sortText.text = value;
 
     void Start()
     {
@@ -267,11 +285,11 @@ public class FilmHand_Panel : MonoBehaviour
         if (_sortText == null) return;
         if (_currentSortType == HandSortType.Length)
         {
-            _sortText.text = "길이순 정렬";
+            _sort.TableEntryReference = "UI_SORTING_LENGTH";
         }
         else if(_currentSortType == HandSortType.Action)
         {
-            _sortText.text = "액션순 정렬";
+            _sort.TableEntryReference = "UI_SORTING_ACTION";
         }
     }
 
