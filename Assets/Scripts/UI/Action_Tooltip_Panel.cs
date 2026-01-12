@@ -17,6 +17,20 @@ public class Action_Tooltip_Panel : MonoBehaviour
     [SerializeField]
     private Action_Desc_Cell[] _descriptionCells;
 
+    private void OnEnable()
+    {
+        _nameText.StringChanged += OnNameChanged;
+
+        _nameText.RefreshString();
+    }
+
+    private void OnDisable()
+    {
+        _nameText.StringChanged -= OnNameChanged;
+    }
+
+    private void OnNameChanged(string value) => _nameTxt.text = value;
+
     private void Clear_Cells()
     {
         for (int i = 0; i < _descriptionCells.Length; i++)
@@ -56,7 +70,7 @@ public class Action_Tooltip_Panel : MonoBehaviour
         Clear_Cells();
 
         // 이름 텍스트 설정(추후 
-        _nameTxt.text = r_block.BaseData.blockName;
+        _nameText.TableEntryReference = r_block.BaseData.blockName;
 
         for (int i = 0; i < r_block.BaseData.blockLength; i++)
         {
