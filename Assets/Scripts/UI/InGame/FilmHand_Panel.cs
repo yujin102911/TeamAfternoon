@@ -171,7 +171,6 @@ public class FilmHand_Panel : MonoBehaviour
 
     public GameObject Get()
     {
-        Debug.Log($"{_handPool.Count}. 블럭 풀 크기");
         if (_handPool.Count > 0)
         {
             GameObject obj = _handPool.Dequeue();
