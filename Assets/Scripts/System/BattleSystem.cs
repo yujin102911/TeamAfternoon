@@ -406,6 +406,10 @@ public class BattleSystem
             {
                 OnChangePlayerAnim?.Invoke("7_1_GuardSuccess");
                 Debug.Log("<color=blue>[BattleSystem] 방어 성공! 데미지 0</color>");
+                
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Guard);
+
                 _isGuarding = false;
             }
             else

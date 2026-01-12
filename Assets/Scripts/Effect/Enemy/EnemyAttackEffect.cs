@@ -91,6 +91,9 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     {
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.SpawnStone();
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Stone);
     }
 
     public void Show_Star()
