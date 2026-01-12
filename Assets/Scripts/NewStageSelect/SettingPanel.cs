@@ -49,6 +49,16 @@ public class SettingPanel : MonoBehaviour
 
     private bool _isInitializing = false;
 
+    // 언어 딕셔너리
+    static readonly Dictionary<string, string> AutonymMap = new()
+{
+    { "en", "English" },
+    { "ko-KR", "한국어" },
+    { "ja", "日本語" },
+    { "zh-Hans", "简体中文" },
+    { "zh-Hant", "繁體中文" },
+};
+
     private void Awake()
     {
         _xButton.onClick.AddListener(CloseSetting);
@@ -293,6 +303,15 @@ public class SettingPanel : MonoBehaviour
         confirmPopup.SetActive(false);
     }
 
+    string GetDisplayName(Locale locale)
+    {
+        var code = locale.Identifier.Code; // "ko-KR"
+        if (AutonymMap.TryGetValue(code, out var name)) return name;
+
+        // fallback: "Korean (South Korea)" 같은 기본 이름
+        return locale.LocaleName;
+    }
+
     private void InitLanguageDropdown()
     {
         if (languageDropdown == null) return;
@@ -308,7 +327,8 @@ public class SettingPanel : MonoBehaviour
         List<string> options = new List<string>(_availableLocales.Count);
         for (int i = 0; i < _availableLocales.Count; i++)
         {
-            options.Add(_availableLocales[i].LocaleName);
+            string name = GetDisplayName(_availableLocales[i]);
+            options.Add(name);
         }
         languageDropdown.AddOptions(options);
 
