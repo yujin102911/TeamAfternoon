@@ -41,6 +41,7 @@ public class BattleResultUIController : MonoBehaviour
     [Header("씬 설정")]
     [SerializeField] private string _mainSceneName = "MainScene";
     [SerializeField] private string _battleSceneName = "BattleScene";
+    [SerializeField] private string _endSceneName = "EndScene";
 
     private void Awake()
     {
@@ -162,17 +163,29 @@ public class BattleResultUIController : MonoBehaviour
     {
         int currentDay = 0;
         int nextDay = 1;
-        AsyncOperation asyncLoad = null;
-        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
-        {
-            asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(_mainSceneName);
-            asyncLoad.allowSceneActivation = false; // 로딩이 끝나도 바로 씬을 바꾸지 않음
-        }
+        int totalStages = 0;
+        string targetSceneName = _mainSceneName;
+        
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             currentDay = GameManager.Instance.CurrentStageData.StageNumber;
             nextDay = currentDay + 1;
             _dayCountText.text = $"Day {currentDay:D2}";
+        }
+        if (DataRepository.Instance != null)
+        {
+            totalStages = DataRepository.Instance.stageDatas.Count;
+        }
+        if (currentDay >= totalStages)
+        {
+            targetSceneName = _endSceneName;
+            Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
+        }
+        AsyncOperation asyncLoad = null;
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
+        {
+            asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(targetSceneName);
+            asyncLoad.allowSceneActivation = false; // 로딩이 끝나도 바로 씬을 바꾸지 않음
         }
         if (_fadeCanvasGroup != null)
         {
