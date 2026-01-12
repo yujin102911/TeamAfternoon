@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class SettingPanel : MonoBehaviour
@@ -25,6 +27,14 @@ public class SettingPanel : MonoBehaviour
     [SerializeField] private GameObject confirmPopup;
     [SerializeField] private TMP_Text confirmText;
 
+    [Header("언어 설정")]
+    [SerializeField] private TMP_Dropdown languageDropdown;
+
+    private const string LanguageKey = "LANGUAGE_LOCALE_CODE"; // 예: "en", "ko-KR"
+
+    private List<Locale> _availableLocales = new List<Locale>();
+    private bool _isInitializingLanguageUI = false;
+
     private Resolution[] resolutions;
     private List<string> options = new List<string>();
 
@@ -37,6 +47,8 @@ public class SettingPanel : MonoBehaviour
     private Coroutine confirmCoroutine;
     private const float CONFIRM_TIME = 15f;
 
+    private bool _isInitializing = false;
+
     private void Awake()
     {
         _xButton.onClick.AddListener(CloseSetting);
@@ -45,14 +57,30 @@ public class SettingPanel : MonoBehaviour
         _bgmSlider.onValueChanged.AddListener(val => SoundManager.Instance.SetBGMVolume(val));
         _sfxSlider.onValueChanged.AddListener(val => SoundManager.Instance.SetSFXVolume(val));
 
-        _activeBtn.onClick.AddListener(OnSetting_change);
+        //_activeBtn.onClick.AddListener(OnSetting_change);
+
+        // ✅ 즉시 적용 리스너 연결
+        resolutionDropdown.onValueChanged.RemoveListener(OnResolutionDropdownChanged_Immediate);
+        resolutionDropdown.onValueChanged.AddListener(OnResolutionDropdownChanged_Immediate);
+
+        fullscreenToggle.onValueChanged.RemoveListener(OnFullscreenToggleChanged_Immediate);
+        fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged_Immediate);
     }
 
-    void Start()
+    private IEnumerator Start()
     {
+        _isInitializing = true;
+
         InitResolutionDropdown();
 
-        fullscreenToggle.isOn = Screen.fullScreen;
+        // 초기값 세팅 시 이벤트 발동 방지
+        fullscreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
+
+        yield return LocalizationSettings.InitializationOperation;
+
+        InitLanguageDropdown();
+
+        _isInitializing = false;
     }
 
     private void OnEnable()
@@ -141,6 +169,48 @@ public class SettingPanel : MonoBehaviour
             fullscreenToggle.isOn = Screen.fullScreen;
     }
 
+    private void OnResolutionDropdownChanged_Immediate(int index)
+    {
+        if (_isInitializing) return;
+
+        ApplyDisplaySettingsAndAskConfirm();
+    }
+
+    private void OnFullscreenToggleChanged_Immediate(bool isFullscreen)
+    {
+        if (_isInitializing) return;
+
+        ApplyDisplaySettingsAndAskConfirm();
+    }
+
+    private void ApplyDisplaySettingsAndAskConfirm()
+    {
+        // 이미 확인 팝업 떠있는 상태에서 또 바꾸면
+        // "이전값"을 덮어쓰면 롤백이 꼬여서,
+        // 팝업이 떠있으면 먼저 롤백값을 업데이트하지 않는 편이 안전함.
+        // 여기선 "팝업이 꺼져있을 때만 prev 저장" 방식으로 처리.
+        if (confirmPopup != null && !confirmPopup.activeSelf)
+        {
+            prevWidth = Screen.width;
+            prevHeight = Screen.height;
+            prevFullscreen = Screen.fullScreen;
+        }
+
+        // ✅ 즉시 적용
+        ApplyResolution(resolutionDropdown.value, fullscreenToggle.isOn);
+    }
+
+    private void ApplyResolution(int index, bool fullscreen)
+    {
+        if (resolutions == null || resolutions.Length == 0) return;
+        index = Mathf.Clamp(index, 0, resolutions.Length - 1);
+
+        Resolution selected = resolutions[index];
+
+        Screen.SetResolution(selected.width, selected.height, fullscreen);
+    }
+
+
     public void OnResolutionChanged(int index)
     {
         Resolution selected = resolutions[index];
@@ -221,6 +291,74 @@ public class SettingPanel : MonoBehaviour
         fullscreenToggle.isOn = prevFullscreen;
 
         confirmPopup.SetActive(false);
+    }
+
+    private void InitLanguageDropdown()
+    {
+        if (languageDropdown == null) return;
+
+        _isInitializingLanguageUI = true;
+
+        _availableLocales.Clear();
+        _availableLocales.AddRange(LocalizationSettings.AvailableLocales.Locales);
+
+        languageDropdown.ClearOptions();
+
+        // 표시 이름은 LocaleName(예: English, Korean (South Korea)) 사용
+        List<string> options = new List<string>(_availableLocales.Count);
+        for (int i = 0; i < _availableLocales.Count; i++)
+        {
+            options.Add(_availableLocales[i].LocaleName);
+        }
+        languageDropdown.AddOptions(options);
+
+        // 저장된 언어가 있으면 그걸로 선택, 없으면 현재 SelectedLocale
+        string savedCode = PlayerPrefs.GetString(LanguageKey, "");
+        int selectedIndex = GetLocaleIndexByCode(savedCode);
+
+        if (selectedIndex < 0)
+        {
+            var current = LocalizationSettings.SelectedLocale;
+            selectedIndex = _availableLocales.IndexOf(current);
+            if (selectedIndex < 0) selectedIndex = 0;
+        }
+
+        languageDropdown.SetValueWithoutNotify(selectedIndex);
+        languageDropdown.RefreshShownValue();
+
+        // 이벤트 연결 (중복 방지)
+        languageDropdown.onValueChanged.RemoveListener(OnLanguageDropdownChanged);
+        languageDropdown.onValueChanged.AddListener(OnLanguageDropdownChanged);
+
+        _isInitializingLanguageUI = false;
+    }
+
+    private int GetLocaleIndexByCode(string code)
+    {
+        if (string.IsNullOrEmpty(code)) return -1;
+
+        for (int i = 0; i < _availableLocales.Count; i++)
+        {
+            // Locale.Identifier.Code 예: "en", "ko-KR"
+            if (_availableLocales[i].Identifier.Code == code)
+                return i;
+        }
+        return -1;
+    }
+
+    private void OnLanguageDropdownChanged(int index)
+    {
+        if (_isInitializingLanguageUI) return;
+        if (index < 0 || index >= _availableLocales.Count) return;
+
+        Locale selected = _availableLocales[index];
+
+        // 즉시 적용
+        LocalizationSettings.SelectedLocale = selected;
+
+        // 저장(다음 실행 때 유지)
+        PlayerPrefs.SetString(LanguageKey, selected.Identifier.Code);
+        PlayerPrefs.Save();
     }
 
 }
