@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 
 public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler,
@@ -31,6 +32,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     private TextMeshProUGUI costText;
     [SerializeField]
     private TextMeshProUGUI nameText;
+    [SerializeField]
+    private LocalizedString _nameText;
 
     [Header("자물쇠")]
     [SerializeField]
@@ -68,20 +71,31 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    private void OnEnable()
+    {
+        _nameText.StringChanged += OnNameChanged;
+        _nameText.RefreshString();
+    }
+
     private void OnDisable()
     {
         Destroy(ghost);
         ghost = null;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+
+        _nameText.StringChanged -= OnNameChanged;
     }
+
+    private void OnNameChanged(string value) => nameText.text = value;
 
     public void Init(Additional_Effect _Effect)
     {
         Additional_Effect = _Effect;
         cell.Update_CellVisual(Additional_Effect);
 
-        nameText.text = Additional_Effect.effectName + ".mfx";
+        //nameText.text = Additional_Effect.effectName + ".mfx";
+        _nameText.TableEntryReference = Additional_Effect.effectName;
         costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
     }
 
@@ -179,23 +193,28 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void Set_Descript_Text()
     {
-        if(CardTooltip.Instance != null)
+        if (CardTooltip.Instance != null)
         {
-            string title = Additional_Effect.effectName;
-            string body = Additional_Effect.effectDescription;
+            var canvas = GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
 
-            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+            RectTransform rt = transform as RectTransform;
+            if (rt == null) return;
 
-            // 카드 Rect의 오른쪽 중앙 월드 좌표
-            Vector3 worldBottomCenter = rectTransform.TransformPoint(
-                new Vector3(rectTransform.rect.width * 0.6f, rectTransform.rect.height * 0.5f, 0f)
+            // ✅ Rect 내부의 (0.9, 0.9) 지점(정규화) -> 로컬 좌표로 변환
+            Vector2 rectSize = rt.rect.size;
+            Vector2 localPoint = new Vector2(
+                (0.9f - rt.pivot.x) * rectSize.x,
+                (0.9f - rt.pivot.y) * rectSize.y
             );
 
-            // 월드 → 스크린 좌표
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+            // ✅ 로컬 -> 월드 -> 스크린
+            Vector3 worldPoint = rt.TransformPoint(localPoint);
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldPoint);
 
-            CardTooltip.Instance.Show(title, body, screenPos, Camera.main);
+            CardTooltip.Instance.Show_EffectDesc(Additional_Effect, screenPos, cam);
         }
     }
 

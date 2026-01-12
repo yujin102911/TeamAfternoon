@@ -16,6 +16,12 @@ public class CardTooltip : MonoBehaviour
     [Header("액션 상세 설명창")]
     [SerializeField]
     private Action_Tooltip_Panel action_Tooltip_Panel;
+    [SerializeField]
+    private Timeline_Action_TooltipPanel timeline_Action_TooltipPanel;
+    [SerializeField]
+    private EnemyPattern_TooltipPanel enemy_Pattern_TooltipPanel;
+    [SerializeField]
+    private Effect_TooltipPanel effect_TooltipPanel;
 
     [Header("위치 오프셋")]
     [SerializeField] private Vector2 offset = new Vector2(0f, -10f); // ← 오른쪽으로 안 밀리게 X=0
@@ -91,6 +97,21 @@ public class CardTooltip : MonoBehaviour
         action_Tooltip_Panel.Show(runtimeBlock, screenPos, cam);
     }
 
+    public void Show_TimelineAction(ActionType action, int damage, Vector2 screenPos, Camera cam)
+    {
+        timeline_Action_TooltipPanel.Show(action, damage, screenPos, cam);
+    }
+
+    public void Show_PatternDesc(Pattern_Label label, Vector2 screenPos, Camera cam, int stone_num = 0)
+    {
+        enemy_Pattern_TooltipPanel.Show(label, screenPos, cam, stone_num);
+    }
+
+    public void Show_EffectDesc(Additional_Effect effect, Vector2 screenPos, Camera cam)
+    {
+        effect_TooltipPanel.Show(effect, screenPos, cam);
+    }
+
     public void Hide()
     {
         for (int i = 0; i < keywords.Length; i++) 
@@ -104,5 +125,14 @@ public class CardTooltip : MonoBehaviour
 
         if(action_Tooltip_Panel != null)
             action_Tooltip_Panel.Hide();
+
+        if(timeline_Action_TooltipPanel != null)
+            timeline_Action_TooltipPanel.Hide();
+
+        if(enemy_Pattern_TooltipPanel != null)
+            enemy_Pattern_TooltipPanel.Hide();
+
+        if(effect_TooltipPanel  != null) 
+            effect_TooltipPanel.Hide();
     }
 }

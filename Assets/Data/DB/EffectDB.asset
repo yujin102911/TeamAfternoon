@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36ec2b988e0d03e44959d1b0e6543d76, type: 3}
+  m_Name: EffectDB
+  m_EditorClassIdentifier: 
+  _effectDB:
+  - effectName: EFFECT_SWIFT_NAME
+    effectDescription: EFFECT_SWIFT_DESC
+    effectType: 2
+    effectColor: {r: 0.23113209, g: 0.92763597, b: 1, a: 1}
+    cost: 2
+    Apply_actionTypes: 090000000a000000
+  - effectName: EFFECT_DAMAGE_UP_NAME
+    effectDescription: EFFECT_DAMAGE_UP_DESC
+    effectType: 3
+    effectColor: {r: 0.64705884, g: 0.28235295, b: 0.28627452, a: 1}
+    cost: 3
+    Apply_actionTypes: 0100000005000000
+  - effectName: EFFECT_CRITICAL_NAME
+    effectDescription: EFFECT_CRITICAL_DESC
+    effectType: 1
+    effectColor: {r: 1, g: 0.60045624, b: 0, a: 1}
+    cost: 5
+    Apply_actionTypes: 0100000005000000
+  - effectName: EFFECT_STUN_NAME
+    effectDescription: EFFECT_STUN_DESC
+    effectType: 4
+    effectColor: {r: 1, g: 0.94301146, b: 0.18396229, a: 1}
+    cost: 4
+    Apply_actionTypes: 01000000

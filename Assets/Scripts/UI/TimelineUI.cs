@@ -391,12 +391,15 @@ public class TimelineUI : MonoBehaviour
 
         string title = "";
         string body = "";
+        Pattern_Label label = Pattern_Label.None;
+        int stone_num = 0;
 
         if (tooltipTitleText != null)
         {
             if (attack != null)
             {
                 title = _currentPattern.Pattern_Name;
+                label = Pattern_Label.Attack;
             }
             if (parrying != null)
             {
@@ -405,14 +408,18 @@ public class TimelineUI : MonoBehaviour
             if (wind != null)
             {
                 title = $"바람 생성";
+                label = Pattern_Label.Wind;
             }
             if (dash != null)
             {
                 title = $"돌진 공격";
+                label = Pattern_Label.Dash;
             }
             if (stone != null)
             {
                 title = $"바위 생성";
+                label = Pattern_Label.Stone;
+                stone_num = stone.count;
             } 
         }
 
@@ -445,16 +452,25 @@ public class TimelineUI : MonoBehaviour
         // 툴팁 위치 설정
         if (CardTooltip.Instance != null) 
         {
-            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+            var canvas = GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
 
-            // 카드 Rect의 오른쪽 중앙 월드 좌표
-            Vector3 worldBottomCenter = position;
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
-            // 월드 → 스크린 좌표
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+            CardTooltip.Instance.Show_PatternDesc(label, screenPos, cam, stone_num);
 
-            CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+            //// 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
+            //Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+
+            //// 카드 Rect의 오른쪽 중앙 월드 좌표
+            //Vector3 worldBottomCenter = position;
+
+            //// 월드 → 스크린 좌표
+            //Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
+
+            //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
         }
         
         //tooltipPanel.transform.position = position + tooltipOffset;
@@ -591,16 +607,15 @@ public class TimelineUI : MonoBehaviour
         // 툴팁 위치 설정
         if (CardTooltip.Instance != null)
         {
-            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+            var canvas = GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
 
-            // 카드 Rect의 오른쪽 중앙 월드 좌표
-            Vector3 worldBottomCenter = position;
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
-            // 월드 → 스크린 좌표
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
-
-            CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+            //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+            CardTooltip.Instance.Show_TimelineAction(effect, blockData.attackDamage, screenPos, cam);
         }
 
 

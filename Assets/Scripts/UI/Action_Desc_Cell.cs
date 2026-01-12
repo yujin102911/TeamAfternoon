@@ -83,7 +83,6 @@ public class Action_Desc_Cell : MonoBehaviour
         {
             damage
         };
-        Debug.Log(_descriptionText.GetLocalizedString());
         _descriptionText.RefreshString();
 
         switch (action)
