@@ -591,16 +591,15 @@ public class TimelineUI : MonoBehaviour
         // 툴팁 위치 설정
         if (CardTooltip.Instance != null)
         {
-            // 캔버스에 연결된 카메라 사용 (Screen Space - Camera 대응)
-            Camera cam = canvas != null ? canvas.worldCamera : Camera.main;
+            var canvas = GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
 
-            // 카드 Rect의 오른쪽 중앙 월드 좌표
-            Vector3 worldBottomCenter = position;
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
-            // 월드 → 스크린 좌표
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, worldBottomCenter);
-
-            CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+            //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
+            CardTooltip.Instance.Show_TimelineAction(effect, blockData.attackDamage, screenPos, cam);
         }
 
 

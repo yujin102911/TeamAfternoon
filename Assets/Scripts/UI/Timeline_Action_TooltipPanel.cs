@@ -1,19 +1,22 @@
 ﻿using Sirenix.OdinInspector;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
-public class Action_Desc_Cell : MonoBehaviour
+public class Timeline_Action_TooltipPanel : MonoBehaviour
 {
+    [Header("호버 설정")]
+    [SerializeField] private GameObject root;
+    [SerializeField] private RectTransform panelRt;   // root의 RectTransform
+    [SerializeField] private Vector2 offset = new Vector2(12f, 12f); // 마우스 기준 오른쪽 위
+
     [Header("액션 DB")]
     [SerializeField]
     private ActionData _actionData;
 
     [Header("수정할 UI연결")]
-    [SerializeField]
-    private Image _colorBack;
     [SerializeField]
     private Image _icon;
     [SerializeField] private TextMeshProUGUI nameTMP;
@@ -22,30 +25,24 @@ public class Action_Desc_Cell : MonoBehaviour
     private LocalizedString _nameText;
     [SerializeField]
     private LocalizedString _descriptionText;
+    [SerializeField]
+    private GameObject _direction;
 
-    [TabGroup("Attack")]
-    public Sprite Attack_back;
     [TabGroup("Attack")]
     public Sprite Sword_icon;
     [TabGroup("Attack")]
     public Sprite Sword_Charge_icon;
 
     [TabGroup("Move")]
-    public Sprite Move_back;
-    [TabGroup("Move")]
     public Sprite Shoes_Icon;
     [TabGroup("Move")]
     public Sprite Jump_Icon;
 
     [TabGroup("Bow")]
-    public Sprite Bow_back;
-    [TabGroup("Bow")]
     public Sprite Bow_Icon;
     [TabGroup("Bow")]
     public Sprite Bow_Charge_Icon;
 
-    [TabGroup("Guard")]
-    public Sprite Guard_Back;
     [TabGroup("Guard")]
     public Sprite Guard_Icon;
 
@@ -67,13 +64,65 @@ public class Action_Desc_Cell : MonoBehaviour
     private void OnNameChanged(string value) => nameTMP.text = value;
     private void OnDescChanged(string value) => descTMP.text = value;
 
-    // TODO: 설명들은 나중에 SO로 따로 빼기
-    public void Update_descriptionCell(ActionType action, int damage)
+    public void Show(ActionType action, int damage, Vector2 screenPos, Camera cam)
+    {
+        root.SetActive(true);
+
+        // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
+        panelRt.pivot = Vector2.zero; // (0,0) = 좌하단
+
+        RectTransform parentRt = panelRt.parent as RectTransform;
+        if (parentRt == null) return;
+
+        Vector2 targetScreenPos = screenPos + offset;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRt,
+            targetScreenPos,
+            cam,
+            out Vector2 localPos
+        );
+
+        // 1) 일단 “좌하단을 마우스+offset에”
+        panelRt.anchoredPosition = localPos;
+
+        // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
+        ClampToParent(panelRt, parentRt);
+
+        // 내용 설정
+        Update_Info(action, damage);
+
+        this.gameObject.SetActive(true);
+    }
+
+    private void ClampToParent(RectTransform rt, RectTransform parentRt)
+    {
+        // rt는 pivot=(0,0) 기준이므로
+        // anchoredPosition은 “좌하단”
+        Vector2 pos = rt.anchoredPosition;
+
+        float minX = parentRt.rect.xMin;
+        float maxX = parentRt.rect.xMax - rt.rect.width;
+        float minY = parentRt.rect.yMin;
+        float maxY = parentRt.rect.yMax - rt.rect.height;
+
+        pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+
+        rt.anchoredPosition = pos;
+    }
+
+
+    public void Hide()
+    {
+        this.gameObject.SetActive(false);
+    }
+
+    private void Update_Info(ActionType action, int damage)
     {
         Action_info action_Info = _actionData.GetAction_Info(action);
 
-        this.gameObject.SetActive(true);
-
+        _direction.SetActive(false);
 
         // 설명 텍스트 키값으로 출력
         _nameText.TableEntryReference = action_Info.Name_key;
@@ -89,40 +138,35 @@ public class Action_Desc_Cell : MonoBehaviour
         {
             case ActionType.Sword_start:
             case ActionType.Attack:
-                _colorBack.sprite = Attack_back;
                 _icon.sprite = Sword_icon;
                 break;
 
             case ActionType.Sword_end:
             case ActionType.Sword_middle:
-                _colorBack.sprite = Attack_back;
                 _icon.sprite = Sword_Charge_icon;
                 break;
 
             case ActionType.Move:
-                _colorBack.sprite = Move_back;
                 _icon.sprite = Shoes_Icon;
+                _direction.SetActive(true);
                 break;
 
             case ActionType.Jump:
-                _colorBack.sprite = Move_back;
                 _icon.sprite = Jump_Icon;
+                _direction.SetActive(true);
                 break;
 
             case ActionType.Bow_single:
             case ActionType.Bow_start:
-                _colorBack.sprite = Bow_back;
                 _icon.sprite = Bow_Icon;
                 break;
-                
+
             case ActionType.Bow_middle:
             case ActionType.Bow_end:
-                _colorBack.sprite = Bow_back;
                 _icon.sprite = Bow_Charge_Icon;
                 break;
 
             case ActionType.Guard:
-                _colorBack.sprite = Guard_Back;
                 _icon.sprite = Guard_Icon;
                 break;
 
