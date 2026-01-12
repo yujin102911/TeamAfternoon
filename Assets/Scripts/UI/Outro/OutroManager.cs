@@ -1,47 +1,50 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Localization;
 
 [System.Serializable]
 public class ScenarioStep
 {
-    [TextArea(3, 5)]
-    public string dialogue;
+    public string dialogueKey;
     public Image background;
 
-    [Tooltip("Ã¼Å©ÇÏ¸é ÆäÀÌµå È¿°ú ¾øÀÌ ¹Ù·Î ÀÌ¹ÌÁö°¡ ¹Ù²ò´Ï´Ù.")]
+    [Tooltip("ì²´í¬í•˜ë©´ í˜ì´ë“œ íš¨ê³¼ ì—†ì´ ë°”ë¡œ ì´ë¯¸ì§€ê°€ ë°”ë€ë‹ˆë‹¤.")]
     public bool instantChange;
 
-    [Header("½ºÅ©·Ñ ¼³Á¤")]
-    [Tooltip("Ã¼Å©ÇÏ¸é ÀÌ Àå¸éÀÌ ½ÃÀÛµÉ ¶§ ½ºÅ©·ÑÀÌ À§·Î ¿Ã¶ó°©´Ï´Ù.")]
+    [Header("ìŠ¤í¬ë¡¤ ì„¤ì •")]
+    [Tooltip("ì²´í¬í•˜ë©´ ì´ ì¥ë©´ì´ ì‹œì‘ë  ë•Œ ìŠ¤í¬ë¡¤ì´ ìœ„ë¡œ ì˜¬ë¼ê°‘ë‹ˆë‹¤.")]
     public bool triggerScroll;
     public float scrollAmount = 300f;
 
-    [Header("ÇÏ´Ü¹Ù ¼³Á¤")]
-    [Tooltip("Ã¼Å©ÇÏ¸é ÇÏ´Ü¹Ù°¡ Åä±ÛµË´Ï´Ù.")]
+    [Header("í•˜ë‹¨ë°” ì„¤ì •")]
+    [Tooltip("ì²´í¬í•˜ë©´ í•˜ë‹¨ë°”ê°€ í† ê¸€ë©ë‹ˆë‹¤.")]
     public bool toggleBottomBar;
 }
 
 public class OutroManager : MonoBehaviour
 {
+    [Header("Localization")]
+    [SerializeField] private LocalizedString _dialogueLocalizedString;
+
     [Header("External Systems")]
     public AutoScroll scrollController;
     public BottomBarController bottomBarController;
 
     [Header("Ending Credits Settings")]
-    public GameObject endingCreditPanel;   // ¿£µù Å©·¹µ÷ ÀüÃ¼ ÆĞ³Î
-    public RectTransform creditContent;    // ¿òÁ÷ÀÏ ÅØ½ºÆ® ³»¿ë¹°
-    public GameObject endGamePanel;        // Å©·¹µ÷ ³¡³ª¸é ¶ã ÃÖÁ¾ Á¾·á ÆĞ³Î
+    public GameObject endingCreditPanel;   // ì—”ë”© í¬ë ˆë”§ ì „ì²´ íŒ¨ë„
+    public RectTransform creditContent;    // ì›€ì§ì¼ í…ìŠ¤íŠ¸ ë‚´ìš©ë¬¼
+    public GameObject endGamePanel;        // í¬ë ˆë”§ ëë‚˜ë©´ ëœ° ìµœì¢… ì¢…ë£Œ íŒ¨ë„
 
     [Space(10)]
-    public float creditScrollSpeed = 50f;  // ¿Ã¶ó°¡´Â ¼Óµµ
-    public float creditStartDelay = 5.0f;  // ½ÃÀÛ Àü ´ë±â ½Ã°£
+    public float creditScrollSpeed = 50f;  // ì˜¬ë¼ê°€ëŠ” ì†ë„
+    public float creditStartDelay = 5.0f;  // ì‹œì‘ ì „ ëŒ€ê¸° ì‹œê°„
 
     [Header("Credit Positions")]
-    public float creditStartY = -500f;     // Å©·¹µ÷ ½ÃÀÛ Y À§Ä¡
-    public float creditEndY = 1500f;       // Å©·¹µ÷ ³¡³ª´Â Y À§Ä¡
+    public float creditStartY = -500f;     // í¬ë ˆë”§ ì‹œì‘ Y ìœ„ì¹˜
+    public float creditEndY = 1500f;       // í¬ë ˆë”§ ëë‚˜ëŠ” Y ìœ„ì¹˜
 
     [Header("UI Components")]
     public TextMeshProUGUI textDisplay;
@@ -64,7 +67,7 @@ public class OutroManager : MonoBehaviour
     {
         textDisplay.text = "";
 
-        // ½ÃÀÛÇÒ ¶§ Å©·¹µ÷ °ü·Ã ÆĞ³ÎµéÀº ´Ù ²¨µÎ±â
+        // ì‹œì‘í•  ë•Œ í¬ë ˆë”§ ê´€ë ¨ íŒ¨ë„ë“¤ì€ ë‹¤ êº¼ë‘ê¸°
         if (endingCreditPanel != null) endingCreditPanel.SetActive(false);
         if (endGamePanel != null) endGamePanel.SetActive(false);
 
@@ -73,7 +76,7 @@ public class OutroManager : MonoBehaviour
 
     void Update()
     {
-        // ¿£µù Å©·¹µ÷ÀÌ³ª Á¾·á ÆĞ³ÎÀÌ ¶°ÀÖÀ¸¸é Å¬¸¯ ¹«½Ã
+        // ì—”ë”© í¬ë ˆë”§ì´ë‚˜ ì¢…ë£Œ íŒ¨ë„ì´ ë– ìˆìœ¼ë©´ í´ë¦­ ë¬´ì‹œ
         if ((endingCreditPanel != null && endingCreditPanel.activeSelf) ||
             (endGamePanel != null && endGamePanel.activeSelf))
         {
@@ -96,56 +99,76 @@ public class OutroManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _dialogueLocalizedString.StringChanged += OnDialogueChanged;
+    }
+
+    private void OnDisable()
+    {
+        _dialogueLocalizedString.StringChanged -= OnDialogueChanged;
+    }
+
+    #region Localization Methods
+    private void OnDialogueChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+
+        currentFullText = value;
+        StopCoroutine("TypewriterEffect");
+        StartCoroutine("TypewriterEffect");
+    }
+    #endregion
+
     void NextStep()
     {
         currentIndex++;
 
         if (currentIndex >= scenarioList.Count)
         {
-            Debug.Log("½Ã³ª¸®¿À Á¾·á -> ¿£µù Å©·¹µ÷ Àç»ı");
+            Debug.Log("ì‹œë‚˜ë¦¬ì˜¤ ì¢…ë£Œ -> ì—”ë”© í¬ë ˆë”§ ì¬ìƒ");
             StartCoroutine(PlayEndingCredits());
             return;
         }
 
         ScenarioStep step = scenarioList[currentIndex];
 
-        // 1. ½ºÅ©·Ñ ·ÎÁ÷
+        // 1. ìŠ¤í¬ë¡¤ ë¡œì§
         if (step.triggerScroll && scrollController != null)
         {
             scrollController.MoveNext(step.scrollAmount);
         }
 
-        // 2. ÇÏ´Ü¹Ù Åä±Û ·ÎÁ÷
+        // 2. í•˜ë‹¨ë°” í† ê¸€ ë¡œì§
         if (step.toggleBottomBar && bottomBarController != null)
         {
             bottomBarController.ToggleBar();
         }
 
-        // 3. ÅØ½ºÆ® Ã³¸®
-        if (!string.IsNullOrEmpty(step.dialogue))
+        // 3. í…ìŠ¤íŠ¸ ì²˜ë¦¬
+        if (!string.IsNullOrEmpty(step.dialogueKey))
         {
-            currentFullText = step.dialogue;
-            StopCoroutine("TypewriterEffect");
-            StartCoroutine("TypewriterEffect");
+            _dialogueLocalizedString.TableEntryReference = step.dialogueKey;
         }
         else
         {
+            textDisplay.text = "";
             isTyping = false;
         }
 
-        // 4. ÀÌ¹ÌÁö Ã³¸® (¡Ú ¼öÁ¤µÈ ºÎºĞ)
+        // 4. ì´ë¯¸ì§€ ì²˜ë¦¬ (â˜… ìˆ˜ì •ëœ ë¶€ë¶„)
         if (step.background != null && step.background != currentActiveImage)
         {
             if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
 
-            // currentIndex == 0 (¸Ç Ã³À½)ÀÌ°Å³ª, instantChange°¡ ÄÑÁ® ÀÖÀ¸¸é -> Áï½Ã ÀüÈ¯
+            // currentIndex == 0 (ë§¨ ì²˜ìŒ)ì´ê±°ë‚˜, instantChangeê°€ ì¼œì ¸ ìˆìœ¼ë©´ -> ì¦‰ì‹œ ì „í™˜
             if (currentIndex == 0 || step.instantChange)
             {
                 ChangeImageInstantly(currentActiveImage, step.background);
             }
             else
             {
-                // ±× ¿Ü¿¡´Â ºÎµå·´°Ô ÆäÀÌµå ÀüÈ¯
+                // ê·¸ ì™¸ì—ëŠ” ë¶€ë“œëŸ½ê²Œ í˜ì´ë“œ ì „í™˜
                 transitionCoroutine = StartCoroutine(TransitionImages(currentActiveImage, step.background));
             }
 
@@ -178,14 +201,14 @@ public class OutroManager : MonoBehaviour
             }
         }
 
-        Debug.Log("Å©·¹µ÷ Á¾·á -> ÃÖÁ¾ ÆĞ³Î Ç¥½Ã");
+        Debug.Log("í¬ë ˆë”§ ì¢…ë£Œ -> ìµœì¢… íŒ¨ë„ í‘œì‹œ");
         if (endGamePanel != null)
         {
             endGamePanel.SetActive(true);
         }
     }
 
-    // ... (ÀÌÇÏ ±âÁ¸ ÇÔ¼öµé) ...
+    // ... (ì´í•˜ ê¸°ì¡´ í•¨ìˆ˜ë“¤) ...
 
     IEnumerator TypewriterEffect()
     {
@@ -208,7 +231,7 @@ public class OutroManager : MonoBehaviour
         {
             incoming.gameObject.SetActive(true);
             Color c = incoming.color;
-            c.a = 1f; // ¾ËÆÄ°ª 1 (¿ÏÀü ºÒÅõ¸í)
+            c.a = 1f; // ì•ŒíŒŒê°’ 1 (ì™„ì „ ë¶ˆíˆ¬ëª…)
             incoming.color = c;
         }
     }

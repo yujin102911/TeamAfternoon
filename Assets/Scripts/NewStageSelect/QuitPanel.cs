@@ -16,11 +16,14 @@ public class QuitPanel : MonoBehaviour
 
     private void QuitGame()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
+        Debug.Log("저장됨");
+        SaveService.Save(ServiceLocator.Instance.CurrentUser);
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
+        SaveService.Save(ServiceLocator.Instance.CurrentUser);
         Application.Quit();
-        #endif
+#endif
     }
     private void AllOff()
     {
