@@ -5,15 +5,15 @@ using UnityEngine.EventSystems;
 using System.Collections;
 
 public class BoardButton : MonoBehaviour
-    ,IPointerEnterHandler, IPointerExitHandler
+    , IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private TextMeshProUGUI _buttonTitleText;
 
-    [Header("폰트 설정")]
+    [Header("Font Settings")]
     [SerializeField] private TMP_FontAsset regul;
     [SerializeField] private TMP_FontAsset bold;
 
-    [Header("스케일 설정")]
+    [Header("Animation Settings")]
     [SerializeField] private float _hoverScale = 1.05f;
     [SerializeField] private float _animationSpeed = 10f;
 
@@ -28,11 +28,18 @@ public class BoardButton : MonoBehaviour
         _initialScale = transform.localScale;
     }
 
-    public void Setup(StageData stage ,BoardPanel panel)
+    // 로컬라이제이션 이벤트 구독 관련 함수들(OnEnable, OnDisable 등)을 모두 제거했습니다.
+
+    public void Setup(StageData stage, BoardPanel panel)
     {
         _stageData = stage;
         _panel = panel;
-        _buttonTitleText.text = $"Day {stage.StageNumber}";
+
+        // 다시 직접 문자열을 조합하여 출력합니다.
+        if (_buttonTitleText != null)
+        {
+            _buttonTitleText.text = $"Day {stage.StageNumber}";
+        }
 
         Button btn = GetComponent<Button>();
         btn.onClick.RemoveAllListeners();
@@ -41,11 +48,9 @@ public class BoardButton : MonoBehaviour
 
     public void UpdateVisual(bool isSelected)
     {
-        UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
-        if (currentUser == null) return;
+        if (_stageData == null) return;
 
-        bool isRead = currentUser.IsBoardRead(_stageData.StageNumber);
-
+        // 선택 여부에 따른 폰트 및 크기 변경 로직 유지
         _buttonTitleText.font = isSelected ? bold : regul;
         _buttonTitleText.fontSize = isSelected ? 36 : 32;
     }
@@ -71,6 +76,7 @@ public class BoardButton : MonoBehaviour
         }
         transform.localScale = targetScale;
     }
+
     private void StopScaleCoroutine()
     {
         if (_scaleCoroutine != null) StopCoroutine(_scaleCoroutine);
@@ -78,7 +84,6 @@ public class BoardButton : MonoBehaviour
 
     public int GetStageNumber()
     {
-        return _stageData.StageNumber;
+        return _stageData != null ? _stageData.StageNumber : -1;
     }
-
 }

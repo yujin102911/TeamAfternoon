@@ -1,9 +1,10 @@
-﻿using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.UI;
 
 /// <summary>
 /// OutLook에 있는 온갖 버튼들을 관리
@@ -101,12 +102,35 @@ public class MailPanel : MonoBehaviour
         ServiceLocator.Instance.CurrentUser.SetMailRead(data.StageNumber, mailIndex);
         OnMailStatusChanged?.Invoke();
 
-        if (_senderText != null) _senderText.text = mail.sender;
-        if (_receiverText != null) _receiverText.text = mail.receiver;
-        if (_titleText != null) _titleText.text = mail.subject;
+        string GetSafeString(LocalizedString locStr)
+        {
+            if (locStr == null || locStr.IsEmpty) return "";
+
+            try
+            {
+                return locStr.GetLocalizedString();
+            }
+            catch
+            {
+                return ""; // 예기치 못한 에러 발생 시 빈 문자열 반환
+            }
+        }
+
+        if (_senderText != null) _senderText.text = mail.sender.GetLocalizedString(); 
+        if (_receiverText != null) _receiverText.text = mail.receiver.GetLocalizedString();
+        if (_titleText != null) _titleText.text = mail.subject.GetLocalizedString();
+
+        string attachedFileName = GetSafeString(mail.attached);
+
+        if (string.IsNullOrEmpty(attachedFileName))
+        {
+            attachedFileName = $"Dungeon_{data.StageNumber}_Day.mp4";
+        }
 
         string linkTag = $"<color=#5865F2><u><link=\"stage_enter:{data.StageNumber}\">";
-        string formattedText = mail.body.Replace($"[ENTER_LINK]", linkTag + $"던전{data.StageNumber}일차.mp4</link></u></color>");
+        string bodyText = GetSafeString(mail.body);
+
+        string formattedText = bodyText.Replace("[ENTER_LINK]", $"{linkTag}{attachedFileName}</link></u></color>");
 
         _mailContextText.text = formattedText;
         if (_bodyScrollRect != null)
