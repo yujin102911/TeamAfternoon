@@ -11,6 +11,8 @@ public class NailInstaller : MonoBehaviour
     [SerializeField] private Button _endBtn;
     [SerializeField] private string _tutoSelectScene = "TutorialDesktop";
     [SerializeField] private IntroPanel _introPanel;
+    [SerializeField] private Image _progressBar;
+    [SerializeField] private float _downloadDuration = 2.0f;
 
     private void Awake()
     {
@@ -29,9 +31,21 @@ public class NailInstaller : MonoBehaviour
     private IEnumerator DownloadRoutine()
     {
         ServiceLocator.Instance.Cursor.StartAnimation("Loading");
-        // TODO: 다운로드 연출 추가
+        if (_progressBar != null)
+        {
+            _progressBar.fillAmount = 0;
+
+            float elapsed = 0f;
+            while (elapsed < _downloadDuration)
+            {
+                elapsed += Time.deltaTime;
+                _progressBar.fillAmount = Mathf.Clamp01(elapsed / _downloadDuration);
+                yield return null;
+            }
+            _progressBar.fillAmount = 1f;
+        }
         ServiceLocator.Instance.Cursor.StopAnimation();
-        yield return null;
+        yield return new WaitForSeconds(0.5f);
         _p2.SetActive(false);
         _p3.SetActive(true);
     }

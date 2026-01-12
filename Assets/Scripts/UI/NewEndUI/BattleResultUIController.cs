@@ -68,14 +68,6 @@ public class BattleResultUIController : MonoBehaviour
             GameManager.Instance.OnBattleEnded += HandleBattleEnded;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F12))
-        {
-            Debug.Log("승리 디버그 코드 실행");
-            GoToTitleVictory();
-        }
-    }
 
     private void OnDestroy()
     {
