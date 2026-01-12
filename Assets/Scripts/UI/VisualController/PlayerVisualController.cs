@@ -439,6 +439,9 @@ public class PlayerVisualController : MonoBehaviour
         {
             ChangeAnim("3_1_ Run");
             UpdateFacing(direction);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.Player_Walk);
         }
             
 
@@ -473,6 +476,9 @@ public class PlayerVisualController : MonoBehaviour
         _moveCoroutine = null;
 
         ChangeAnim("1_Idle");
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.StopSFX();
 
         //if (_playerAnimator != null)
         //_playerAnimator.SetTrigger("Run_Stop");

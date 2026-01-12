@@ -148,12 +148,20 @@ public class MapVisualController : MonoBehaviour
     {
         WindEffect.GetComponent<SpriteRenderer>().flipX = is_left;
         WindEffect.SetActive(true);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Wind);
     }
 
     public void Stop_WindEffect()
     {
-        if( WindEffect.activeSelf)
+        if(WindEffect.activeSelf)
+        {
             WindEffect.SetActive(false);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.StopSFX();
+        }
     }
 
 }

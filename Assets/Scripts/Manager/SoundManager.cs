@@ -108,6 +108,8 @@ public class SoundManager : MonoBehaviour
     void PlaySFX(SoundData data)
     {
         AudioSource source = GetAvailableSource();
+        source.ignoreListenerPause = (data.type == SoundType.UI);
+
         source.clip = data.clip;
         source.volume = data.volume;
         source.pitch = Random.Range(
@@ -117,6 +119,15 @@ public class SoundManager : MonoBehaviour
 
         source.loop = false;
         source.Play();
+    }
+
+    public void StopSFX()
+    {
+        foreach (var src in _sfxPool)
+        {
+            if (src.isPlaying)
+                src.Stop();
+        }
     }
 
     AudioSource GetAvailableSource()

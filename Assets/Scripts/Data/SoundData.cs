@@ -63,6 +63,12 @@ public enum SoundID
     EnemyEffect_2,
     EnemyEffect_3,
     EnemyEffect_4,
-    EnemyEffect_5
+    EnemyEffect_5,
+
+    Player_Guard,
+    Player_Walk,
+
+    Wind,
+    Stone
 
 }
