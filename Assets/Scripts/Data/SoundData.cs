@@ -40,6 +40,35 @@ public enum SoundID
     SFX_Cure,
     SFX_Spell_Write,
     SFX_Spell_Cancle,
-    SFX_Execute
+    SFX_Execute,
+
+    // Player
+    Player_hit,
+    Player_Sword,
+    Player_Sword2,
+    Player_Bow,
+    Player_Bow2,
+    Player_Bow3,
+
+    // Enemy
+    EnemyHurt_0,
+    EnemyHurt_1,
+    EnemyHurt_2,
+    EnemyHurt_3,
+    EnemyHurt_4,
+    EnemyHurt_5,
+
+    EnemyEffect_0,
+    EnemyEffect_1,
+    EnemyEffect_2,
+    EnemyEffect_3,
+    EnemyEffect_4,
+    EnemyEffect_5,
+
+    Player_Guard,
+    Player_Walk,
+
+    Wind,
+    Stone
 
 }

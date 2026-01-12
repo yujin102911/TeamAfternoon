@@ -7,8 +7,6 @@ public class BarRaycastFilter : MonoBehaviour, IPointerEnterHandler, IEndDragHan
     [SerializeField]
     private Image _image;
 
-
-
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (eventData.pointerDrag == null || DragOn_timeline.instance == null) return;

@@ -311,9 +311,6 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public void RemovePlacedBlock(PlacedBlock placedBlock)
     {
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.SFX_Spell_Cancle);
-
         RuntimeBlock runtimeBlock = _timelineSystem.RemovePlacedBlock(placedBlock);
 
         if (runtimeBlock != null)

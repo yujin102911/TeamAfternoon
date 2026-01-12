@@ -121,6 +121,8 @@ public class EnemyVisualController : MonoBehaviour
             if (GameManager.Instance.MapSystem != null)
                 _enemyAttackEffect.Set_worldSectorPos(GameManager.Instance.MapSystem.GetSectorsPosition());
 
+            _enemyAttackEffect.Set_StageNum(GameManager.Instance.CurrentStageData.StageNumber);
+
             _enemyHealthBar.SetTarget(obj.transform, enemy.Data.HPBarOffset);
         }
 
@@ -300,6 +302,7 @@ public class EnemyVisualController : MonoBehaviour
         else
         {
             ChangeAnim("Hurt");
+            Choose_EnemyHurt(GameManager.Instance.CurrentStageData.StageNumber);
         }
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
@@ -410,5 +413,34 @@ public class EnemyVisualController : MonoBehaviour
         }
     }
     #endregion
+
+    private void Choose_EnemyHurt(int stage_num)
+    {
+        if (SoundManager.Instance == null) return;
+
+
+        switch (stage_num -1)
+        {
+
+            case 0:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_0);
+                break;
+            case 1:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_1);
+                break;
+            case 2:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_2);
+                break;
+            case 3:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_3);
+                break;
+            case 4:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_4);
+                break;
+            case 5:
+                SoundManager.Instance.Play(SoundID.EnemyHurt_5);
+                break;
+        }
+    }
 
 }

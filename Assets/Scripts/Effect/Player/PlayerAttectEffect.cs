@@ -69,15 +69,27 @@ public class PlayerAttectEffect : MonoBehaviour
         {
             case 0:
                 fx = swordAttackFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
             case 1:
                 fx = swordEnfoceFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
             case 2:
                 fx = big_swordAttackFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Sword2);
                 break;
             case 3:
                 fx = Enfocebig_swordAttackFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Sword2);
                 break;
             default:
                 break;
@@ -98,9 +110,15 @@ public class PlayerAttectEffect : MonoBehaviour
         {
             case 0:
                 fx = bowAttackFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Bow);
                 break;
             case 1:
                 fx = Enforce_bowAttackFX_pool.GetEffect();
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.Play(SoundID.Player_Bow2);
                 break;
             default:
                 break;
@@ -145,7 +163,10 @@ public class PlayerAttectEffect : MonoBehaviour
             //fx.transform.position = 
             //fx.SetActive(true);
             _currentAnimtor = fx.GetComponent<Animator>();
-        } 
+        }
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Player_Bow3);
     }
 
     // 가드 이펙트

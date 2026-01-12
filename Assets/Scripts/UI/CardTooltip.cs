@@ -13,6 +13,10 @@ public class CardTooltip : MonoBehaviour
     [SerializeField]
     private Keyword_tooltip[] keywords;
 
+    [Header("액션 상세 설명창")]
+    [SerializeField]
+    private Action_Tooltip_Panel action_Tooltip_Panel;
+
     [Header("위치 오프셋")]
     [SerializeField] private Vector2 offset = new Vector2(0f, -10f); // ← 오른쪽으로 안 밀리게 X=0
 
@@ -82,6 +86,11 @@ public class CardTooltip : MonoBehaviour
         rt.anchoredPosition = clamped;
     }
 
+    public void ShowAction(RuntimeBlock runtimeBlock, Vector2 screenPos, Camera cam)
+    {
+        action_Tooltip_Panel.Show(runtimeBlock, screenPos, cam);
+    }
+
     public void Hide()
     {
         for (int i = 0; i < keywords.Length; i++) 
@@ -92,5 +101,8 @@ public class CardTooltip : MonoBehaviour
 
         if (root != null)
             root.SetActive(false);
+
+        if(action_Tooltip_Panel != null)
+            action_Tooltip_Panel.Hide();
     }
 }

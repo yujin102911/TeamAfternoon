@@ -139,7 +139,10 @@ public class PlayerVisualController : MonoBehaviour
         {
             _currentAnimation = animation;
             _playerAnimator.CrossFade(animation, 0.2f);
-        } 
+        }
+
+        if (animation == "4_Hurt" && SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Player_hit);
     }
 
     public void Play_PlayerIdle()
@@ -436,6 +439,9 @@ public class PlayerVisualController : MonoBehaviour
         {
             ChangeAnim("3_1_ Run");
             UpdateFacing(direction);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.Player_Walk);
         }
             
 
@@ -470,6 +476,9 @@ public class PlayerVisualController : MonoBehaviour
         _moveCoroutine = null;
 
         ChangeAnim("1_Idle");
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.StopSFX();
 
         //if (_playerAnimator != null)
         //_playerAnimator.SetTrigger("Run_Stop");
