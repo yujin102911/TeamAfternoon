@@ -120,8 +120,9 @@ public class CardTooltip : MonoBehaviour
                 keywords[i].Hide();
         }
 
-        if (root != null)
-            root.SetActive(false);
+
+        //if (root != null)
+        //    root.SetActive(false);
 
         if(action_Tooltip_Panel != null)
             action_Tooltip_Panel.Hide();
