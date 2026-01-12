@@ -47,6 +47,7 @@ public class BoardButton : MonoBehaviour
         bool isRead = currentUser.IsBoardRead(_stageData.StageNumber);
 
         _buttonTitleText.font = isSelected ? bold : regul;
+        _buttonTitleText.fontSize = isSelected ? 36 : 32;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
