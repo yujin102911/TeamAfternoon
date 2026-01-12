@@ -16,6 +16,7 @@ public enum TutorialCondition
     ComplexPlacement,
     PlacementWithDirection,
     RoundExecutionFinished,
+    FinalComplexCondition,
 }
 
 [System.Serializable]
@@ -270,6 +271,46 @@ public class BattleTutorialManager : MonoBehaviour
         TutorialStep currentStep = steps[currentIndex];
 
         if (currentStep.condition == TutorialCondition.RoundExecutionFinished)
+        {
+            CompleteStep();
+        }
+    }
+
+    private void CheckFinalComplexCondition()
+    {
+        if (currentIndex >= steps.Length) return;
+        TutorialStep step = steps[currentIndex];
+
+        if (step.condition != TutorialCondition.FinalComplexCondition) return;
+
+        PlacedBlock targetBlock = TimelineManager.Instance.PlacedBlocks.FirstOrDefault(pb =>
+        pb.linkedRuntimeBlock.BlockID == step.targetBlockID &&
+        pb.startTick == step.targetTick);
+
+        if (targetBlock == null) return;
+
+        int localIndex = step.checkDirectionTick - targetBlock.startTick;
+        bool isDirectionCorrect = false;
+
+        if (localIndex >= 0 && localIndex < targetBlock.linkedRuntimeBlock.CurrentMoveDirections.Length)
+        {
+            if (targetBlock.linkedRuntimeBlock.CurrentMoveDirections[localIndex] == step.targetDirection)
+                isDirectionCorrect = true;
+        }
+        if (!isDirectionCorrect) return;
+        bool isEffectCorrect = false;
+        var currentEffects = TimelineManager.Instance.additional_Effects;
+        int effectIdx = step.targetTick - 1; // 틱 번호 -> 리스트 인덱스 보정
+
+        if (effectIdx >= 0 && effectIdx < currentEffects.Count)
+        {
+            var effect = currentEffects[effectIdx];
+            if (effect != null && effect.effectType == step.targetEffectType)
+            {
+                isEffectCorrect = true;
+            }
+        }
+        if (isEffectCorrect)
         {
             CompleteStep();
         }
