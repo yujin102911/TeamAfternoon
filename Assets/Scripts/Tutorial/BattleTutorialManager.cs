@@ -80,14 +80,26 @@ public class BattleTutorialManager : MonoBehaviour
     {
         _timelineUI.OnEnemySlotHovered += CheckHoverCondition;
         _handPanel.OnFilterChanged += CheckFilterCondition;
-        TimelineManager.Instance.OnTimelineChanged += CheckPlacementCondition;
-        TimelineManager.Instance.OnTimelineChanged += CheckDirectionCondition;
         _stepSlider.OnStepSelected += CheckSliderCondition;
-        TimelineManager.Instance.OnEffectChanged += CheckEffectCondition;
-        TimelineManager.Instance.OnTimelineChanged += (blocks, prev) => CheckComplexCondition();
-        TimelineManager.Instance.OnEffectChanged += (effects) => CheckComplexCondition();
-        TimelineManager.Instance.OnTimelineChanged += (blocks, prev) => CheckPlacementAndDirection();
-        TimelineManager.Instance.OnExecutionFinished += CheckExecutionFinished;
+
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.OnTimelineChanged += (blocks, prev) => {
+                CheckPlacementCondition(blocks, prev);
+                CheckDirectionCondition(blocks, prev);
+                CheckPlacementAndDirection();
+                CheckComplexCondition();
+                CheckFinalComplexCondition();
+            };
+
+            TimelineManager.Instance.OnEffectChanged += (effects) => {
+                CheckEffectCondition(effects);
+                CheckComplexCondition();
+                CheckFinalComplexCondition();
+            };
+
+            TimelineManager.Instance.OnExecutionFinished += CheckExecutionFinished;
+        }
 
         ApplyStepUI(0);
     }
@@ -246,6 +258,8 @@ public class BattleTutorialManager : MonoBehaviour
     {
         if (currentIndex >= steps.Length) return;
         TutorialStep step = steps[currentIndex];
+
+        if (step.condition != TutorialCondition.PlacementWithDirection) return;
 
         PlacedBlock targetBlock = TimelineManager.Instance.PlacedBlocks.FirstOrDefault(pb =>
         pb.linkedRuntimeBlock.BlockID == step.targetBlockID && pb.startTick == step.targetTick);
