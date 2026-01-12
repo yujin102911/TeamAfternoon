@@ -26,6 +26,9 @@ public class ScenarioStep
 
 public class OutroManager : MonoBehaviour
 {
+    [Header("종료 버튼")]
+    public Button quitButton;
+
     [Header("Localization")]
     [SerializeField] private LocalizedString _dialogueLocalizedString;
 
@@ -70,6 +73,7 @@ public class OutroManager : MonoBehaviour
         // 시작할 때 크레딧 관련 패널들은 다 꺼두기
         if (endingCreditPanel != null) endingCreditPanel.SetActive(false);
         if (endGamePanel != null) endGamePanel.SetActive(false);
+        quitButton.onClick.AddListener(QuitGame);
 
         NextStep();
     }
@@ -275,4 +279,16 @@ public class OutroManager : MonoBehaviour
             incoming.color = c;
         }
     }
+    private void QuitGame()
+    {
+        SaveService.DeleteSave();
+        Debug.Log("모든 세이브 데이터가 삭제되었습니다.");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+    Application.Quit();
+#endif
+    }
+
 }
