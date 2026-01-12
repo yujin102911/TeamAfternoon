@@ -114,7 +114,7 @@ public class BattleResultUIController : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             int stageNum = GameManager.Instance.CurrentStageData.StageNumber;
-            string stageName = GameManager.Instance.CurrentStageData.StageName;
+            //string stageName = GameManager.Instance.CurrentStageData.StageName;
             if (_victoryStageText != null)
                 _victoryStageText.text = $"[ Clear_Run_Stage_{stageNum:D2}.mp4 ]";
             //if (_defeatStageText != null)

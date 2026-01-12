@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Localization;
 
 [System.Serializable]
 public struct StageEnemySetup
@@ -16,11 +17,12 @@ public struct StageEnemySetup
 [System.Serializable]
 public class MailContent
 {
-    public string subject;
-    public string sender;
-    public string receiver;
+    public LocalizedString subject;
+    public LocalizedString sender;
+    public LocalizedString receiver;
     [TextArea(5, 20)]
-    public string body;
+    public LocalizedString body;
+    public LocalizedString attached;
 
     public enum MailUnlockCondition { Always, AfterClear }
     public MailUnlockCondition unlockCondition;
@@ -29,9 +31,9 @@ public class MailContent
 [System.Serializable]
 public class BoardEntry
 {
-    public string title;
+    public LocalizedString title;
     [TextArea(10, 20)]
-    public string content;
+    public LocalizedString content;
     public Sprite illustration;
 }
 
@@ -43,7 +45,7 @@ public class StageData : ScriptableObject
     private int _stageNumber;
     [SerializeField]
     [TextArea(3, 20)]
-    private string _stageName; //스테이지 이름
+    private LocalizedString _stageName; //스테이지 이름
 
     [Header("제한 설정")]
     [SerializeField] private int _limitRound = 8;
@@ -66,7 +68,7 @@ public class StageData : ScriptableObject
     private List<StageEnemySetup> _enemySpawns = new List<StageEnemySetup>();
 
     public int StageNumber => _stageNumber;
-    public string StageName => _stageName;
+    public LocalizedString StageName => _stageName;
     public List<MailContent> Mails => _mails;
     public List<BoardEntry > BoardEntries => _boardEntries;
     public List<StageEnemySetup> EnemySpawns => _enemySpawns;
