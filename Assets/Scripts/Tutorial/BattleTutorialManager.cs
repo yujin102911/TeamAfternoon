@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum TutorialCondition 
 { 
@@ -12,83 +14,66 @@ public enum TutorialCondition
     SliderTick,
     EffectPlaced,
     ComplexPlacement,
+    PlacementWithDirection,
+    RoundExecutionFinished,
+    FinalComplexCondition,
 }
 
 [System.Serializable]
 public class TutorialStep
 {
     public TutorialCondition condition;
+
+    [TabGroup("UI 설정")] public List<GameObject> hideUIs; // 시작 시 끌 UI들
+    [TabGroup("UI 설정")] public List<GameObject> showUIs; // 시작 시 켤 UI들
+
     public string targetButtonName;
     public int targetTick;
     public int targetBlockID;
+    public int checkDirectionTick;
     public List<HandFilterType> targetFilters;
     public MoveDirection targetDirection;
     public EffectType targetEffectType;
+    public string StepSummary
+    {
+        get
+        {
+            string summary = $"[{condition}] ";
+            summary += condition switch
+            {
+                TutorialCondition.ButtonClicked => targetButtonName,
+                TutorialCondition.HoverEnemySlot => $"Tick: {targetTick}",
+                TutorialCondition.PlacedBlock => $"ID: {targetBlockID} at T{targetTick}",
+                TutorialCondition.FilterState => $"Filters: {targetFilters?.Count ?? 0}",
+                TutorialCondition.ChangeDirection => $"Tick: {targetTick} to {targetDirection}",
+                TutorialCondition.PlacementWithDirection => $"Block: {targetBlockID} at T{targetTick} (Dir T{checkDirectionTick})",
+                TutorialCondition.EffectPlaced => $"{targetEffectType} at T{targetTick}",
+                _ => "Detail Data"
+            };
+            return summary;
+        }
+    }
 }
 
 public class BattleTutorialManager : MonoBehaviour
 {
+    [Title("튜토리얼 단계 설정")]
+    [ListDrawerSettings(ListElementLabelName = "StepSummary", ShowIndexLabels = true)]
     public TutorialStep[] steps;
     private int currentIndex = 0;
     [SerializeField] private TimelineUI _timelineUI;
     [SerializeField] private FilmHand_Panel _handPanel;
     [SerializeField] private StepSlider _stepSlider;
 
-    [Header("12 -> 19")]
-    [SerializeField] private GameObject TwelveDesc;
-    [SerializeField] private GameObject ThirteenDesc;
-    [SerializeField] private GameObject FourteenDesc;
-    [SerializeField] private GameObject FifteenDesc;
-    [SerializeField] private GameObject SixteenDesc;
-    [SerializeField] private GameObject SeventeenDesc;
-    [SerializeField] private GameObject EighteenDesc;
-    [SerializeField] private GameObject NineteenDesc;
+    [Header("튜토리얼 끝나고 지급될 블록들")]
+    [SerializeField] private List<int> _addBlocks;
+    [SerializeField] private Button _lastButton;
 
-    [Header("23 -> 35")]
-    [SerializeField] private GameObject TwentythreeDesc;
-    [SerializeField] private GameObject TwentyFourDesc;
-    [SerializeField] private GameObject TwentyFiveDesc;
-    [SerializeField] private GameObject TwentysixDesc;
-    [SerializeField] private GameObject Desc_27;
-    [SerializeField] private GameObject Desc_28;
-    [SerializeField] private GameObject Desc_29;
-    [SerializeField] private GameObject Desc_30;
-    [SerializeField] private GameObject Desc_31;
-    [SerializeField] private GameObject Desc_32;
-    [SerializeField] private GameObject Desc_33;
-    [SerializeField] private GameObject Desc_34;
-    [SerializeField] private GameObject Desc_35;
-    [SerializeField] private GameObject Nail_6;
-    [SerializeField] private GameObject Nail_7;
+    private void Awake()
+    {
+        _lastButton.onClick.AddListener(ButtonClicked);
+    }
 
-    [Header("35 -> 59")]
-    [SerializeField] private GameObject D_35;
-    [SerializeField] private GameObject D_36;
-    [SerializeField] private GameObject D_37;
-    [SerializeField] private GameObject D_38;
-    [SerializeField] private GameObject D_39;
-    [SerializeField] private GameObject D_40;
-    [SerializeField] private GameObject D_41;
-    [SerializeField] private GameObject D_42;
-    [SerializeField] private GameObject D_43;
-    [SerializeField] private GameObject D_44;
-    [SerializeField] private GameObject D_45;
-    [SerializeField] private GameObject D_46;
-    [SerializeField] private GameObject D_47;
-    [SerializeField] private GameObject D_48;
-    [SerializeField] private GameObject D_49;
-    [SerializeField] private GameObject D_50;
-    [SerializeField] private GameObject D_51;
-    [SerializeField] private GameObject D_52;
-    [SerializeField] private GameObject D_53;
-    [SerializeField] private GameObject D_54;
-    [SerializeField] private GameObject D_55;
-    [SerializeField] private GameObject D_56;
-    [SerializeField] private GameObject D_57;
-    [SerializeField] private GameObject D_58;
-    [SerializeField] private GameObject D_59;
-    [SerializeField] private GameObject Nail_9;
-    [SerializeField] private GameObject Nail_10;
 
     #region 튜토리얼 내부용 로직
     private void Start()
@@ -101,6 +86,10 @@ public class BattleTutorialManager : MonoBehaviour
         TimelineManager.Instance.OnEffectChanged += CheckEffectCondition;
         TimelineManager.Instance.OnTimelineChanged += (blocks, prev) => CheckComplexCondition();
         TimelineManager.Instance.OnEffectChanged += (effects) => CheckComplexCondition();
+        TimelineManager.Instance.OnTimelineChanged += (blocks, prev) => CheckPlacementAndDirection();
+        TimelineManager.Instance.OnExecutionFinished += CheckExecutionFinished;
+
+        ApplyStepUI(0);
     }
 
     public void OnTutorialButtonClicked(string button)
@@ -206,7 +195,6 @@ public class BattleTutorialManager : MonoBehaviour
 
     private void CheckEffectCondition(IReadOnlyList<Additional_Effect> currentEffects)
     {
-        Debug.Log($"효과 변경 감지! 현재 스텝 조건: {steps[currentIndex].condition}, {currentEffects}");
         if (currentIndex >= steps.Length) return;
         TutorialStep currentStep = steps[currentIndex];
         if (currentStep.condition != TutorialCondition.EffectPlaced) return;
@@ -254,314 +242,127 @@ public class BattleTutorialManager : MonoBehaviour
         }
     }
 
+    private void CheckPlacementAndDirection()
+    {
+        if (currentIndex >= steps.Length) return;
+        TutorialStep step = steps[currentIndex];
+
+        PlacedBlock targetBlock = TimelineManager.Instance.PlacedBlocks.FirstOrDefault(pb =>
+        pb.linkedRuntimeBlock.BlockID == step.targetBlockID && pb.startTick == step.targetTick);
+
+        if (targetBlock == null) return;
+
+        int localIndex = step.checkDirectionTick - targetBlock.startTick;
+
+        if (localIndex >= 0 && localIndex < targetBlock.linkedRuntimeBlock.CurrentMoveDirections.Length)
+        {
+            MoveDirection currentDir = targetBlock.linkedRuntimeBlock.CurrentMoveDirections[localIndex];
+            if (currentDir == step.targetDirection)
+            {
+                CompleteStep();
+            }
+        }
+
+    }
+
+    private void CheckExecutionFinished()
+    {
+        if (currentIndex >= steps.Length) return;
+        TutorialStep currentStep = steps[currentIndex];
+
+        if (currentStep.condition == TutorialCondition.RoundExecutionFinished)
+        {
+            CompleteStep();
+        }
+    }
+
+    private void CheckFinalComplexCondition()
+    {
+        if (currentIndex >= steps.Length) return;
+        TutorialStep step = steps[currentIndex];
+
+        if (step.condition != TutorialCondition.FinalComplexCondition) return;
+
+        PlacedBlock targetBlock = TimelineManager.Instance.PlacedBlocks.FirstOrDefault(pb =>
+        pb.linkedRuntimeBlock.BlockID == step.targetBlockID &&
+        pb.startTick == step.targetTick);
+
+        if (targetBlock == null) return;
+
+        int localIndex = step.checkDirectionTick - targetBlock.startTick;
+        bool isDirectionCorrect = false;
+
+        if (localIndex >= 0 && localIndex < targetBlock.linkedRuntimeBlock.CurrentMoveDirections.Length)
+        {
+            if (targetBlock.linkedRuntimeBlock.CurrentMoveDirections[localIndex] == step.targetDirection)
+                isDirectionCorrect = true;
+        }
+        if (!isDirectionCorrect) return;
+        bool isEffectCorrect = false;
+        var currentEffects = TimelineManager.Instance.additional_Effects;
+        int effectIdx = step.targetTick - 1; // 틱 번호 -> 리스트 인덱스 보정
+
+        if (effectIdx >= 0 && effectIdx < currentEffects.Count)
+        {
+            var effect = currentEffects[effectIdx];
+            if (effect != null && effect.effectType == step.targetEffectType)
+            {
+                isEffectCorrect = true;
+            }
+        }
+        if (isEffectCorrect)
+        {
+            CompleteStep();
+        }
+    }
+
+    private void ButtonClicked()
+    {
+        foreach (int block in _addBlocks)
+        {
+            ServiceLocator.Instance.CurrentUser.AddUnlockedBlock(block);
+        }
+    }
+
     #endregion
 
     // ================ 스텝 넘어가는 함수들 모음
     private void CompleteStep()
     {
         Debug.Log($"{currentIndex}단계 완료");
-        if (currentIndex == 1)
+        if (currentIndex < steps.Length)
         {
-            TwelveToThirteen();
+            ApplyStepUI(currentIndex);
         }
-        else if (currentIndex == 2)
+        else
         {
-            FourteenToFifteen();
+            Debug.Log("모든 튜토리얼 종료");
         }
-        else if (currentIndex == 3)
+        currentIndex++;
+
+    }
+
+
+    private void ApplyStepUI(int index)
+    {
+        if (index >= steps.Length) return;
+
+        TutorialStep currentStep = steps[index];
+
+        // 1. 꺼야 할 UI들 처리
+        if (currentStep.hideUIs != null)
         {
-            FifteenToSixteen();
+            foreach (var ui in currentStep.hideUIs)
+                if (ui != null) ui.SetActive(false);
         }
-        else if (currentIndex == 4)
+
+        // 2. 켜야 할 UI들 처리
+        if (currentStep.showUIs != null)
         {
-            SixteenToSeventeen();
+            foreach (var ui in currentStep.showUIs)
+                if (ui != null) ui.SetActive(true);
         }
-        else if (currentIndex == 5)
-        {
-            SeventeenToEighteen();
-        }
-        else if (currentIndex == 6)
-        {
-            EighteenToNineteen();
-        }
-        else if (currentIndex == 7)
-        {
-            TwentythreeToTwentyFour();
-        }
-        else if (currentIndex == 8)
-        {
-            TwentyFourToTwentyFive();
-        }
-        else if (currentIndex == 9)
-        {
-            TwentyfiveToTwentysix();
-        }
-        else if (currentIndex == 11)
-        {
-            Change27_28();
-        }
-        else if (currentIndex == 12)
-        {
-            Change28_29();
-        }
-        else if (currentIndex == 13)
-        {
-            Change29_30();
-        }
-        else if (currentIndex == 15)
-        {
-            Change31_32();
-        }
-        else if (currentIndex == 17)
-        {
-            Change33_34();
-        }
-        else if (currentIndex == 18)
-        {
-            Change34_35();
-        }
-        else if (currentIndex == 19)
-        {
-            C35_36();
-        }
-        else if (currentIndex == 20)
-        {
-            C38_39();
-        }
-        else if (currentIndex == 21)
-        {
-            C39_40();
-        }
-        else if (currentIndex == 22)
-        {
-            C40_41();
-        }
-        else if (currentIndex == 23)
-        {
-            C41_42();
-        }
-        else if (currentIndex == 24)
-        {
-            C42_43();
-        }
-        else if (currentIndex == 25)
-        {
-            C43_44();
-        }
-        else if (currentIndex == 26)
-        {
-            C44_45();
-        }
-        else if (currentIndex == 27)
-        {
-            C45_46();
-        }
-        else if (currentIndex == 28)
-        {
-            C46_47();
-        }
-        else if(currentIndex == 29)
-        {
-            C51_52();
-        }else if (currentIndex == 30)
-        {
-            C52_53();
-        }else if(currentIndex == 31)
-        {
-            C53_54();
-        }else if(currentIndex == 33)
-        {
-            C55_56();
-        }else if(currentIndex == 34)
-        {
-            C58_59  ();
-        }
-            currentIndex++;
     }
-
-    private void TwelveToThirteen()
-    {
-        TwelveDesc.SetActive(false);
-        ThirteenDesc.SetActive(true);
-    }
-
-    private void FourteenToFifteen()
-    {
-        FourteenDesc.SetActive(false);
-        FifteenDesc.SetActive(true);
-    }
-
-    private void FifteenToSixteen()
-    {
-        FifteenDesc.SetActive(false);
-        SixteenDesc.SetActive(true);
-    }
-
-    private void SixteenToSeventeen()
-    {
-        SixteenDesc.SetActive(false);
-        SeventeenDesc.SetActive(true);
-    }
-
-    private void SeventeenToEighteen()
-    {
-        SeventeenDesc.SetActive(false);
-        EighteenDesc.SetActive(true);
-    }
-
-    private void EighteenToNineteen()
-    {
-        EighteenDesc.SetActive(false);
-        NineteenDesc.SetActive(true);
-    }
-
-    private void TwentythreeToTwentyFour()
-    {
-        TwentythreeDesc.SetActive(false);
-        TwentyFourDesc.SetActive(true);
-    }
-
-    private void TwentyFourToTwentyFive()
-    {
-        TwentyFourDesc.SetActive(false);
-        TwentyFiveDesc.SetActive(true);
-    }
-
-    private void TwentyfiveToTwentysix()
-    {
-        TwentyFiveDesc.SetActive(false);
-        TwentysixDesc.SetActive(true);
-    }
-
-    private void Change27_28()
-    {
-        Desc_27.SetActive(false);
-        Desc_28.SetActive(true);
-    }
-
-    private void Change28_29()
-    {
-        Desc_28.SetActive(false);
-        Desc_29.SetActive(true);
-    }
-
-    private void Change29_30()
-    {
-        Desc_29.SetActive(false);
-        Desc_30.SetActive(true);
-    }
-
-    private void Change31_32()
-    {
-        Desc_31.SetActive(false);
-        Desc_32.SetActive(true);
-    }
-
-    private void Change33_34()
-    {
-        Desc_33.SetActive(false);
-        Desc_34.SetActive(true);
-    }
-
-    private void Change34_35()
-    {
-        Desc_34.SetActive(false);
-        Desc_35.SetActive(true);
-        Nail_6.SetActive(false);
-        Nail_7.SetActive(true);
-    }
-
-    private void C35_36()
-    {
-        D_35.SetActive(false);
-        D_36.SetActive(true);
-    }
-
-    private void C38_39()
-    {
-        D_38.SetActive(false);
-        D_39.SetActive(true);
-    }
-
-    private void C39_40()
-    {
-        D_39.SetActive(false);
-        D_40.SetActive(true);
-    }
-
-    private void C40_41()
-    {
-        D_40.SetActive(false);
-        D_41.SetActive(true);
-    }
-
-    private void C41_42()
-    {
-        D_41.SetActive(false) ;
-        D_42.SetActive(true) ;
-    }
-
-    private void C42_43()
-    {
-        D_42.SetActive(false) ;
-        D_43.SetActive(true) ;
-    }
-
-    private void C43_44()
-    {
-        D_43.SetActive(false) ;
-        D_44.SetActive(true) ;
-    }
-
-    private void C44_45()
-    {
-        D_44.SetActive(false) ;
-        D_45.SetActive(true) ;
-    }
-
-    private void C45_46()
-    {
-        D_45.SetActive(false) ;
-        D_46.SetActive(true) ;
-    }
-
-    private void C46_47()
-    {
-        D_46.SetActive(false) ;
-        D_47.SetActive(true) ;
-    }
-
-    private void C51_52()
-    {
-        D_51.SetActive(false) ;
-        D_52.SetActive(true) ;
-    }
-
-    private void C52_53()
-    {
-        D_52.SetActive(false);
-        D_53.SetActive(true) ;
-    }
-
-    private void C53_54()
-    {
-        D_53.SetActive(false) ;
-        D_54.SetActive(true) ;
-    }
-
-    private void C55_56()
-    {
-        Debug.Log("56으로 전환");
-        D_55.SetActive(false) ;
-        D_56.SetActive(true) ;
-        Nail_9.SetActive(false) ;
-        Nail_10.SetActive(true) ;
-    }
-
-    private void C58_59()
-    {
-        D_58.SetActive(false);
-        D_59.SetActive(true) ;
-    }
+    
 
 }

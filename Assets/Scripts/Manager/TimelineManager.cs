@@ -71,6 +71,7 @@ public class TimelineManager : MonoBehaviour
     public event Action<int> OnCurrentTickChanged;
     public event Action<IReadOnlyList<Additional_Effect>> OnEffectChanged;
     public event Action<int, int> OnTextMemoryChanged;
+    public event Action OnExecutionFinished;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
@@ -558,6 +559,7 @@ public class TimelineManager : MonoBehaviour
         }
 
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
+        OnExecutionFinished?.Invoke();
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
         //Time.timeScale = 1f;
         //_battleSystem.ResetMeleeStack();
