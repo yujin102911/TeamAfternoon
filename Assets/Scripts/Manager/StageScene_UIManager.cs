@@ -48,7 +48,7 @@ public class StageScene_UIManager : MonoBehaviour
         StageData stageData = DataRepository.Instance.GetStage(id);
 
         Light_On();
-        SetandShow_Txt(stageData.StageName);
+        //SetandShow_Txt(stageData.StageName);
     }
 
     // 책 위에서 마우스 벗어날 때

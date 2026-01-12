@@ -49,7 +49,7 @@ public class StageButton : MonoBehaviour
         if (_titleText != null)
         {
             _titleText.font = isRead ? regul : bold;
-            _titleText.text = $"{_mailData.subject}";
+            _titleText.text = _mailData.subject.GetLocalizedString();
         }
 
     }
