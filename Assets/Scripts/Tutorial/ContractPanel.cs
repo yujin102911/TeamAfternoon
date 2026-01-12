@@ -41,7 +41,7 @@ public class ContractPanel : MonoBehaviour
         else if (_noToggle.isOn)
         {
             Debug.Log("설치하지 않음 선택");
-            GoWithoutTutorial();
+            _realPopup.SetActive(true);
         }
     }
 
