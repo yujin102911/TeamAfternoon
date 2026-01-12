@@ -57,6 +57,8 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
 
     public void Show(Pattern_Label label, Vector2 screenPos, Camera cam, int stone_num)
     {
+        this.gameObject.SetActive(true);
+
         root.SetActive(true);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
@@ -83,7 +85,9 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
         // 내용 설정
         Update_Info(label, stone_num);
 
-        this.gameObject.SetActive(true);
+        Debug.Log($"[Tooltip] NameTable={_nameText.TableReference}  NameKey={_nameText.TableEntryReference}");
+        Debug.Log($"[Tooltip] DescTable={_descriptionText.TableReference} DescKey={_descriptionText.TableEntryReference}");
+
     }
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)

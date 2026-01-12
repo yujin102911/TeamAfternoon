@@ -27,6 +27,8 @@ public class Action_Tooltip_Panel : MonoBehaviour
 
     public void Show(RuntimeBlock r_block, Vector2 screenPos, Camera cam)
     {
+        this.gameObject.SetActive(true);
+
         root.SetActive(true);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
@@ -52,8 +54,6 @@ public class Action_Tooltip_Panel : MonoBehaviour
 
 
         Clear_Cells();
-
-        this.gameObject.SetActive(true);
 
         // 이름 텍스트 설정(추후 
         _nameTxt.text = r_block.BaseData.blockName;
