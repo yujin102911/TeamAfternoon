@@ -66,6 +66,8 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
 
     public void Show(ActionType action, int damage, Vector2 screenPos, Camera cam)
     {
+        this.gameObject.SetActive(true);
+
         root.SetActive(true);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
@@ -92,7 +94,7 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
         // 내용 설정
         Update_Info(action, damage);
 
-        this.gameObject.SetActive(true);
+        
     }
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)

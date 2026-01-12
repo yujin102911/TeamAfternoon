@@ -85,6 +85,8 @@ public class Effect_TooltipPanel : MonoBehaviour
 
     public void Show(Additional_Effect effect, Vector2 screenPos, Camera cam)
     {
+        this.gameObject.SetActive(true);
+
         root.SetActive(true);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
@@ -111,7 +113,7 @@ public class Effect_TooltipPanel : MonoBehaviour
 
         Clear_Cells();
 
-        this.gameObject.SetActive(true);
+        
 
         // 아이콘 설정
         Set_Icon(effect.effectType);

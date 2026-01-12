@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class QuestOptionState : MonoBehaviour
+public class QuestOptionState
 {
     public bool IsHit { get; private set; }
     public bool IsEight { get; private set; }

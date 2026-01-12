@@ -96,6 +96,8 @@ public class TimelineManager : MonoBehaviour
 
         // QuestOptionState 할당
         QuestOptionState = new QuestOptionState();
+        // 퀘스트 상태 초기화
+        QuestOptionState.Initialize();
 
         // TimelineSystem 초기화
         _timelineSystem = new TimelineSystem();
