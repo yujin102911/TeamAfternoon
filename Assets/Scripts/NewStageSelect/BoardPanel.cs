@@ -8,14 +8,14 @@ public class BoardPanel : MonoBehaviour
 {
     public static event System.Action OnBoardStatusChanged;
 
-    [Header("패널 제어")]
+    [Header("Panel Controls")]
     [SerializeField] private Button _closeButton;
 
-    [Header("사이드 바 설정")]
+    [Header("Sidebar Settings")]
     [SerializeField] private GameObject _dayButtonPrefab;
     [SerializeField] private Transform _sidebarArea;
 
-    [Header("게시물 목록 생성")]
+    [Header("Post List Settings")]
     [SerializeField] private Transform _scrollContent;
     [SerializeField] private GameObject _boardItemPrefab;
 
@@ -34,6 +34,7 @@ public class BoardPanel : MonoBehaviour
 
     private void ClosePanel()
     {
+        Debug.Log("Board Panel Closed.");
         gameObject.SetActive(false);
         OnBoardStatusChanged?.Invoke();
     }
@@ -56,6 +57,7 @@ public class BoardPanel : MonoBehaviour
         {
             int index = sortedStages.IndexOf(stage);
             bool isUnlocked = (index == 0) || currentUser.IsStageCleared(sortedStages[index - 1].StageNumber);
+
             if (isUnlocked)
             {
                 GameObject go = Instantiate(_dayButtonPrefab, _sidebarArea);
@@ -67,10 +69,9 @@ public class BoardPanel : MonoBehaviour
                 lastAvailableStage = stage;
             }
             else break;
-
         }
-        if (lastAvailableStage != null) SelectDay(lastAvailableStage);
 
+        if (lastAvailableStage != null) SelectDay(lastAvailableStage);
     }
 
     public void SelectDay(StageData stage)
@@ -96,6 +97,4 @@ public class BoardPanel : MonoBehaviour
             go.GetComponent<BoardItem_UI>().Setup(entry);
         }
     }
-
-
 }
