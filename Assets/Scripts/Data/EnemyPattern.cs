@@ -10,6 +10,7 @@ using Sirenix.OdinInspector;
 [System.Serializable]
 public class EnemyAttack
 {
+
     public int tick;                  // 공격 틱 (1~18)
     public List<int> targetSectors;   // 공격 대상 섹터들
     public int damage;                  // 피해 주사위
@@ -25,6 +26,10 @@ public class EnemyAttack
 [System.Serializable]
 public class EnemyParrying
 {
+    public string Name_key; //패턴 이름
+    public string Desc_key; //패턴 설명
+    public string Type_key; //패턴 타입 설명
+
     public int tick;
     // public float probability = 1f;  // 패링 발동 확률 - 지금은 사실상 사용하는 부분 없음. 추후 확장 가능성을 위해 일단 만들어둠
     public float damageMultiplier = 1f; // 패링 시 데미지
@@ -40,6 +45,7 @@ public class EnemyParrying
 [System.Serializable]
 public class EnemyStone
 {
+
     public int tick = 8;
     public int count = 1;
 
@@ -61,6 +67,8 @@ public enum WindType
 [System.Serializable]
 public class EnemyWind
 {
+
+
     public int tick;
     public WindType windType;
 

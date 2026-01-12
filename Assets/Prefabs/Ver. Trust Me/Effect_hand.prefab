@@ -235,12 +235,25 @@ MonoBehaviour:
     effectType: 0
     effectColor: {r: 0, g: 0, b: 0, a: 0}
     cost: 0
+    Apply_actionTypes: 
   cell: {fileID: 1370202594294682545}
   dragGhostPrefab: {fileID: 4773672169210653192, guid: 8586e948f655fda4099d4c11cb483f6c, type: 3}
   _image: {fileID: 933731659415549400}
   costText: {fileID: 856610931128502961}
   nameText: {fileID: 8704329692856967338}
+  _nameText:
+    m_TableReference:
+      m_TableCollectionName: GUID:827eee7c347741a4eafb0851cd79787f
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   _lock: {fileID: 8772322576887658294}
+  references:
+    version: 2
+    RefIds: []
 --- !u!225 &1867952359195751510
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -278,6 +291,7 @@ GameObject:
   - component: {fileID: 7280220660865757383}
   - component: {fileID: 1648148962809660670}
   - component: {fileID: 8704329692856967338}
+  - component: {fileID: 71761493450950846}
   m_Layer: 5
   m_Name: Name_Text
   m_TagString: Untagged
@@ -403,6 +417,46 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &71761493450950846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5892334715199963672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:827eee7c347741a4eafb0851cd79787f
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8704329692856967338}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &8772322576887658294
 GameObject:
   m_ObjectHideFlags: 0

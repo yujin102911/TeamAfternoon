@@ -13,26 +13,27 @@ MonoBehaviour:
   m_Name: EffectDB
   m_EditorClassIdentifier: 
   _effectDB:
-  - effectName: "\uC2E0\uC18D"
-    effectDescription: "\uC774\uB3D9 \uAC70\uB9AC\uAC00 <color=green>1 \uC99D\uAC00</color>
-      \uD569\uB2C8\uB2E4."
+  - effectName: EFFECT_SWIFT_NAME
+    effectDescription: EFFECT_SWIFT_DESC
     effectType: 2
     effectColor: {r: 0.23113209, g: 0.92763597, b: 1, a: 1}
     cost: 2
-  - effectName: "\uB370\uBBF8\uC9C0 \uC99D\uAC00"
-    effectDescription: "\uB370\uBBF8\uC9C0\uAC00 <color=green>+5</color>\uB429\uB2C8\uB2E4"
+    Apply_actionTypes: 090000000a000000
+  - effectName: EFFECT_DAMAGE_UP_NAME
+    effectDescription: EFFECT_DAMAGE_UP_DESC
     effectType: 3
     effectColor: {r: 0.64705884, g: 0.28235295, b: 0.28627452, a: 1}
     cost: 3
-  - effectName: "\uD06C\uB9AC\uD2F0\uCEEC"
-    effectDescription: "\uB370\uBBF8\uC9C0\uAC00 <color=green>2\uBC30</color>\uAC00
-      \uB429\uB2C8\uB2E4"
+    Apply_actionTypes: 0100000005000000
+  - effectName: EFFECT_CRITICAL_NAME
+    effectDescription: EFFECT_CRITICAL_DESC
     effectType: 1
     effectColor: {r: 1, g: 0.60045624, b: 0, a: 1}
     cost: 5
-  - effectName: "\uAE30\uC808"
-    effectDescription: "\uADFC\uAC70\uB9AC \uACF5\uACA9 \uC131\uACF5\uC2DC \uC801\uC774
-      \uC7A0\uC2DC \uAE30\uC808\uD569\uB2C8\uB2E4"
+    Apply_actionTypes: 0100000005000000
+  - effectName: EFFECT_STUN_NAME
+    effectDescription: EFFECT_STUN_DESC
     effectType: 4
     effectColor: {r: 1, g: 0.94301146, b: 0.18396229, a: 1}
     cost: 4
+    Apply_actionTypes: 01000000

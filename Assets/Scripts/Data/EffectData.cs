@@ -21,6 +21,7 @@ public class Additional_Effect
     public EffectType effectType;
     public Color effectColor;
     public int cost;
+    public ActionType[] Apply_actionTypes;
 }
 
 [CreateAssetMenu(fileName = "New EffectData", menuName = "Data/Effect")]
