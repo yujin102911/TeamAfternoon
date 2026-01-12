@@ -139,6 +139,16 @@ public class GameManager : MonoBehaviour
             
     }
 
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            Debug.Log("[GameManager] F10 키 입력 감지 - 현재 스테이지 클리어 처리 실행");
+            ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
+            OnBattleEnded?.Invoke(EndCondition.Victory);
+        }
+    }
     private void OnDestroy()
     {
         UnSubscribeEvents();
