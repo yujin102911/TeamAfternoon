@@ -18,6 +18,8 @@ public class CardTooltip : MonoBehaviour
     private Action_Tooltip_Panel action_Tooltip_Panel;
     [SerializeField]
     private Timeline_Action_TooltipPanel timeline_Action_TooltipPanel;
+    [SerializeField]
+    private EnemyPattern_TooltipPanel enemy_Pattern_TooltipPanel;
 
     [Header("위치 오프셋")]
     [SerializeField] private Vector2 offset = new Vector2(0f, -10f); // ← 오른쪽으로 안 밀리게 X=0
@@ -98,6 +100,11 @@ public class CardTooltip : MonoBehaviour
         timeline_Action_TooltipPanel.Show(action, damage, screenPos, cam);
     }
 
+    public void Show_PatternDesc(Pattern_Label label, Vector2 screenPos, Camera cam, int stone_num = 0)
+    {
+        enemy_Pattern_TooltipPanel.Show(label, screenPos, cam, stone_num);
+    }
+
     public void Hide()
     {
         for (int i = 0; i < keywords.Length; i++) 
@@ -114,5 +121,8 @@ public class CardTooltip : MonoBehaviour
 
         if(timeline_Action_TooltipPanel != null)
             timeline_Action_TooltipPanel.Hide();
+
+        if(enemy_Pattern_TooltipPanel != null)
+            enemy_Pattern_TooltipPanel.Hide();
     }
 }
