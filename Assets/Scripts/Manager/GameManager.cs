@@ -133,8 +133,14 @@ public class GameManager : MonoBehaviour
         // 베틀씬 사운드
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.Play(SoundID.BGM_Battle);
-            Debug.Log("함");
+            if(currentStageData.StageNumber < 5)
+            {
+                SoundManager.Instance.Play(SoundID.BGM_Battle);
+            }
+            else
+            {
+                SoundManager.Instance.Play(SoundID.BGM_Boss);
+            }
         }
             
     }
