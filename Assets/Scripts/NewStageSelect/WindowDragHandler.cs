@@ -16,6 +16,10 @@ public class WindowDragHandler : MonoBehaviour
             _targetPanel = transform.parent.GetComponent<RectTransform>();
         }
     }
+    private void OnDisable()
+    {
+        ServiceLocator.Instance.Cursor.OnDragEnd();
+    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
