@@ -19381,7 +19381,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1100
+  m_SortingOrder: 3000
   m_TargetDisplay: 0
 --- !u!114 &4284984437140003061
 MonoBehaviour:
@@ -19852,12 +19852,24 @@ MonoBehaviour:
     targetFilters: 
     targetDirection: 0
     targetEffectType: 0
-  - condition: 9
+  - condition: 11
     hideUIs:
     - {fileID: 4122665612687195439}
     showUIs:
     - {fileID: 629252638386993761}
     targetButtonName: 
+    targetTick: 0
+    targetBlockID: 0
+    checkDirectionTick: 0
+    targetFilters: 
+    targetDirection: 0
+    targetEffectType: 0
+  - condition: 2
+    hideUIs:
+    - {fileID: 1753403451097987802}
+    - {fileID: 6501949463130132836}
+    showUIs: []
+    targetButtonName: GOTITLE
     targetTick: 0
     targetBlockID: 0
     checkDirectionTick: 0

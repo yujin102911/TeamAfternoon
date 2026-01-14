@@ -17,6 +17,7 @@ public enum TutorialCondition
     PlacementWithDirection,
     RoundExecutionFinished,
     FinalComplexCondition,
+    BattleVictory,
 }
 
 [System.Serializable]
@@ -99,6 +100,10 @@ public class BattleTutorialManager : MonoBehaviour
             };
 
             TimelineManager.Instance.OnExecutionFinished += CheckExecutionFinished;
+        }
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnBattleEnded += CheckBattleVictory;
         }
 
         ApplyStepUI(0);
@@ -328,6 +333,15 @@ public class BattleTutorialManager : MonoBehaviour
         {
             CompleteStep();
         }
+    }
+
+    private void CheckBattleVictory(EndCondition condition)
+    {
+        if (currentIndex >= steps.Length) return;
+        TutorialStep currentStep = steps[currentIndex];
+
+        if (currentStep.condition == TutorialCondition.BattleVictory && condition == EndCondition.Victory)
+            CompleteStep();
     }
 
     private void ButtonClicked()
