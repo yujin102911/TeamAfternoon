@@ -42,10 +42,6 @@ public class EscPanel : MonoBehaviour
     private void TurnOnEscPanel()
     {
         _escPanel.SetActive(true);
-        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
-        {
-            ServiceLocator.Instance.Cursor.SetCursorConfined(false);
-        }
         if (Time.timeScale > 0)
         {
             savedTimeScale = Time.timeScale;
@@ -56,10 +52,6 @@ public class EscPanel : MonoBehaviour
     private void TurnOffEscPanel()
     {
         _escPanel.SetActive(false);
-        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
-        {
-            ServiceLocator.Instance.Cursor.SetCursorConfined(true);
-        }
         Time.timeScale = savedTimeScale;
     }
 

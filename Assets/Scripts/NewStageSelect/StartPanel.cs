@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Globalization;
 
 public class StartPanel : MonoBehaviour
 {
@@ -45,7 +46,7 @@ public class StartPanel : MonoBehaviour
     {
         if (_timeText != null)
         {
-            _timeText.text = DateTime.Now.ToString("hh:mm tt");
+            _timeText.text = DateTime.Now.ToString("hh:mm tt", CultureInfo.InvariantCulture);
         }
     }
 

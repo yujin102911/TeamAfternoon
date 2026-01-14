@@ -33,13 +33,6 @@ public class ServiceLocator : MonoBehaviour
         Cursor = new CursorService(this, cursorAnimations);
     }
 
-    private void Start()
-    {
-        if (Cursor != null)
-        {
-            Cursor.SetCursorConfined(true);
-        }
-    }
 
     /// <summary>
     /// 튜토리얼 전용 유저데이터를 생성하는 함수 (저장 X)
