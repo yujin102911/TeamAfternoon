@@ -15,6 +15,9 @@ public class ServiceLocator : MonoBehaviour
     [SerializeField] private UserGameData easyModeTemplate;
     [SerializeField] private UserGameData hardModeTemplate;
 
+    [Header("테스트용 유저 데이터")]
+    [SerializeField] private bool isTestMode = false;
+    [SerializeField] private UserGameData testUserData;
 
     [Header("커서 애니메이션 설정")]
     [SerializeField] private List<CursorAnimation> cursorAnimations;
@@ -31,15 +34,12 @@ public class ServiceLocator : MonoBehaviour
 
         Scene = new SceneService();
         Cursor = new CursorService(this, cursorAnimations);
-    }
-
-    private void Start()
-    {
-        if (Cursor != null)
+        if (isTestMode)
         {
-            Cursor.SetCursorConfined(true);
+            CurrentUser = Instantiate(testUserData);
         }
     }
+
 
     /// <summary>
     /// 튜토리얼 전용 유저데이터를 생성하는 함수 (저장 X)

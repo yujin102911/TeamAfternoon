@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 [System.Serializable]
 public class CursorAnimation
@@ -16,6 +17,8 @@ public class CursorService
     private readonly MonoBehaviour _owner;
     private readonly List<CursorAnimation> _animations;
     private Coroutine _activeCoroutine;
+
+    private int _dragCount = 0;
 
     public CursorService(MonoBehaviour owner, List<CursorAnimation> animations)
     {
@@ -53,9 +56,22 @@ public class CursorService
         }
     }
 
-    public void SetCursorConfined(bool isConfined)
+    public void OnDragStart()
     {
-        Cursor.lockState = isConfined ? CursorLockMode.Confined : CursorLockMode.None;
+        _dragCount++;
+        ApplyLockState();
     }
+
+    public void OnDragEnd()
+    {
+        _dragCount = Mathf.Max(0, _dragCount - 1);
+        ApplyLockState();
+    }
+
+    private void ApplyLockState()
+    {
+        Cursor.lockState = (_dragCount > 0) ? CursorLockMode.Confined : CursorLockMode.None;
+    }
+
 
 }
