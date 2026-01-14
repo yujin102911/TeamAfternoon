@@ -40,6 +40,8 @@ public class BattleUIManager : MonoBehaviour
     private Image _speedButtonIcon;
     [SerializeField]
     private Sprite[] _speedSprites;
+    [SerializeField]
+    private TextMeshProUGUI _speedTxt;
     private int _currentSpeedIndex = 0;
 
     private void StartSpeedButton()
@@ -59,14 +61,17 @@ public class BattleUIManager : MonoBehaviour
                         case 0:
                             TimelineManager.Instance.SetTimeScale(1.0f);
                             _speedButtonIcon.sprite = _speedSprites[0];
+                            _speedTxt.text = $"X1";
                             break;
                         case 1:
                             TimelineManager.Instance.SetTimeScale(1.5f);
                             _speedButtonIcon.sprite = _speedSprites[1];
+                            _speedTxt.text = $"X2";
                             break;
                         case 2:
                             TimelineManager.Instance.SetTimeScale(2.0f);
                             _speedButtonIcon.sprite = _speedSprites[2];
+                            _speedTxt.text = $"X3";
                             break;
                     }
                 }
