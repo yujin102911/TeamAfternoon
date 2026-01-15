@@ -207,8 +207,10 @@ public class BattleSequenceController : MonoBehaviour
     private IEnumerator ScrollLeft()
     {
         _timelineUI.SetActive_Slots(false);
+        _nextCover.gameObject.SetActive(false);
+        _currentCover.gameObject.SetActive(true);
 
-        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, true));
+        //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, true));
 
         SwitchCover();
 
@@ -219,7 +221,8 @@ public class BattleSequenceController : MonoBehaviour
         yield return beltReset;
         yield return sliderReturn;
 
-        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
+        //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
+        _currentCover.gameObject.SetActive(false);
 
         _timelineUI.SetActive_Slots(true);
     }
@@ -544,8 +547,9 @@ public class BattleSequenceController : MonoBehaviour
         _nextCover = _coverEffects[2];
 
         //열림
-        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
-
+        //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
+        _currentCover.gameObject.SetActive(false);
+        yield return null;
         _timelineUI.SetActive_Slots(true);
     }
 
