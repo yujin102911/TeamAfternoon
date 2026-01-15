@@ -860,10 +860,23 @@ public class TimelineUI : MonoBehaviour
                         ? blockData.CalCulate_CurePower(i)
                         : blockData.attackDamage;
 
+                    Cell_Pos cell_Pos = Cell_Pos.Middle;
+
+                    if (i == 0)
+                    {
+                        cell_Pos = Cell_Pos.Start;
+                    }
+                    
+                    if (i == blockData.blockLength - 1)
+                    {
+                        cell_Pos = Cell_Pos.End;
+                    }
+
                     slotView.SetAction(
                         action,
                         dir,
                         damage,
+                        cell_Pos,
                         isPreview: false,
                         isPrev: true
                     );
@@ -924,10 +937,23 @@ public class TimelineUI : MonoBehaviour
                         ? blockData.CalCulate_CurePower(i)
                         : blockData.attackDamage;
 
+                    Cell_Pos cell_Pos = Cell_Pos.Middle;
+
+                    if (i == 0)
+                    {
+                        cell_Pos = Cell_Pos.Start;
+                    }
+
+                    if (i == blockData.blockLength - 1)
+                    {
+                        cell_Pos = Cell_Pos.End;
+                    }
+
                     slotView.SetAction(
                         action,
                         dir,
                         damage,
+                        cell_Pos,
                         isPreview: false,
                         isPrev: false
                     );

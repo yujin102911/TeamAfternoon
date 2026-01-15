@@ -39,7 +39,19 @@ public class Film_UI : MonoBehaviour
             MoveDirection dir = data.MoveDirections[i];
             int damage = data.attackDamage;
 
-            cell.GetComponent<Action_cell>().Update_CellVisual(action, dir, damage);
+            Cell_Pos cell_Pos = Cell_Pos.Middle;
+
+            if (i == 0)
+            {
+                cell_Pos = Cell_Pos.Start;
+            }
+            
+            if (i == data.blockLength - 1)
+            {
+                cell_Pos = Cell_Pos.End;
+            }
+
+            cell.GetComponent<Action_cell>().Update_CellVisual(action, dir, damage, cell_Pos);
 
 
         }

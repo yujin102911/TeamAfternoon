@@ -115,7 +115,7 @@ public class StepSlider : MonoBehaviour
 
         slider.value = 0f;
         slider.interactable = true;
-        _timelineUI.SetActive_Slots(true);
+        //_timelineUI.SetActive_Slots(true);
     }
 
     public void Stop()
