@@ -2,6 +2,7 @@
 using Steamworks;
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SteamAchievementSimpleTest : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class SteamAchievementSimpleTest : MonoBehaviour
     private const string ACH_ID = "NEW_ACHIEVEMENT_1_0";
 
     public int id;
+
+    private bool _done;
 
     private void Awake()
     {
@@ -22,17 +25,16 @@ public class SteamAchievementSimpleTest : MonoBehaviour
         SteamUserStats.RequestUserStats(_mySteamId);
     }
 
+    void Start()
+    {
+        InvokeRepeating(nameof(CheckTimeAchievement), 0f, 1f); // 1초마다
+        Debug.Log($"{_done}");
+    }
+
+
     private void Update()
     {
         SteamAPI.RunCallbacks();
-
-        if (IsInTimeRange(11, 28, 11, 29))
-        {
-            SteamUserStats.SetAchievement("NEW_ACHIEVEMENT_17_0");
-            SteamUserStats.StoreStats();
-
-            Debug.Log($"Achievement Unlocked: {"NEW_ACHIEVEMENT_17_0"}");
-        }
     }
 
     private void OnDestroy()
@@ -66,6 +68,8 @@ public class SteamAchievementSimpleTest : MonoBehaviour
 
     bool IsInTimeRange(int startHour, int startMinute, int endHour, int endMinute)
     {
+        // 글로벌 시간 기준
+        //DateTime now = DateTime.UtcNow;
         DateTime now = DateTime.Now;
 
         TimeSpan nowTime = now.TimeOfDay;
@@ -78,5 +82,20 @@ public class SteamAchievementSimpleTest : MonoBehaviour
 
         // 자정 넘어가는 범위 (예: 22:00 ~ 02:00)
         return nowTime >= start || nowTime <= end;
+    }
+
+    void CheckTimeAchievement()
+    {
+        if (_done) return;
+
+        if (IsInTimeRange(13,45,13,46))
+        {
+            SteamUserStats.SetAchievement("NEW_ACHIEVEMENT_17_0");
+            SteamUserStats.StoreStats();
+            _done = true;
+
+            Debug.Log($"Achievement Unlocked: NEW_ACHIEVEMENT_17_0");
+            CancelInvoke(nameof(CheckTimeAchievement));
+        }
     }
 }

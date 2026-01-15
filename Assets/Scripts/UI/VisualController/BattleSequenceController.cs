@@ -18,6 +18,12 @@ public class BattleSequenceController : MonoBehaviour
     [SerializeField]
     private GameStartPanel_VController _gamestartPanel;
 
+    [Header("타임 라인 가림막")]
+    [SerializeField] Cover_Effect[] _coverEffects;
+    private Cover_Effect _prevCover;
+    private Cover_Effect _currentCover;
+    private Cover_Effect _nextCover;
+
     [Header("연출 코드")]
     [SerializeField]
     private TimeLineResetController _resetController;
@@ -142,8 +148,10 @@ public class BattleSequenceController : MonoBehaviour
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.Show_startBtn();
 
+
+        StartCoroutine(SetCover());
         _gamestartPanel.FadeOut();
-        _timelineUI.SetActive_Slots(true);
+        //_timelineUI.SetActive_Slots(true);
     }
 
     // 연출 재생 후 끝나면 onComplete
@@ -198,12 +206,21 @@ public class BattleSequenceController : MonoBehaviour
     // 타임라인 원래대로 돌아오는 연출
     private IEnumerator ScrollLeft()
     {
+        _timelineUI.SetActive_Slots(false);
+
+        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, true));
+
+        SwitchCover();
+
         Coroutine beltReset = _resetController.Play();
         Coroutine sliderReturn = _timelineSlider.Return(2.0f);
 
-        _timelineUI.SetActive_Slots(false);
+        
         yield return beltReset;
         yield return sliderReturn;
+
+        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
+
         _timelineUI.SetActive_Slots(true);
     }
 
@@ -517,5 +534,26 @@ public class BattleSequenceController : MonoBehaviour
             _timelineSlider.Stop();
         if (_roundSlider != null)
             _roundSlider.Stop();
+    }
+
+    // 커버 초기화
+    IEnumerator SetCover()
+    {
+        _prevCover = _coverEffects[0];
+        _currentCover = _coverEffects[1];
+        _nextCover = _coverEffects[2];
+
+        //열림
+        yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
+
+        _timelineUI.SetActive_Slots(true);
+    }
+
+    private void SwitchCover()
+    {
+        Cover_Effect temp = _prevCover;
+        _prevCover = _currentCover;
+        _currentCover = _nextCover;
+        _nextCover = temp;
     }
 }
