@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _startHandSize = 5;
     [SerializeField] private int _playerMaxHP = 3; // 기본값 (-> 정상적으로 실행 시 UserData에서 받아옴)
     [SerializeField] private MapSize _mapSize = MapSize.Grid_3x3;
+    [SerializeField] private bool isTutorial;
 
     [Header("테스트용 스테이지 데이터")]
     [SerializeField] private StageData currentStageData;
@@ -91,6 +92,7 @@ public class GameManager : MonoBehaviour
     }
     public bool IsSectorSelected => _isSectorSelected;
     public bool IsBattleEnded => _isBattleEnded;
+    public bool IsTutorial => isTutorial;
     public bool IsSequencePlaying { get; set; } = false;
     public bool IsRoundInterrupted { get; private set; }
     #endregion

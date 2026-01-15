@@ -34,10 +34,14 @@ public class ServiceLocator : MonoBehaviour
 
         Scene = new SceneService();
         Cursor = new CursorService(this, cursorAnimations);
-        if (isTestMode)
+        if (testUserData != null)
         {
-            CurrentUser = Instantiate(testUserData);
+            if (isTestMode)
+            {
+                CurrentUser = Instantiate(testUserData);
+            }
         }
+        
     }
 
 

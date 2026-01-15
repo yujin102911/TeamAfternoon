@@ -140,7 +140,8 @@ public class MailPanel : MonoBehaviour
         if (NailController.Instance != null)
         {
             string signal = $"Mail_Read_{data.StageNumber}_{mailIndex}";
-            NailController.Instance.CompleteStepBySignal(signal);
+            Debug.Log("신호이름: "+ signal);
+            NailController.Instance.OnGetSignal(signal);
         }
     }
 }
