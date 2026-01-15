@@ -38,6 +38,10 @@ public class DragOn_timeline : MonoBehaviour
     private void OnDisable()
     {
         EventBus.Unsubscribe<DragBeginEvent>(OnDragBegin);
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
+        {
+            ServiceLocator.Instance.Cursor.OnDragEnd();
+        }
     }
 
     private void Awake()
@@ -48,6 +52,11 @@ public class DragOn_timeline : MonoBehaviour
     private void OnDragBegin(DragBeginEvent e)
     {
         isDragging = true;
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
+        {
+            ServiceLocator.Instance.Cursor.OnDragStart();
+        }
+
 
         draggingBlock = e.block;
         canvas = e.canvas;
@@ -101,8 +110,12 @@ public class DragOn_timeline : MonoBehaviour
         Destroy(ghost);
         ghost = null;
         isDragging = false;
+        if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
+        {
+            ServiceLocator.Instance.Cursor.OnDragEnd();
+        }
 
-        if(BattleUIManager.Instance != null)
+        if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
     }
 
@@ -139,17 +152,29 @@ public class DragOn_timeline : MonoBehaviour
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointer, results);
 
-        foreach (var hit in results)
+        if (results.Count > 0)
         {
-            TimelineDropZone dropTarget =
-                hit.gameObject.GetComponentInParent<TimelineDropZone>();
+            TimelineDropZone dropTarget = results[0].gameObject.GetComponentInParent<TimelineDropZone>();
 
-            if (dropTarget == null)
-                continue;
-
-            dropTarget.OnDrop_inTimeline(draggingBlock);
-            return true; // ✅ 성공
+            if (dropTarget != null)
+            {
+                dropTarget.OnDrop_inTimeline(draggingBlock);
+                return true;
+            }
         }
+        
+
+        //foreach (var hit in results)
+        //{
+        //    TimelineDropZone dropTarget =
+        //        hit.gameObject.GetComponentInParent<TimelineDropZone>();
+
+        //    if (dropTarget == null)
+        //        continue;
+
+        //    dropTarget.OnDrop_inTimeline(draggingBlock);
+        //    return true; // ✅ 성공
+        //}
 
         return false; // ❌ 실패
     }

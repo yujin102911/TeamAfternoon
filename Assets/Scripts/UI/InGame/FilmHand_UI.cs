@@ -26,6 +26,9 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
     private Color _originColor;
     private bool _isPointerOver = false;
 
+    [Header("튜토리얼 여부")]
+    [SerializeField] private bool isTutorial = false;
+
 
 
     private void Awake()
@@ -41,13 +44,22 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
+    private void Start()
+    {
+        isTutorial = GameManager.Instance.IsTutorial;
+    }
+
     private void Update()
     {
-        int num = GetNumberKeyDown();
-        if (num >= 1 && num <= 9 && _isPointerOver && TimelineManager.Instance != null)
+        if (!isTutorial)
         {
-            bool tryPlace = TimelineManager.Instance.TryPlaceBlock(RuntimeBlock, num);
+            int num = GetNumberKeyDown();
+            if (num >= 1 && num <= 9 && _isPointerOver && TimelineManager.Instance != null)
+            {
+                bool tryPlace = TimelineManager.Instance.TryPlaceBlock(RuntimeBlock, num);
+            }
         }
+        
     }
     int GetNumberKeyDown()
     {
