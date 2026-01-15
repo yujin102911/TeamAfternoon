@@ -53,6 +53,7 @@ public class LegacyTimelineSlotView : MonoBehaviour, ITimelineSlotView
         ActionType action,
         MoveDirection dir,
         int damage,
+        Cell_Pos cellPos,
         bool isPreview,
         bool isPrev
     )

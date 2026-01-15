@@ -7,6 +7,7 @@ public interface ITimelineSlotView
         ActionType action,
         MoveDirection dir,
         int damage,
+        Cell_Pos cell_Pos,
         bool isPreview,
         bool isPrev
     );

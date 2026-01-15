@@ -3,6 +3,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Cell_Pos
+{
+    None = 0,
+    Start = 1,
+    Middle = 2,
+    End = 3
+}
+
+
 public class Action_cell : MonoBehaviour
 {
     [Header("수정할 UI연결")]
@@ -20,7 +29,7 @@ public class Action_cell : MonoBehaviour
     [SerializeField]
     private Sprite _noneSprite;
     [SerializeField]
-    private Sprite _actionSprite;
+    private Sprite[] _actionSprite;
 
     [TabGroup("Attack")]
     public Sprite Attack_back;
@@ -88,9 +97,24 @@ public class Action_cell : MonoBehaviour
     }
 
     // 셀 설정
-    public void Update_CellVisual(ActionType action, MoveDirection dir = MoveDirection.None, int dam = -1)
+    public void Update_CellVisual(ActionType action, MoveDirection dir = MoveDirection.None, int dam = -1, Cell_Pos cell_Pos = Cell_Pos.None)
     {
-        _rootImage.sprite = _actionSprite;
+        _rootImage.sprite = _actionSprite[1];
+
+        // 위치에 따른 필름 이미지 변경
+        switch (cell_Pos)
+        {
+            case Cell_Pos.Start:
+                _rootImage.sprite = _actionSprite[0];
+                break;
+
+            case Cell_Pos.End:
+                _rootImage.sprite = _actionSprite[2];
+                break;
+
+            default:
+                break;
+        }
 
         _backImage.gameObject.SetActive(true);
         _directionIcon.gameObject.SetActive(true);
