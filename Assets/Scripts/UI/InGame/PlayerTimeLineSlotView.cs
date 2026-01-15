@@ -19,9 +19,9 @@ public class PlayerTimeLineSlotView : MonoBehaviour, ITimelineSlotView
         }  
     }
 
-    public void SetAction(ActionType action, MoveDirection dir, int damage, bool isPreview, bool isPrev)
+    public void SetAction(ActionType action, MoveDirection dir, int damage, Cell_Pos cell_Pos,bool isPreview, bool isPrev)
     {
-        cell.Update_CellVisual(action, dir, damage);
+        cell.Update_CellVisual(action, dir, damage, cell_Pos);
 
         if (isPrev) 
         {
