@@ -177,6 +177,11 @@ public class EnemyVisualController : MonoBehaviour
     }
     public void ChangeAnim(string animation)
     {
+        if(animation == "Sturn")
+        {
+            _enemyAttackEffect.Show_Star_Flip();
+        }
+
         // 기절 별 이펙트 숨기기
         if (_currentAnimation == "Sturn" && _currentAnimation != animation)
         {

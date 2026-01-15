@@ -111,6 +111,8 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
         {
             Second_StarPrefab.SetActive(true);
         }
+
+        Debug.Log("했음?");
     }
 
     public void Hide_Star()
