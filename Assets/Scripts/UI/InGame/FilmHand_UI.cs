@@ -183,10 +183,10 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            ToggleFavorite();
-        }
+        //if (eventData.button == PointerEventData.InputButton.Right)
+        //{
+        //    ToggleFavorite();
+        //}
     }
 
     private void ToggleFavorite()
