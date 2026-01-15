@@ -7,7 +7,7 @@ public class TutorialObjectTrigger : MonoBehaviour
     {
         if (NailController.Instance != null)
         {
-            NailController.Instance.CompleteStepBySignal(keyword);
+            NailController.Instance.OnGetSignal(keyword);
         }
     }
 

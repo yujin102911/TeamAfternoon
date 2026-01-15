@@ -1,133 +1,94 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
+
+public enum DesktopTutorialCondition
+{
+    ButtonClicked,
+    RecieveSignal,
+}
+
+[System.Serializable]
+public class DesktopTutorialStep
+{
+    public DesktopTutorialCondition condition;
+    [TabGroup("UI 설정")] public List<GameObject> hideUIs;
+    [TabGroup("UI 설정")] public List<GameObject> showUIs;
+    public string signal;
+}
+
 
 public class NailController : MonoBehaviour
 {
     public static NailController Instance { get; private set; }
-    public string currentRequiredSignal = "";
+
+    [Title("튜토리얼 단계 설정")]
+    public DesktopTutorialStep[] steps;
+    private int currentIndex = 0;
 
     private void Awake()
     {
         Instance = this;
-        Btn1_2.onClick.AddListener(OneToTwo);
-        Btn2_3.onClick.AddListener(TwoToThree);
-        Btn4_5.onClick.AddListener(FourToFive);
-        Btn5_6.onClick.AddListener(FiveToSix);
-        Btn6_7.onClick.AddListener(SixToSeven);
-        Btn9_10.onClick.AddListener(NineToTen);
     }
 
-    private void Start()
+    public void OnTutorialButtonClicked(string button)
     {
-        Init();
-    }
-    #region SerializeField
-    [Header("버튼 연결")]
-    [SerializeField] private Button Btn1_2;
-    [SerializeField] private Button Btn2_3;
-    [SerializeField] private Button Btn4_5;
-    [SerializeField] private Button Btn5_6;
-    [SerializeField] private Button Btn6_7;
-    [SerializeField] private Button Btn9_10;
+        if (currentIndex >= steps.Length) return;
 
-    [Header("말풍선 패널 연결")]
-    [SerializeField] private List<GameObject> nails;
-
-    [Header("Nail오브젝트 연결 (2->3)")]
-    [SerializeField] private GameObject nailObject1;
-    [SerializeField] private GameObject nailObject2;
-
-    [Header("특정 행동 시그널")]
-    [SerializeField] private string signal3_4 = "MSN";
-    [SerializeField] private string signal7_8 = "OWL";
-    [SerializeField] private string signal11_12 = "END";
-    #endregion
-    public void CompleteStepBySignal(string signal)
-    {
-        if (signal != currentRequiredSignal) return;
-        if (signal ==  signal3_4) ThreeToFour();
-        else if (signal == signal7_8) SevenToEight();
-        else if (signal == "Mail_Read_1_1") EightToNine();
-        else if (signal == "Mail_Read_1_0") TenToEleven();
-        else if (signal == signal11_12) ElevenToEnd();
-
-    }
-
-    private void Init()
-    {
-        foreach (GameObject nail in nails)
+        DesktopTutorialStep currentStep = steps[currentIndex];
+        if (currentStep.condition == DesktopTutorialCondition.ButtonClicked)
         {
-            nail.gameObject.SetActive(false);
+            if (!string.IsNullOrEmpty(currentStep.signal) && currentStep.signal != button) return;
+
+            CompleteStep();
         }
-        nailObject1.SetActive(true);
-        nailObject2.SetActive(false);
-        nails[0].SetActive(true);
     }
 
-    private void OneToTwo() // 버튼
+    public void OnGetSignal(string signal)
     {
-        nails[0].SetActive(false);
-        nails[1].SetActive(true);
+        if (currentIndex >= steps.Length) return ;
+
+        DesktopTutorialStep currentStep = steps[currentIndex];
+        if (currentStep.condition == DesktopTutorialCondition.RecieveSignal)
+        {
+            if (!string.IsNullOrEmpty(currentStep.signal) && currentStep.signal !=  signal) return;
+
+            CompleteStep();
+        }
     }
 
-    private void TwoToThree() // 버튼
+    public void CompleteStep()
     {
-        nails[1].SetActive(false);
-        nails[2].SetActive(true);
-        nailObject1.SetActive(false);
-        nailObject2.SetActive(true);
-        currentRequiredSignal = signal3_4;
+        Debug.Log($"{currentIndex} 단계 완료");
+        if (currentIndex < steps.Length)
+        {
+            ApplyStepUI(currentIndex);
+        }
+        else
+        {
+            Debug.Log("모든 튜토리얼 종료");
+        }
+        currentIndex++;
     }
-    private void ThreeToFour() // 트리거
+
+    private void ApplyStepUI(int index)
     {
-        nails[2].SetActive(false);
-        nails[3].SetActive(true);
-        currentRequiredSignal = "";
+        if (index >= steps.Length) return;
+
+        DesktopTutorialStep currentStep = steps[index];
+
+        if (currentStep.hideUIs != null)
+        {
+            foreach (var ui in currentStep.hideUIs)
+                if (ui != null) ui.SetActive(false);
+        }
+        if (currentStep.showUIs != null)
+        {
+            foreach (var ui in currentStep.showUIs)
+                if (ui != null) ui.SetActive(true);
+        }
     }
-    private void FourToFive() // 버튼
-    {
-        nails[3].SetActive(false);
-        nails[4].SetActive(true);
-    }
-    private void FiveToSix() // x버튼
-    {
-        nails[4].SetActive(false);
-        nails[5].SetActive(true);
-    }
-    private void SixToSeven() // 버튼
-    {
-        nails[5].SetActive(false);
-        nails[6].SetActive(true);
-        currentRequiredSignal = signal7_8;
-    }
-    private void SevenToEight() // 트리거
-    {
-        nails[6].SetActive (false);
-        nails[7].SetActive(true);
-        currentRequiredSignal = "Mail_Read_1_1";
-    }
-    private void EightToNine() // 메시지 클릭?? 어케 구현
-    {
-        nails[7].SetActive (false);
-        nails[8].SetActive(true);
-        currentRequiredSignal = "";
-    }
-    private void NineToTen() // 버튼
-    {
-        nails[8].SetActive (false);
-        nails[9].SetActive(true);
-        currentRequiredSignal = "Mail_Read_1_0";
-    }
-    private void TenToEleven() // 메시지 클릭
-    {
-        nails[9].SetActive (false);
-        nails[10].SetActive(true);
-        currentRequiredSignal = signal11_12;
-    }
-    private void ElevenToEnd() // 첨부파일 클릭
-    {
-        nails[10].SetActive(false);
-    }
+
 
 }
