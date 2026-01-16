@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.IO;
 using System.Linq;
 using TMPro;
+using Steamworks;
 
 public class TitleUI : MonoBehaviour
 {
@@ -65,9 +66,9 @@ public class TitleUI : MonoBehaviour
         ShowMainMenu();
 
         // 이어하기 버튼 활성화 상태 체크
-        bool hasSave = SaveService.HasSaveData();
-        _continueButton.interactable = hasSave;
-        if (hasSave)
+        bool canContinue = SaveService.CanContinue();
+        _continueButton.interactable = canContinue;
+        if (canContinue)
         {
             _continueButton.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         }
@@ -153,7 +154,7 @@ public class TitleUI : MonoBehaviour
         Difficulty selectedMode = (Difficulty)_difficultyDropdown.value;
 
         //ServiceLocator.Instance.CreateNewGame(selectedMode);
-        ServiceLocator.Instance.CreateNewTutorial(selectedMode);
+        ServiceLocator.Instance.ResetDataToDefault(selectedMode);
         ServiceLocator.Instance.Scene.Load(_tutorialScene);
     }
 
@@ -177,7 +178,13 @@ public class TitleUI : MonoBehaviour
         }
         _lastStageInfoText.text = $"Day {currentDay}";
 
-        if (File.Exists(SaveService.SavePath))
+        if (SteamManager.Initialized && SteamRemoteStorage.FileExists(SaveService.FILE_NAME))
+        {
+            long timestamp = SteamRemoteStorage.GetFileTimestamp(SaveService.FILE_NAME);
+            System.DateTime dateTime = System.DateTimeOffset.FromUnixTimeSeconds(timestamp).LocalDateTime;
+            _saveDateText.text = dateTime.ToString("yyyy.MM.dd HH:mm:ss");
+        }
+        else if (File.Exists(SaveService.SavePath))
         {
             System.DateTime lastWriteTime = File.GetLastWriteTime(SaveService.SavePath);
             _saveDateText.text = lastWriteTime.ToString("yyyy.MM.dd HH:mm:ss");
