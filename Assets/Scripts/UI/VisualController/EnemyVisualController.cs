@@ -290,6 +290,8 @@ public class EnemyVisualController : MonoBehaviour
         targetCamera.transform.position = camera_end;
         _currentEnemy.transform.position = endPos.position;
 
+        CameraShake.Instance.RePosition(camera_end);
+
         SpriteRenderer sr = _currentEnemy.GetComponent<SpriteRenderer>();
         if (sr != null) sr.flipX = isLeft;
 

@@ -142,7 +142,11 @@ public class PlayerVisualController : MonoBehaviour
         }
 
         if (animation == "4_Hurt" && SoundManager.Instance != null)
+        {
             SoundManager.Instance.Play(SoundID.Player_hit);
+            CameraShake.Instance.Shake(0.04f, 0.1f);
+        }
+            
     }
 
     public void Play_PlayerIdle()

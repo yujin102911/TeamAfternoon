@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerAttectEffect : MonoBehaviour
@@ -67,29 +68,34 @@ public class PlayerAttectEffect : MonoBehaviour
 
         switch (Pool_ID)
         {
+            //일반 공격
             case 0:
                 fx = swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
+            //일반 공격 + 단데증
             case 1:
                 fx = swordEnfoceFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
+            //차징
             case 2:
                 fx = big_swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword2);
                 break;
+            //차징 + 단데증
             case 3:
                 fx = Enfocebig_swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword2);
+
                 break;
             default:
                 break;
@@ -97,6 +103,10 @@ public class PlayerAttectEffect : MonoBehaviour
 
         if(fx != null)
             Flip_setPos(fx);
+
+        //타격 연출
+        //StartCoroutine(HitStop(0.05f));
+        //CameraShake.Instance.Shake(0.05f, 0.12f);
 
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.EnemyTakeDamage();
@@ -113,12 +123,14 @@ public class PlayerAttectEffect : MonoBehaviour
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Bow);
+
                 break;
             case 1:
                 fx = Enforce_bowAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Bow2);
+
                 break;
             default:
                 break;

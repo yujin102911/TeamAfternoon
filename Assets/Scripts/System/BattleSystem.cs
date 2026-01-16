@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -252,7 +253,24 @@ public class BattleSystem
 
         int final_dam = result.damage;
 
-        DamageEnemy(final_dam);
+        //데미지에 따른 피격연출
+        if(final_dam >= 5 && final_dam < 10)
+        {
+            CameraShake.Instance.Play_Hitstop(0.03f);
+            CameraShake.Instance.Shake(0.05f, 0.12f);
+        }
+        else if (final_dam >= 10 && final_dam < 15)
+        {
+            CameraShake.Instance.Play_Hitstop(0.05f);
+            CameraShake.Instance.Shake(0.08f, 0.2f);
+        }
+        else if(final_dam >= 15)
+        {
+            CameraShake.Instance.Play_Hitstop(0.08f);
+            CameraShake.Instance.Shake(0.1f, 0.3f);
+        }
+
+            DamageEnemy(final_dam);
         OnEnemyHit?.Invoke(final_dam, result.isCritical, _isSturnSuccess);
     }
 
