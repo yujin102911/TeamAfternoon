@@ -19923,7 +19923,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 10
   m_Viewport: {fileID: 1513433642}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 470464616}
@@ -23192,6 +23192,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 928158786251215904, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1069340466226197223, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -23272,14 +23276,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1831221201813945284, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5261307856762343730, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
       propertyPath: m_Name
       value: NailCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 5261307856762343730, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6905627129069858432, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1043108525}
+    - target: {fileID: 7827520431253862207, guid: 6543f8c46204feb428cb4c08ddd6c571, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

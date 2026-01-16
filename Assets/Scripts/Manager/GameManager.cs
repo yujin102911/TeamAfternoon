@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Rendering.UI;
+using UnityEngine.UI;
 
 /// <summary>
 /// 게임 전투 흐름 총괄 관리
@@ -51,11 +52,14 @@ public class GameManager : MonoBehaviour
     private int _currentRound = 0;
     private int _currentEnemyIndex = 0;
     private int _memory = 0;
+    private int _limitRound = 0;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
     private bool _isBattleEnded = false;
+    [SerializeField] private bool isDebugging = false;
+    [SerializeField] private GameObject _debugmodeChecking;
 
     // UI 용 변수
     private int _currentPhase = 1; // 기본 1
@@ -95,6 +99,7 @@ public class GameManager : MonoBehaviour
     public bool IsTutorial => isTutorial;
     public bool IsSequencePlaying { get; set; } = false;
     public bool IsRoundInterrupted { get; private set; }
+    public bool IsDebugging => isDebugging;
     #endregion
 
     #region Events
@@ -155,6 +160,19 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GameManager] F10 키 입력 감지 - 현재 스테이지 클리어 처리 실행");
             ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
             OnBattleEnded?.Invoke(EndCondition.Victory);
+        }
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            ToggleDebugging();
+            if (isDebugging == true)
+            {
+                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 진입(무적, 라운드 무제한)");
+            }
+            else
+            {
+                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 해제");
+            }
+
         }
     }
     private void OnDestroy()
@@ -226,7 +244,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"[GameManager] 인스펙터 데이터로 스테이지 배경 오브젝트를 생성했습니다");
             }
         }
-
+        _limitRound = currentStageData.LimitRound;
         
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
@@ -442,7 +460,7 @@ public class GameManager : MonoBehaviour
 
 
         //TODO:추후에 8 자리에 최대 턴수 기입
-        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
+        OnMemoryUpdate?.Invoke(_currentRound, _limitRound);
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -542,7 +560,10 @@ public class GameManager : MonoBehaviour
     {
         IsExecutingRound = true;
         IsRoundInterrupted = false;
-        _currentRound++;
+        if (!isDebugging)
+        {
+            _currentRound++;
+        }
         int final_memory = 0;
 
         foreach (var effect in TimelineManager.Instance.additional_Effects)
@@ -551,9 +572,12 @@ public class GameManager : MonoBehaviour
             final_memory += effect.cost;
         }
 
-        _memory += 8;
+        if (!isDebugging)
+        {
+            _memory += 8;
+        }
 
-        OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
+        OnMemoryUpdate?.Invoke(_memory, _limitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
@@ -610,11 +634,9 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
-        
-
-        if (currentStageData != null && _memory >= 8 * currentStageData.LimitRound)
+        if (currentStageData != null && _memory >= 8 * _limitRound)
         {
-            Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            Debug.Log($"[GameManager] 제한 라운드 ({_limitRound}) 도달. 패배");
             EndBattle(EndCondition.RoundOver); // 라운드 초과 실패 함수 호출
             return;
         }
@@ -794,6 +816,24 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _statPlayerHitCount++;
     }
+    #endregion
+
+    #region Debug Methods
+
+    private void ToggleDebugging()
+    {
+        if (isDebugging == true)
+        {
+            isDebugging = false;
+            _debugmodeChecking.SetActive(false);
+        }
+        else
+        {
+            isDebugging = true;
+            _debugmodeChecking.SetActive(true);
+        }
+    }
+
     #endregion
 
 }
