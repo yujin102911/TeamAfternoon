@@ -366,7 +366,7 @@ public class BattleSystem
     public void DealDamageToPlayer(int damage)
     {
         if (damage <= 0) return;
-
+        if (GameManager.Instance.IsDebugging) return;
         int finalDamage = _isGuarding ? 0 : damage;
 
         if (_isGuarding)
