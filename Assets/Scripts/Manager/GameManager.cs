@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour
 
     [Header("테스트용 스테이지 데이터")]
     [SerializeField] private StageData currentStageData;
+
+    [Header("UI 알림")]
+    [SerializeField] private SpecialEffectNotification _effectNotification;
     #endregion
 
     #region Private Fields
@@ -418,7 +421,7 @@ public class GameManager : MonoBehaviour
 
         _currentPhase = 1;
         _phaseTurnCount = 0;
-
+        CheckLimitEffectChange();
         if (_deckSystem == null)
         {
             Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
@@ -722,6 +725,30 @@ public class GameManager : MonoBehaviour
          SaveService.Save(userGameData);
 
         OnBattleEnded?.Invoke(victory);
+    }
+    #endregion
+
+    #region Notification Methods
+    private void CheckLimitEffectChange()
+    {
+        if (currentStageData == null || _effectNotification == null) return;
+
+        bool shouldShow = false;
+        if (currentStageData.StageNumber == 1)
+        {
+            shouldShow = true;
+        }
+        else
+        {
+            StageData prevStage = dataRepository.GetStage(currentStageData.StageNumber - 1);
+            if (prevStage != null)
+            {
+                if (prevStage.LimitEffect != currentStageData.LimitEffect)
+                    shouldShow = true;
+            }
+        }
+        if (shouldShow)
+            _effectNotification.Show();
     }
     #endregion
 
