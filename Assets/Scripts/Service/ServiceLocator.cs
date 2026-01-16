@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum Difficulty { Easy, Hard }
@@ -7,9 +8,17 @@ public class ServiceLocator : MonoBehaviour
 {
     public static ServiceLocator Instance { get; private set; }
     public SceneService Scene { get; private set; }
-    public UserGameData CurrentUser { get; private set; }
     public CursorService Cursor { get; private set; }
 
+    public UserGameData CurrentUser { get; private set; }
+    public DataRepository CurrentRepository { get; private set; }
+    public GlobalSaveDTO GlobalData { get; private set; }
+
+
+
+    [Header("난이도별 DB")]
+    [SerializeField] private DataRepository easyRepository;
+    [SerializeField] private DataRepository hardRepository;
 
     [Header("시작 유저 데이터(난이도 별)")]
     [SerializeField] private UserGameData easyModeTemplate;
@@ -34,6 +43,12 @@ public class ServiceLocator : MonoBehaviour
 
         Scene = new SceneService();
         Cursor = new CursorService(this, cursorAnimations);
+        GlobalData = GlobalSaveService.Load();
+        if (!System.IO.File.Exists(GlobalSaveService.SavePath))
+        {
+            Debug.Log("[ServiceLocator] glabal.json이 없어 초기 파일을 생성합니다.");
+            GlobalSaveService.Save(GlobalData);
+        }
         if (testUserData != null)
         {
             if (isTestMode)
@@ -52,6 +67,11 @@ public class ServiceLocator : MonoBehaviour
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
         CurrentUser = Instantiate(template);
+    }
+
+    public void SetDifficulty(Difficulty mode)
+    {
+        CurrentRepository = (mode == Difficulty.Easy) ? easyRepository : hardRepository;
     }
     
     /// <summary>
@@ -84,6 +104,22 @@ public class ServiceLocator : MonoBehaviour
     {
         SaveService.DeleteSave();
         CreateNewTutorial(mode);
+    }
+
+    [Button("게임 클리어 처리 버튼", ButtonSizes.Medium)]
+    public void SetGameClear()
+    {
+        Debug.Log("[ServiceLocator] 게임 클리어 처리");
+        GlobalData.IsGameCleared = true;
+        GlobalSaveService.Save(GlobalData);
+    }
+
+    [Button("게임 클리어 여부 초기화 버튼", ButtonSizes.Medium)]
+    public void SetGameInit()
+    {
+        Debug.Log("[ServiceLocator] 게임 클리어 여부 초기화");
+        GlobalData.IsGameCleared = false;
+        GlobalSaveService.Save(GlobalData);
     }
     #endregion
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using Steamworks;
+using System.Collections.Generic;
 
 public class TitleUI : MonoBehaviour
 {
@@ -132,8 +133,17 @@ public class TitleUI : MonoBehaviour
 
     private void OnClickStartWithDifficulty()
     {
+        string selectedText = _difficultyDropdown.options[_difficultyDropdown.value].text;
+
+        Difficulty selectedMode = Difficulty.Easy;
+        if (selectedText == "Hard")
+        {
+            selectedMode = Difficulty.Hard;
+        }
+
+        ServiceLocator.Instance.SetDifficulty(selectedMode);
         // 이미 데이터가 존재하면 경고 팝업 출력
-        if (SaveService.HasSaveData())
+        if (SaveService.CanContinue())
         {
             _confirmPopup.SetActive(true);
         }

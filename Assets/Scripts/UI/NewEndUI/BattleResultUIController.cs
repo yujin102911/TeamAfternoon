@@ -174,9 +174,9 @@ public class BattleResultUIController : MonoBehaviour
             nextDay = currentDay + 1;
             _dayCountText.text = $"Day {currentDay:D2}";
         }
-        if (DataRepository.Instance != null)
+        if (ServiceLocator.Instance.CurrentRepository != null)
         {
-            totalStages = DataRepository.Instance.stageDatas.Count;
+            totalStages = ServiceLocator.Instance.CurrentRepository.stageDatas.Count;
         }
         if (currentDay >= totalStages)
         {

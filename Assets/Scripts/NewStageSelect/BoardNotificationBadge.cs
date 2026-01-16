@@ -18,7 +18,7 @@ public class BoardNotificationBadge : MonoBehaviour
     {
         if (_notificationIcon != null)
         {
-            bool hasUnread = DataRepository.Instance.HasUnreadBoard();
+            bool hasUnread = ServiceLocator.Instance.CurrentRepository.HasUnreadBoard();
             _notificationIcon.SetActive(hasUnread);
         }
     }

@@ -19,7 +19,7 @@ public class MailNotificationBadge : MonoBehaviour
     {
         if (_notificationIcon != null)
         {
-            bool hasUnread = DataRepository.Instance.HasUnreadMail();
+            bool hasUnread = ServiceLocator.Instance.CurrentRepository.HasUnreadMail();
             _notificationIcon.SetActive(hasUnread);
         }
     }

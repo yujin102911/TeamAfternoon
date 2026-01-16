@@ -61,7 +61,7 @@ public class MailPanel : MonoBehaviour
         UserGameData currentUser = ServiceLocator.Instance.CurrentUser;
         if (currentUser == null) return;
 
-        List<StageData> sortedStages = DataRepository.Instance.stageDatas.Values
+        List<StageData> sortedStages = ServiceLocator.Instance.CurrentRepository.stageDatas.Values
             .OrderBy(s => s.StageNumber)
             .ToList();
 

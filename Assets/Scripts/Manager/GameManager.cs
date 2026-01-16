@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
         }
         if (dataRepository == null)
         {
-            dataRepository = DataRepository.Instance;
+            dataRepository = ServiceLocator.Instance.CurrentRepository;
         }
         Initialize();
 
@@ -697,7 +697,7 @@ public class GameManager : MonoBehaviour
             // 현재 돌아가고 있는 모든 코루틴 종료
          StopAllCoroutines();
 
-         SaveService.Save(userGameData);
+         ServiceLocator.Instance.SaveNowUserData();
 
         OnBattleEnded?.Invoke(victory);
     }
