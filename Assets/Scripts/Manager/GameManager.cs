@@ -392,6 +392,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetupGame()
     {
+        Time.timeScale = 1.0f;
+
         _currentRound = 0;
         _currentEnemyIndex = 0;
 
