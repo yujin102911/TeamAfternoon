@@ -55,6 +55,14 @@ public class ServiceLocator : MonoBehaviour
     }
     
     /// <summary>
+    /// 튜토리얼 클리어 여부를 저장하는 함수 (솔직히 굳이 필요없긴함)
+    /// </summary>
+    public void SetTutorialClear(bool clear)
+    {
+        CurrentUser.Is_Tutorial_Cleared = clear;
+    }
+
+    /// <summary>
     /// 현재의 UserData를 저장하는 함수
     /// </summary>
     public void SaveNowUserData()
@@ -71,5 +79,12 @@ public class ServiceLocator : MonoBehaviour
         return true;
     }
 
+    #region Reset Logic
+    public void ResetDataToDefault(Difficulty mode)
+    {
+        SaveService.DeleteSave();
+        CreateNewTutorial(mode);
+    }
+    #endregion
 
 }

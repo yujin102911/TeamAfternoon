@@ -349,6 +349,7 @@ public class BattleTutorialManager : MonoBehaviour
         foreach (int block in _addBlocks)
         {
             ServiceLocator.Instance.CurrentUser.AddUnlockedBlock(block);
+            ServiceLocator.Instance.SetTutorialClear(true);
         }
     }
 
