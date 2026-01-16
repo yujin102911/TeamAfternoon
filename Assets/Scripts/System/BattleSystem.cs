@@ -53,6 +53,10 @@ public class BattleSystem
     private bool _isSturn = false;
     private bool _isSturnSuccess = false;
 
+    //바람 계산 전용
+    private WindDirection _actualDirection;
+    private MoveDirection _windMoveDir;
+
     #endregion
 
     #region Events
@@ -611,31 +615,41 @@ public class BattleSystem
     public void ProcessEnemyWind(WindDirection actualDirection)
     {
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
-        MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+
+        // 전역 변수 저장
+        _actualDirection = actualDirection;
+        _windMoveDir = ConvertWindToMoveDirection(actualDirection);
 
         OnChangeEnemyAnim?.Invoke("Wind");
         
 
+        
+    }
+
+    //실제 바람 적용부
+    public void ActiveWind()
+    {
         foreach (var enemy in _enemies)
         {
+            // 바람 이펙트
             OnEnemyWind?.Invoke(enemy.IsLeft);
         }
 
         int currentPos = _playerCurrentSector;
-        int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, _actualDirection);
 
-        while(targetSector != -1 && !IsSectorBlocked(targetSector))
+        while (targetSector != -1 && !IsSectorBlocked(targetSector))
         {
             currentPos = targetSector;
-            targetSector = GetWindTargetSector(currentPos, actualDirection);
+            targetSector = GetWindTargetSector(currentPos, _actualDirection);
         }
 
-        if (currentPos !=  _playerCurrentSector)
+        if (currentPos != _playerCurrentSector)
         {
             int prevSector = _playerCurrentSector;
             _playerCurrentSector = currentPos;
 
-            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir, true);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, _windMoveDir, true);
         }
         else
         {

@@ -60,6 +60,13 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     }
     #endregion
 
+    //바람 효과 생성
+    public void WindEffect()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.ActiveWind();
+    }
+
     public void SpawnAttackEffect()
     {
         Debug.Log($"[EnemyAttackEffect] 적 공격! 대상 섹터: [{string.Join(", ", _targetSectors)}]");
