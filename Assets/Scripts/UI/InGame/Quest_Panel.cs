@@ -25,11 +25,15 @@ public class Quest_Panel : MonoBehaviour
     private void Start()
     {
         TimelineManager.Instance.QuestOptionState.OnChanged += OnOptionChanged;
+        TimelineManager.Instance.OnMarkActiveChanged += Active_Mark;
+
+        Active_Mark(false);
     }
 
     private void OnDestroy()
     {
         TimelineManager.Instance.QuestOptionState.OnChanged -= OnOptionChanged;
+        TimelineManager.Instance.OnMarkActiveChanged -= Active_Mark;
     }
 
     private void OnOptionChanged(QuestOptionState state)
@@ -64,5 +68,12 @@ public class Quest_Panel : MonoBehaviour
         {
             _twiceMark.sprite = _falseMark;
         }
+    }
+
+    private void Active_Mark(bool is_on)
+    {
+        _hitCheckMark.gameObject.SetActive(is_on);
+        _eightMark.gameObject.SetActive(is_on);
+        _twiceMark.gameObject.SetActive(is_on);
     }
 }

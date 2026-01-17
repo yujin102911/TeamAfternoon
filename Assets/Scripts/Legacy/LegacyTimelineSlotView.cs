@@ -55,7 +55,8 @@ public class LegacyTimelineSlotView : MonoBehaviour, ITimelineSlotView
         int damage,
         Cell_Pos cellPos,
         bool isPreview,
-        bool isPrev
+        bool isPrev,
+        Additional_Effect additional_Effect
     )
     {
         root.sprite = Set_SlotSprite;
