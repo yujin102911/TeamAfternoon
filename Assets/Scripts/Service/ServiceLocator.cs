@@ -67,6 +67,8 @@ public class ServiceLocator : MonoBehaviour
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
         CurrentUser = Instantiate(template);
+
+        CurrentUser.Difficulty = mode;
     }
 
     public void SetDifficulty(Difficulty mode)
@@ -103,6 +105,7 @@ public class ServiceLocator : MonoBehaviour
         else
         {
             CurrentRepository = hardRepository;
+            Debug.Log("하드 레포 로잉");
         }
             return true;
     }
@@ -111,6 +114,7 @@ public class ServiceLocator : MonoBehaviour
     public void ResetDataToDefault(Difficulty mode)
     {
         SaveService.DeleteSave();
+        SetDifficulty(mode);
         CreateNewTutorial(mode);
     }
 
