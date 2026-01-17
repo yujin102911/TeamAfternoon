@@ -17,7 +17,9 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _storageTxtMemory;
     [SerializeField]
-    private Slider _textmemorySlider;
+    private Slider _lateMemorySlider;
+    [SerializeField]
+    private Slider _fastMemorySlider;
 
     [Header("슬라이더 핸들 바")]
     [SerializeField]
@@ -92,7 +94,8 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
 
-            TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider;
+            TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider_Both;
+            TimelineManager.Instance.OnFastMemoryChanged += Update_TextSlider_Fast;
         }
         RefreshStartButtonState();
         StartSpeedButton();
@@ -108,7 +111,8 @@ public class BattleUIManager : MonoBehaviour
             battleSystem.OnCriticalChanceChanged -= UpdateStackUI;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
 
-            TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider;
+            TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider_Both;
+            TimelineManager.Instance.OnFastMemoryChanged -= Update_TextSlider_Fast;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
@@ -119,13 +123,23 @@ public class BattleUIManager : MonoBehaviour
         //_adTxt.text = $"편집 콤보: +{(int)chance} / 최대 자막수: {(int)chance / 8}";
     }
 
-    public void Update_TextSlider(int current, int max)
+    public void Update_TextSlider_Both(int current, int max)
     {
         float slider_size = (float)current / max;
 
-        _textmemorySlider.value = slider_size;
+        _lateMemorySlider.value = slider_size;
+        _fastMemorySlider.value = slider_size;
         _storageTxtMemory.text = $"{current}/{max} <size=20>mb</size>";
     }
+
+    public void Update_TextSlider_Fast(int current, int max)
+    {
+        float slider_size = (float)current / max;
+
+        _fastMemorySlider.value = slider_size;
+        _storageTxtMemory.text = $"{current}/{max} <size=20>mb</size>";
+    }
+
     private void HandleBattleInitialized()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
