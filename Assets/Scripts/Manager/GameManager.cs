@@ -177,6 +177,12 @@ public class GameManager : MonoBehaviour
             }
 
         }
+        if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.Z))
+        {
+            Debug.Log("[GameManager] Ctrl + Z 입력 감지 - 도전과제 호출");
+            CtrlZAchievement();
+        }
+
     }
     private void OnDestroy()
     {
@@ -857,6 +863,11 @@ public class GameManager : MonoBehaviour
             isDebugging = true;
             _debugmodeChecking.SetActive(true);
         }
+    }
+
+    private void CtrlZAchievement()
+    {
+        SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_16_0");
     }
 
     #endregion

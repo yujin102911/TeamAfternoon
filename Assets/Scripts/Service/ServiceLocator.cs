@@ -96,7 +96,15 @@ public class ServiceLocator : MonoBehaviour
 
         CurrentUser = Instantiate(hardModeTemplate);
         SaveService.Load(CurrentUser);
-        return true;
+        if (CurrentUser.Difficulty == Difficulty.Easy)
+        {
+            CurrentRepository = easyRepository;
+        }
+        else
+        {
+            CurrentRepository = hardRepository;
+        }
+            return true;
     }
 
     #region Reset Logic

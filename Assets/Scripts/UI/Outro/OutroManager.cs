@@ -300,49 +300,26 @@ public class OutroManager : MonoBehaviour
     #region Achievement Methods
     private void CheckDeathAchievement()
     {
-        if (!SteamManager.Initialized) return;
-
         UserGameData userData = ServiceLocator.Instance.CurrentUser;
         if (userData == null) return;
 
         if (userData.Difficulty == Difficulty.Easy && userData.GameOverCount == 0)
         {
-            string achievementKey = $"NEW_ACHIEVEMENT_9_0";
-            bool success = SteamUserStats.SetAchievement(achievementKey);
-            if (success)
-            {
-                SteamUserStats.StoreStats();
-                Debug.Log($"[Steam] 도전과제 해금 성공: {achievementKey}");
-            }
-            else
-            {
-                Debug.LogError($"[Steam] 도전과제 해금 실패 (Key를 찾을 수 없음): {achievementKey}");
-            }
+            string achievementKey = "NEW_ACHIEVEMENT_9_0";
+            SteamAchievementManager.Unlock(achievementKey);
         }
     }
 
     private void CheckEndingAchievement()
     {
-        if (!SteamManager.Initialized) return;
-
         UserGameData userData = ServiceLocator.Instance.CurrentUser;
         if (userData == null) return;
         string achievementKey = "NEW_ACHIEVEMENT_7_0";
-
         if (userData.Difficulty == Difficulty.Hard)
         {
             achievementKey = "NEW_ACHIEVEMENT_8_0";
         }
-        bool success = SteamUserStats.SetAchievement(achievementKey);
-        if (success)
-        {
-            SteamUserStats.StoreStats();
-            Debug.Log($"[Steam] 도전과제 해금 성공: {achievementKey}");
-        }
-        else
-        {
-            Debug.LogError($"[Steam] 도전과제 해금 실패 (Key를 찾을 수 없음): {achievementKey}");
-        }
+        SteamAchievementManager.Unlock(achievementKey);
     }
 
     #endregion

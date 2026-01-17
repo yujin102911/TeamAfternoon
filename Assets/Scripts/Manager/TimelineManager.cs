@@ -81,6 +81,7 @@ public class TimelineManager : MonoBehaviour
     public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
     public int TotalColumns => _totalColumns;
+    public int CurrentTick { get; private set; }
 
     void Awake()
     {
@@ -469,9 +470,19 @@ public class TimelineManager : MonoBehaviour
                 keyword.OnRoundStart(placed);
             }
         }
+        if (_timelineSystem.PlacedBlocks.Count == 0)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_10_0");
+        }
+        if (_currentMemory >= Max_memory && Max_memory > 0)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_15_0");
+        }
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
+            CurrentTick = tick;
+
             // 매 틱마다 방어 초기화하고 시작
             _battleSystem.SetGuard(false);
             _mapVisualController.Stop_WindEffect();
@@ -550,6 +561,7 @@ public class TimelineManager : MonoBehaviour
             OnCurrentTickChanged?.Invoke(0);
         }
 
+
         // 라운드 종료 키워드 호출
         allBlocks = _timelineSystem.GetAllPlacedBlocksWithRuntime();
         foreach (var (placed, runtime) in allBlocks)
@@ -561,6 +573,7 @@ public class TimelineManager : MonoBehaviour
         }
 
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
+        CurrentTick = 0;
         OnExecutionFinished?.Invoke();
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
         //Time.timeScale = 1f;
