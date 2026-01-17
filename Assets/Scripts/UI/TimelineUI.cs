@@ -615,7 +615,7 @@ public class TimelineUI : MonoBehaviour
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
             //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
-            CardTooltip.Instance.Show_TimelineAction(effect, blockData.attackDamage, screenPos, cam);
+            CardTooltip.Instance.Show_TimelineAction(tick, effect, blockData.attackDamage, screenPos, cam);
         }
 
 

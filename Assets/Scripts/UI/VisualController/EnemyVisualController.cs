@@ -308,8 +308,13 @@ public class EnemyVisualController : MonoBehaviour
         }
         else
         {
-            ChangeAnim("Hurt");
-            Choose_EnemyHurt(GameManager.Instance.CurrentStageData.StageNumber);
+            //데미지가 0이 아닐때만 피격 모션
+            if(damage != 0)
+            {
+                ChangeAnim("Hurt");
+                Choose_EnemyHurt(GameManager.Instance.CurrentStageData.StageNumber);
+            }
+            
         }
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
@@ -365,7 +370,14 @@ public class EnemyVisualController : MonoBehaviour
             TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.text = damage.ToString();
+            if(damage == 0)
+            {
+                tmp.text = "Miss!";
+            }
+            else
+            {
+                tmp.text = damage.ToString();
+            }   
         }
         StartCoroutine(DestroyDamageText(go));
     }

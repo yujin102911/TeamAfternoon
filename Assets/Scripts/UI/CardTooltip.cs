@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEditor.Timeline.Actions;
+using UnityEngine;
 
 public class CardTooltip : MonoBehaviour
 {
@@ -97,9 +98,9 @@ public class CardTooltip : MonoBehaviour
         action_Tooltip_Panel.Show(runtimeBlock, screenPos, cam);
     }
 
-    public void Show_TimelineAction(ActionType action, int damage, Vector2 screenPos, Camera cam)
+    public void Show_TimelineAction(int tick, ActionType action, int damage, Vector2 screenPos, Camera cam)
     {
-        timeline_Action_TooltipPanel.Show(action, damage, screenPos, cam);
+        timeline_Action_TooltipPanel.Show(tick, action, damage, screenPos, cam);
     }
 
     public void Show_PatternDesc(Pattern_Label label, Vector2 screenPos, Camera cam, int stone_num = 0)

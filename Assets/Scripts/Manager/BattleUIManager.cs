@@ -13,16 +13,6 @@ public class BattleUIManager : MonoBehaviour
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
 
-    [Header("메모리 UI")]
-    [SerializeField] 
-    private GameObject _memoryObject;
-    [SerializeField]
-    private TextMeshProUGUI _percentTxt;
-    [SerializeField]
-    private TextMeshProUGUI _storageTxt;
-    [SerializeField] 
-    private Slider _memorySlider;
-
     [Header("자막 메모리 UI")]
     [SerializeField]
     private TextMeshProUGUI _storageTxtMemory;
@@ -101,7 +91,6 @@ public class BattleUIManager : MonoBehaviour
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
-            GameManager.Instance.OnMemoryUpdate += UpdateSlider;
 
             TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider;
         }
@@ -118,7 +107,6 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
             battleSystem.OnCriticalChanceChanged -= UpdateStackUI;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
-            GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
 
             TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider;
             //battle.UpdateCureGauage -= HandleCureChanged;
@@ -190,16 +178,6 @@ public class BattleUIManager : MonoBehaviour
         _startButton.gameObject.SetActive(false);
     }
 
-    private void UpdateSlider(int current, int max)
-    {
-
-        float slider_size = (float)current / (8 * max);
-        float percent = slider_size * 100f;
-
-        _memorySlider.value = slider_size;
-        _percentTxt.text = $"{percent}%";
-        _storageTxt.text = $"{current}/{8 * max} <size=20>mb</size>";
-    }
 
     // 슬라이더 핸들 바 레이캐스트 온
     public void HandleBar_raycastOn()

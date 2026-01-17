@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class PlayerAttectEffect : MonoBehaviour
 {
+    [Header("그림자")]
+    [SerializeField]
+    private GameObject _leftShadow;
+    [SerializeField]
+    private GameObject _rightShadow;
+
+    [Header("이펙트 위치")]
     [SerializeField] 
     private Vector3 attackOffset;
     [SerializeField] 
@@ -45,6 +52,9 @@ public class PlayerAttectEffect : MonoBehaviour
     private void Awake()
     {
         _sr = GetComponent<SpriteRenderer>();
+
+        _leftShadow.SetActive(true);
+        _rightShadow.SetActive(false);
     }
 
     private void Flip_setPos(GameObject fx)
@@ -222,5 +232,11 @@ public class PlayerAttectEffect : MonoBehaviour
         {
             _currentAnimtor.transform.position = transform.position + charging_rightOffset;
         }
+    }
+
+    public void Flip_shadow()
+    {
+        _leftShadow.SetActive(!_sr.flipX);
+        _rightShadow.SetActive(_sr.flipX);
     }
 }

@@ -5,6 +5,10 @@ using UnityEngine.Localization;
 
 public class Action_Tooltip_Panel : MonoBehaviour
 {
+    [Header("공격 가능 범위")]
+    [SerializeField]
+    private Melee_Tooltip _meleeTooltip;
+
     [Header("호버 설정")]
     [SerializeField] private GameObject root;
     [SerializeField] private RectTransform panelRt;   // root의 RectTransform
@@ -72,11 +76,23 @@ public class Action_Tooltip_Panel : MonoBehaviour
         // 이름 텍스트 설정(추후 
         _nameText.TableEntryReference = r_block.BaseData.blockName;
 
+        List<ActionType> actionTypes = new List<ActionType>();
+
         for (int i = 0; i < r_block.BaseData.blockLength; i++)
         {
             ActionType action = r_block.BaseData.GetEffectAt(i);
+            actionTypes.Add(action);
             int dam = r_block.BaseData.attackDamage;
             _descriptionCells[i].Update_descriptionCell(action, dam);
+        }
+
+        if(actionTypes.Contains(ActionType.Attack) || actionTypes.Contains(ActionType.Sword_start))
+        {
+            _meleeTooltip.show(ActionType.Attack, 1);
+        }
+        else if (actionTypes.Contains(ActionType.Bow_start) || actionTypes.Contains(ActionType.Bow_single))
+        {
+            _meleeTooltip.show(ActionType.Bow_single, 1);
         }
     }
 
@@ -101,6 +117,8 @@ public class Action_Tooltip_Panel : MonoBehaviour
     public void Hide()
     {
         this.gameObject.SetActive(false);
+
+        _meleeTooltip.Hide();
     }
 
 }

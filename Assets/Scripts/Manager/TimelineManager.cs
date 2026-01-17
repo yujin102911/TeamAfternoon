@@ -81,6 +81,7 @@ public class TimelineManager : MonoBehaviour
     public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
     public int TotalColumns => _totalColumns;
+    public EnemyPattern enemyPattern => _currentEnemyPattern;
 
     void Awake()
     {

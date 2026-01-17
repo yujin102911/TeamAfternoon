@@ -16,6 +16,10 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
     [SerializeField]
     private ActionData _actionData;
 
+    [Header("공격 가능 범위")]
+    [SerializeField]
+    private Melee_Tooltip _meleeTooltip;
+
     [Header("수정할 UI연결")]
     [SerializeField]
     private Image _icon;
@@ -64,17 +68,25 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
     private void OnNameChanged(string value) => nameTMP.text = value;
     private void OnDescChanged(string value) => descTMP.text = value;
 
-    public void Show(ActionType action, int damage, Vector2 screenPos, Camera cam)
+    public void Show(int tick, ActionType action, int damage, Vector2 screenPos, Camera cam)
     {
         this.gameObject.SetActive(true);
 
         root.SetActive(true);
+
+        _meleeTooltip.show(action, tick);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
         panelRt.pivot = Vector2.zero; // (0,0) = 좌하단
 
         RectTransform parentRt = panelRt.parent as RectTransform;
         if (parentRt == null) return;
+
+        // 내용 설정
+        Update_Info(action, damage);
+
+        // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
+        ForceRebuild(panelRt);
 
         Vector2 targetScreenPos = screenPos + offset;
 
@@ -85,16 +97,23 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
             out Vector2 localPos
         );
 
-        // 1) 일단 “좌하단을 마우스+offset에”
+
         panelRt.anchoredPosition = localPos;
 
-        // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
+        // 화면(부모 Rect) 밖으로 나가지 않게 클램프
         ClampToParent(panelRt, parentRt);
 
-        // 내용 설정
-        Update_Info(action, damage);
+        
 
         
+    }
+
+    private void ForceRebuild(RectTransform rt)
+    {
+        // rt가 레이아웃 그룹/CSF가 붙은 "루트"라면 이것만으로 충분한 경우가 많음
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+        Canvas.ForceUpdateCanvases();
     }
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)
@@ -118,6 +137,8 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
     public void Hide()
     {
         this.gameObject.SetActive(false);
+
+        _meleeTooltip.Hide();
     }
 
     private void Update_Info(ActionType action, int damage)

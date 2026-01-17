@@ -130,6 +130,7 @@ public class PlayerVisualController : MonoBehaviour
         if (_playerEffector != null)
         {
             _playerEffector.Flip_currentCharge();
+            _playerEffector.Flip_shadow();
         }
     }
 
