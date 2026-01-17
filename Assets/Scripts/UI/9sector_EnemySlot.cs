@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,16 @@ public enum Special_Pattern
 
 public class sector_EnemySlot : Enemy_slot
 {
+    [TabGroup("Back")]
+    [SerializeField]
+    private Image _backImage;
+    [TabGroup("Back")]
+    [SerializeField]
+    private Sprite _nomalBack;
+    [TabGroup("Back")]
+    [SerializeField]
+    private Sprite _hardBack;
+
     [Header("일반 공격")]
     [SerializeField]
     private GameObject _attackIcon;
@@ -50,6 +61,15 @@ public class sector_EnemySlot : Enemy_slot
     public override void Show(int tick, bool is_normal, Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
     {
         Show_Slot();
+
+        if (GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        {
+            _backImage.sprite = _hardBack;
+        }
+        else
+        {
+            _backImage.sprite= _nomalBack;
+        }
 
         if (is_normal)
         {
