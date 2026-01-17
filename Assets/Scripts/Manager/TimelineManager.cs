@@ -520,7 +520,6 @@ public class TimelineManager : MonoBehaviour
             CurrentTick = tick;
 
             _isCurrentTickStunned = _battleSystem.IsPlayerStunned;
-            _battleSystem.ClearPlayerStun();
             if (_isCurrentTickStunned)
                 Debug.Log($"<color=purple>[Timeline] {tick}틱: 기절 상태입니다. 플레이어 행동이 무시됩니다.</color>");
 
@@ -562,6 +561,8 @@ public class TimelineManager : MonoBehaviour
 
             //틱이 분리됨에 따른 틱 쪼개기
             OnCurrentTickChanged?.Invoke(2 * tick);
+
+            _battleSystem.ClearPlayerStun();
 
             // 2. 적 공격 처리
             if (_currentEnemyPattern != null && _battleSystem != null)
