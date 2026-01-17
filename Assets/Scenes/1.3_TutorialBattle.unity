@@ -4625,7 +4625,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18.5
+  m_fontSize: 24
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -14253,6 +14253,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Next_Txt
       objectReference: {fileID: 0}
+    - target: {fileID: 1753403451097987802, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1916202720661774050, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
       propertyPath: m_StringReference.m_TableEntryReference.m_KeyId
       value: 50019426307
@@ -14460,6 +14464,10 @@ PrefabInstance:
     - target: {fileID: 6433122868177895574, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
       propertyPath: m_StringReference.m_TableReference.m_TableCollectionName
       value: GUID:19f015b4bfda5824bad8438f07798533
+      objectReference: {fileID: 0}
+    - target: {fileID: 6501949463130132836, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6601537745238021437, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
       propertyPath: m_StringReference.m_TableEntryReference.m_KeyId
@@ -14708,6 +14716,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 178ea728f38300147a8789af2788fc6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1500635297 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6501949463130132836, guid: 9ae4b720995d41449aa2083d0a595e56, type: 3}
+  m_PrefabInstance: {fileID: 1500635292}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1517387538 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8848369937953878122, guid: 266edf89b19e79444a73811ddbd4a15e, type: 3}
@@ -43192,6 +43205,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1500635297}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093066744643037372, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7577612343494634230, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
       propertyPath: m_Camera
       value: 
@@ -50756,7 +50797,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3613165681821738322}
   m_HandleRect: {fileID: 8374442163001255656}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
