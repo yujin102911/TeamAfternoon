@@ -124,6 +124,11 @@ public class Action_cell : MonoBehaviour
                 finalDam *= 2;
                 ApplyActionColor(action);
                 break;
+
+            case EffectType.Critical_3:
+                finalDam *= 3;
+                ApplyActionColor(action);
+                break;
         }
     }
 
