@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Sirenix.OdinInspector;
 using System.Collections;
+using Steamworks;
 
 public enum EndCondition
 {
@@ -148,6 +149,9 @@ public class BattleResultUIController : MonoBehaviour
     public void GoToTitleVictory()
     {
         _victoryHomeButton.interactable = false;
+
+        UnlockStageAchivement();
+
         StartCoroutine(ClearSequenceAndLoadAsync());
     }
 
@@ -233,6 +237,44 @@ public class BattleResultUIController : MonoBehaviour
 
     #endregion
 
+    #region Achivement Methods
+    private void UnlockStageAchivement()
+    {
+        if (!SteamManager.Initialized)
+        {
+            Debug.LogWarning("[Steam] SteamManager가 초기화되지 않아 도전과제를 해금할 수 없음");
+            return;
+        }
+        if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
+        {
+            int stageNum = GameManager.Instance.CurrentStageData.StageNumber;
+            string achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
+
+            bool success = SteamUserStats.SetAchievement(achievementKey);
+            if (success)
+            {
+                SteamUserStats.StoreStats();
+                Debug.Log($"[Steam] 도전과제 해금 성공: {achievementKey}");
+            }
+            else
+            {
+                Debug.LogError($"[Steam] 도전과제 해금 실패 (Key를 찾을 수 없음): {achievementKey}");
+            }
+        } 
+    }
+
+    [Button("업적 초기화")]
+    public void ClearSpecificAchievement(int stageNum)
+    {
+        string key = $"NEW_ACHIEVEMENT_{stageNum}_0";
+        bool success = SteamUserStats.ClearAchievement(key);
+        if (success)
+        {
+            SteamUserStats.StoreStats();
+            Debug.Log($"[Steam] 업적 초기화 완료: {key}");
+        }
+    }
+    #endregion
 
     [Button("승리 연출 테스트", ButtonSizes.Medium)]
     private void TestVictory() => HandleBattleEnded(EndCondition.Victory);
