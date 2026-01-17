@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1568112341388879047}
   - component: {fileID: 2270912306803239852}
   m_Layer: 0
-  m_Name: Night
+  m_Name: Ice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_Sprite: {fileID: 21300000, guid: ee961c1b58dc87d479830131489a5d38, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1d150699fdd9b7e4aa6a0ba6002dc184, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0
@@ -108,9 +108,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SturnFx_Prefab: {fileID: 7177238191200734579}
   Second_StarPrefab: {fileID: 8407319674702855159}
-  attackFxPrefab: {fileID: 1236370559262856938, guid: bc55aac756c48fb42afe704bbb0242ac, type: 3}
+  attackFxPrefab: {fileID: 7979821638608940722, guid: b29f55a4ec9140d4f8a9677a521a97fc, type: 3}
   initialPoolSize: 30
-  _offset: {x: 0, y: 0, z: 0}
+  _offset: {x: 0, y: 1, z: 0}
 --- !u!114 &1609208213736323941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Library: []
-  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: 28b7525923897b44cae73a2fa2686e7c, type: 3}
+  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: ff911f3d25e249b4690d4cd5bf564dff, type: 3}
 --- !u!114 &1568112341388879047
 MonoBehaviour:
   m_ObjectHideFlags: 0
