@@ -1,5 +1,4 @@
 ﻿using TMPro;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 
 public class CardTooltip : MonoBehaviour
