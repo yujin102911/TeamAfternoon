@@ -307,7 +307,7 @@ public class TimelineUI : MonoBehaviour
             if (attack.tick >= 1 && attack.tick <= enemySlots.Count)
             {
 
-                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attack.tick, is_normal, attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
             }
             else
             {
@@ -320,7 +320,7 @@ public class TimelineUI : MonoBehaviour
             if (parrying.tick >= 1 && parrying.tick <= enemySlots.Count)
             {
 
-                enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, parryingColor, "P");
+                enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(parrying.tick, is_normal, parryingColor, "P");
             }
             else
             {
@@ -333,7 +333,7 @@ public class TimelineUI : MonoBehaviour
             if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
             {
 
-                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, attackColor, "", Special_Pattern.Stone, null, is_left);
+                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(stone.tick, is_normal, attackColor, "", Special_Pattern.Stone, null, is_left);
             }
             else
             {
@@ -347,7 +347,7 @@ public class TimelineUI : MonoBehaviour
             if (wind.tick >= 1 && wind.tick <= enemySlots.Count)
             {
 
-                enemySlots[wind.tick - 1].GetComponent<Enemy_slot>().Show(is_normal,attackColor, "", Special_Pattern.Wind, null, is_left);
+                enemySlots[wind.tick - 1].GetComponent<Enemy_slot>().Show(wind.tick, is_normal, attackColor, "", Special_Pattern.Wind, null, is_left);
             }
             else
             {
@@ -360,7 +360,7 @@ public class TimelineUI : MonoBehaviour
         {
             if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
             {
-                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(is_normal,attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(dash.tick, is_normal, attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
             }
             else
             {

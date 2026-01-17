@@ -54,7 +54,6 @@ public class Melee_Tooltip : MonoBehaviour
                 if(TimelineManager.Instance.enemyPattern.GetDashAt(i) != null)
                 {
                     is_left = !is_left;
-                    break;
                 }
             }
         }

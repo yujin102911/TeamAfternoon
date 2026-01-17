@@ -47,7 +47,7 @@ public class sector_EnemySlot : Enemy_slot
 
     private Image[] _imageSectors;
 
-    public override void Show(bool is_normal, Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
+    public override void Show(int tick, bool is_normal, Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
     {
         Show_Slot();
 
@@ -98,13 +98,36 @@ public class sector_EnemySlot : Enemy_slot
                 break;
 
             case Special_Pattern.Wind:
-                //바람 패턴 구현 예정
+                //변경되는 위치에따른 방향 계산
+                if (TimelineManager.Instance != null)
+                {
+                    for (int i = tick - 1; i >= 1; i--)
+                    {
+                        if (TimelineManager.Instance.enemyPattern.GetDashAt(i) != null)
+                        {
+                            is_left = !is_left;
+                        }
+                    }
+                }
+
                 _patternIcon.SetActive(true);
                 _patternIcon.GetComponent<Image>().sprite = is_left ? _windLeftIcon : _windRightIcon;
                 break;
             case Special_Pattern.Dash:
                 //대시 패턴 구현 예정
                 _attackIcon.SetActive(true);
+
+                //변경되는 위치에따른 방향 계산
+                if (TimelineManager.Instance != null)
+                {
+                    for (int i = tick - 1; i >= 1; i--)
+                    {
+                        if (TimelineManager.Instance.enemyPattern.GetDashAt(i) != null)
+                        {
+                            is_left = !is_left;
+                        }
+                    }
+                }
 
                 for (int i = 0; i < _imageSectors.Length; i++)
                 {
