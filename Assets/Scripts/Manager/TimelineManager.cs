@@ -286,7 +286,6 @@ public class TimelineManager : MonoBehaviour
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
-
             return true;
         }
 
@@ -302,7 +301,6 @@ public class TimelineManager : MonoBehaviour
         {
             // UI 업데이트
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
-
             return true;
         }
 
