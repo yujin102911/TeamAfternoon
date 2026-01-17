@@ -698,14 +698,15 @@ public class TimelineManager : MonoBehaviour
     /// <summary>
     /// 특정 틱 시점의 플레이어 섹터와 적의 위치 반환
     /// </summary>
-    public (int sector, bool isEnemyLeft) SimulateStateAtTick(int targetTick, bool includeLastEnemyAction)
+    public (int sector, bool isEnemyLeft, bool isPushed) SimulateStateAtTick(int targetTick, bool includeLastEnemyAction)
     {
         if (_battleSystem == null || _battleSystem.Enemies.Count == 0)
-            return (1, false);
+            return (1, false, false);
 
         int currentSimulatedSector = _battleSystem.PlayerCurrentSector;
         bool currentSimulatedIsLeft = _battleSystem.Enemies[0].IsLeft;
         bool sideToReturn = currentSimulatedIsLeft;
+        bool isPushedByWind = false;
 
         int columns = _totalColumns > 0  ? _totalColumns : 3;
         int rows = _totalSectors / columns;
@@ -746,6 +747,7 @@ public class TimelineManager : MonoBehaviour
                 {
                     WindDirection actualDirection = wind.GetDynamicDirection(currentSimulatedIsLeft);
                     int nextWindTarget = _battleSystem.GetWindTargetSector(currentSimulatedSector, actualDirection);
+                    if (t == targetTick) isPushedByWind = true;
                     while (nextWindTarget != -1 && !_battleSystem.IsSectorBlocked(nextWindTarget))
                     {
                         currentSimulatedSector = nextWindTarget;
@@ -760,7 +762,7 @@ public class TimelineManager : MonoBehaviour
                 }
             }
         }
-        return (currentSimulatedSector, sideToReturn);
+        return (currentSimulatedSector, sideToReturn, isPushedByWind);
     }
 
 
