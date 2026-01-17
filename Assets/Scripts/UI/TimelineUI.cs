@@ -729,6 +729,7 @@ public class TimelineUI : MonoBehaviour
 
             int predictedSector = simState.sector;
             bool simIsLeft = simState.isEnemyLeft;
+            bool isPushed = simState.isPushed;
 
             ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
             ActionType previewAction = ActionType.None;
@@ -747,7 +748,11 @@ public class TimelineUI : MonoBehaviour
                 {
                     previewAction = ActionType.Sword_middle;
                 }
-                else if(action == ActionType.Guard)
+                else if (isPushed)
+                {
+                    previewAction = ActionType.Cure;
+                }
+                else if (action == ActionType.Guard)
                 {
                     previewAction = ActionType.Guard;
                 }
