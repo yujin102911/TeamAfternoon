@@ -7,8 +7,8 @@ public class Stage_BookBtn : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (StageScene_UIManager.Instance != null)
-            StageScene_UIManager.Instance.BookHoverEnter(Stage_ID);
+        //if (StageScene_UIManager.Instance != null)
+        //    StageScene_UIManager.Instance.BookHoverEnter(Stage_ID);
     }
 
     public void OnPointerExit(PointerEventData eventData)
