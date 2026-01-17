@@ -13,21 +13,13 @@ public class BattleUIManager : MonoBehaviour
     [Header("스테이지 UI")]
     [SerializeField] private Button _startButton;
 
-    [Header("메모리 UI")]
-    [SerializeField] 
-    private GameObject _memoryObject;
-    [SerializeField]
-    private TextMeshProUGUI _percentTxt;
-    [SerializeField]
-    private TextMeshProUGUI _storageTxt;
-    [SerializeField] 
-    private Slider _memorySlider;
-
     [Header("자막 메모리 UI")]
     [SerializeField]
     private TextMeshProUGUI _storageTxtMemory;
     [SerializeField]
-    private Slider _textmemorySlider;
+    private Slider _lateMemorySlider;
+    [SerializeField]
+    private Slider _fastMemorySlider;
 
     [Header("슬라이더 핸들 바")]
     [SerializeField]
@@ -101,9 +93,9 @@ public class BattleUIManager : MonoBehaviour
 
             GameManager.Instance.OnGameStateChanged += RefreshStartButtonState;
             GameManager.Instance.OnBattleEnded += RefreshStartButtonState;
-            GameManager.Instance.OnMemoryUpdate += UpdateSlider;
 
-            TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider;
+            TimelineManager.Instance.OnTextMemoryChanged += Update_TextSlider_Both;
+            TimelineManager.Instance.OnFastMemoryChanged += Update_TextSlider_Fast;
         }
         RefreshStartButtonState();
         StartSpeedButton();
@@ -118,9 +110,9 @@ public class BattleUIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged -= RefreshStartButtonState;
             battleSystem.OnCriticalChanceChanged -= UpdateStackUI;
             battleSystem.OnBattleInitialized -= HandleBattleInitialized;
-            GameManager.Instance.OnMemoryUpdate -= UpdateSlider;
 
-            TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider;
+            TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider_Both;
+            TimelineManager.Instance.OnFastMemoryChanged -= Update_TextSlider_Fast;
             //battle.UpdateCureGauage -= HandleCureChanged;
         }
     }
@@ -131,13 +123,23 @@ public class BattleUIManager : MonoBehaviour
         //_adTxt.text = $"편집 콤보: +{(int)chance} / 최대 자막수: {(int)chance / 8}";
     }
 
-    public void Update_TextSlider(int current, int max)
+    public void Update_TextSlider_Both(int current, int max)
     {
         float slider_size = (float)current / max;
 
-        _textmemorySlider.value = slider_size;
+        _lateMemorySlider.value = slider_size;
+        _fastMemorySlider.value = slider_size;
         _storageTxtMemory.text = $"{current}/{max} <size=20>mb</size>";
     }
+
+    public void Update_TextSlider_Fast(int current, int max)
+    {
+        float slider_size = (float)current / max;
+
+        _fastMemorySlider.value = slider_size;
+        _storageTxtMemory.text = $"{current}/{max} <size=20>mb</size>";
+    }
+
     private void HandleBattleInitialized()
     {
         if (GameManager.Instance != null && GameManager.Instance.BattleSystem != null)
@@ -190,16 +192,6 @@ public class BattleUIManager : MonoBehaviour
         _startButton.gameObject.SetActive(false);
     }
 
-    private void UpdateSlider(int current, int max)
-    {
-
-        float slider_size = (float)current / (8 * max);
-        float percent = slider_size * 100f;
-
-        _memorySlider.value = slider_size;
-        _percentTxt.text = $"{percent}%";
-        _storageTxt.text = $"{current}/{8 * max} <size=20>mb</size>";
-    }
 
     // 슬라이더 핸들 바 레이캐스트 온
     public void HandleBar_raycastOn()

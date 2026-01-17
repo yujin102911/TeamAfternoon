@@ -615,7 +615,7 @@ public class TimelineUI : MonoBehaviour
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
             //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
-            CardTooltip.Instance.Show_TimelineAction(effect, blockData.attackDamage, screenPos, cam);
+            CardTooltip.Instance.Show_TimelineAction(tick, effect, blockData.attackDamage, screenPos, cam);
         }
 
 
@@ -954,13 +954,16 @@ public class TimelineUI : MonoBehaviour
                         cell_Pos = Cell_Pos.End;
                     }
 
+                    Additional_Effect additional_Effect = TimelineManager.Instance.additional_Effects[tickIndex];
+
                     slotView.SetAction(
                         action,
                         dir,
                         damage,
                         cell_Pos,
                         isPreview: false,
-                        isPrev: false
+                        isPrev: false,
+                        additional_Effect
                     );
 
                     // 호버 핸들러 추가/업데이트
@@ -984,7 +987,8 @@ public class TimelineUI : MonoBehaviour
             Hide_Preview();
         }
 
-            
+        if (TimelineManager.Instance != null)
+            Update_effectColor(TimelineManager.Instance.additional_Effects);
     }
 
     public void Update_effectColor(IReadOnlyList<Additional_Effect> additional_Effects)
@@ -997,13 +1001,32 @@ public class TimelineUI : MonoBehaviour
 
             Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
 
+            BlockData block = null;
+            int index = -1;
+
+            if(slotGO.GetComponent<PlayerSlotHover>().placedBlock != null)
+            {
+                block = slotGO.GetComponent<PlayerSlotHover>().placedBlock.GetBlockData();
+                index = slotGO.GetComponent<PlayerSlotHover>().placedBlock.GetCardTickIndex(i+1);
+            }
+
             if (additional_Effects[i] == null)
             {
                 effectLine.Hide();
             }
             else
             {
-                effectLine.Show(additional_Effects[i]);
+                if(block == null)
+                {
+                    effectLine.Show(additional_Effects[i]);
+                    Debug.Log("널입니다.");
+                }
+                else
+                {
+                    effectLine.Show(additional_Effects[i], block.GetEffectAt(index));
+                    Debug.Log("널아닙니다.");
+                }
+                    
             }   
         }
     }
@@ -1015,7 +1038,7 @@ public class TimelineUI : MonoBehaviour
         // 특수효과가 없는 틱은 무시
         if (TimelineManager.Instance.CanPlaceEffect(tick)) return;
 
-        GameObject slotGO = playerSlots[tick];
+        GameObject slotGO = playerSlots[tick-1];
         Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
         effectLine.Hover(is_enter);
     }

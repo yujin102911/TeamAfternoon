@@ -42,6 +42,7 @@ public class SoundManager : MonoBehaviour
         if (Instance != null)
         {
             Destroy(gameObject);
+            Debug.Log("부숴짐");
             return;
         }
 
