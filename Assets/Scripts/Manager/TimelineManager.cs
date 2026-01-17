@@ -56,6 +56,9 @@ public class TimelineManager : MonoBehaviour
     private TimelineSystem _timelineSystem;
     private BattleSystem _battleSystem;
 
+    // 기절 여부
+    private bool _isCurrentTickStunned = false;
+
     private List<Additional_Effect> _placedEffect = new List<Additional_Effect>();
 
     // 현재 손패 (GameDirector로부터 받음)
@@ -145,6 +148,7 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleMeleeAttackRequest(BlockData data, bool isChargeRequired)
     {
+        if (_isCurrentTickStunned) return;
         int currentStack = _battleSystem.MeleeAttackStack;
         int finalDamage = data.CalculateStackedDamage(currentStack);
         bool isSuccess = _battleSystem.MeleeAttack(finalDamage, isChargeRequired);
@@ -155,29 +159,35 @@ public class TimelineManager : MonoBehaviour
     }
     private void HandleMeleeAttack_Start()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.MeleeAttack_Start();
     }
     private void HandleLongRangeAttackRequest(int power, bool isChargeRequired)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack(power, isChargeRequired);
     }
 
     private void HandleLongRangeAttack_Start()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack_Start();
     }
 
     private void HandleLongRangeAttack_Middle()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack_Middle();
     }
 
     private void HandleMoveRequest(MoveDirection direction)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.MovePlayer(direction);
     }
     private void HandleGuardRequest(bool state)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.SetGuard(state);
 
         if (state)
@@ -482,6 +492,11 @@ public class TimelineManager : MonoBehaviour
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
             CurrentTick = tick;
+
+            _isCurrentTickStunned = _battleSystem.IsPlayerStunned;
+            _battleSystem.ClearPlayerStun();
+            if (_isCurrentTickStunned)
+                Debug.Log($"<color=purple>[Timeline] {tick}틱: 기절 상태입니다. 플레이어 행동이 무시됩니다.</color>");
 
             // 매 틱마다 방어 초기화하고 시작
             _battleSystem.SetGuard(false);

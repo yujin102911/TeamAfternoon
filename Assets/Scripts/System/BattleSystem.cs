@@ -11,7 +11,6 @@ public struct DamageResult
 }
 
 
-
 /// <summary>
 /// 전투 로직을 처리하는 System
 /// HP, 데미지 등 전투 관련 계산 담당
@@ -57,6 +56,10 @@ public class BattleSystem
     private int _roundTotalDamage = 0;
     private int _videoTotalGuard = 0;
     private int _rountTotalMove = 0;
+
+    // 기절 상태 플래그
+    private bool _isPlayerStunned = false;
+    public bool IsPlayerStunned => _isPlayerStunned;
 
     #endregion
 
@@ -388,6 +391,11 @@ public class BattleSystem
         if (_isGuarding)
         {
             return;
+        }
+        if (GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        {
+            _isPlayerStunned = true;
+            Debug.Log("<color=purple>[BattleSystem] 하드 모드 피격: 다음 틱 기절 예약!</color>");
         }
         if (_isBowCharging)
         {
@@ -825,6 +833,7 @@ public class BattleSystem
         _battleTurnCount++;
         _roundTotalDamage = 0;
         _rountTotalMove = 0;
+        ClearPlayerStun();
     }
 
     public void SetGuard(bool state)
@@ -858,6 +867,8 @@ public class BattleSystem
     {
         //OnChangePlayerAnim?.Invoke("1_Idle");
     }
+
+    public void ClearPlayerStun() => _isPlayerStunned = false;
 
     #region Achievement Methods
     private void CheckBattleAchievements()
