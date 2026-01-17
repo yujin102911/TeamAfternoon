@@ -34,7 +34,7 @@ public class KeywordSpawn_UI : MonoBehaviour, IBeginDragHandler,
 
     public void Init(Owned_Keyword_Data keyword_Data)
     {
-        Keyword_Data = DataRepository.Instance.GetKeyword(keyword_Data.Owned_KeywordID);
+        Keyword_Data = ServiceLocator.Instance.CurrentRepository.GetKeyword(keyword_Data.Owned_KeywordID);
 
         // 이름 설정
         _keywordUI.SetAndShow(Keyword_Data.KeywordName);

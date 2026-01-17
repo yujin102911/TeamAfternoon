@@ -15,7 +15,8 @@ public class UserSaveDTO
     public List<int> Cleared_Stage_IDs;
     public List<string> Read_Mail_Keys;
     public List<int> Read_Board_Stage_IDs;
-    public int MaxHP;
+    public Difficulty Difficulty;
+    public int GameOverCount;
 }
 
 
@@ -106,7 +107,8 @@ public static class SaveService
             Cleared_Stage_IDs = so.Cleared_Stage_IDs,
             Read_Mail_Keys = so.Read_Mail_Keys,
             Read_Board_Stage_IDs = new List<int>(so.Read_Board_Stage_IDs),
-            MaxHP = so.MaxHP,
+            Difficulty = so.Difficulty,
+            GameOverCount = so.GameOverCount,
         };
     }
 
@@ -120,7 +122,8 @@ public static class SaveService
         so.Cleared_Stage_IDs = dto.Cleared_Stage_IDs;
         so.Read_Mail_Keys = dto.Read_Mail_Keys;
         so.Read_Board_Stage_IDs = dto.Read_Board_Stage_IDs;
-        so.MaxHP = dto.MaxHP;
+        so.Difficulty = dto.Difficulty;
+        so.GameOverCount = dto.GameOverCount;
     }
 
     // ============= 검증 함수 ================

@@ -97,7 +97,7 @@ public class Deck_UI : MonoBehaviour
             // 키워드 UI 설정
             foreach (int keyword_id in keywords)
             {
-                KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
+                KeywordData keyword = ServiceLocator.Instance.CurrentRepository.GetKeyword(keyword_id);
 
                 BlockInfoText.text += $"#{keyword.KeywordName}\n";
 

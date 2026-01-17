@@ -22,7 +22,15 @@ public class UserGameData : ScriptableObject
     public List<int> Owned_Relics_IDs = new List<int>();
 
     [Header("난이도 설정")]
-    public int MaxHP;
+    public Difficulty Difficulty;
+    public int HardHP = 3;
+    public int NormalHP = 3;
+    public int MaxHP()
+    {
+        if (Difficulty == Difficulty.Hard) return HardHP;
+        else if (Difficulty == Difficulty.Easy) return NormalHP;
+        return 3; // 혹시 모를 예외상황 방지
+    }
 
     [Header("튜토리얼 클리어 여부")]
     public bool Is_Tutorial_Cleared = false;
@@ -35,6 +43,9 @@ public class UserGameData : ScriptableObject
 
     [Header("읽은 게시판 정보 (StageID 리스트)")]
     public List<int> Read_Board_Stage_IDs = new List<int>();
+
+    [Header("게임 오버 횟수")]
+    public int GameOverCount = 0;
 
     #region Helper Methods
     #region 클립 헬퍼 함수
@@ -97,6 +108,13 @@ public class UserGameData : ScriptableObject
     {
         if (!Read_Board_Stage_IDs.Contains(stageID))
             Read_Board_Stage_IDs.Add(stageID);
+    }
+    #endregion
+
+    #region 실패 시 업데이트 함수
+    public void AddGameOverCount()
+    {
+        GameOverCount ++;
     }
     #endregion
     #endregion
