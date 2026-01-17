@@ -45,7 +45,7 @@ public class StageScene_UIManager : MonoBehaviour
     // 책 위에 마우스 호버
     public void BookHoverEnter(int id)
     {
-        StageData stageData = DataRepository.Instance.GetStage(id);
+        //StageData stageData = DataRepository.Instance.GetStage(id);
 
         Light_On();
         //SetandShow_Txt(stageData.StageName);

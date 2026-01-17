@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Sirenix.OdinInspector;
 using System.Collections;
+using Steamworks;
 
 public enum EndCondition
 {
@@ -148,6 +149,9 @@ public class BattleResultUIController : MonoBehaviour
     public void GoToTitleVictory()
     {
         _victoryHomeButton.interactable = false;
+
+        UnlockStageAchivement();
+
         StartCoroutine(ClearSequenceAndLoadAsync());
     }
 
@@ -174,9 +178,9 @@ public class BattleResultUIController : MonoBehaviour
             nextDay = currentDay + 1;
             _dayCountText.text = $"Day {currentDay:D2}";
         }
-        if (DataRepository.Instance != null)
+        if (ServiceLocator.Instance.CurrentRepository != null)
         {
-            totalStages = DataRepository.Instance.stageDatas.Count;
+            totalStages = ServiceLocator.Instance.CurrentRepository.stageDatas.Count;
         }
         if (currentDay >= totalStages)
         {
@@ -233,6 +237,19 @@ public class BattleResultUIController : MonoBehaviour
 
     #endregion
 
+    #region Achivement Methods
+    private void UnlockStageAchivement()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
+        {
+            int stageNum = GameManager.Instance.CurrentStageData.StageNumber;
+            string achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
+
+            SteamAchievementManager.Unlock(achievementKey);
+        } 
+    }
+
+    #endregion
 
     [Button("승리 연출 테스트", ButtonSizes.Medium)]
     private void TestVictory() => HandleBattleEnded(EndCondition.Victory);

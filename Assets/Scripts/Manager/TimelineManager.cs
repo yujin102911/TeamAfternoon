@@ -56,6 +56,9 @@ public class TimelineManager : MonoBehaviour
     private TimelineSystem _timelineSystem;
     private BattleSystem _battleSystem;
 
+    // 기절 여부
+    private bool _isCurrentTickStunned = false;
+
     private List<Additional_Effect> _placedEffect = new List<Additional_Effect>();
 
     // 현재 손패 (GameDirector로부터 받음)
@@ -81,6 +84,7 @@ public class TimelineManager : MonoBehaviour
     public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
     public int TotalColumns => _totalColumns;
+    public int CurrentTick { get; private set; }
 
     void Awake()
     {
@@ -144,6 +148,7 @@ public class TimelineManager : MonoBehaviour
 
     private void HandleMeleeAttackRequest(BlockData data, bool isChargeRequired)
     {
+        if (_isCurrentTickStunned) return;
         int currentStack = _battleSystem.MeleeAttackStack;
         int finalDamage = data.CalculateStackedDamage(currentStack);
         bool isSuccess = _battleSystem.MeleeAttack(finalDamage, isChargeRequired);
@@ -154,29 +159,35 @@ public class TimelineManager : MonoBehaviour
     }
     private void HandleMeleeAttack_Start()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.MeleeAttack_Start();
     }
     private void HandleLongRangeAttackRequest(int power, bool isChargeRequired)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack(power, isChargeRequired);
     }
 
     private void HandleLongRangeAttack_Start()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack_Start();
     }
 
     private void HandleLongRangeAttack_Middle()
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.LongRangeAttack_Middle();
     }
 
     private void HandleMoveRequest(MoveDirection direction)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.MovePlayer(direction);
     }
     private void HandleGuardRequest(bool state)
     {
+        if (_isCurrentTickStunned) return;
         _battleSystem.SetGuard(state);
 
         if (state)
@@ -469,9 +480,24 @@ public class TimelineManager : MonoBehaviour
                 keyword.OnRoundStart(placed);
             }
         }
+        if (_timelineSystem.PlacedBlocks.Count == 0)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_10_0");
+        }
+        if (_currentMemory >= Max_memory && Max_memory > 0)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_15_0");
+        }
 
         for (int tick = 1; tick <= _totalTicks; tick++)
         {
+            CurrentTick = tick;
+
+            _isCurrentTickStunned = _battleSystem.IsPlayerStunned;
+            _battleSystem.ClearPlayerStun();
+            if (_isCurrentTickStunned)
+                Debug.Log($"<color=purple>[Timeline] {tick}틱: 기절 상태입니다. 플레이어 행동이 무시됩니다.</color>");
+
             // 매 틱마다 방어 초기화하고 시작
             _battleSystem.SetGuard(false);
             _mapVisualController.Stop_WindEffect();
@@ -550,6 +576,7 @@ public class TimelineManager : MonoBehaviour
             OnCurrentTickChanged?.Invoke(0);
         }
 
+
         // 라운드 종료 키워드 호출
         allBlocks = _timelineSystem.GetAllPlacedBlocksWithRuntime();
         foreach (var (placed, runtime) in allBlocks)
@@ -561,6 +588,7 @@ public class TimelineManager : MonoBehaviour
         }
 
         float elapsed = Time.unscaledTime - startTime;   // 총 실행 시간
+        CurrentTick = 0;
         OnExecutionFinished?.Invoke();
         Debug.Log($"[TimelineDirector] 타임라인 실행 완료 - 총 소요 시간: {elapsed:F2}초");
         //Time.timeScale = 1f;

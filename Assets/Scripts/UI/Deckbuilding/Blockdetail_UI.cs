@@ -83,7 +83,7 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
             // 키워드 UI 설정
             foreach (int keyword_id in keywords)
             {
-                KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
+                KeywordData keyword = ServiceLocator.Instance.CurrentRepository.GetKeyword(keyword_id);
 
                 // 반납용 데이터 설정
                 if (_returnKeywords[index] != null)
@@ -141,7 +141,7 @@ public class Blockdetail_UI : MonoBehaviour, IDropHandler, IPointerEnterHandler,
             // 키워드 UI 설정
             foreach (int keyword_id in keywords)
             {
-                KeywordData keyword = DataRepository.Instance.GetKeyword(keyword_id);
+                KeywordData keyword = ServiceLocator.Instance.CurrentRepository.GetKeyword(keyword_id);
 
                 // 반납용 데이터 설정
                 if (_returnKeywords[index] != null)

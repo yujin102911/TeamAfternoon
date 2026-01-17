@@ -11,7 +11,6 @@ public struct DamageResult
 }
 
 
-
 /// <summary>
 /// 전투 로직을 처리하는 System
 /// HP, 데미지 등 전투 관련 계산 담당
@@ -52,6 +51,15 @@ public class BattleSystem
     private bool _isDamageUp = false;
     private bool _isSturn = false;
     private bool _isSturnSuccess = false;
+
+    // 도전과제용 머시기
+    private int _roundTotalDamage = 0;
+    private int _videoTotalGuard = 0;
+    private int _rountTotalMove = 0;
+
+    // 기절 상태 플래그
+    private bool _isPlayerStunned = false;
+    public bool IsPlayerStunned => _isPlayerStunned;
 
     #endregion
 
@@ -130,6 +138,11 @@ public class BattleSystem
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);    
 
         _battleTurnCount = 0;
+
+        // 도전과제용 변수 초기화
+        _videoTotalGuard = 0;
+        _roundTotalDamage = 0;
+        _rountTotalMove = 0;
 
         ResetMeleeStack();
     }
@@ -351,12 +364,18 @@ public class BattleSystem
     private void DamageEnemy(int amount)
     {
         _enemyHP = Mathf.Max(0, _enemyHP - amount);
+        _roundTotalDamage += amount;
+        if (_roundTotalDamage >= 50)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_12_0");
+        }
         Debug.Log($"[BattleSystem] 적에게 {amount} 데미지! 남은 HP: {_enemyHP}");
 
         TimelineManager.Instance.QuestOptionState.IncreaseCount();
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
         if (_enemyHP <= 0)
         {
+            CheckBattleAchievements();
             Debug.Log("적 처치 완료");
             OnChangeEnemyAnim?.Invoke("Die");
             OnEnemyDefeated(); 
@@ -372,6 +391,11 @@ public class BattleSystem
         if (_isGuarding)
         {
             return;
+        }
+        if (GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        {
+            _isPlayerStunned = true;
+            Debug.Log("<color=purple>[BattleSystem] 하드 모드 피격: 다음 틱 기절 예약!</color>");
         }
         if (_isBowCharging)
         {
@@ -484,6 +508,11 @@ public class BattleSystem
         {
             Debug.Log($"[BattleSystem] 이동 결과: {_playerCurrentSector} -> {currentSector}");
             _playerCurrentSector = currentSector;
+            _rountTotalMove++;
+            if (_rountTotalMove >= 5)
+            {
+                SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_11_0");
+            }
             OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection, false);
         }
     }
@@ -802,6 +831,9 @@ public class BattleSystem
     public void OnRoundEnded()
     {
         _battleTurnCount++;
+        _roundTotalDamage = 0;
+        _rountTotalMove = 0;
+        ClearPlayerStun();
     }
 
     public void SetGuard(bool state)
@@ -815,6 +847,11 @@ public class BattleSystem
         else if (state)
         {
             Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+            _videoTotalGuard++;
+            if (_videoTotalGuard >= 10)
+            {
+                SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_13_0");
+            }
         }
 
         _isGuarding = state;
@@ -830,4 +867,24 @@ public class BattleSystem
     {
         //OnChangePlayerAnim?.Invoke("1_Idle");
     }
+
+    public void ClearPlayerStun() => _isPlayerStunned = false;
+
+    #region Achievement Methods
+    private void CheckBattleAchievements()
+    {
+        if (GameManager.Instance == null || TimelineManager.Instance == null) return;
+
+        int currentRound = GameManager.Instance.CurrentRound;
+        int limitRound = GameManager.Instance.CurrentStageData.LimitRound;
+        int currentTick = TimelineManager.Instance.CurrentTick;
+        int totalTicks = TimelineManager.Instance.TotalTicks;
+
+        if (currentRound == limitRound && currentTick == totalTicks)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_14_0");
+        } 
+    }
+    #endregion
+
 }

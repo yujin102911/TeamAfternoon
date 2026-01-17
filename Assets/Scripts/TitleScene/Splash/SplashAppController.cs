@@ -26,7 +26,7 @@ public class SplashAppController : MonoBehaviour
 
     private IEnumerator InitializeSystems()
     {
-        DataRepository repo = DataRepository.Instance;
+        DataRepository repo = ServiceLocator.Instance.CurrentRepository;
         if (repo != null) Debug.Log("[Splash] DataRepository 로드 완료");
 
         SaveService.PeekSaveData();

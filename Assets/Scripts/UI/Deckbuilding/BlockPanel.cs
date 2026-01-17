@@ -72,7 +72,7 @@ public class DeckPanel : MonoBehaviour
         {
             GameObject go = Get();
             Deck_UI uiBlock = go.GetComponent<Deck_UI>();
-            RuntimeBlock block = new RuntimeBlock(DataRepository.Instance.GetBlock(id));
+            RuntimeBlock block = new RuntimeBlock(ServiceLocator.Instance.CurrentRepository.GetBlock(id));
             
             if (uiBlock != null)
             {

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Localization;
+using Steamworks;
 
 [System.Serializable]
 public class ScenarioStep
@@ -182,6 +183,9 @@ public class OutroManager : MonoBehaviour
 
     IEnumerator PlayEndingCredits()
     {
+        CheckEndingAchievement();
+        CheckDeathAchievement();
+
         if (endingCreditPanel != null)
         {
             endingCreditPanel.SetActive(true);
@@ -204,6 +208,8 @@ public class OutroManager : MonoBehaviour
                 yield return null;
             }
         }
+
+
 
         Debug.Log("크레딧 종료 -> 최종 패널 표시");
         if (endGamePanel != null)
@@ -291,4 +297,30 @@ public class OutroManager : MonoBehaviour
 #endif
     }
 
+    #region Achievement Methods
+    private void CheckDeathAchievement()
+    {
+        UserGameData userData = ServiceLocator.Instance.CurrentUser;
+        if (userData == null) return;
+
+        if (userData.Difficulty == Difficulty.Easy && userData.GameOverCount == 0)
+        {
+            string achievementKey = "NEW_ACHIEVEMENT_9_0";
+            SteamAchievementManager.Unlock(achievementKey);
+        }
+    }
+
+    private void CheckEndingAchievement()
+    {
+        UserGameData userData = ServiceLocator.Instance.CurrentUser;
+        if (userData == null) return;
+        string achievementKey = "NEW_ACHIEVEMENT_7_0";
+        if (userData.Difficulty == Difficulty.Hard)
+        {
+            achievementKey = "NEW_ACHIEVEMENT_8_0";
+        }
+        SteamAchievementManager.Unlock(achievementKey);
+    }
+
+    #endregion
 }
