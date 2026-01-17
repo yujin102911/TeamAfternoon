@@ -87,6 +87,46 @@ public class Action_cell : MonoBehaviour
     [TabGroup("None")]
     public Sprite Bow_endIcon;
 
+    // ---- 색상 상수(한번만 파싱) ----
+    private static readonly Color MeleeColor = Hex("#FFA7A3");
+    private static readonly Color BowColor = Hex("#FFEF64");
+
+    private static Color Hex(string hex)
+    {
+        ColorUtility.TryParseHtmlString(hex, out var c);
+        return c;
+    }
+
+    private static bool IsMelee(ActionType action)
+        => action == ActionType.Attack || action == ActionType.Sword_start;
+
+    private static bool IsBow(ActionType action)
+        => action == ActionType.Bow_single || action == ActionType.Bow_start;
+
+    private void ApplyActionColor(ActionType action)
+    {
+        if (IsMelee(action)) _damageText.color = MeleeColor;
+        else if (IsBow(action)) _damageText.color = BowColor;
+    }
+
+    private void ApplyAdditionalEffect(ref int finalDam, Additional_Effect effect, ActionType action)
+    {
+        if (effect == null) return;
+
+        switch (effect.effectType)
+        {
+            case EffectType.Damage_Up:
+                finalDam += 3;
+                ApplyActionColor(action);
+                break;
+
+            case EffectType.Critical:
+                finalDam *= 2;
+                ApplyActionColor(action);
+                break;
+        }
+    }
+
     public void Clear()
     {
         _rootImage.sprite = _noneSprite;
@@ -128,24 +168,11 @@ public class Action_cell : MonoBehaviour
 
         int final_dam = dam;
 
-        //특수효과로인한 데미지 증가 계산
-        if(additional_Effect != null)
-        {
-            if (additional_Effect.effectType == EffectType.Damage_Up)
-            {
-                final_dam += 5;
-                _damageText.color = Color.green;
-            }
-            else if (additional_Effect.effectType == EffectType.Critical)
-            {
-                final_dam *= 2;
-                _damageText.color = Color.green;
-            }
-        }
-
+        //특수효과로 인한 데미지 증가 계산
+        ApplyAdditionalEffect(ref final_dam, additional_Effect, action);
         
 
-            switch (action)
+        switch (action)
             {
                 case ActionType.None:
                     _backImage.gameObject.SetActive(false);
