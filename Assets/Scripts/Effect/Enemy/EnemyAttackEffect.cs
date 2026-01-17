@@ -79,7 +79,9 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             GameObject fx = GetEffect();
             fx.transform.SetParent(effectRoot, true); // ⭐ 월드 기준 유지
             fx.transform.position = _worldSectorPos[index - 1] + _offset;
-            
+
+            fx.GetComponent<SpriteRenderer>().sortingOrder = index * 10 + 4;
+
             if (_sr.flipX)
             {
                 fx.GetComponent<EffectAutoReturn>().Flip();
@@ -119,7 +121,6 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             Second_StarPrefab.SetActive(true);
         }
 
-        Debug.Log("했음?");
     }
 
     public void Hide_Star()

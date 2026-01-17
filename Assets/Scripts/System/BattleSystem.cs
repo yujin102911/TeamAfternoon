@@ -302,7 +302,7 @@ public class BattleSystem
         }
 
         //데미지에 따른 피격연출
-        if (final_dam >= 5 && final_dam < 10)
+        if (final_dam >= 4 && final_dam < 10)
         {
             CameraShake.Instance.Play_Hitstop(0.03f);
             CameraShake.Instance.Shake(0.05f, 0.12f);
@@ -359,7 +359,7 @@ public class BattleSystem
 
 
         finalDamage = _isDamageUp
-                ? finalDamage + 5
+                ? finalDamage + 3
                 : finalDamage;
 
         return new DamageResult
@@ -676,6 +676,13 @@ public class BattleSystem
 
     public void ProcessEnemyStone(int count = 1)
     {
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
+
         List<int> validSectors = new List<int>();
         for (int i = 1; i <= _totalSectors; i++)
         {
@@ -711,6 +718,13 @@ public class BattleSystem
 
     public void ProcessEnemyWind(WindDirection actualDirection)
     {
+        if (_isSturnSuccess)
+        {
+            Debug.Log("<color=yellow>[BattleSystem] 기절로 인한 행동 취소!</color>");
+            _isSturnSuccess = false;
+            return;
+        }
+
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
 
         // 전역 변수 저장
@@ -718,9 +732,6 @@ public class BattleSystem
         _windMoveDir = ConvertWindToMoveDirection(actualDirection);
 
         OnChangeEnemyAnim?.Invoke("Wind");
-        
-
-        
     }
 
     //실제 바람 적용부
