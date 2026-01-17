@@ -127,10 +127,12 @@ public class MailPanel : MonoBehaviour
             attachedFileName = $"Dungeon_{data.StageNumber}_Day.mp4";
         }
 
+        string spriteTag = "<sprite=\"MovieIcon\" name=\"MovieIcon\"> ";
+
         string linkTag = $"<color=#5865F2><u><link=\"stage_enter:{data.StageNumber}\">";
         string bodyText = GetSafeString(mail.body);
 
-        string formattedText = bodyText.Replace("[ENTER_LINK]", $"{linkTag}{attachedFileName}</link></u></color>");
+        string formattedText = bodyText.Replace("[ENTER_LINK]", $"{spriteTag}{linkTag}{attachedFileName}</link></u></color>");
 
         _mailContextText.text = formattedText;
         if (_bodyScrollRect != null)
