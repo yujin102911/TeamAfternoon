@@ -949,13 +949,16 @@ public class TimelineUI : MonoBehaviour
                         cell_Pos = Cell_Pos.End;
                     }
 
+                    Additional_Effect additional_Effect = TimelineManager.Instance.additional_Effects[tickIndex];
+
                     slotView.SetAction(
                         action,
                         dir,
                         damage,
                         cell_Pos,
                         isPreview: false,
-                        isPrev: false
+                        isPrev: false,
+                        additional_Effect
                     );
 
                     // 호버 핸들러 추가/업데이트

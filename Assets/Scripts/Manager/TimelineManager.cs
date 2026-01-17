@@ -415,6 +415,7 @@ public class TimelineManager : MonoBehaviour
 
             OnEffectChanged.Invoke(_placedEffect);
             OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
             return true;
         }
 
@@ -426,6 +427,7 @@ public class TimelineManager : MonoBehaviour
         _placedEffect.Remove(effect);
         OnEffectChanged.Invoke(_placedEffect);
         OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     public void RemovePlacedEffect_Index(int tick)
@@ -434,6 +436,7 @@ public class TimelineManager : MonoBehaviour
         _placedEffect[tick - 1] = null;
         OnEffectChanged.Invoke(_placedEffect);
         OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     public bool CanPlaceEffect(int startTick) 
