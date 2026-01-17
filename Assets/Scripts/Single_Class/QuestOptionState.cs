@@ -55,4 +55,26 @@ public class QuestOptionState
             SetTwice(false);
         }
     }
+
+    public int CountFrag()
+    {
+        int count = 0;
+
+        if (!IsHit)
+        {
+            count++;
+        }
+
+        if (IsEight)
+        {
+            count++;
+        }
+
+        if (IsTwice)
+        {
+            count++;
+        }
+
+        return count;
+    }
 }

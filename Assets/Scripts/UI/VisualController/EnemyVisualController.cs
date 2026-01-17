@@ -177,6 +177,11 @@ public class EnemyVisualController : MonoBehaviour
     }
     public void ChangeAnim(string animation)
     {
+        if(animation == "Sturn")
+        {
+            _enemyAttackEffect.Show_Star_Flip();
+        }
+
         // 기절 별 이펙트 숨기기
         if (_currentAnimation == "Sturn" && _currentAnimation != animation)
         {
@@ -285,6 +290,8 @@ public class EnemyVisualController : MonoBehaviour
         targetCamera.transform.position = camera_end;
         _currentEnemy.transform.position = endPos.position;
 
+        CameraShake.Instance.RePosition(camera_end);
+
         SpriteRenderer sr = _currentEnemy.GetComponent<SpriteRenderer>();
         if (sr != null) sr.flipX = isLeft;
 
@@ -301,8 +308,13 @@ public class EnemyVisualController : MonoBehaviour
         }
         else
         {
-            ChangeAnim("Hurt");
-            Choose_EnemyHurt(GameManager.Instance.CurrentStageData.StageNumber);
+            //데미지가 0이 아닐때만 피격 모션
+            if(damage != 0)
+            {
+                ChangeAnim("Hurt");
+                Choose_EnemyHurt(GameManager.Instance.CurrentStageData.StageNumber);
+            }
+            
         }
 
         StartCoroutine(ShowEnemyDamage(damage, is_crit));
@@ -358,7 +370,14 @@ public class EnemyVisualController : MonoBehaviour
             TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (tmp != null)
         {
-            tmp.text = damage.ToString();
+            if(damage == 0)
+            {
+                tmp.text = "Miss!";
+            }
+            else
+            {
+                tmp.text = damage.ToString();
+            }   
         }
         StartCoroutine(DestroyDamageText(go));
     }

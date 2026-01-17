@@ -71,7 +71,9 @@ public class TimelineManager : MonoBehaviour
     public event Action<int> OnCurrentTickChanged;
     public event Action<IReadOnlyList<Additional_Effect>> OnEffectChanged;
     public event Action<int, int> OnTextMemoryChanged;
+    public event Action<int, int> OnFastMemoryChanged;
     public event Action OnExecutionFinished;
+    public event Action<bool> OnMarkActiveChanged;
 
     // 외부 접근용 프로퍼티
     public IReadOnlyList<RuntimeBlock> CurrentHand => _currentHand;
@@ -81,6 +83,7 @@ public class TimelineManager : MonoBehaviour
     public IReadOnlyList<Additional_Effect> additional_Effects => _placedEffect;
     public int TotalTicks => _totalTicks;
     public int TotalColumns => _totalColumns;
+    public EnemyPattern enemyPattern => _currentEnemyPattern;
 
     void Awake()
     {
@@ -115,6 +118,8 @@ public class TimelineManager : MonoBehaviour
         _timelineSystem.OnGuardRequested += HandleGuardRequest;
         _timelineSystem.OnLongRangeAttacking += HandleLongRangeAttack_Middle;
 
+        QuestOptionState.OnChanged += HandleSlider;
+
         // 이펙트 초기화
         InitializedEffect(_totalTicks);
     }
@@ -136,6 +141,8 @@ public class TimelineManager : MonoBehaviour
             _timelineSystem.OnMeleeAttackStarted -= HandleMeleeAttack_Start;
             _timelineSystem.OnGuardRequested -= HandleGuardRequest;
         }
+
+        QuestOptionState.OnChanged -= HandleSlider;
     }
 
     // ========================================
@@ -232,6 +239,21 @@ public class TimelineManager : MonoBehaviour
         _battleSystem.ResetMeleeStack();
         _battleSystem.Release_Guard();
     }
+
+    private void HandleSlider(QuestOptionState quest)
+    {
+        if (!GameManager.Instance.IsExecutingRound) return;
+
+        int buffer = _currentMemory;
+        buffer -= quest.CountFrag();
+
+        if (buffer < 0)
+        {
+            buffer = 0;
+        }
+
+        OnFastMemoryChanged?.Invoke(buffer, Max_memory);
+    }
     // ========================================
     // 공개 메서드
     // ========================================
@@ -285,7 +307,6 @@ public class TimelineManager : MonoBehaviour
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
-
             return true;
         }
 
@@ -301,7 +322,6 @@ public class TimelineManager : MonoBehaviour
         {
             // UI 업데이트
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
-
             return true;
         }
 
@@ -395,6 +415,7 @@ public class TimelineManager : MonoBehaviour
 
             OnEffectChanged.Invoke(_placedEffect);
             OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+            OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
             return true;
         }
 
@@ -406,6 +427,7 @@ public class TimelineManager : MonoBehaviour
         _placedEffect.Remove(effect);
         OnEffectChanged.Invoke(_placedEffect);
         OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     public void RemovePlacedEffect_Index(int tick)
@@ -414,6 +436,7 @@ public class TimelineManager : MonoBehaviour
         _placedEffect[tick - 1] = null;
         OnEffectChanged.Invoke(_placedEffect);
         OnTextMemoryChanged?.Invoke(_currentMemory, Max_memory);
+        OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
     }
 
     public bool CanPlaceEffect(int startTick) 
@@ -455,6 +478,9 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public IEnumerator ExecuteTimeline()
     {
+        OnMarkActiveChanged?.Invoke(true);
+        HandleSlider(QuestOptionState);
+
         float startTime = Time.unscaledTime;   // 시작 시간 기록
         // 늦추기
         //Time.timeScale = timeScale;
@@ -572,6 +598,8 @@ public class TimelineManager : MonoBehaviour
     /// </summary>
     public void OnRoundEnded()
     {
+        OnMarkActiveChanged?.Invoke(false);
+
         // 방향 전환할 블록들 보관하는 리스트
         List<RuntimeBlock> blocksToReset = new List<RuntimeBlock>();
         foreach (PlacedBlock placed in _timelineSystem.PlacedBlocks)

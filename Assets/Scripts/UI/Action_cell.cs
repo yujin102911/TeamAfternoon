@@ -97,7 +97,8 @@ public class Action_cell : MonoBehaviour
     }
 
     // 셀 설정
-    public void Update_CellVisual(ActionType action, MoveDirection dir = MoveDirection.None, int dam = -1, Cell_Pos cell_Pos = Cell_Pos.None)
+    public void Update_CellVisual(ActionType action, MoveDirection dir = MoveDirection.None, int dam = -1, Cell_Pos cell_Pos = Cell_Pos.None,
+        Additional_Effect additional_Effect = null)
     {
         _rootImage.sprite = _actionSprite[1];
 
@@ -119,110 +120,130 @@ public class Action_cell : MonoBehaviour
         _backImage.gameObject.SetActive(true);
         _directionIcon.gameObject.SetActive(true);
         _damageText.text = "";
+        _damageText.color = Color.white;
 
         ChangeAlpha(_backImage, 1.0f);
 
         OffLines();
 
-        switch (action)
+        int final_dam = dam;
+
+        //특수효과로인한 데미지 증가 계산
+        if(additional_Effect != null)
         {
-            case ActionType.None:
-                _backImage.gameObject.SetActive(false);
-                break;
-
-            case ActionType.Sword_start:
-                Attack_startLine.SetActive(true);
-                goto case ActionType.Attack;
-
-            case ActionType.Sword_middle:
-                _backImage.gameObject.SetActive(false);
-                Attack_middleLine.SetActive(true);
-                break;
-
-            case ActionType.Sword_end:
-                ChangeAlpha(_backImage, 0f);
-                _actionIcon.sprite = Attack_startIcon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = "";
-                Attack_endLine.SetActive(true);
-                break;
-
-            case ActionType.Attack:
-                _backImage.sprite = Attack_back;
-                _actionIcon.sprite = Sword_icon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = dam.ToString();
-                break;
-
-            case ActionType.Jump:
-                _backImage.sprite = Move_back;
-                _actionIcon.sprite = jump_icon;
-                switch (dir)
-                {
-                    //추후 방향 나오면 연결
-                    case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
-                    case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
-                    case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
-                    case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
-                }
-
-                _damageText.text = "";
-                break;
-
-            case ActionType.Move:
-                _backImage.sprite = Move_back;
-                _actionIcon.sprite = Shoes_icon;
-                
-                switch (dir)
-                {
-                    case MoveDirection.Front: _directionIcon.sprite = Front_icon; break;
-                    case MoveDirection.Right: _directionIcon.sprite = Right_icon; break;
-                    case MoveDirection.Back: _directionIcon.sprite = Back_icon; break;
-                    case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
-                }
-
-                _damageText.text = "";
-                break;
-
-            case ActionType.Bow_single:
-            case ActionType.Cure:
-                _backImage.sprite = Bow_back;
-                _actionIcon.sprite = Bow_startIcon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = dam.ToString();
-                break;
-
-            case ActionType.Bow_start:
-                _backImage.sprite = Bow_back;
-                _actionIcon.sprite = Bow_startIcon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = dam.ToString();
-                Bow_startLine.SetActive(true);
-                break;
-
-            case ActionType.Bow_middle:
-                _backImage.gameObject.SetActive(false);
-                Bow_middleLine.SetActive(true);
-                break;
-
-            case ActionType.Bow_end:
-                ChangeAlpha(_backImage, 0f);
-                _actionIcon.sprite = Bow_endIcon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = "";
-                Bow_endLine.SetActive(true);
-                break;
-
-            case ActionType.Guard:
-                _backImage.sprite = Guard_Back;
-                _actionIcon.sprite = Guard_Icon;
-                _directionIcon.gameObject.SetActive(false);
-                _damageText.text = "";
-                break;
-
-            default:
-                break;
+            if (additional_Effect.effectType == EffectType.Damage_Up)
+            {
+                final_dam += 5;
+                _damageText.color = Color.green;
+            }
+            else if (additional_Effect.effectType == EffectType.Critical)
+            {
+                final_dam *= 2;
+                _damageText.color = Color.green;
+            }
         }
+
+        
+
+            switch (action)
+            {
+                case ActionType.None:
+                    _backImage.gameObject.SetActive(false);
+                    break;
+
+                case ActionType.Sword_start:
+                    Attack_startLine.SetActive(true);
+                    goto case ActionType.Attack;
+
+                case ActionType.Sword_middle:
+                    _backImage.gameObject.SetActive(false);
+                    Attack_middleLine.SetActive(true);
+                    break;
+
+                case ActionType.Sword_end:
+                    ChangeAlpha(_backImage, 0f);
+                    _actionIcon.sprite = Attack_startIcon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = "";
+                    Attack_endLine.SetActive(true);
+                    break;
+
+                case ActionType.Attack:
+                    _backImage.sprite = Attack_back;
+                    _actionIcon.sprite = Sword_icon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = final_dam.ToString();
+                    break;
+
+                case ActionType.Jump:
+                    _backImage.sprite = Move_back;
+                    _actionIcon.sprite = jump_icon;
+                    switch (dir)
+                    {
+                        //추후 방향 나오면 연결
+                        case MoveDirection.DiagonalRu: _directionIcon.sprite = SE_icon; break;
+                        case MoveDirection.DiagonalRd: _directionIcon.sprite = SW_icon; break;
+                        case MoveDirection.DiagonalLd: _directionIcon.sprite = NW_icon; break;
+                        case MoveDirection.DiagonalLu: _directionIcon.sprite = NE_icon; break;
+                    }
+
+                    _damageText.text = "";
+                    break;
+
+                case ActionType.Move:
+                    _backImage.sprite = Move_back;
+                    _actionIcon.sprite = Shoes_icon;
+
+                    switch (dir)
+                    {
+                        case MoveDirection.Front: _directionIcon.sprite = Front_icon; break;
+                        case MoveDirection.Right: _directionIcon.sprite = Right_icon; break;
+                        case MoveDirection.Back: _directionIcon.sprite = Back_icon; break;
+                        case MoveDirection.Left: _directionIcon.sprite = Left_icon; break;
+                    }
+
+                    _damageText.text = "";
+                    break;
+
+                case ActionType.Bow_single:
+                case ActionType.Cure:
+                    _backImage.sprite = Bow_back;
+                    _actionIcon.sprite = Bow_startIcon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = final_dam.ToString();
+                    break;
+
+                case ActionType.Bow_start:
+                    _backImage.sprite = Bow_back;
+                    _actionIcon.sprite = Bow_startIcon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = final_dam.ToString();
+                    Bow_startLine.SetActive(true);
+                    break;
+
+                case ActionType.Bow_middle:
+                    _backImage.gameObject.SetActive(false);
+                    Bow_middleLine.SetActive(true);
+                    break;
+
+                case ActionType.Bow_end:
+                    ChangeAlpha(_backImage, 0f);
+                    _actionIcon.sprite = Bow_endIcon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = "";
+                    Bow_endLine.SetActive(true);
+                    break;
+
+                case ActionType.Guard:
+                    _backImage.sprite = Guard_Back;
+                    _actionIcon.sprite = Guard_Icon;
+                    _directionIcon.gameObject.SetActive(false);
+                    _damageText.text = "";
+                    break;
+
+                default:
+                    break;
+            }
     }
 
     private void OffLines()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -33,6 +34,7 @@ public class BattleSystem
     private int _enemyHP;
     private int _enemyMaxHP;
 
+    private bool _isMelee = true;              // 근거리 성공 실패 플래그
     private bool _isGuarding = false; // 방어 플래그
     private bool _isBowCharging = false; // 활 플래그
     private bool _isSwordCharging = false; // 검 플래그
@@ -52,6 +54,10 @@ public class BattleSystem
     private bool _isDamageUp = false;
     private bool _isSturn = false;
     private bool _isSturnSuccess = false;
+
+    //바람 계산 전용
+    private WindDirection _actualDirection;
+    private MoveDirection _windMoveDir;
 
     #endregion
 
@@ -182,23 +188,22 @@ public class BattleSystem
 
         _damageBuffer = damage;
 
-        
+
+        if (isChargeRequired)
+        {
+            OnChangePlayerAnim?.Invoke(_isDamageUp ? "6_3_EnforceCharge" : "6_2_SwordEnd");
+        }
+        else
+        {
+            OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_Sword_Enforce" : "2_2_SwordAttack");
+        }
 
         // 공격 위치에 적이 있는지 확인
         foreach (RuntimeEnemy enemy in _enemies)
         {
             if (enemy.IsHitByAttackFrom(_playerCurrentSector, _columns))
             {
-
-                if (isChargeRequired)
-                {
-                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "6_3_EnforceCharge" : "6_2_SwordEnd");
-                }
-                else
-                {
-                    OnChangePlayerAnim?.Invoke(_isDamageUp ? "2_3_Sword_Enforce" : "2_2_SwordAttack");
-                }
-                    
+   
 
                 // 기절 플래그 처리
                 if(_isSturn)
@@ -209,11 +214,15 @@ public class BattleSystem
                     _isSturn = false;
                 }
 
-                return true;
+                _isMelee = true;
+
+                return _isMelee;
             }
         }
+
         _isSwordCharging = false;
-        return false;
+        _isMelee = false;
+        return _isMelee;
     }
     /// <summary>
     /// 원거리 공격
@@ -247,6 +256,31 @@ public class BattleSystem
         DamageResult result = CalculateDamage(_damageBuffer, critChance);
 
         int final_dam = result.damage;
+
+        // 근거리 실패시 데미지 0
+        if (!_isMelee)
+        {
+            final_dam = 0;
+            // 활이랑 함수를 공유하기 때문에 항상 true
+            _isMelee = true;
+        }
+
+        //데미지에 따른 피격연출
+        if (final_dam >= 5 && final_dam < 10)
+        {
+            CameraShake.Instance.Play_Hitstop(0.03f);
+            CameraShake.Instance.Shake(0.05f, 0.12f);
+        }
+        else if (final_dam >= 10 && final_dam < 15)
+        {
+            CameraShake.Instance.Play_Hitstop(0.05f);
+            CameraShake.Instance.Shake(0.08f, 0.2f);
+        }
+        else if(final_dam >= 15)
+        {
+            CameraShake.Instance.Play_Hitstop(0.08f);
+            CameraShake.Instance.Shake(0.1f, 0.3f);
+        }
 
         DamageEnemy(final_dam);
         OnEnemyHit?.Invoke(final_dam, result.isCritical, _isSturnSuccess);
@@ -611,31 +645,41 @@ public class BattleSystem
     public void ProcessEnemyWind(WindDirection actualDirection)
     {
         Debug.Log($"[BattleSystem] 바람 발생! 실제 방향: {actualDirection}");
-        MoveDirection moveDir = ConvertWindToMoveDirection(actualDirection);
+
+        // 전역 변수 저장
+        _actualDirection = actualDirection;
+        _windMoveDir = ConvertWindToMoveDirection(actualDirection);
 
         OnChangeEnemyAnim?.Invoke("Wind");
         
 
+        
+    }
+
+    //실제 바람 적용부
+    public void ActiveWind()
+    {
         foreach (var enemy in _enemies)
         {
+            // 바람 이펙트
             OnEnemyWind?.Invoke(enemy.IsLeft);
         }
 
         int currentPos = _playerCurrentSector;
-        int targetSector = GetWindTargetSector(_playerCurrentSector, actualDirection);
+        int targetSector = GetWindTargetSector(_playerCurrentSector, _actualDirection);
 
-        while(targetSector != -1 && !IsSectorBlocked(targetSector))
+        while (targetSector != -1 && !IsSectorBlocked(targetSector))
         {
             currentPos = targetSector;
-            targetSector = GetWindTargetSector(currentPos, actualDirection);
+            targetSector = GetWindTargetSector(currentPos, _actualDirection);
         }
 
-        if (currentPos !=  _playerCurrentSector)
+        if (currentPos != _playerCurrentSector)
         {
             int prevSector = _playerCurrentSector;
             _playerCurrentSector = currentPos;
 
-            OnPlayerMoved?.Invoke(_playerCurrentSector, moveDir, true);
+            OnPlayerMoved?.Invoke(_playerCurrentSector, _windMoveDir, true);
         }
         else
         {
