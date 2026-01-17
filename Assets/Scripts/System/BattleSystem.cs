@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,10 +10,15 @@ using Random = UnityEngine.Random;
 public struct DamageResult
 {
     public int damage;
-    public bool isCritical;
+    public Critical isCritical;
 }
 
-
+public enum Critical
+{
+    None,
+    Critical_2,
+    Critical_3,
+}
 
 /// <summary>
 /// 전투 로직을 처리하는 System
@@ -54,10 +61,20 @@ public class BattleSystem
     private bool _isDamageUp = false;
     private bool _isSturn = false;
     private bool _isSturnSuccess = false;
+    private bool _is3Critical = false;
 
     //바람 계산 전용
     private WindDirection _actualDirection;
     private MoveDirection _windMoveDir;
+
+    // 도전과제용 머시기
+    private int _roundTotalDamage = 0;
+    private int _videoTotalGuard = 0;
+    private int _rountTotalMove = 0;
+
+    // 기절 상태 플래그
+    private bool _isPlayerStunned = false;
+    public bool IsPlayerStunned => _isPlayerStunned;
 
     #endregion
 
@@ -84,7 +101,7 @@ public class BattleSystem
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
-    public event Action<int, bool, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
+    public event Action<int, Critical, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection, bool> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
@@ -137,6 +154,11 @@ public class BattleSystem
 
         _battleTurnCount = 0;
 
+        // 도전과제용 변수 초기화
+        _videoTotalGuard = 0;
+        _roundTotalDamage = 0;
+        _rountTotalMove = 0;
+
         ResetMeleeStack();
     }
 
@@ -149,6 +171,7 @@ public class BattleSystem
         _isCritical = false;
         _isDubleDash = false;
         _isDamageUp = false;
+        _is3Critical = false;
 
         // 스턴 관련
         _isSturn = false;
@@ -169,6 +192,12 @@ public class BattleSystem
                 break;
             case EffectType.Sturn:
                 _isSturn = true;
+                break;
+            case EffectType.Critical_3:
+                _is3Critical = true;
+                break;
+            case EffectType.HealAll:
+                HealBoth();
                 break;
             case EffectType.None:
                 break;
@@ -246,16 +275,23 @@ public class BattleSystem
     /// </summary>
     public void EnemyTakeDamage()
     {
-        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
 
-        if (critChance > 1)
-        {
-            critChance = 1;
-        }
-
-        DamageResult result = CalculateDamage(_damageBuffer, critChance);
+        DamageResult result = CalculateDamage(_damageBuffer);
 
         int final_dam = result.damage;
+
+        if (result.isCritical == Critical.Critical_3)
+        {
+            _playerHP = Mathf.Max(0, _playerHP - 1);
+            OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+            Debug.Log("[BattleSystem] 3배 크리티컬의 대가로 HP 1을 소모");
+            if (_playerHP <= 0)
+            {
+                OnPlayerDied?.Invoke();
+                OnPlayerDefeated();
+                return;
+            }
+        }
 
         // 근거리 실패시 데미지 0
         if (!_isMelee)
@@ -287,25 +323,40 @@ public class BattleSystem
     }
 
     // 데미지 결과 계산
-    public DamageResult CalculateDamage(int baseDamage, float critChance)
+    public DamageResult CalculateDamage(int baseDamage)
     {
-        bool isCritical = UnityEngine.Random.value < critChance;
+        Critical isCritical = Critical.None;
 
         // 특수효과 플래그 처리(확정 치명타)
         if (_isCritical) 
         {
-            isCritical = true;
+            isCritical = Critical.Critical_2;
             _isCritical = false;
+        }
+        else if (_is3Critical)
+        {
+            isCritical = Critical.Critical_3;
+            _is3Critical = false;
         }
         else
         {
             //이거 없으면 크리터짐
-            isCritical = false;
+            isCritical = Critical.None;
+        }
+        int finalDamage = 0;
+        if (isCritical == Critical.Critical_2)
+        {
+            finalDamage = baseDamage * 2;
+        } 
+        else if (isCritical == Critical.Critical_3)
+        {
+            finalDamage = baseDamage * 3;
+        }
+        else
+        {
+            finalDamage = baseDamage;
         }
 
-            int finalDamage = isCritical
-                    ? baseDamage * 2
-                    : baseDamage;
 
         finalDamage = _isDamageUp
                 ? finalDamage + 5
@@ -385,12 +436,18 @@ public class BattleSystem
     private void DamageEnemy(int amount)
     {
         _enemyHP = Mathf.Max(0, _enemyHP - amount);
+        _roundTotalDamage += amount;
+        if (_roundTotalDamage >= 50)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_12_0");
+        }
         Debug.Log($"[BattleSystem] 적에게 {amount} 데미지! 남은 HP: {_enemyHP}");
 
         TimelineManager.Instance.QuestOptionState.IncreaseCount();
         OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
         if (_enemyHP <= 0)
         {
+            CheckBattleAchievements();
             Debug.Log("적 처치 완료");
             OnChangeEnemyAnim?.Invoke("Die");
             OnEnemyDefeated(); 
@@ -406,6 +463,11 @@ public class BattleSystem
         if (_isGuarding)
         {
             return;
+        }
+        if (GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        {
+            _isPlayerStunned = true;
+            Debug.Log("<color=purple>[BattleSystem] 하드 모드 피격: 다음 틱 기절 예약!</color>");
         }
         if (_isBowCharging)
         {
@@ -518,6 +580,11 @@ public class BattleSystem
         {
             Debug.Log($"[BattleSystem] 이동 결과: {_playerCurrentSector} -> {currentSector}");
             _playerCurrentSector = currentSector;
+            _rountTotalMove++;
+            if (_rountTotalMove >= 5)
+            {
+                SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_11_0");
+            }
             OnPlayerMoved?.Invoke(_playerCurrentSector, moveDirection, false);
         }
     }
@@ -811,6 +878,19 @@ public class BattleSystem
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
     }
 
+    private void HealBoth()
+    {
+        _playerHP = Mathf.Min(_playerMaxHP, _playerHP + 1);
+        OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+
+        int enemyHeal = Mathf.FloorToInt(_enemyMaxHP * 0.1f);
+
+        _enemyHP = Mathf.Min(_enemyMaxHP, _enemyHP + enemyHeal);
+        OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
+
+        Debug.Log($"[BattleSystem] HealAll 플레이어: +1 / 적: +{enemyHeal}");
+    }
+
 
     private void OnEnemyDefeated()
     {
@@ -846,6 +926,9 @@ public class BattleSystem
     public void OnRoundEnded()
     {
         _battleTurnCount++;
+        _roundTotalDamage = 0;
+        _rountTotalMove = 0;
+        ClearPlayerStun();
     }
 
     public void SetGuard(bool state)
@@ -859,6 +942,11 @@ public class BattleSystem
         else if (state)
         {
             Debug.Log("<color=blue>[BattleSystem] 플레이어 방어 태세!</color>");
+            _videoTotalGuard++;
+            if (_videoTotalGuard >= 10)
+            {
+                SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_13_0");
+            }
         }
 
         _isGuarding = state;
@@ -874,4 +962,24 @@ public class BattleSystem
     {
         //OnChangePlayerAnim?.Invoke("1_Idle");
     }
+
+    public void ClearPlayerStun() => _isPlayerStunned = false;
+
+    #region Achievement Methods
+    private void CheckBattleAchievements()
+    {
+        if (GameManager.Instance == null || TimelineManager.Instance == null) return;
+
+        int currentRound = GameManager.Instance.CurrentRound;
+        int limitRound = GameManager.Instance.CurrentStageData.LimitRound;
+        int currentTick = TimelineManager.Instance.CurrentTick;
+        int totalTicks = TimelineManager.Instance.TotalTicks;
+
+        if (currentRound == limitRound && currentTick == totalTicks)
+        {
+            SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_14_0");
+        } 
+    }
+    #endregion
+
 }

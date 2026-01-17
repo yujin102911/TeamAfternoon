@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,7 +9,9 @@ public enum EffectType
     Critical,
     Duble_Dash,
     Damage_Up,
-    Sturn
+    Sturn,
+    Critical_3,
+    HealAll,
 }
 
 
