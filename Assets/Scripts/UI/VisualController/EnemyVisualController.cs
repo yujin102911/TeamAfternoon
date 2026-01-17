@@ -300,7 +300,7 @@ public class EnemyVisualController : MonoBehaviour
 
 
 
-    public void PlayDamage(int damage, bool is_crit, bool is_sturn)
+    public void PlayDamage(int damage, Critical is_crit, bool is_sturn)
     {
         if(is_sturn)
         {
@@ -328,20 +328,20 @@ public class EnemyVisualController : MonoBehaviour
         ChangeAnim("Attack");
     }
 
-    public IEnumerator ShowEnemyDamage(int damage, bool is_crit)
+    public IEnumerator ShowEnemyDamage(int damage, Critical is_crit)
     {
         SpawnDamageText(damage, is_crit);
 
         yield return new WaitForSeconds(blinkDuration);
     }
 
-    private void SpawnDamageText(int damage, bool is_crit)
+    private void SpawnDamageText(int damage, Critical is_crit)
     {
         if (textPrefab == null) return;
         
         GameObject go = null;
 
-        if (is_crit)
+        if (is_crit == Critical.Critical_2 || is_crit == Critical.Critical_3)
         {
             // 왼쪽일 때는 오프셋 조정
             if (_runtimeEnemy.IsLeft)

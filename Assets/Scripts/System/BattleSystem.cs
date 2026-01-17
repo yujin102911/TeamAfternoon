@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,9 +10,15 @@ using Random = UnityEngine.Random;
 public struct DamageResult
 {
     public int damage;
-    public bool isCritical;
+    public Critical isCritical;
 }
 
+public enum Critical
+{
+    None,
+    Critical_2,
+    Critical_3,
+}
 
 /// <summary>
 /// 전투 로직을 처리하는 System
@@ -53,6 +61,7 @@ public class BattleSystem
     private bool _isDamageUp = false;
     private bool _isSturn = false;
     private bool _isSturnSuccess = false;
+    private bool _is3Critical = false;
 
     //바람 계산 전용
     private WindDirection _actualDirection;
@@ -92,7 +101,7 @@ public class BattleSystem
     public event Action OnEnemyDied; // 적 사망시 발행되는 이벤트
     public event Action OnPlayerDied; // 플레이어 사망 시 발행되는 이벤트
 
-    public event Action<int, bool, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
+    public event Action<int, Critical, bool> OnEnemyHit; // 적이 맞을 때 발행되는 이벤트
     public event Action OnPlayerHit; // 플레이어가 맞을 때 발행되는 이벤트
     public event Action OnPlayerAttackSuccess; // 성공적으로 때렸을 때 발행되는 이벤트
     public event Action<int, MoveDirection, bool> OnPlayerMoved; // 플레이어가 움직였을 때 발행되는 이벤트
@@ -162,6 +171,7 @@ public class BattleSystem
         _isCritical = false;
         _isDubleDash = false;
         _isDamageUp = false;
+        _is3Critical = false;
 
         // 스턴 관련
         _isSturn = false;
@@ -182,6 +192,12 @@ public class BattleSystem
                 break;
             case EffectType.Sturn:
                 _isSturn = true;
+                break;
+            case EffectType.Critical_3:
+                _is3Critical = true;
+                break;
+            case EffectType.HealAll:
+                HealBoth();
                 break;
             case EffectType.None:
                 break;
@@ -259,16 +275,23 @@ public class BattleSystem
     /// </summary>
     public void EnemyTakeDamage()
     {
-        float critChance = _defualtCriticalChance + (_criticMulti * MeleeAttackStack);
 
-        if (critChance > 1)
-        {
-            critChance = 1;
-        }
-
-        DamageResult result = CalculateDamage(_damageBuffer, critChance);
+        DamageResult result = CalculateDamage(_damageBuffer);
 
         int final_dam = result.damage;
+
+        if (result.isCritical == Critical.Critical_3)
+        {
+            _playerHP = Mathf.Max(0, _playerHP - 1);
+            OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+            Debug.Log("[BattleSystem] 3배 크리티컬의 대가로 HP 1을 소모");
+            if (_playerHP <= 0)
+            {
+                OnPlayerDied?.Invoke();
+                OnPlayerDefeated();
+                return;
+            }
+        }
 
         // 근거리 실패시 데미지 0
         if (!_isMelee)
@@ -300,25 +323,40 @@ public class BattleSystem
     }
 
     // 데미지 결과 계산
-    public DamageResult CalculateDamage(int baseDamage, float critChance)
+    public DamageResult CalculateDamage(int baseDamage)
     {
-        bool isCritical = UnityEngine.Random.value < critChance;
+        Critical isCritical = Critical.None;
 
         // 특수효과 플래그 처리(확정 치명타)
         if (_isCritical) 
         {
-            isCritical = true;
+            isCritical = Critical.Critical_2;
             _isCritical = false;
+        }
+        else if (_is3Critical)
+        {
+            isCritical = Critical.Critical_3;
+            _is3Critical = false;
         }
         else
         {
             //이거 없으면 크리터짐
-            isCritical = false;
+            isCritical = Critical.None;
+        }
+        int finalDamage = 0;
+        if (isCritical == Critical.Critical_2)
+        {
+            finalDamage = baseDamage * 2;
+        } 
+        else if (isCritical == Critical.Critical_3)
+        {
+            finalDamage = baseDamage * 3;
+        }
+        else
+        {
+            finalDamage = baseDamage;
         }
 
-            int finalDamage = isCritical
-                    ? baseDamage * 2
-                    : baseDamage;
 
         finalDamage = _isDamageUp
                 ? finalDamage + 5
@@ -838,6 +876,19 @@ public class BattleSystem
         Debug.Log($"[BattleSystem] 플레이어 {amount} 회복! (현재 HP: {_playerHP}/{_playerMaxHP})");
 
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+    }
+
+    private void HealBoth()
+    {
+        _playerHP = Mathf.Min(_playerMaxHP, _playerHP + 1);
+        OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
+
+        int enemyHeal = Mathf.FloorToInt(_enemyMaxHP * 0.1f);
+
+        _enemyHP = Mathf.Min(_enemyMaxHP, _enemyHP + enemyHeal);
+        OnEnemyHPChanged?.Invoke(_enemyHP, _enemyMaxHP);
+
+        Debug.Log($"[BattleSystem] HealAll 플레이어: +1 / 적: +{enemyHeal}");
     }
 
 
