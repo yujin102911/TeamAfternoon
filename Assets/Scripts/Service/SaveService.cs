@@ -17,6 +17,7 @@ public class UserSaveDTO
     public List<int> Read_Board_Stage_IDs;
     public Difficulty Difficulty;
     public int GameOverCount;
+    public string SteamID;
 }
 
 
@@ -109,6 +110,7 @@ public static class SaveService
             Read_Board_Stage_IDs = new List<int>(so.Read_Board_Stage_IDs),
             Difficulty = so.Difficulty,
             GameOverCount = so.GameOverCount,
+            SteamID = so.SteamID,
         };
     }
 
@@ -124,6 +126,7 @@ public static class SaveService
         so.Read_Board_Stage_IDs = dto.Read_Board_Stage_IDs;
         so.Difficulty = dto.Difficulty;
         so.GameOverCount = dto.GameOverCount;
+        so.SteamID = dto.SteamID;
     }
 
     // ============= 검증 함수 ================

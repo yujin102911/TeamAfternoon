@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -69,6 +70,11 @@ public class ServiceLocator : MonoBehaviour
         CurrentUser = Instantiate(template);
 
         CurrentUser.Difficulty = mode;
+        if (SteamManager.Initialized)
+        {
+            CurrentUser.SteamID = SteamUser.GetSteamID().m_SteamID.ToString();
+            Debug.Log($"[ServiceLocator] Steam ID 연결 성공: {CurrentUser.SteamID}");
+        }
     }
 
     public void SetDifficulty(Difficulty mode)

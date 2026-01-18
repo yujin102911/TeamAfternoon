@@ -47,6 +47,9 @@ public class UserGameData : ScriptableObject
     [Header("게임 오버 횟수")]
     public int GameOverCount = 0;
 
+    [Header("스팀 유저 정보")]
+    public string SteamID = "Unknown";
+
     #region Helper Methods
     #region 클립 헬퍼 함수
     public void AddUnlockedBlock(int blockID, List<int> keywordIDs = null)
