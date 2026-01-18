@@ -411,6 +411,8 @@ public class EnemyVisualController : MonoBehaviour
         {
             targetCamera.transform.position = isLeft ? _cameraLeftPos : _cameraRightPos;
         }
+
+        Debug.Log($"<color=red>[EV_controller] 카메라 뒤집기 / isLeft: {isLeft}</color>");
     }
 
     public void RestoreActualSide()

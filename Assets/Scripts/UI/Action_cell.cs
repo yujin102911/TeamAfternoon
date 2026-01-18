@@ -90,6 +90,7 @@ public class Action_cell : MonoBehaviour
     // ---- 색상 상수(한번만 파싱) ----
     private static readonly Color MeleeColor = Hex("#FFA7A3");
     private static readonly Color BowColor = Hex("#FFEF64");
+    private static readonly Color ForceColor = Hex("#00e48b");
 
     private static Color Hex(string hex)
     {
@@ -105,8 +106,8 @@ public class Action_cell : MonoBehaviour
 
     private void ApplyActionColor(ActionType action)
     {
-        if (IsMelee(action)) _damageText.color = MeleeColor;
-        else if (IsBow(action)) _damageText.color = BowColor;
+        if (IsMelee(action)) _damageText.color = Color.white;
+        else if (IsBow(action)) _damageText.color = Color.white;
     }
 
     private void ApplyAdditionalEffect(ref int finalDam, Additional_Effect effect, ActionType action)

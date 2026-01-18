@@ -726,6 +726,7 @@ public class TimelineUI : MonoBehaviour
             bool includeEnemyAction = (tick % 2 == 0);
 
             var simState = TimelineManager.Instance.SimulateStateAtTick(new_tick, includeEnemyAction);
+            Debug.Log($"<color=green>틱 번호</color>{new_tick}");
 
             int predictedSector = simState.sector;
             bool simIsLeft = simState.isEnemyLeft;
