@@ -37,6 +37,15 @@ public class BuildInfoToggle : MonoBehaviour
             if (panel != null)
                 panel.SetActive(!panel.activeSelf);
         }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            ServiceLocator.Instance.SetGameClear();
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            ServiceLocator.Instance.SetGameInit();
+        }
+
     }
 
     string GetBuildInfo()

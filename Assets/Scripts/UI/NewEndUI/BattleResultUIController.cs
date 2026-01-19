@@ -40,9 +40,11 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private float _waitInBlack = 0.5f;
 
     [Header("씬 설정")]
-    [SerializeField] private string _mainSceneName = "MainScene";
+    [SerializeField] private string _easyMainSceneName = "MainScene";
+    [SerializeField] private string _hardMainSceneName = "hardMainScene";
     [SerializeField] private string _battleSceneName = "BattleScene";
-    [SerializeField] private string _endSceneName = "EndScene";
+    [SerializeField] private string _easyEndSceneName = "EasyOutro";
+    [SerializeField] private string _hardEndSceneName = "HardOutro";
 
     private void Awake()
     {
@@ -58,10 +60,6 @@ public class BattleResultUIController : MonoBehaviour
         {
             _roundOverDefeatHomeButton.onClick.AddListener(GoToTitle);
         }
-        //if (_retryButton != null)
-        //{
-        //    _retryButton.onClick.AddListener(RetryStage);
-        //}
     }
     private void Start()
     {
@@ -115,11 +113,8 @@ public class BattleResultUIController : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             int stageNum = GameManager.Instance.CurrentStageData.StageNumber;
-            //string stageName = GameManager.Instance.CurrentStageData.StageName;
             if (_victoryStageText != null)
                 _victoryStageText.text = $"[ Clear_Run_Stage_{stageNum:D2}.mp4 ]";
-            //if (_defeatStageText != null)
-            //    _defeatStageText.text = $"[ Fail_Run_Stage_{stageNum:D2}.mp4 ]";
         }
     }
     private void ShowResultPanel(EndCondition victory)
@@ -142,7 +137,14 @@ public class BattleResultUIController : MonoBehaviour
         GameManager.SelectedStageID = 0;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
-            ServiceLocator.Instance.Scene.Load(_mainSceneName);
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                ServiceLocator.Instance.Scene.Load(_easyMainSceneName);
+            }
+            else if(ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                ServiceLocator.Instance.Scene.Load(_hardMainSceneName);
+            }
         }
     }
 
@@ -170,13 +172,29 @@ public class BattleResultUIController : MonoBehaviour
         int currentDay = 0;
         int nextDay = 1;
         int totalStages = 0;
-        string targetSceneName = _mainSceneName;
-        
+        string targetSceneName = "";
+
+        if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+        {
+            targetSceneName = _easyMainSceneName;
+        }
+        else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+        {
+            targetSceneName = _hardMainSceneName;
+        }
+
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             currentDay = GameManager.Instance.CurrentStageData.StageNumber;
             nextDay = currentDay + 1;
-            _dayCountText.text = $"Day {currentDay:D2}";
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _dayCountText.text = $"Day {currentDay:D2}";
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                _dayCountText.text = $"Week {currentDay:D2}";
+            }
         }
         if (ServiceLocator.Instance.CurrentRepository != null)
         {
@@ -184,8 +202,15 @@ public class BattleResultUIController : MonoBehaviour
         }
         if (currentDay >= totalStages)
         {
-            targetSceneName = _endSceneName;
-            Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                targetSceneName = _easyEndSceneName;
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                targetSceneName = _hardEndSceneName;
+            }
+                Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
         }
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
@@ -211,11 +236,30 @@ public class BattleResultUIController : MonoBehaviour
             e += Time.deltaTime;
             int displayDay = (int)Mathf.Lerp(currentDay, nextDay, e/_countUpDuration);
             if (_dayCountText != null)
-                _dayCountText.text = $"Day {displayDay:D2}";
+            {
+                if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+                {
+                    _dayCountText.text = $"Day {displayDay:D2}";
+                }
+                else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+                {
+                    _dayCountText.text = $"Week {displayDay:D2}";
+                }
+            }
 
             yield return null;
         }
-        if (_dayCountText != null) _dayCountText.text = $"Day {nextDay:D2}";
+        if (_dayCountText != null)
+        {
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _dayCountText.text = $"Day {nextDay:D2}";
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                _dayCountText.text = $"Week {nextDay:D2}";
+            }
+        }
         
         yield return new WaitForSeconds(_waitInBlack);
         while (asyncLoad != null && asyncLoad.progress < 0.9f)
@@ -243,7 +287,11 @@ public class BattleResultUIController : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             int stageNum = GameManager.Instance.CurrentStageData.StageNumber;
-            string achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
+            string achievementKey = "";
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
+            }
 
             SteamAchievementManager.Unlock(achievementKey);
         } 

@@ -29,6 +29,10 @@ public class OutroManager : MonoBehaviour
 {
     [Header("종료 버튼")]
     public Button quitButton;
+    public Button goToTitle;
+
+    [Header("씬 설정")]
+    public string titleScene = "TitleScene";
 
     [Header("Localization")]
     [SerializeField] private LocalizedString _dialogueLocalizedString;
@@ -74,7 +78,9 @@ public class OutroManager : MonoBehaviour
         // 시작할 때 크레딧 관련 패널들은 다 꺼두기
         if (endingCreditPanel != null) endingCreditPanel.SetActive(false);
         if (endGamePanel != null) endGamePanel.SetActive(false);
-        quitButton.onClick.AddListener(QuitGame);
+
+        if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+        if (goToTitle != null) goToTitle.onClick.AddListener(GoToTitle);
 
         NextStep();
     }
@@ -185,6 +191,7 @@ public class OutroManager : MonoBehaviour
     {
         CheckEndingAchievement();
         CheckDeathAchievement();
+        SetGameClear();
 
         if (endingCreditPanel != null)
         {
@@ -295,6 +302,19 @@ public class OutroManager : MonoBehaviour
 #else
     Application.Quit();
 #endif
+    }
+
+    private void GoToTitle()
+    {
+        ServiceLocator.Instance.Scene.Load(titleScene);
+    }
+
+    private void SetGameClear()
+    {
+        Debug.Log("[OutroManager] 게임 클리어 처리");
+        ServiceLocator.Instance.GlobalData.IsGameCleared = true;
+        GlobalSaveService.Save(ServiceLocator.Instance.GlobalData);
+        SaveService.DeleteSave();
     }
 
     #region Achievement Methods

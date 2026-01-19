@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class StageButton : MonoBehaviour
@@ -17,6 +18,20 @@ public class StageButton : MonoBehaviour
     private MailContent _mailData;
     private int _mailIndex;
     private System.Action<StageData, int, MailContent> _onSelect;
+
+    private void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+    }
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    private void OnLocaleChanged(UnityEngine.Localization.Locale locale)
+    {
+        UpdateVisual();
+    }
 
     public void Setup(StageData stage, int mailIndex, MailContent mail, System.Action<StageData, int, MailContent> onSelect)
     {
