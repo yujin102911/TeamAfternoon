@@ -628,6 +628,7 @@ public class TimelineManager : MonoBehaviour
     public void OnRoundEnded()
     {
         OnMarkActiveChanged?.Invoke(false);
+        _mapVisualController.Stop_WindEffect();
 
         // 방향 전환할 블록들 보관하는 리스트
         List<RuntimeBlock> blocksToReset = new List<RuntimeBlock>();
