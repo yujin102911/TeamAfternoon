@@ -70,16 +70,20 @@ public class ServiceLocator : MonoBehaviour
         CurrentUser = Instantiate(template);
 
         CurrentUser.Difficulty = mode;
-        if (SteamManager.Initialized)
-        {
-            CurrentUser.SteamID = SteamUser.GetSteamID().m_SteamID.ToString();
-            Debug.Log($"[ServiceLocator] Steam ID 연결 성공: {CurrentUser.SteamID}");
-        }
     }
 
     public void SetDifficulty(Difficulty mode)
     {
-        CurrentRepository = (mode == Difficulty.Easy) ? easyRepository : hardRepository;
+        if (mode == Difficulty.Easy)
+        {
+            CurrentRepository = easyRepository;
+            Debug.Log("이지 선택됨");
+        }
+        else
+        {
+            CurrentRepository = hardRepository;
+            Debug.Log("하드 선택됨");
+        }
     }
     
     /// <summary>

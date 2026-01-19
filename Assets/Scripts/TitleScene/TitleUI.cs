@@ -174,13 +174,6 @@ public class TitleUI : MonoBehaviour
     {
         string selectedText = _difficultyDropdown.options[_difficultyDropdown.value].text;
 
-        Difficulty selectedMode = Difficulty.Easy;
-        if (selectedText == "Hard")
-        {
-            selectedMode = Difficulty.Hard;
-        }
-
-        ServiceLocator.Instance.SetDifficulty(selectedMode);
         // 이미 데이터가 존재하면 경고 팝업 출력
         if (SaveService.CanContinue())
         {

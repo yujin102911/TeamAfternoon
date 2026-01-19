@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (dataRepository == null)
+        if (ServiceLocator.Instance != null)
         {
             dataRepository = ServiceLocator.Instance.CurrentRepository;
         }

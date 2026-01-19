@@ -14,10 +14,9 @@ public class UserSaveDTO
     public bool Is_Tutorial_Cleared;
     public List<int> Cleared_Stage_IDs;
     public List<string> Read_Mail_Keys;
-    public List<int> Read_Board_Stage_IDs;
+    public List<string> Read_Board_Keys;
     public Difficulty Difficulty;
     public int GameOverCount;
-    public string SteamID;
 }
 
 
@@ -82,16 +81,25 @@ public static class SaveService
     // Delete Save
     public static void DeleteSave()
     {
-        // 로컬 삭제
-        if (File.Exists(SavePath)) File.Delete(SavePath);
-
-        // steam 삭제
-        if (IsSteamAvailable && SteamRemoteStorage.FileExists(FILE_NAME))
+        UserSaveDTO emptyDto = new UserSaveDTO()
         {
-            SteamRemoteStorage.FileForget(FILE_NAME);
+            Unlocked_Blocks = new List<Saved_BlockData>(),
+            Deck_Block_IDs = new List<int>(),
+            Cleared_Stage_IDs = new List<int>(),
+            Is_Tutorial_Cleared = false,
+            GameOverCount = 0
+        };
+        string json = JsonUtility.ToJson(emptyDto, true);
+
+        File.WriteAllText(SavePath, json);
+        // steam 삭제
+        if (IsSteamAvailable)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            SteamRemoteStorage.FileWrite(FILE_NAME, bytes, bytes.Length);
         }
 
-        Debug.Log("[SaveService] 저장 파일 삭제 완료");
+        Debug.Log("[SaveService] 세이브 데이터가 초기화(덮어쓰기)되었습니다.");
     }
 
     // ======================= 변환 함수 =======================
@@ -107,10 +115,9 @@ public static class SaveService
             Is_Tutorial_Cleared = so.Is_Tutorial_Cleared,
             Cleared_Stage_IDs = so.Cleared_Stage_IDs,
             Read_Mail_Keys = so.Read_Mail_Keys,
-            Read_Board_Stage_IDs = new List<int>(so.Read_Board_Stage_IDs),
+            Read_Board_Keys = new List<string>(so.Read_Board_Keys),
             Difficulty = so.Difficulty,
             GameOverCount = so.GameOverCount,
-            SteamID = so.SteamID,
         };
     }
 
@@ -123,10 +130,9 @@ public static class SaveService
         so.Is_Tutorial_Cleared = dto.Is_Tutorial_Cleared;
         so.Cleared_Stage_IDs = dto.Cleared_Stage_IDs;
         so.Read_Mail_Keys = dto.Read_Mail_Keys;
-        so.Read_Board_Stage_IDs = dto.Read_Board_Stage_IDs;
+        so.Read_Board_Keys = dto.Read_Board_Keys;
         so.Difficulty = dto.Difficulty;
         so.GameOverCount = dto.GameOverCount;
-        so.SteamID = dto.SteamID;
     }
 
     // ============= 검증 함수 ================
