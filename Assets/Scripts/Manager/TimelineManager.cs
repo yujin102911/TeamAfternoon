@@ -577,10 +577,11 @@ public class TimelineManager : MonoBehaviour
                 {
                     _battleSystem.ProcessEnemyStone(stone.count);
                 }
+                bool currentActualIsLeft = (_battleSystem.Enemies.Count > 0) ? _battleSystem.Enemies[0].IsLeft : false;
                 EnemyWind wind = _currentEnemyPattern?.GetWindAt(tick);
                 if (wind != null)
                 {
-                    WindDirection actualDirection = wind.GetDynamicDirection(_currentEnemyPattern.Get_Is_left());
+                    WindDirection actualDirection = wind.GetDynamicDirection(currentActualIsLeft);
                     _battleSystem.ProcessEnemyWind(actualDirection);
                 }
                 EnemyDash dash = _currentEnemyPattern?.GetDashAt(tick);
