@@ -40,7 +40,8 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private float _waitInBlack = 0.5f;
 
     [Header("씬 설정")]
-    [SerializeField] private string _mainSceneName = "MainScene";
+    [SerializeField] private string _easyMainSceneName = "MainScene";
+    [SerializeField] private string _hardMainSceneName = "hardMainScene";
     [SerializeField] private string _battleSceneName = "BattleScene";
     [SerializeField] private string _easyEndSceneName = "EasyOutro";
     [SerializeField] private string _hardEndSceneName = "HardOutro";
@@ -136,7 +137,14 @@ public class BattleResultUIController : MonoBehaviour
         GameManager.SelectedStageID = 0;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
-            ServiceLocator.Instance.Scene.Load(_mainSceneName);
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                ServiceLocator.Instance.Scene.Load(_easyMainSceneName);
+            }
+            else if(ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                ServiceLocator.Instance.Scene.Load(_hardMainSceneName);
+            }
         }
     }
 
@@ -164,8 +172,17 @@ public class BattleResultUIController : MonoBehaviour
         int currentDay = 0;
         int nextDay = 1;
         int totalStages = 0;
-        string targetSceneName = _mainSceneName;
-        
+        string targetSceneName = "";
+
+        if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+        {
+            targetSceneName = _easyMainSceneName;
+        }
+        else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+        {
+            targetSceneName = _hardMainSceneName;
+        }
+
         if (GameManager.Instance != null && GameManager.Instance.CurrentStageData != null)
         {
             currentDay = GameManager.Instance.CurrentStageData.StageNumber;

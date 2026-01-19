@@ -66,11 +66,11 @@ public class IntroPanel : MonoBehaviour
             {
                 if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
                 {
-                    _dayCountText.text = $"Day {_startDay:D2}";
+                    _dayCountText.text = $"Day {displayDay:D2}";
                 }
                 else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
                 {
-                    _dayCountText.text = $"Week {_startDay:D2}";
+                    _dayCountText.text = $"Week {displayDay:D2}";
                 }
             }
 
@@ -80,11 +80,11 @@ public class IntroPanel : MonoBehaviour
         {
             if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
             {
-                _dayCountText.text = $"Day {_startDay:D2}";
+                _dayCountText.text = $"Day {_endDay:D2}";
             }
             else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
             {
-                _dayCountText.text = $"Week {_startDay:D2}";
+                _dayCountText.text = $"Week {_endDay:D2}";
             }
         }
 
