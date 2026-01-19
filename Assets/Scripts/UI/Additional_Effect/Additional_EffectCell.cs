@@ -38,6 +38,20 @@ public class Additional_EffectCell : MonoBehaviour
     [SerializeField]
     private Sprite _sturnIcon;
 
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Back;
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Icon;
+
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllBack;
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllIcon;
+
     public void Update_CellVisual(Additional_Effect additional_Effect)
     {
         switch (additional_Effect.effectType)
@@ -60,6 +74,14 @@ public class Additional_EffectCell : MonoBehaviour
             case EffectType.Sturn:
                 _back.sprite = _sturnBack;
                 _icon.sprite = _sturnIcon;
+                break;
+            case EffectType.Critical_3:
+                _back.sprite = _Critical_3Back;
+                _icon.sprite = _Critical_3Icon;
+                break;
+            case EffectType.HealAll:
+                _back.sprite = _HealAllBack;
+                _icon.sprite = _HealAllIcon;
                 break;
         }
     }
