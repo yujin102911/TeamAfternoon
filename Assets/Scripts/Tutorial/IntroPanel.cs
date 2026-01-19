@@ -24,9 +24,18 @@ public class IntroPanel : MonoBehaviour
         if (_introPanel != null)
             _introCanvasGroup = _introPanel.GetComponent<CanvasGroup>();
         if (_introCanvasGroup != null) _introCanvasGroup.alpha = 0f;
-        if (_dayCountText != null) _dayCountText.text = $"Day {_startDay:D2}";
+        if (_dayCountText != null)
+        {
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _dayCountText.text = $"Day {_startDay:D2}";
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                _dayCountText.text = $"Week {_startDay:D2}";
+            }
+        }
     }
-
     public void StartDayChange(int startDay, int endDay)
     {
         _startDay = startDay;
@@ -54,12 +63,30 @@ public class IntroPanel : MonoBehaviour
             int displayDay = (int)Mathf.Lerp(_startDay, _endDay, elapsed / _countUpDuration);
 
             if (_dayCountText != null)
-                _dayCountText.text = $"Day {displayDay:D2}";
+            {
+                if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+                {
+                    _dayCountText.text = $"Day {_startDay:D2}";
+                }
+                else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+                {
+                    _dayCountText.text = $"Week {_startDay:D2}";
+                }
+            }
 
             yield return null;
         }
         if (_dayCountText != null)
-            _dayCountText.text = $"Day {_endDay:D2}";
+        {
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _dayCountText.text = $"Day {_startDay:D2}";
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                _dayCountText.text = $"Week {_startDay:D2}";
+            }
+        }
 
         yield return new WaitForSeconds(_stayDuration);
 

@@ -15,7 +15,7 @@ public class ServiceLocator : MonoBehaviour
     public DataRepository CurrentRepository { get; private set; }
     public GlobalSaveDTO GlobalData { get; private set; }
 
-
+    public System.Action OnGlobalDataChanged;
 
     [Header("난이도별 DB")]
     [SerializeField] private DataRepository easyRepository;
@@ -111,9 +111,8 @@ public class ServiceLocator : MonoBehaviour
         else
         {
             CurrentRepository = hardRepository;
-            Debug.Log("하드 레포 로잉");
         }
-            return true;
+        return true;
     }
 
     #region Reset Logic
@@ -130,6 +129,8 @@ public class ServiceLocator : MonoBehaviour
         Debug.Log("[ServiceLocator] 게임 클리어 처리");
         GlobalData.IsGameCleared = true;
         GlobalSaveService.Save(GlobalData);
+
+        OnGlobalDataChanged?.Invoke();
     }
 
     [Button("게임 클리어 여부 초기화 버튼", ButtonSizes.Medium)]
@@ -138,6 +139,8 @@ public class ServiceLocator : MonoBehaviour
         Debug.Log("[ServiceLocator] 게임 클리어 여부 초기화");
         GlobalData.IsGameCleared = false;
         GlobalSaveService.Save(GlobalData);
+
+        OnGlobalDataChanged?.Invoke();
     }
     #endregion
 

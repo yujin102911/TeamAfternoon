@@ -27,9 +27,21 @@ public class DifficultyDropdown : MonoBehaviour
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
     }
 
+    public void Start()
+    {
+        if (ServiceLocator.Instance != null)
+        {
+            ServiceLocator.Instance.OnGlobalDataChanged += BuildOptions;
+        }
+    }
+
     void OnDestroy()
     {
         LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+        if (ServiceLocator.Instance != null)
+        {
+            ServiceLocator.Instance.OnGlobalDataChanged -= BuildOptions;
+        }
     }
 
     void OnLocaleChanged(Locale _)

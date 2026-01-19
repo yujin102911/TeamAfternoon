@@ -37,8 +37,12 @@ public class TitleUI : MonoBehaviour
     [SerializeField] private Button _confirmNoButton;
 
     [Header("씬 설정")]
-    [SerializeField] private string _withoutTutorialScene = "DesktopScene";
-    [SerializeField] private string _tutorialScene = "TutorialScene";
+    [SerializeField] private string _easyContinueScene = "EasyScene";
+    [SerializeField] private string _hardContinueScene = "HardScene";
+    [SerializeField] private string _easyIntroScene = "EasyIntroScene";
+    [SerializeField] private string _hardIntroScene = "HardIntroScene";
+    [SerializeField] private string _easyEndScene = "EasyOutroScene";
+    [SerializeField] private string _hardEndScene = "HardOutroScene";
 
 
     private void Awake()
@@ -113,7 +117,42 @@ public class TitleUI : MonoBehaviour
         Debug.Log("[TitleUI] 기존 데이터를 불러와 게임을 이어갑니다.");
         if (ServiceLocator.Instance.LoadGame())
         {
-            ServiceLocator.Instance.Scene.Load(_withoutTutorialScene);
+            UserGameData user = ServiceLocator.Instance.CurrentUser;
+            DataRepository repo = ServiceLocator.Instance.CurrentRepository;
+
+            int totalStages = 0;
+            if (repo != null && repo.stageDatas != null)
+            {
+                totalStages = repo.stageDatas.Count;
+            }
+            int nextStageNum = 1;
+            if (user.Cleared_Stage_IDs != null && user.Cleared_Stage_IDs.Count > 0)
+            {
+                nextStageNum = user.Cleared_Stage_IDs.Max() + 1;
+            }
+
+            if (nextStageNum > totalStages && totalStages > 0)
+            {
+                Debug.Log("[TitleUI] 모든 스테이지를 클리어한 상태입니다. 엔딩 씬으로 이동합니다.");
+                if (user.Difficulty == Difficulty.Easy)
+                {
+                    ServiceLocator.Instance.Scene.Load(_easyEndScene);
+                }
+                else
+                {
+                    ServiceLocator.Instance.Scene.Load(_hardEndScene);
+                }
+                return;
+            }
+
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                ServiceLocator.Instance.Scene.Load(_easyContinueScene);
+            }
+            else
+            {
+                ServiceLocator.Instance.Scene.Load(_hardContinueScene);
+            }
         }
     }
 
@@ -165,7 +204,16 @@ public class TitleUI : MonoBehaviour
 
         //ServiceLocator.Instance.CreateNewGame(selectedMode);
         ServiceLocator.Instance.ResetDataToDefault(selectedMode);
-        ServiceLocator.Instance.Scene.Load(_tutorialScene);
+
+        if (selectedMode == Difficulty.Hard)
+        {
+            ServiceLocator.Instance.Scene.Load(_hardIntroScene);
+        }
+        else
+        {
+            ServiceLocator.Instance.Scene.Load(_easyIntroScene);
+        }
+
     }
 
     #endregion
