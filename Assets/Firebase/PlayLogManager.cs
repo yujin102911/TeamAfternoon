@@ -6,7 +6,23 @@ using Sirenix.OdinInspector;
 
 public class PlayLogManager : MonoBehaviour
 {
+    public static PlayLogManager Instance;
+
     FirebaseFirestore db;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void Start()
     {
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
@@ -47,6 +63,7 @@ public class PlayLogManager : MonoBehaviour
             if (task.IsCompleted) Debug.Log($"[Firestore] 스테이지 {stageId} 로그 전송 완료!");
         });
     }
+
 
 
 }

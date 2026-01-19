@@ -12,8 +12,10 @@ public class FirebaseInitializer : MonoBehaviour
             if (dependencyStatus == DependencyStatus.Available)
             {
                 Debug.Log("Firebase Analytics is ready!");
+                FirebaseAnalytics.SetUserProperty(
+                FirebaseAnalytics.UserPropertyAllowAdPersonalizationSignals, "false");
                 FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-
+                FirebaseAnalytics.SetSessionTimeoutDuration(new System.TimeSpan(0, 30, 0));
                 LogTestEvent();
             }
             else
