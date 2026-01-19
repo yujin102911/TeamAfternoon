@@ -74,6 +74,9 @@ public class GameManager : MonoBehaviour
 
     // 배경 전환 저장용
     private Sprite _bgSprite;
+
+    // 로그 수집용 변수
+    private float _stageStartTime;
     #endregion
 
     #region Properties
@@ -125,7 +128,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (dataRepository == null)
+        if (ServiceLocator.Instance != null)
         {
             dataRepository = ServiceLocator.Instance.CurrentRepository;
         }
@@ -473,6 +476,9 @@ public class GameManager : MonoBehaviour
 
         //TODO:추후에 8 자리에 최대 턴수 기입
         OnMemoryUpdate?.Invoke(_currentRound, _limitRound);
+
+        _stageStartTime = Time.time;
+        Debug.Log("[GameManager] 스테이지 타이머 시작");
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -728,11 +734,24 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
- 
-            // 현재 돌아가고 있는 모든 코루틴 종료
-         StopAllCoroutines();
+        // 현재 돌아가고 있는 모든 코루틴 종료
+        StopAllCoroutines();
 
-         ServiceLocator.Instance.SaveNowUserData();
+        float stageDuration = Time.time - _stageStartTime; // 스테이지 소요 시간
+        float totalSessionTime = Time.realtimeSinceStartup; // 게임 켜고 여기까지 시간
+        int stageId = currentStageData.StageNumber;
+        int totalTurns = _currentRound;
+
+        FindAnyObjectByType<PlayLogManager>().SendStageLog(
+            stageId,
+            totalTurns,
+            stageDuration,
+            victory.ToString(),
+            totalSessionTime
+            );
+
+
+        ServiceLocator.Instance.SaveNowUserData();
 
         OnBattleEnded?.Invoke(victory);
     }

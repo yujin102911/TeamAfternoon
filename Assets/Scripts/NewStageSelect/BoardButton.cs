@@ -38,7 +38,14 @@ public class BoardButton : MonoBehaviour
         // 다시 직접 문자열을 조합하여 출력합니다.
         if (_buttonTitleText != null)
         {
-            _buttonTitleText.text = $"Day {stage.StageNumber}";
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _buttonTitleText.text = $"Day {stage.StageNumber}";
+            }
+            else if(ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                _buttonTitleText.text = $"<size=25>Week</size> {stage.StageNumber}";
+            }
         }
 
         Button btn = GetComponent<Button>();

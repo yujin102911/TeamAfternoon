@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ public class ServiceLocator : MonoBehaviour
     public DataRepository CurrentRepository { get; private set; }
     public GlobalSaveDTO GlobalData { get; private set; }
 
-
+    public System.Action OnGlobalDataChanged;
 
     [Header("난이도별 DB")]
     [SerializeField] private DataRepository easyRepository;
@@ -67,11 +68,22 @@ public class ServiceLocator : MonoBehaviour
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
         CurrentUser = Instantiate(template);
+
+        CurrentUser.Difficulty = mode;
     }
 
     public void SetDifficulty(Difficulty mode)
     {
-        CurrentRepository = (mode == Difficulty.Easy) ? easyRepository : hardRepository;
+        if (mode == Difficulty.Easy)
+        {
+            CurrentRepository = easyRepository;
+            Debug.Log("이지 선택됨");
+        }
+        else
+        {
+            CurrentRepository = hardRepository;
+            Debug.Log("하드 선택됨");
+        }
     }
     
     /// <summary>
@@ -104,13 +116,14 @@ public class ServiceLocator : MonoBehaviour
         {
             CurrentRepository = hardRepository;
         }
-            return true;
+        return true;
     }
 
     #region Reset Logic
     public void ResetDataToDefault(Difficulty mode)
     {
         SaveService.DeleteSave();
+        SetDifficulty(mode);
         CreateNewTutorial(mode);
     }
 
@@ -120,6 +133,8 @@ public class ServiceLocator : MonoBehaviour
         Debug.Log("[ServiceLocator] 게임 클리어 처리");
         GlobalData.IsGameCleared = true;
         GlobalSaveService.Save(GlobalData);
+
+        OnGlobalDataChanged?.Invoke();
     }
 
     [Button("게임 클리어 여부 초기화 버튼", ButtonSizes.Medium)]
@@ -128,6 +143,8 @@ public class ServiceLocator : MonoBehaviour
         Debug.Log("[ServiceLocator] 게임 클리어 여부 초기화");
         GlobalData.IsGameCleared = false;
         GlobalSaveService.Save(GlobalData);
+
+        OnGlobalDataChanged?.Invoke();
     }
     #endregion
 

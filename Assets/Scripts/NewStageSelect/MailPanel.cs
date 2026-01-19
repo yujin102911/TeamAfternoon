@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 /// <summary>
@@ -27,6 +28,10 @@ public class MailPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _mailContextText;
     [SerializeField] private ScrollRect _bodyScrollRect;
 
+    private StageData _lastSelectedStage;
+    private int _lastSelectedMailIndex;
+    private MailContent _lastSelectedMail;
+
     private void Awake()
     {
         _closeButton.onClick.AddListener(ClosePanel);
@@ -36,6 +41,22 @@ public class MailPanel : MonoBehaviour
     {
         ClearDisplay();
         GenerateStageList();
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    private void OnLocaleChanged(UnityEngine.Localization.Locale locale)
+    {
+        GenerateStageList();
+
+        if (_lastSelectedMail != null)
+        {
+            DisplayLetterContent(_lastSelectedStage, _lastSelectedMailIndex, _lastSelectedMail);
+        }
     }
 
     private void ClosePanel()
@@ -99,6 +120,10 @@ public class MailPanel : MonoBehaviour
     }
     private void DisplayLetterContent(StageData data, int mailIndex, MailContent mail)
     {
+        _lastSelectedStage = data;
+        _lastSelectedMailIndex = mailIndex;
+        _lastSelectedMail = mail;
+
         ServiceLocator.Instance.CurrentUser.SetMailRead(data.StageNumber, mailIndex);
         OnMailStatusChanged?.Invoke();
 

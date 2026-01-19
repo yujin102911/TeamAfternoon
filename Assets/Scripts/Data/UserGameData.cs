@@ -42,7 +42,7 @@ public class UserGameData : ScriptableObject
     public List<string> Read_Mail_Keys = new List<string>();
 
     [Header("읽은 게시판 정보 (StageID 리스트)")]
-    public List<int> Read_Board_Stage_IDs = new List<int>();
+    public List<string> Read_Board_Keys = new List<string>();
 
     [Header("게임 오버 횟수")]
     public int GameOverCount = 0;
@@ -88,26 +88,31 @@ public class UserGameData : ScriptableObject
     /// 메일 읽음 여부 확인하는 헬퍼 함수
     /// </summary>
     public bool IsMailRead(int stageID, int mailIndex)
-        => Read_Mail_Keys.Contains($"{stageID}_{mailIndex}");
+        => Read_Mail_Keys.Contains($"{(int)Difficulty}_{stageID}_{mailIndex}");
 
     /// <summary>
     /// 메일 읽음 처리하는 함수
     /// </summary>
     public void SetMailRead(int stageID, int mailIndex)
     {
-        string key = $"{stageID}_{mailIndex}";
+        string key = $"{(int)Difficulty}_{stageID}_{mailIndex}";
         if (!Read_Mail_Keys.Contains (key))
             Read_Mail_Keys .Add (key);
     }
     #endregion
 
     #region 보드 헬퍼 함수
-    public bool IsBoardRead(int stageID) => Read_Board_Stage_IDs .Contains (stageID);
+    public bool IsBoardRead(int stageID)
+    {
+        string key = $"{(int)Difficulty}_{stageID}";
+        return Read_Board_Keys.Contains(key);
+    }
 
     public void SetBoardRead(int stageID)
     {
-        if (!Read_Board_Stage_IDs.Contains(stageID))
-            Read_Board_Stage_IDs.Add(stageID);
+        string key = $"{(int)Difficulty}_{stageID}";
+        if (!Read_Board_Keys.Contains(key))
+            Read_Board_Keys.Add(key);
     }
     #endregion
 
