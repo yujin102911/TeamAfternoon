@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ public class Effect_TooltipPanel : MonoBehaviour
     [Header("호버 설정")]
     [SerializeField] private GameObject root;
     [SerializeField] private RectTransform panelRt;   // root의 RectTransform
+    [SerializeField] private RectTransform cell_Rt;   // cell_root의 RectTransform
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f); // 마우스 기준 오른쪽 위
 
     [Header("번역 텍스트")]
@@ -58,6 +60,20 @@ public class Effect_TooltipPanel : MonoBehaviour
     [SerializeField]
     private Sprite _sturnIcon;
 
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Back;
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Icon;
+
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllBack;
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllIcon;
+
     private void OnEnable()
     {
         _nameText.StringChanged += OnNameChanged;
@@ -90,8 +106,58 @@ public class Effect_TooltipPanel : MonoBehaviour
 
         root.SetActive(true);
 
+        Clear_Cells();
+
+        // 아이콘 설정
+        Set_Icon(effect.effectType);
+
+        Dictionary<ActionType, int> keyValuePairs = new Dictionary<ActionType, int>();
+
+        foreach (var action in effect.Apply_actionTypes)
+        {
+            var key = GetGroupKey(action);
+            if (key == null) continue;
+
+            if (keyValuePairs.ContainsKey(key.Value))
+                keyValuePairs[key.Value]++;
+            else
+                keyValuePairs[key.Value] = 1;
+        }
+
+        //전체일경우(지금은 "가드"를 포함하고있을경우)
+        if (keyValuePairs.TryGetValue(ActionType.Guard, out int count) && count >= 1)
+        {
+            _actionCell[0].Update_CellVisual(ActionType.Guard);
+        }
+        else
+        {
+
+            int index = 0;
+            foreach (var key in keyValuePairs.Keys)
+            {
+                if (keyValuePairs[key] >= 1)
+                {
+                    _actionCell[index].Update_CellVisual(key);
+                    index++;
+                }
+            }
+        }
+
+        // 설명 텍스트 키값으로 출력
+        _nameText.TableEntryReference = effect.effectName;
+
+        _descriptionText.TableEntryReference = effect.effectDescription;
+
+        _nameText.RefreshString();
+        _descriptionText.RefreshString();
+
+
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
         panelRt.pivot = Vector2.zero; // (0,0) = 좌하단
+
+        // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
+        ForceRebuild(cell_Rt);
+        ForceRebuild(panelRt);
 
         RectTransform parentRt = panelRt.parent as RectTransform;
         if (parentRt == null) return;
@@ -109,45 +175,13 @@ public class Effect_TooltipPanel : MonoBehaviour
         panelRt.anchoredPosition = localPos;
 
         // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
-        ClampToParent(panelRt, parentRt);
+        ClampToParent(panelRt, parentRt);     
+    }
 
-
-        Clear_Cells();
-
-        
-
-        // 아이콘 설정
-        Set_Icon(effect.effectType);
-
-        // 설명 텍스트 키값으로 출력
-        _nameText.TableEntryReference = effect.effectName;
-
-        _descriptionText.TableEntryReference = effect.effectDescription;
-
-        Dictionary<ActionType, int> keyValuePairs = new Dictionary<ActionType, int>();
-
-        foreach (var action in effect.Apply_actionTypes)
-        {
-            var key = GetGroupKey(action);
-            if (key == null) continue;
-
-            if (keyValuePairs.ContainsKey(key.Value))
-                keyValuePairs[key.Value]++;
-            else
-                keyValuePairs[key.Value] = 1;
-        }
-
-        int index = 0;
-        foreach (var key in keyValuePairs.Keys)
-        {
-            if (keyValuePairs[key] >= 1)
-            {
-                _actionCell[index].Update_CellVisual(key);
-                index++;
-            }
-        }
-
-        
+    private void ForceRebuild(RectTransform rt)
+    {
+        // rt가 레이아웃 그룹/CSF가 붙은 "루트"라면 이것만으로 충분한 경우가 많음
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
     }
 
     ActionType? GetGroupKey(ActionType type)
@@ -158,6 +192,7 @@ public class Effect_TooltipPanel : MonoBehaviour
             ActionType.Bow_start or ActionType.Bow_single => ActionType.Bow_single,
             ActionType.Move => ActionType.Move,
             ActionType.Jump => ActionType.Jump,
+            ActionType.Guard => ActionType.Guard,
             _ => null
         };
     }
@@ -199,6 +234,14 @@ public class Effect_TooltipPanel : MonoBehaviour
             case EffectType.Sturn:
                 _back.sprite = _sturnBack;
                 _icon.sprite = _sturnIcon;
+                break;
+            case EffectType.Critical_3:
+                _back.sprite = _Critical_3Back;
+                _icon.sprite = _Critical_3Icon;
+                break;
+            case EffectType.HealAll:
+                _back.sprite = _HealAllBack;
+                _icon.sprite = _HealAllIcon;
                 break;
         }
     }

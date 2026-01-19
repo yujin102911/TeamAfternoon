@@ -309,6 +309,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestClearHighlight += () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttackSuccess += _mapVisualController.OnEnemyAttackVisual;
             _battleSystem.OnEnemyAttackSuccess += _enemyVisualController.PlayEnemyAttack;
+            _battleSystem.OnHeal += _mapVisualController.PlayHealEffect;
         }
 
         if (_timelineUI != null && _playerVisualController != null)
@@ -367,6 +368,7 @@ public class GameManager : MonoBehaviour
             _timelineUI.OnRequestClearHighlight -= () => _mapVisualController.OnRequestClearHighlight();
             _battleSystem.OnEnemyAttackSuccess -= _mapVisualController.OnEnemyAttackVisual;
             _battleSystem.OnEnemyAttackSuccess -= _enemyVisualController.PlayEnemyAttack;
+            _battleSystem.OnHeal -= _mapVisualController.PlayHealEffect;
         }
 
         if (_timelineUI != null && _playerVisualController != null)

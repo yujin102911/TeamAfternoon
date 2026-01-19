@@ -11,6 +11,8 @@ public class MapVisualController : MonoBehaviour
     [SerializeField] private UIEffectPool effectPool;
     [SerializeField]
     private GameObject WindEffect;
+    [SerializeField]
+    private HealEffectPlayer _heal;
 
     private MapSystem _mapSystem;
     private BattleSystem _battleSystem;
@@ -164,4 +166,9 @@ public class MapVisualController : MonoBehaviour
         }
     }
 
+    public void PlayHealEffect()
+    {
+        if(_heal != null)
+            _heal.PlayAndFade();
+    }
 }

@@ -33,6 +33,11 @@ public class Mini_Action_cell : MonoBehaviour
     public Sprite Jump_icon;
     [TabGroup("Jump")]
     public string Jump_key;
+
+    [TabGroup("All")]
+    public Sprite All_icon;
+    [TabGroup("All")]
+    public string All_key;
     private void OnEnable()
     {
         _typeTxt.StringChanged += OnTypeChanged;
@@ -68,6 +73,10 @@ public class Mini_Action_cell : MonoBehaviour
             case ActionType.Jump:
                 _icon.sprite = Jump_icon;
                 _typeTxt.TableEntryReference = Jump_key;
+                break;
+            case ActionType.Guard:
+                _icon.sprite = All_icon;
+                _typeTxt.TableEntryReference = All_key;
                 break;
         }
     }

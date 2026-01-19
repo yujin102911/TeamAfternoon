@@ -131,6 +131,21 @@ public class Action_cell : MonoBehaviour
                 ApplyActionColor(action);
                 break;
         }
+
+        if(finalDam>=10 && finalDam < 30)
+        {
+            _damageText.fontSize = 24;
+        }
+        else if (finalDam >= 30 && finalDam < 40)
+        {
+            _damageText.fontSize = 26;
+        }
+        else if (finalDam >= 40)
+        {
+            _damageText.fontSize = 28;
+        }
+
+        _damageText.fontStyle = FontStyles.Bold | FontStyles.Italic;
     }
 
     public void Clear()
@@ -167,6 +182,8 @@ public class Action_cell : MonoBehaviour
         _directionIcon.gameObject.SetActive(true);
         _damageText.text = "";
         _damageText.color = Color.white;
+        _damageText.fontSize = 22;
+        _damageText.fontStyle = FontStyles.Bold;
 
         ChangeAlpha(_backImage, 1.0f);
 

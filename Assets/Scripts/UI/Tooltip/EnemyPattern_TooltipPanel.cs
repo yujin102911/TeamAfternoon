@@ -33,18 +33,17 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
     [SerializeField]
     private LocalizedString _typeText;
 
-    private void OnEnable()
+    private object[] _descArgs = new object[1];
+
+
+    private void Awake()
     {
         _nameText.StringChanged += OnNameChanged;
         _descriptionText.StringChanged += OnDescChanged;
         _typeText.StringChanged += OnTypeChanged;
-
-        _nameText.RefreshString();
-        _descriptionText.RefreshString();
-        _typeText.RefreshString();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         _nameText.StringChanged -= OnNameChanged;
         _descriptionText.StringChanged -= OnDescChanged;
@@ -58,8 +57,10 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
     public void Show(Pattern_Label label, Vector2 screenPos, Camera cam, int stone_num)
     {
         this.gameObject.SetActive(true);
-
         root.SetActive(true);
+
+        // 내용 설정
+        Update_Info(label, stone_num);
 
         // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
         panelRt.pivot = Vector2.zero; // (0,0) = 좌하단
@@ -82,8 +83,7 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
         // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
         ClampToParent(panelRt, parentRt);
 
-        // 내용 설정
-        Update_Info(label, stone_num);
+        
 
     }
 
@@ -133,11 +133,17 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
         // 설명 텍스트 키값으로 출력
         _nameText.TableEntryReference = pattern_Key_Data.Name_key;
 
+        _descArgs[0] = stone_num;
         _descriptionText.TableEntryReference = pattern_Key_Data.Desc_key;
-        _descriptionText.Arguments = new object[]
-        {
-            stone_num
-        };
+        _descriptionText.Arguments = _descArgs;
+
         _typeText.TableEntryReference = pattern_Key_Data.Type_key;
+
+        if(GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+            _typeText.TableEntryReference = pattern_Key_Data.Hard_key;
+
+        _nameText.RefreshString();
+        _descriptionText.RefreshString();
+        _typeText.RefreshString();
     }
 }

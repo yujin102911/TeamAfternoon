@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 public class Action_Tooltip_Panel : MonoBehaviour
 {
@@ -55,6 +56,9 @@ public class Action_Tooltip_Panel : MonoBehaviour
         RectTransform parentRt = panelRt.parent as RectTransform;
         if (parentRt == null) return;
 
+        // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
+        ForceRebuild(panelRt);
+
         Vector2 targetScreenPos = screenPos + offset;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -94,6 +98,14 @@ public class Action_Tooltip_Panel : MonoBehaviour
         {
             _meleeTooltip.show(ActionType.Bow_single, 1);
         }
+    }
+
+    private void ForceRebuild(RectTransform rt)
+    {
+        // rt가 레이아웃 그룹/CSF가 붙은 "루트"라면 이것만으로 충분한 경우가 많음
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+        Canvas.ForceUpdateCanvases();
     }
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)
