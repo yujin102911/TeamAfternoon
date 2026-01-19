@@ -46,12 +46,13 @@ public class PlayLogManager : MonoBehaviour
         docRef.SetAsync(log);
     }
 
-    public void SendStageLog(int stageId, int turns, float stagePlayTime, string status, float totalSessionTime)
+    public void SendStageLog(int stageId, string diff, int turns, float stagePlayTime, string status, float totalSessionTime)
     {
         DocumentReference docRef = db.Collection("StageLogs").Document();
         Dictionary<string, object> log = new Dictionary<string, object>
     {
         { "stage_id", stageId },
+        {"stage_difficulty", diff },
         { "turns_taken", turns },         
         { "stage_play_time", stagePlayTime },
         { "clear_status", status },         
