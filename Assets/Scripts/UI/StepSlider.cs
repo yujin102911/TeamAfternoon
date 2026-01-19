@@ -24,6 +24,12 @@ public class StepSlider : MonoBehaviour
         slider.wholeNumbers = false;
 
         slider.onValueChanged.AddListener(OnSliderChanged);
+        Debug.Log(slider.onValueChanged.GetPersistentEventCount());
+    }
+
+    private void OnEnable()
+    {
+        
     }
 
     void OnSliderChanged(float value)

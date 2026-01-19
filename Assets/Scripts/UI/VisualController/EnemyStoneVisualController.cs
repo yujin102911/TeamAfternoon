@@ -66,7 +66,8 @@ public class EnemyStoneVisualController : MonoBehaviour
         foreach (GameObject stone in _activeStoneObjects.Values)
         {
             if (stone != null)
-                Destroy(stone);
+                stone.GetComponent<Animator>().CrossFade("Stone_breaking",0.2f);
+                //Destroy(stone);
         }
         _activeStoneObjects.Clear();
         Debug.Log("[EnemyStoneVisualController] 모든 돌 모델 제거 완료");

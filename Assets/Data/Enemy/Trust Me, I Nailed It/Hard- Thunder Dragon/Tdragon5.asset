@@ -10,28 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 021e2050029ab3c42aa4571c60d42650, type: 3}
-  m_Name: dragon3
+  m_Name: Tdragon5
   m_EditorClassIdentifier: 
   Pattern_Name: "4\uBC88\uC5D0 \uD55C\uBC88 \uBE612"
   attacks:
   - tick: 2
-    targetSectors: 0100000002000000030000000400000008000000090000000a0000000b000000
+    targetSectors: 01000000020000000300000005000000090000000a0000000b000000
     damage: 1
   - tick: 3
-    targetSectors: 0600000007000000
-    damage: 1
-  - tick: 4
-    targetSectors: 01000000030000000600000008000000090000000b000000
+    targetSectors: 01000000060000000700000009000000
     damage: 1
   - tick: 5
-    targetSectors: 020000000400000005000000070000000a0000000c000000
+    targetSectors: 020000000300000004000000050000000600000007000000080000000a0000000b000000
     damage: 1
   - tick: 7
-    targetSectors: 020000000300000006000000070000000a0000000b000000
+    targetSectors: 01000000040000000600000007000000090000000c000000
     damage: 1
   stones:
   - tick: 8
-    count: 2
-  winds: []
+    count: 3
+  winds:
+  - tick: 6
+    windType: 0
+  - tick: 4
+    windType: 0
   dashes: []
   parryings: []
