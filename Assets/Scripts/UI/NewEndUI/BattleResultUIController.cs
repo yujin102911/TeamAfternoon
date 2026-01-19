@@ -42,7 +42,8 @@ public class BattleResultUIController : MonoBehaviour
     [Header("씬 설정")]
     [SerializeField] private string _mainSceneName = "MainScene";
     [SerializeField] private string _battleSceneName = "BattleScene";
-    [SerializeField] private string _endSceneName = "EndScene";
+    [SerializeField] private string _easyEndSceneName = "EasyOutro";
+    [SerializeField] private string _hardEndSceneName = "HardOutro";
 
     private void Awake()
     {
@@ -184,8 +185,15 @@ public class BattleResultUIController : MonoBehaviour
         }
         if (currentDay >= totalStages)
         {
-            targetSceneName = _endSceneName;
-            Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                targetSceneName = _easyEndSceneName;
+            }
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            {
+                targetSceneName = _hardEndSceneName;
+            }
+                Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
         }
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
