@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Rendering.UI;
+using UnityEngine.UI;
 
 /// <summary>
 /// 게임 전투 흐름 총괄 관리
@@ -38,6 +39,9 @@ public class GameManager : MonoBehaviour
 
     [Header("테스트용 스테이지 데이터")]
     [SerializeField] private StageData currentStageData;
+
+    [Header("UI 알림")]
+    [SerializeField] private SpecialEffectNotification _effectNotification;
     #endregion
 
     #region Private Fields
@@ -51,11 +55,14 @@ public class GameManager : MonoBehaviour
     private int _currentRound = 0;
     private int _currentEnemyIndex = 0;
     private int _memory = 0;
+    private int _limitRound = 0;
 
     // 게임 상태 변수
     private bool _isSectorSelected = false;
     private bool _isExecutingRound = false;
     private bool _isBattleEnded = false;
+    [SerializeField] private bool isDebugging = false;
+    [SerializeField] private GameObject _debugmodeChecking;
 
     // UI 용 변수
     private int _currentPhase = 1; // 기본 1
@@ -95,6 +102,7 @@ public class GameManager : MonoBehaviour
     public bool IsTutorial => isTutorial;
     public bool IsSequencePlaying { get; set; } = false;
     public bool IsRoundInterrupted { get; private set; }
+    public bool IsDebugging => isDebugging;
     #endregion
 
     #region Events
@@ -119,7 +127,7 @@ public class GameManager : MonoBehaviour
         }
         if (dataRepository == null)
         {
-            dataRepository = DataRepository.Instance;
+            dataRepository = ServiceLocator.Instance.CurrentRepository;
         }
         Initialize();
 
@@ -156,6 +164,25 @@ public class GameManager : MonoBehaviour
             ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
             OnBattleEnded?.Invoke(EndCondition.Victory);
         }
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            ToggleDebugging();
+            if (isDebugging == true)
+            {
+                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 진입(무적, 라운드 무제한)");
+            }
+            else
+            {
+                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 해제");
+            }
+
+        }
+        if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.Z))
+        {
+            Debug.Log("[GameManager] Ctrl + Z 입력 감지 - 도전과제 호출");
+            CtrlZAchievement();
+        }
+
     }
     private void OnDestroy()
     {
@@ -175,11 +202,12 @@ public class GameManager : MonoBehaviour
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.CurrentUser != null)
         {
             userGameData = ServiceLocator.Instance.CurrentUser;
-            _playerMaxHP = userGameData.MaxHP;
+            _playerMaxHP = userGameData.MaxHP();
+            ServiceLocator.Instance.SaveNowUserData(); // 전투 시작 전에도 한번 저장
         }
         else if (userGameData != null) // 여기서 Tutorial의 유저데이터로 설정 가능
         {
-            _playerMaxHP = userGameData.MaxHP;
+            _playerMaxHP = userGameData.MaxHP();
         }
         else
         {
@@ -226,7 +254,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"[GameManager] 인스펙터 데이터로 스테이지 배경 오브젝트를 생성했습니다");
             }
         }
-
+        _limitRound = currentStageData.LimitRound;
         
         Debug.Log("[GameManager] 내부 시스템 생성 완료 (Awake)");
     }
@@ -392,6 +420,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetupGame()
     {
+        Time.timeScale = 1.0f;
+
         _currentRound = 0;
         _currentEnemyIndex = 0;
 
@@ -400,7 +430,7 @@ public class GameManager : MonoBehaviour
 
         _currentPhase = 1;
         _phaseTurnCount = 0;
-
+        CheckLimitEffectChange();
         if (_deckSystem == null)
         {
             Debug.LogError("[GameManager] 덱 시스템이 초기화되지 않았습니다");
@@ -440,7 +470,7 @@ public class GameManager : MonoBehaviour
 
 
         //TODO:추후에 8 자리에 최대 턴수 기입
-        OnMemoryUpdate?.Invoke(_currentRound, currentStageData.LimitRound);
+        OnMemoryUpdate?.Invoke(_currentRound, _limitRound);
     }
 
     public void GameStart(List<RuntimeBlock> hand)
@@ -540,7 +570,10 @@ public class GameManager : MonoBehaviour
     {
         IsExecutingRound = true;
         IsRoundInterrupted = false;
-        _currentRound++;
+        if (!isDebugging)
+        {
+            _currentRound++;
+        }
         int final_memory = 0;
 
         foreach (var effect in TimelineManager.Instance.additional_Effects)
@@ -549,9 +582,12 @@ public class GameManager : MonoBehaviour
             final_memory += effect.cost;
         }
 
-        _memory += 8;
+        if (!isDebugging)
+        {
+            _memory += 8;
+        }
 
-        OnMemoryUpdate?.Invoke(_memory, currentStageData.LimitRound);
+        OnMemoryUpdate?.Invoke(_memory, _limitRound);
         Debug.Log($"[GameManager] ==== 라운드 {_currentRound} 시작 ====");
 
         //idle 실행
@@ -608,11 +644,9 @@ public class GameManager : MonoBehaviour
     }
     private void EndRound()
     {
-        
-
-        if (currentStageData != null && _memory >= 8 * currentStageData.LimitRound)
+        if (currentStageData != null && _memory >= 8 * _limitRound)
         {
-            Debug.Log($"[GameManager] 제한 라운드 ({currentStageData.LimitRound}) 도달. 패배");
+            Debug.Log($"[GameManager] 제한 라운드 ({_limitRound}) 도달. 패배");
             EndBattle(EndCondition.RoundOver); // 라운드 초과 실패 함수 호출
             return;
         }
@@ -673,33 +707,56 @@ public class GameManager : MonoBehaviour
                     ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
                 }
             }
-//            if (currentStageData != null)
-//            {
-//                currentStageData.IsCleared = true;
-//                Debug.Log($"[GameManager] 스테이지 '{currentStageData.StageName}'(ID: {currentStageData.StageNumber}) 클리어 처리 완료!");
-
-//                // (선택 사항) 에디터 상에서 변경 사항을 즉시 파일에 저장하고 싶다면 아래 코드 사용
-//                // 빌드 후에는 UserGameData 같은 별도의 저장 시스템을 사용해야 영구 저장됩니다.
-//#if UNITY_EDITOR
-//                UnityEditor.EditorUtility.SetDirty(currentStageData);
-//#endif
-//            }
         }
         else if (victory == EndCondition.Dead)
         {
             Debug.Log("[GameManager] 전투 종료 - 패배 (플레이어 사망)");
+            if (ServiceLocator.Instance.CurrentUser != null)
+            {
+                ServiceLocator.Instance.CurrentUser.AddGameOverCount();
+            }
         }
         else if (victory == EndCondition.RoundOver)
         {
             Debug.Log("[GameManager] 전투 종료 - 패배 (라운드 초과)");
+            {
+                if (ServiceLocator.Instance.CurrentUser != null)
+                {
+                    ServiceLocator.Instance.CurrentUser.AddGameOverCount();
+                }
+            }
         }
  
             // 현재 돌아가고 있는 모든 코루틴 종료
          StopAllCoroutines();
 
-         SaveService.Save(userGameData);
+         ServiceLocator.Instance.SaveNowUserData();
 
         OnBattleEnded?.Invoke(victory);
+    }
+    #endregion
+
+    #region Notification Methods
+    private void CheckLimitEffectChange()
+    {
+        if (currentStageData == null || _effectNotification == null) return;
+
+        bool shouldShow = false;
+        if (currentStageData.StageNumber == 1)
+        {
+            shouldShow = true;
+        }
+        else
+        {
+            StageData prevStage = dataRepository.GetStage(currentStageData.StageNumber - 1);
+            if (prevStage != null)
+            {
+                if (prevStage.LimitEffect != currentStageData.LimitEffect)
+                    shouldShow = true;
+            }
+        }
+        if (shouldShow)
+            _effectNotification.Show();
     }
     #endregion
 
@@ -792,6 +849,29 @@ public class GameManager : MonoBehaviour
         if (_isBattleEnded) return;
         _statPlayerHitCount++;
     }
+    #endregion
+
+    #region Debug Methods
+
+    private void ToggleDebugging()
+    {
+        if (isDebugging == true)
+        {
+            isDebugging = false;
+            _debugmodeChecking.SetActive(false);
+        }
+        else
+        {
+            isDebugging = true;
+            _debugmodeChecking.SetActive(true);
+        }
+    }
+
+    private void CtrlZAchievement()
+    {
+        SteamAchievementManager.Unlock("NEW_ACHIEVEMENT_16_0");
+    }
+
     #endregion
 
 }

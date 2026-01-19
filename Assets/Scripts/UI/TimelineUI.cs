@@ -307,7 +307,7 @@ public class TimelineUI : MonoBehaviour
             if (attack.tick >= 1 && attack.tick <= enemySlots.Count)
             {
 
-                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
+                enemySlots[attack.tick - 1].GetComponent<Enemy_slot>().Show(attack.tick, is_normal, attackColor, attack.damage.ToString(), Special_Pattern.None, attack.targetSectors);
             }
             else
             {
@@ -320,7 +320,7 @@ public class TimelineUI : MonoBehaviour
             if (parrying.tick >= 1 && parrying.tick <= enemySlots.Count)
             {
 
-                enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, parryingColor, "P");
+                enemySlots[parrying.tick - 1].GetComponent<Enemy_slot>().Show(parrying.tick, is_normal, parryingColor, "P");
             }
             else
             {
@@ -333,7 +333,7 @@ public class TimelineUI : MonoBehaviour
             if (stone.tick >= 1 && stone.tick <= enemySlots.Count)
             {
 
-                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(is_normal, attackColor, "", Special_Pattern.Stone, null, is_left);
+                enemySlots[stone.tick - 1].GetComponent<Enemy_slot>().Show(stone.tick, is_normal, attackColor, "", Special_Pattern.Stone, null, is_left);
             }
             else
             {
@@ -347,7 +347,7 @@ public class TimelineUI : MonoBehaviour
             if (wind.tick >= 1 && wind.tick <= enemySlots.Count)
             {
 
-                enemySlots[wind.tick - 1].GetComponent<Enemy_slot>().Show(is_normal,attackColor, "", Special_Pattern.Wind, null, is_left);
+                enemySlots[wind.tick - 1].GetComponent<Enemy_slot>().Show(wind.tick, is_normal, attackColor, "", Special_Pattern.Wind, null, is_left);
             }
             else
             {
@@ -360,7 +360,7 @@ public class TimelineUI : MonoBehaviour
         {
             if (dash.tick >= 1 && dash.tick <= enemySlots.Count)
             {
-                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(is_normal,attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
+                enemySlots[dash.tick - 1].GetComponent<Enemy_slot>().Show(dash.tick, is_normal, attackColor, dash.damage.ToString(), Special_Pattern.Dash, dash.GetTargetSectors(TimelineManager.Instance.TotalColumns), is_left);
             }
             else
             {
@@ -615,7 +615,7 @@ public class TimelineUI : MonoBehaviour
             Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(cam, position);
 
             //CardTooltip.Instance.Show(title, body, screenPos + tooltipOffset, Camera.main);
-            CardTooltip.Instance.Show_TimelineAction(effect, blockData.attackDamage, screenPos, cam);
+            CardTooltip.Instance.Show_TimelineAction(tick, effect, blockData.attackDamage, screenPos, cam);
         }
 
 
@@ -726,9 +726,11 @@ public class TimelineUI : MonoBehaviour
             bool includeEnemyAction = (tick % 2 == 0);
 
             var simState = TimelineManager.Instance.SimulateStateAtTick(new_tick, includeEnemyAction);
+            Debug.Log($"<color=green>틱 번호</color>{new_tick}");
 
             int predictedSector = simState.sector;
             bool simIsLeft = simState.isEnemyLeft;
+            bool isPushed = simState.isPushed;
 
             ActionType action = TimelineManager.Instance.GetActionAtTick(new_tick);
             ActionType previewAction = ActionType.None;
@@ -747,7 +749,11 @@ public class TimelineUI : MonoBehaviour
                 {
                     previewAction = ActionType.Sword_middle;
                 }
-                else if(action == ActionType.Guard)
+                else if (isPushed)
+                {
+                    previewAction = ActionType.Cure;
+                }
+                else if (action == ActionType.Guard)
                 {
                     previewAction = ActionType.Guard;
                 }
@@ -949,13 +955,16 @@ public class TimelineUI : MonoBehaviour
                         cell_Pos = Cell_Pos.End;
                     }
 
+                    Additional_Effect additional_Effect = TimelineManager.Instance.additional_Effects[tickIndex];
+
                     slotView.SetAction(
                         action,
                         dir,
                         damage,
                         cell_Pos,
                         isPreview: false,
-                        isPrev: false
+                        isPrev: false,
+                        additional_Effect
                     );
 
                     // 호버 핸들러 추가/업데이트
@@ -979,7 +988,8 @@ public class TimelineUI : MonoBehaviour
             Hide_Preview();
         }
 
-            
+        if (TimelineManager.Instance != null)
+            Update_effectColor(TimelineManager.Instance.additional_Effects);
     }
 
     public void Update_effectColor(IReadOnlyList<Additional_Effect> additional_Effects)
@@ -992,13 +1002,32 @@ public class TimelineUI : MonoBehaviour
 
             Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
 
+            BlockData block = null;
+            int index = -1;
+
+            if(slotGO.GetComponent<PlayerSlotHover>().placedBlock != null)
+            {
+                block = slotGO.GetComponent<PlayerSlotHover>().placedBlock.GetBlockData();
+                index = slotGO.GetComponent<PlayerSlotHover>().placedBlock.GetCardTickIndex(i+1);
+            }
+
             if (additional_Effects[i] == null)
             {
                 effectLine.Hide();
             }
             else
             {
-                effectLine.Show(additional_Effects[i]);
+                if(block == null)
+                {
+                    effectLine.Show(additional_Effects[i]);
+                    Debug.Log("널입니다.");
+                }
+                else
+                {
+                    effectLine.Show(additional_Effects[i], block.GetEffectAt(index));
+                    Debug.Log("널아닙니다.");
+                }
+                    
             }   
         }
     }
@@ -1010,7 +1039,7 @@ public class TimelineUI : MonoBehaviour
         // 특수효과가 없는 틱은 무시
         if (TimelineManager.Instance.CanPlaceEffect(tick)) return;
 
-        GameObject slotGO = playerSlots[tick];
+        GameObject slotGO = playerSlots[tick-1];
         Effect_Line effectLine = slotGO.GetComponentInChildren<Effect_Line>(true);
         effectLine.Hover(is_enter);
     }

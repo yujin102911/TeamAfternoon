@@ -37,7 +37,21 @@ public class Effect_Line : MonoBehaviour
     [SerializeField]
     private Sprite _sturnIcon;
 
-    public void Show(Additional_Effect additional_Effect)
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Back;
+    [TabGroup("Critical_3")]
+    [SerializeField]
+    private Sprite _Critical_3Icon;
+
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllBack;
+    [TabGroup("HealAll")]
+    [SerializeField]
+    private Sprite _HealAllIcon;
+
+    public void Show(Additional_Effect additional_Effect, ActionType action = ActionType.None)
     {
         this.gameObject.SetActive(true);
 
@@ -62,7 +76,30 @@ public class Effect_Line : MonoBehaviour
                 _back.sprite = _sturnBack;
                 _icon.sprite = _sturnIcon;
                 break;
+            case EffectType.Critical_3:
+                _back.sprite = _Critical_3Back;
+                _icon.sprite = _Critical_3Icon;
+                break;
+            case EffectType.HealAll:
+                _back.sprite = _HealAllBack;
+                _icon.sprite = _HealAllIcon;
+                break;
         }
+
+        var color = _back.color;
+
+        if (additional_Effect.HasAction(action))
+        {
+            color.a = 1.0f;
+            Debug.Log($"{action} 있습니다.");
+        }
+        else
+        {
+            color.a = 0.8f;
+            Debug.Log($"{action} 없습니다.");
+        }
+
+        _back.color = color;
     }
 
     public void Hide()
@@ -75,11 +112,11 @@ public class Effect_Line : MonoBehaviour
 
         if(is_enter)
         {
-            _back.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            _back.color = new Color(0.9f, 0.9f, 0.9f, _back.color.a);
         }
         else
         {
-            _back.color = Color.white;
+            _back.color = new Color(1.0f, 1.0f, 1.0f, _back.color.a);
         }
     }
 }

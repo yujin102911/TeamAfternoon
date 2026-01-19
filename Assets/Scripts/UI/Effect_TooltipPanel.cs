@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -123,11 +124,44 @@ public class Effect_TooltipPanel : MonoBehaviour
 
         _descriptionText.TableEntryReference = effect.effectDescription;
 
-        for (int i = 0; i < effect.Apply_actionTypes.Length; i++)
+        Dictionary<ActionType, int> keyValuePairs = new Dictionary<ActionType, int>();
+
+        foreach (var action in effect.Apply_actionTypes)
         {
-            _actionCell[i].Update_CellVisual(effect.Apply_actionTypes[i]);
+            var key = GetGroupKey(action);
+            if (key == null) continue;
+
+            if (keyValuePairs.ContainsKey(key.Value))
+                keyValuePairs[key.Value]++;
+            else
+                keyValuePairs[key.Value] = 1;
         }
+
+        int index = 0;
+        foreach (var key in keyValuePairs.Keys)
+        {
+            if (keyValuePairs[key] >= 1)
+            {
+                _actionCell[index].Update_CellVisual(key);
+                index++;
+            }
+        }
+
+        
     }
+
+    ActionType? GetGroupKey(ActionType type)
+    {
+        return type switch
+        {
+            ActionType.Attack or ActionType.Sword_start => ActionType.Attack,
+            ActionType.Bow_start or ActionType.Bow_single => ActionType.Bow_single,
+            ActionType.Move => ActionType.Move,
+            ActionType.Jump => ActionType.Jump,
+            _ => null
+        };
+    }
+
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)
     {

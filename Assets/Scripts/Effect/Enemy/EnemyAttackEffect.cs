@@ -60,6 +60,13 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     }
     #endregion
 
+    //바람 효과 생성
+    public void WindEffect()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.BattleSystem.ActiveWind();
+    }
+
     public void SpawnAttackEffect()
     {
         Debug.Log($"[EnemyAttackEffect] 적 공격! 대상 섹터: [{string.Join(", ", _targetSectors)}]");
@@ -72,7 +79,9 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             GameObject fx = GetEffect();
             fx.transform.SetParent(effectRoot, true); // ⭐ 월드 기준 유지
             fx.transform.position = _worldSectorPos[index - 1] + _offset;
-            
+
+            fx.GetComponent<SpriteRenderer>().sortingOrder = index * 10 + 4;
+
             if (_sr.flipX)
             {
                 fx.GetComponent<EffectAutoReturn>().Flip();
@@ -111,6 +120,7 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
         {
             Second_StarPrefab.SetActive(true);
         }
+
     }
 
     public void Hide_Star()

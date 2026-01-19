@@ -1,8 +1,16 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerAttectEffect : MonoBehaviour
 {
+    [Header("그림자")]
+    [SerializeField]
+    private GameObject _leftShadow;
+    [SerializeField]
+    private GameObject _rightShadow;
+
+    [Header("이펙트 위치")]
     [SerializeField] 
     private Vector3 attackOffset;
     [SerializeField] 
@@ -44,6 +52,9 @@ public class PlayerAttectEffect : MonoBehaviour
     private void Awake()
     {
         _sr = GetComponent<SpriteRenderer>();
+
+        _leftShadow.SetActive(true);
+        _rightShadow.SetActive(false);
     }
 
     private void Flip_setPos(GameObject fx)
@@ -67,29 +78,34 @@ public class PlayerAttectEffect : MonoBehaviour
 
         switch (Pool_ID)
         {
+            //일반 공격
             case 0:
                 fx = swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
+            //일반 공격 + 단데증
             case 1:
                 fx = swordEnfoceFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword);
                 break;
+            //차징
             case 2:
                 fx = big_swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword2);
                 break;
+            //차징 + 단데증
             case 3:
                 fx = Enfocebig_swordAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Sword2);
+
                 break;
             default:
                 break;
@@ -97,6 +113,10 @@ public class PlayerAttectEffect : MonoBehaviour
 
         if(fx != null)
             Flip_setPos(fx);
+
+        //타격 연출
+        //StartCoroutine(HitStop(0.05f));
+        //CameraShake.Instance.Shake(0.05f, 0.12f);
 
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.EnemyTakeDamage();
@@ -113,12 +133,14 @@ public class PlayerAttectEffect : MonoBehaviour
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Bow);
+
                 break;
             case 1:
                 fx = Enforce_bowAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
                     SoundManager.Instance.Play(SoundID.Player_Bow2);
+
                 break;
             default:
                 break;
@@ -210,5 +232,11 @@ public class PlayerAttectEffect : MonoBehaviour
         {
             _currentAnimtor.transform.position = transform.position + charging_rightOffset;
         }
+    }
+
+    public void Flip_shadow()
+    {
+        _leftShadow.SetActive(!_sr.flipX);
+        _rightShadow.SetActive(_sr.flipX);
     }
 }

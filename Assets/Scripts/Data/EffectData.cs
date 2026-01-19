@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum EffectType
@@ -9,7 +9,9 @@ public enum EffectType
     Critical,
     Duble_Dash,
     Damage_Up,
-    Sturn
+    Sturn,
+    Critical_3,
+    HealAll,
 }
 
 
@@ -22,6 +24,12 @@ public class Additional_Effect
     public Color effectColor;
     public int cost;
     public ActionType[] Apply_actionTypes;
+
+    public bool HasAction(ActionType actionType)
+    {
+        if (Apply_actionTypes == null) return false;
+        return Apply_actionTypes.Contains(actionType);
+    }
 }
 
 [CreateAssetMenu(fileName = "New EffectData", menuName = "Data/Effect")]

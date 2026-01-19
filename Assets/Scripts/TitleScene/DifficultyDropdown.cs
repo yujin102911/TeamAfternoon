@@ -44,6 +44,19 @@ public class DifficultyDropdown : MonoBehaviour
     {
         dropdown.ClearOptions();
 
+        values = new List<Difficulty>();
+        values.Add(Difficulty.Easy); // 노말은 항상 포함
+
+        if (ServiceLocator.Instance.GlobalData.IsGameCleared)
+        {
+            values.Add(Difficulty.Hard);
+            Debug.Log("[DifficultyDropdown] 하드 모드가 포함되었습니다.");
+        }
+        else
+        {
+            Debug.Log("[DifficultyDropdown] 하드 모드가 제외되었습니다.");
+        }
+
         var options = new List<string>(values.Count);
 
         // 동기 로딩(테이블이 프리로드되어 있거나 작은 규모면 OK)
