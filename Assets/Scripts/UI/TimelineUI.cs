@@ -770,7 +770,10 @@ public class TimelineUI : MonoBehaviour
             {
                 List<int> attackSectors = TimelineManager.Instance.GetEnemyAttackSectors(new_tick);
                 if (attackSectors != null && attackSectors.Count > 0)
+                {
                     OnRequestHighlight?.Invoke(attackSectors);
+                }
+                    
             }
         }
     }
