@@ -113,6 +113,8 @@ public class BattleSystem
     public event Action<List<int>, bool> OnEnemyDash;          // 적 돌진 이벤트
     public event Action<bool> OnEnemyWind;          // 적 돌진 이벤트
 
+    public event Action OnHeal;
+
     public event Action OnBattleInitialized;
     #endregion
 
@@ -492,6 +494,8 @@ public class BattleSystem
 
     public void PlayerTakeDamage()
     {
+        Debug.Log($"<color=red>[BattleSystem] \"PlayerTakeDamage\" _isPlayerHitThisTurn: [{_isPlayerHitThisTurn}]</color>");
+
         if (!_isPlayerHitThisTurn)
         {
             return;
@@ -512,11 +516,24 @@ public class BattleSystem
             }
             else
             {
+                Debug.Log($"<color=red>[BattleSystem] 남은 체력:{_playerHP}</color>");
                 OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
 
                 if (_isPlayerStunned)
                 {
-                    OnChangePlayerAnim?.Invoke("9_Stun");
+                    if (GameManager.Instance.CurrentStageData.StageNumber == 8)
+                    {
+                        OnChangePlayerAnim?.Invoke("9_Stun");
+                    }
+                    else if(GameManager.Instance.CurrentStageData.StageNumber == 9)
+                    {
+                        OnChangePlayerAnim?.Invoke("10_NormalStun");
+                    }
+                    else
+                    {
+                        OnChangePlayerAnim?.Invoke("11_ThunderStun");
+                    }
+                        
                 }
                 else
                 {
@@ -665,14 +682,13 @@ public class BattleSystem
 
         Debug.Log($"[BattleSystem] 적 공격! 대상 섹터: [{string.Join(", ", attack.targetSectors)}]");
 
-        _isPlayerHitThisTurn = false;
+        //_isPlayerHitThisTurn = false;
+        
 
-        if (attack.targetSectors != null && attack.targetSectors.Count > 0)
-        {
-            OnEnemyAttackSuccess?.Invoke(attack.targetSectors);
-        }
+        
 
         _isPlayerHitThisTurn = IsPlayerHitByAttack(attack);
+        Debug.Log($"<color=red>[BattleSystem] 공격 함수 _isPlayerHitThisTurn: [{_isPlayerHitThisTurn}]</color>");
 
         if (_isPlayerHitThisTurn)
         {
@@ -682,6 +698,11 @@ public class BattleSystem
         else
         {
             Debug.Log($"[BattleSystem] 회피 성공! (플레이어 위치: 섹터 {_playerCurrentSector})");
+        }
+
+        if (attack.targetSectors != null && attack.targetSectors.Count > 0)
+        {
+            OnEnemyAttackSuccess?.Invoke(attack.targetSectors);
         }
     }
 
@@ -804,18 +825,25 @@ public class BattleSystem
         //OnEnemyAttackSuccess?.Invoke(targetSectors);
 
         _isPlayerHitThisTurn = false;
-
-        foreach (var enemy in _enemies)
-        {
-            OnEnemyDash?.Invoke(targetSectors, enemy.IsLeft);
-        }
-
+        
         _isPlayerHitThisTurn = targetSectors.Contains(_playerCurrentSector);
+        Debug.Log($"<color=red>[BattleSystem] 돌진 함수 _isPlayerHitThisTurn: [{_isPlayerHitThisTurn}]</color>");
+
 
         if (_isPlayerHitThisTurn)
         {
             
             DealDamageToPlayer(dash.damage);
+        }
+        else
+        {
+            Debug.Log($"[BattleSystem] 돌진 회피 성공! (플레이어 위치: 섹터 {_playerCurrentSector})");
+        }
+
+        foreach (var enemy in _enemies)
+        {
+
+            OnEnemyDash?.Invoke(targetSectors, enemy.IsLeft);
         }
 
         foreach (var enemy in _enemies)
@@ -902,6 +930,9 @@ public class BattleSystem
 
     private void HealBoth()
     {
+        //힐 효과 재생
+        OnHeal?.Invoke();
+
         _playerHP = Mathf.Min(_playerMaxHP, _playerHP + 1);
         OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
 
