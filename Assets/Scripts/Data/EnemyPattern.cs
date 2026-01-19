@@ -13,7 +13,7 @@ public class EnemyAttack
 
     public int tick;                  // 공격 틱 (1~18)
     public List<int> targetSectors;   // 공격 대상 섹터들
-    public int damage;                  // 피해 주사위
+    public int damage = 1;                  // 피해 주사위
 
     public EnemyAttack(int t, List<int> sectors, int dmg)
     {
