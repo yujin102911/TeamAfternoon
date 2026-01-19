@@ -738,12 +738,14 @@ public class GameManager : MonoBehaviour
         StopAllCoroutines();
 
         float stageDuration = Time.time - _stageStartTime; // 스테이지 소요 시간
+        Difficulty diff = userGameData.Difficulty;
         float totalSessionTime = Time.realtimeSinceStartup; // 게임 켜고 여기까지 시간
         int stageId = currentStageData.StageNumber;
         int totalTurns = _currentRound;
 
         FindAnyObjectByType<PlayLogManager>().SendStageLog(
             stageId,
+            diff.ToString(),
             totalTurns,
             stageDuration,
             victory.ToString(),
