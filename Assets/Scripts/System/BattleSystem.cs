@@ -520,11 +520,11 @@ public class BattleSystem
 
                 if (_isPlayerStunned)
                 {
-                    if (GameManager.Instance.CurrentStageData.StageNumber == 8)
+                    if (GameManager.Instance.CurrentStageData.StageNumber == 2)
                     {
                         OnChangePlayerAnim?.Invoke("9_Stun");
                     }
-                    else if(GameManager.Instance.CurrentStageData.StageNumber == 9)
+                    else if(GameManager.Instance.CurrentStageData.StageNumber == 3)
                     {
                         OnChangePlayerAnim?.Invoke("10_NormalStun");
                     }

@@ -40,7 +40,7 @@ public class EnemyStoneVisualController : MonoBehaviour
     {
         int stageID = 0;
 
-        if (GameManager.Instance != null)
+        if (GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
             stageID = GameManager.Instance.CurrentStageData.StageNumber;
 
         foreach (int sectorNum in stoneSectors)
@@ -53,7 +53,7 @@ public class EnemyStoneVisualController : MonoBehaviour
 
                 GameObject stoneObj = null;
 
-                if (_icePrefab != null && stageID == 8)
+                if (_icePrefab != null && stageID == 2 && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
                 {
                     stoneObj = Instantiate(_icePrefab, spawnPos, Quaternion.identity);
                 }

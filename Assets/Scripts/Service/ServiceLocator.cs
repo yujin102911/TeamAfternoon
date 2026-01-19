@@ -57,6 +57,13 @@ public class ServiceLocator : MonoBehaviour
                 CurrentUser = Instantiate(testUserData);
             }
         }
+        if (easyRepository != null)
+        {
+            if (isTestMode)
+            {
+                CurrentRepository = easyRepository;
+            }
+        }
         
     }
 
