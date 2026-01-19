@@ -42,6 +42,10 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private RectTransform rectTransform;
 
+    private bool _isDragging;
+    private bool _isOverCost; // current+cost>max 여부 캐시
+
+
     private void Awake()
     {
         if (_image == null)
@@ -144,6 +148,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (GameManager.Instance.IsExecutingRound) return;
 
+        _isDragging = true;
+
         // 드래그용 복제 생성
         ghost = Instantiate(dragGhostPrefab, canvas.transform);
         ghostRect = ghost.GetComponent<RectTransform>();
@@ -154,8 +160,9 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         UpdateGhostPosition(eventData);
 
         // 원본은 숨기기 or 투명화
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
+        ApplyVisualState();
+        //canvasGroup.alpha = 0f;
+        //canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -166,11 +173,15 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        _isDragging = false;
+
         // 드래그 종료
         Destroy(ghost);
         ghost = null;
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.alpha = 1f;
+
+        ApplyVisualState();
+        //canvasGroup.blocksRaycasts = true;
+        //canvasGroup.alpha = 1f;
 
         if (BattleUIManager.Instance != null)
             BattleUIManager.Instance.HandleBar_raycastOn();
@@ -222,7 +233,23 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if(_isLocked) return;
 
-        if (current + Additional_Effect.cost > max)
+        _isOverCost = (current + Additional_Effect.cost > max);
+        ApplyVisualState();
+    }
+
+    //상태관리 메서드
+    private void ApplyVisualState()
+    {
+        if (canvasGroup == null) return;
+
+        if (_isDragging)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.blocksRaycasts = false;
+            return;
+        }
+
+        if (_isOverCost)
         {
             canvasGroup.alpha = 0.5f;
             canvasGroup.blocksRaycasts = false;
@@ -233,4 +260,5 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
             canvasGroup.blocksRaycasts = true;
         }
     }
+
 }

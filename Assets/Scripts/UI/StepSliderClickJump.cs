@@ -10,16 +10,15 @@ public class StepSliderClickJump : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!slider.interactable)
-            return;
+        if (!slider || !slider.interactable || !trackRect) return; 
 
-        // 클릭 위치를 Track 기준 로컬 좌표로 변환
+        var canvas = trackRect.GetComponentInParent<Canvas>();
+        Camera cam = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            cam = canvas.worldCamera;
+
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            trackRect,
-            eventData.position,
-            eventData.pressEventCamera,
-            out Vector2 localPos
-        );
+            trackRect, eventData.position, cam, out Vector2 localPos);
 
         // Track의 좌우 기준 0~1로 정규화
         float width = trackRect.rect.width;
@@ -28,8 +27,12 @@ public class StepSliderClickJump : MonoBehaviour, IPointerDownHandler
         // step 계산
         int step = Mathf.RoundToInt(normalized * (steps - 1));
 
+        Debug.Log($"<color=red>[StepSliderClickJump] 슬라이더 옮기기 / step: {step}</color>");
+
         // 값 설정
-        slider.SetValueWithoutNotify(step);
-        slider.onValueChanged.Invoke(step);
+        //slider.SetValueWithoutNotify(step);
+        //slider.onValueChanged.Invoke(step);
+
+        slider.value = step;
     }
 }

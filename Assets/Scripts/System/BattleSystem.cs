@@ -379,6 +379,8 @@ public class BattleSystem
 
     public void LongRangeAttack_Middle()
     {
+        if (!_isBowCharging) return;
+
         OnChangePlayerAnim?.Invoke("2_2_BowMiddle");
     }
 
@@ -510,7 +512,16 @@ public class BattleSystem
             else
             {
                 OnPlayerHPChanged?.Invoke(_playerHP, _playerMaxHP);
-                OnChangePlayerAnim?.Invoke("4_Hurt");
+
+                if (_isPlayerStunned)
+                {
+                    OnChangePlayerAnim?.Invoke("9_Stun");
+                }
+                else
+                {
+                    OnChangePlayerAnim?.Invoke("4_Hurt");
+                }
+                    
                 Debug.Log("<color=red>[BattleSystem] 플레이어 아야!!!</color>");
 
                 if (_playerHP <= 0)
@@ -973,7 +984,13 @@ public class BattleSystem
         //OnChangePlayerAnim?.Invoke("1_Idle");
     }
 
-    public void ClearPlayerStun() => _isPlayerStunned = false;
+    public void ClearPlayerStun()
+    {
+        if(_isPlayerStunned)
+            OnChangePlayerAnim?.Invoke("1_Idle");
+        
+        _isPlayerStunned = false;
+    }
 
     #region Achievement Methods
     private void CheckBattleAchievements()
