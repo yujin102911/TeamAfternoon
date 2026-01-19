@@ -139,6 +139,9 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
 
         _typeText.TableEntryReference = pattern_Key_Data.Type_key;
 
+        if(GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+            _typeText.TableEntryReference = pattern_Key_Data.Hard_key;
+
         _nameText.RefreshString();
         _descriptionText.RefreshString();
         _typeText.RefreshString();

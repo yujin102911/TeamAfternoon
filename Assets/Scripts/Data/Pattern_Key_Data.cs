@@ -17,4 +17,5 @@ public class Pattern_Key_Data : ScriptableObject
     public string Name_key;
     public string Desc_key;
     public string Type_key;
+    public string Hard_key;
 }

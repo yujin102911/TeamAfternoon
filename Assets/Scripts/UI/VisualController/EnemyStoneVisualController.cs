@@ -5,6 +5,7 @@ public class EnemyStoneVisualController : MonoBehaviour
 {
     [Header("설정")]
     [SerializeField] private GameObject _stonePrefab;
+    [SerializeField] private GameObject _icePrefab;
     [SerializeField] private Vector3 _offset = new Vector3(0, 0.5f, 0);
 
     private MapSystem _mapSystem;
@@ -37,6 +38,11 @@ public class EnemyStoneVisualController : MonoBehaviour
     }
     private void CreateNewStones(List<int> stoneSectors)
     {
+        int stageID = 0;
+
+        if (GameManager.Instance != null)
+            stageID = GameManager.Instance.CurrentStageData.StageNumber;
+
         foreach (int sectorNum in stoneSectors)
         {
             if (_activeStoneObjects.ContainsKey(sectorNum)) continue;
@@ -45,7 +51,17 @@ public class EnemyStoneVisualController : MonoBehaviour
             {
                 Vector3 spawnPos = _mapSystem.GetSectorPosition(sectorNum) + _offset;
 
-                GameObject stoneObj = Instantiate(_stonePrefab, spawnPos, Quaternion.identity);
+                GameObject stoneObj = null;
+
+                if (_icePrefab != null && stageID == 8)
+                {
+                    stoneObj = Instantiate(_icePrefab, spawnPos, Quaternion.identity);
+                }
+                else
+                {
+                    stoneObj = Instantiate(_stonePrefab, spawnPos, Quaternion.identity);
+                }
+
 
                 SpriteRenderer sr = stoneObj.GetComponentInChildren<SpriteRenderer>();
                 if (sr != null)
