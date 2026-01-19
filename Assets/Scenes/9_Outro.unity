@@ -4082,7 +4082,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 34.15
+  m_fontSize: 23.4
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5214,7 +5214,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
+  m_fontSize: 24.55
   m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5798,7 +5798,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
+  m_fontSize: 22.75
   m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6301,6 +6301,7 @@ GameObject:
   - component: {fileID: 1719331798}
   - component: {fileID: 1719331800}
   - component: {fileID: 1719331799}
+  - component: {fileID: 1719331801}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -6365,6 +6366,29 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1719331797}
   m_CullTransparentMesh: 1
+--- !u!114 &1719331801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719331797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85d60e6a42180ed40a028b995dd10dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetImage: {fileID: 1719331799}
+  localeSprites:
+  - localeCode: en
+    sprite: {fileID: 21300000, guid: f9ec5edfed3d9254ab64a1ff695f5aef, type: 3}
+  - localeCode: ko-KR
+    sprite: {fileID: 21300000, guid: f9ec5edfed3d9254ab64a1ff695f5aef, type: 3}
+  - localeCode: ja
+    sprite: {fileID: 21300000, guid: f9ec5edfed3d9254ab64a1ff695f5aef, type: 3}
+  - localeCode: zh-Hans
+    sprite: {fileID: 21300000, guid: f9ec5edfed3d9254ab64a1ff695f5aef, type: 3}
+  fallbackSprite: {fileID: 21300000, guid: f9ec5edfed3d9254ab64a1ff695f5aef, type: 3}
 --- !u!1 &1725888031
 GameObject:
   m_ObjectHideFlags: 0

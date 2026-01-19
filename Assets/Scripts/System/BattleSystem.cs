@@ -380,6 +380,8 @@ public class BattleSystem
 
     public void LongRangeAttack_Middle()
     {
+        if (!_isBowCharging) return;
+
         OnChangePlayerAnim?.Invoke("2_2_BowMiddle");
     }
 
