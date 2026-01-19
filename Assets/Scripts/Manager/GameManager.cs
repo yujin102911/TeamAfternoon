@@ -737,12 +737,10 @@ public class GameManager : MonoBehaviour
 
         float stageDuration = Time.time - _stageStartTime; // 스테이지 소요 시간
         float totalSessionTime = Time.realtimeSinceStartup; // 게임 켜고 여기까지 시간
-        string steamId = userGameData.SteamID;
         int stageId = currentStageData.StageNumber;
         int totalTurns = _currentRound;
 
         FindAnyObjectByType<PlayLogManager>().SendStageLog(
-            steamId,
             stageId,
             totalTurns,
             stageDuration,

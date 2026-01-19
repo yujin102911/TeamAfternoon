@@ -16,33 +16,25 @@ public class PlayLogManager : MonoBehaviour
     }
 
     [Button("로그 테스트용", ButtonSizes.Medium)]
-    public void SendPlayLog(string steamId, float playTimeSeconds)
+    public void SendPlayLog(float playTimeSeconds)
     {
-        DocumentReference docRef = db.Collection("PlayLogs").Document(steamId);
+        DocumentReference docRef = db.Collection("PlayLogs").Document();
 
         Dictionary<string, object> log = new Dictionary<string, object>
         {
-            {"steam_id", steamId },
             {"play_time", playTimeSeconds},
             {"version", Application.version},
             {"timestamp", FieldValue.ServerTimestamp}
         };
 
-        docRef.SetAsync(log).ContinueWithOnMainThread(task => {
-            if (task.IsCompleted)
-            {
-                Debug.Log($"[Firestore] {steamId}의 로그 저장 완료!");
-            }
-        });
+        docRef.SetAsync(log);
     }
 
-    public void SendStageLog(string steamId, int stageId, int turns, float stagePlayTime, string status, float totalSessionTime)
+    public void SendStageLog(int stageId, int turns, float stagePlayTime, string status, float totalSessionTime)
     {
-        string docName = $"{steamId}_Stage{stageId}_{System.DateTime.Now:yyyyMMdd_HHmmss}";
-        DocumentReference docRef = db.Collection("StageLogs").Document(docName);
+        DocumentReference docRef = db.Collection("StageLogs").Document();
         Dictionary<string, object> log = new Dictionary<string, object>
     {
-        { "steam_id", steamId },
         { "stage_id", stageId },
         { "turns_taken", turns },         
         { "stage_play_time", stagePlayTime },
