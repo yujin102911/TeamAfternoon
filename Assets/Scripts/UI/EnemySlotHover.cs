@@ -22,6 +22,8 @@ public class EnemySlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (eventData.pointerDrag != null) return;
+
         if (timelineUI != null)
         {
             timelineUI.HideTooltip();

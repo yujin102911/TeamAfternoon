@@ -346,7 +346,7 @@ public class MapSystem
     // 일시적인 색상 지우는 함수
     public void ResetSectorColor(int sectorNum)
     {
-            UpdateSectorColor(sectorNum, _config.normalColor);
+        UpdateSectorColor(sectorNum, _config.normalColor);
     }
 
 
