@@ -61,7 +61,7 @@ public class ServiceLocator : MonoBehaviour
         {
             if (isTestMode)
             {
-                CurrentRepository = hardRepository;
+                CurrentRepository = easyRepository;
             }
         }
         
