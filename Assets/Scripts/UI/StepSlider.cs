@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class StepSlider : MonoBehaviour
@@ -75,6 +76,9 @@ public class StepSlider : MonoBehaviour
     {
         if (playRoutine != null)
             StopCoroutine(playRoutine);
+
+        // 타임라인이 0일 때 미리보기 보이는 버그 수정
+        _timelineUI.SetCurrent_Tick(0);
 
         playRoutine = StartCoroutine(ReturnRoutine(duration));
         return playRoutine;
