@@ -41,6 +41,9 @@ public class OutroManager : MonoBehaviour
     public AutoScroll scrollController;
     public BottomBarController bottomBarController;
 
+    [Header("Credit Speed Control")]
+    public float fastScrollMultiplier = 2.0f;
+
     [Header("Ending Credits Settings")]
     public GameObject endingCreditPanel;   // 엔딩 크레딧 전체 패널
     public RectTransform creditContent;    // 움직일 텍스트 내용물
@@ -211,7 +214,15 @@ public class OutroManager : MonoBehaviour
         {
             while (creditContent.anchoredPosition.y < creditEndY)
             {
-                creditContent.anchoredPosition += Vector2.up * creditScrollSpeed * Time.deltaTime;
+                float speedMultiplier = 1f;
+
+                // 좌클릭 유지 시 가속
+                if (Input.GetMouseButton(0))
+                    speedMultiplier = fastScrollMultiplier;
+
+                creditContent.anchoredPosition +=
+                    Vector2.up * creditScrollSpeed * speedMultiplier * Time.deltaTime;
+
                 yield return null;
             }
         }
