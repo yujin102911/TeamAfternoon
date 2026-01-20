@@ -11,8 +11,9 @@ public class EscPanel : MonoBehaviour
     [SerializeField] private Button _goBackButton;
     [SerializeField] private Button _xButton;
 
-    [Header("타이틀 씬 이름")]
-    [SerializeField] private string _titleScene = "TitleScene";
+    [Header("씬 이름")]
+    [SerializeField] private string _easyScene = "EasyStageScene";
+    [SerializeField] private string _hardScene = "HardStageScene";
 
     private float savedTimeScale = 1.0f;
 
@@ -57,7 +58,14 @@ public class EscPanel : MonoBehaviour
 
     private void GoToTitle()
     {
-        ServiceLocator.Instance.Scene.Load(_titleScene);
+        if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+        {
+            ServiceLocator.Instance.Scene.Load(_easyScene);
+        }
+        else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+        {
+            ServiceLocator.Instance.Scene.Load(_hardScene);
+        }
     }
 
 }
