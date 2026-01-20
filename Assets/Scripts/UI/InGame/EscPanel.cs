@@ -58,6 +58,7 @@ public class EscPanel : MonoBehaviour
 
     private void GoToTitle()
     {
+        Time.timeScale = savedTimeScale;
         if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
         {
             ServiceLocator.Instance.Scene.Load(_easyScene);
