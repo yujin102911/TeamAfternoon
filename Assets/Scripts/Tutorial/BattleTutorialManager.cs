@@ -111,7 +111,10 @@ public class BattleTutorialManager : MonoBehaviour
 
     public void OnTutorialButtonClicked(string button)
     {
-        Debug.Log($"버튼 클릭 시도: {button} | 현재 인덱스: {currentIndex} | 전체 단계 수: {steps.Length}"); if (currentIndex >= steps.Length) return;
+        Debug.Log($"버튼 클릭 시도: {button} | 현재 인덱스: {currentIndex} | 전체 단계 수: {steps.Length}");
+        
+        if (currentIndex >= steps.Length) return;
+        Debug.Log($"2222버튼 클릭 시도: {button} | 현재 인덱스: {currentIndex} | 전체 단계 수: {steps.Length}");
 
         TutorialStep currentStep = steps[currentIndex];
         if (currentStep.condition == TutorialCondition.ButtonClicked)
