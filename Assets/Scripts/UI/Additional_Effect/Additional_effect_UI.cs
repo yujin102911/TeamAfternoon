@@ -57,6 +57,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         canvasGroup = GetComponent<CanvasGroup>();
         canvasRect = canvas.GetComponent<RectTransform>();
         rectTransform = GetComponent<RectTransform>();
+
+        _nameText.StringChanged += OnNameChanged;
     }
 
     private void Start()
@@ -73,12 +75,14 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         {
             TimelineManager.Instance.OnTextMemoryChanged -= SetAlpha;
         }
+
+        _nameText.StringChanged -= OnNameChanged;
     }
 
     private void OnEnable()
     {
-        _nameText.StringChanged += OnNameChanged;
-        _nameText.RefreshString();
+        
+        //_nameText.RefreshString();
     }
 
     private void OnDisable()
@@ -87,8 +91,6 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         ghost = null;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
-
-        _nameText.StringChanged -= OnNameChanged;
     }
 
     private void OnNameChanged(string value) => nameText.text = value;
@@ -100,6 +102,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
         //nameText.text = Additional_Effect.effectName + ".mfx";
         _nameText.TableEntryReference = Additional_Effect.effectName;
+        _nameText.RefreshString();
         costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
     }
 

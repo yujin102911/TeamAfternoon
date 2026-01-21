@@ -5,7 +5,7 @@ using System.Collections;
 
 public class LanguageInitializer : MonoBehaviour
 {
-    private const string LANGUAGE_KEY = "LANGUAGE_CODE";
+    private const string LANGUAGE_KEY = "LANGUAGE";
 
     IEnumerator Start()
     {
@@ -14,7 +14,7 @@ public class LanguageInitializer : MonoBehaviour
 
         var locales = LocalizationSettings.AvailableLocales.Locales;
 
-        // 1️⃣ 저장된 언어가 있으면 우선
+        // 1️. 저장된 언어가 있으면 우선
         if (PlayerPrefs.HasKey(LANGUAGE_KEY))
         {
             string savedCode = PlayerPrefs.GetString(LANGUAGE_KEY);
@@ -27,7 +27,7 @@ public class LanguageInitializer : MonoBehaviour
             }
         }
 
-        // 2️⃣ OS 언어와 가장 가까운 Locale 찾기
+        // 2️. OS 언어와 가장 가까운 Locale 찾기
         SystemLanguage systemLang = Application.systemLanguage;
         Locale matched = locales.Find(l =>
             l.Identifier.CultureInfo.EnglishName.Contains(systemLang.ToString())
