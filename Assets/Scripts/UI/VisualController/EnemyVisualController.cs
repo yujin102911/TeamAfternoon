@@ -367,6 +367,9 @@ public class EnemyVisualController : MonoBehaviour
             
         }
 
+        //데미지 텍스트 순서 변경
+        go.GetComponent<Canvas>().sortingOrder = 75;
+
             TextMeshProUGUI tmp = go.GetComponentInChildren<TextMeshProUGUI>();
         if (tmp != null)
         {
@@ -439,6 +442,11 @@ public class EnemyVisualController : MonoBehaviour
     {
         if (SoundManager.Instance == null) return;
 
+        if (GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        {
+            SoundManager.Instance.Play(SoundID.EnemyHurt_5);
+            return;
+        }
 
         switch (stage_num -1)
         {

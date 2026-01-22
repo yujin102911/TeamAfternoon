@@ -85,6 +85,10 @@ public class OutroManager : MonoBehaviour
         if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
         if (goToTitle != null) goToTitle.onClick.AddListener(GoToTitle);
 
+        //BGM 변경: 배경 화면 씬
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.BGM_Stage);
+
         NextStep();
     }
 
@@ -195,6 +199,10 @@ public class OutroManager : MonoBehaviour
         CheckEndingAchievement();
         CheckDeathAchievement();
         SetGameClear();
+
+        //BGM 변경: 타이틀 씬
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.BGM_Title);
 
         if (endingCreditPanel != null)
         {

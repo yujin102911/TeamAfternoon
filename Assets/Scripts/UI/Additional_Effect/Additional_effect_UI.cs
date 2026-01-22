@@ -81,7 +81,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void OnEnable()
     {
-        
+        ApplyVisualState();
         //_nameText.RefreshString();
     }
 

@@ -94,7 +94,7 @@ public class DeckSystem
             _drawPile.RemoveAt(0);
             _hand.Add(drawnBlock);
 
-            Debug.Log($"[DeckSystem] 카드 드로우: {drawnBlock.BaseData.BlockName}");
+            //Debug.Log($"[DeckSystem] 카드 드로우: {drawnBlock.BaseData.BlockName}");
         }
         OnHandChanged?.Invoke();
         OnDeckChanged?.Invoke();

@@ -101,8 +101,12 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
         if (GameManager.Instance != null)
             GameManager.Instance.BattleSystem.SpawnStone();
 
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.Stone);
+        //if (SoundManager.Instance != null)
+        //{
+        //    SoundID id = is_ice ? SoundID.Ice : SoundID.Stone;
+
+        //    SoundManager.Instance.Play(id);
+        //}    
     }
 
     public void Show_Star()
@@ -182,16 +186,47 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
     {
         if (SoundManager.Instance == null) return;
 
+        SoundID soundId = SoundID.EnemyEffect_0;
+
         switch (stage_num - 1)
         {
             case 0:
-                SoundManager.Instance.Play(SoundID.EnemyEffect_0);
+
+                soundId = SoundID.EnemyEffect_0;
+
+                if (GameManager.Instance != null &&
+                    GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+                {
+                    soundId = SoundID.EnemyEffect_Hard_0;
+                }
+
+                SoundManager.Instance.Play(soundId);
+
                 break;
+
             case 1:
-                SoundManager.Instance.Play(SoundID.EnemyEffect_1);
+                soundId = SoundID.EnemyEffect_1;
+
+                if (GameManager.Instance != null &&
+                    GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+                {
+                    soundId = SoundID.EnemyEffect_Hard_1;
+                }
+
+                SoundManager.Instance.Play(soundId);
+
                 break;
             case 2:
-                SoundManager.Instance.Play(SoundID.EnemyEffect_2);
+                soundId = SoundID.EnemyEffect_2;
+
+                if (GameManager.Instance != null &&
+                    GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+                {
+                    soundId = SoundID.EnemyEffect_Hard_2;
+                }
+
+                SoundManager.Instance.Play(soundId);
+
                 break;
             case 3:
                 SoundManager.Instance.Play(SoundID.EnemyEffect_3);
