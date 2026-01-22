@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using TMPro;
-using UnityEngine.UI;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
+using UnityEngine.UI;
 
 public class BoardButton : MonoBehaviour
     , IPointerEnterHandler, IPointerExitHandler
@@ -10,8 +12,8 @@ public class BoardButton : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _buttonTitleText;
 
     [Header("Font Settings")]
-    [SerializeField] private TMP_FontAsset regul;
-    [SerializeField] private TMP_FontAsset bold;
+    [SerializeField] private TMP_FontAsset EN_KR;
+    [SerializeField] private TMP_FontAsset Ja_Zhan;
 
     [Header("Animation Settings")]
     [SerializeField] private float _hoverScale = 1.05f;
@@ -46,6 +48,8 @@ public class BoardButton : MonoBehaviour
             {
                 _buttonTitleText.text = $"<size=25>Week</size> {stage.StageNumber}";
             }
+
+            Font_SetUp(LocalizationSettings.SelectedLocale);
         }
 
         Button btn = GetComponent<Button>();
@@ -58,7 +62,8 @@ public class BoardButton : MonoBehaviour
         if (_stageData == null) return;
 
         // 선택 여부에 따른 폰트 및 크기 변경 로직 유지
-        _buttonTitleText.font = isSelected ? bold : regul;
+        //_buttonTitleText.font = isSelected ? bold : regul;
+        _buttonTitleText.fontStyle = isSelected ? FontStyles.Bold : FontStyles.Normal;
         _buttonTitleText.fontSize = isSelected ? 36 : 32;
     }
 
@@ -92,5 +97,21 @@ public class BoardButton : MonoBehaviour
     public int GetStageNumber()
     {
         return _stageData != null ? _stageData.StageNumber : -1;
+    }
+
+    private void Font_SetUp(Locale locale)
+    {
+        if (locale == null) return;
+
+        string code = locale.Identifier.Code;
+
+        if (code == "ja" || code == "zh-Hans")
+        {
+            _buttonTitleText.font = Ja_Zhan;
+        }
+        else
+        {
+            _buttonTitleText.font = EN_KR;
+        }
     }
 }

@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class BoardItem_UI : MonoBehaviour
@@ -7,11 +9,18 @@ public class BoardItem_UI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private TextMeshProUGUI _contextText;
 
+    [SerializeField]
+    private TMP_FontAsset EN_KR;
+    [SerializeField]
+    private TMP_FontAsset Ja_Zhan;
+
     private BoardEntry _currentEntry;
 
     public void Setup(BoardEntry entry)
     {
         UnsubscribeEvents();
+
+        Font_SetUp(LocalizationSettings.SelectedLocale);
 
         _currentEntry = entry;
 
@@ -40,4 +49,21 @@ public class BoardItem_UI : MonoBehaviour
         if (_currentEntry.content != null) _currentEntry.content.StringChanged -= UpdateContent;
     }
 
+    private void Font_SetUp(Locale locale)
+    {
+        if (locale == null) return;
+
+        string code = locale.Identifier.Code;
+
+        if(code == "ja" || code == "zh-Hans")
+        {
+            _titleText.font = Ja_Zhan;
+            _contextText.font = Ja_Zhan;
+        }
+        else
+        {
+            _titleText.font = EN_KR;
+            _contextText.font = EN_KR;
+        }
+    }
 }

@@ -88,7 +88,7 @@ public class SteamAchievementSimpleTest : MonoBehaviour
     {
         if (_done) return;
 
-        if (IsInTimeRange(13,45,13,46))
+        if (IsInTimeRange(14,00,14,01))
         {
             SteamUserStats.SetAchievement("NEW_ACHIEVEMENT_17_0");
             SteamUserStats.StoreStats();
