@@ -1,4 +1,4 @@
-// The SteamManager is designed to work with Steamworks.NET
+﻿// The SteamManager is designed to work with Steamworks.NET
 // This file is released into the public domain.
 // Where that dedication is not recognized you are granted a perpetual,
 // irrevocable license to copy and modify this file as you see fit.
@@ -13,6 +13,7 @@ using UnityEngine;
 #if !DISABLESTEAMWORKS
 using System.Collections;
 using Steamworks;
+using System;
 #endif
 
 //
@@ -25,7 +26,10 @@ public class SteamManager : MonoBehaviour {
 	protected static bool s_EverInitialized = false;
 
 	protected static SteamManager s_instance;
-	protected static SteamManager Instance {
+
+    private CSteamID _mySteamId;
+    private bool _done;
+    protected static SteamManager Instance {
 		get {
 			if (s_instance == null) {
 				return new GameObject("SteamManager").AddComponent<SteamManager>();
@@ -127,7 +131,16 @@ public class SteamManager : MonoBehaviour {
 		}
 
 		s_EverInitialized = true;
-	}
+
+        _mySteamId = SteamUser.GetSteamID();
+
+        SteamUserStats.RequestUserStats(_mySteamId);
+
+        SteamUserStats.GetAchievement("NEW_ACHIEVEMENT_17_0", out _done);
+
+        if (!_done)
+            InvokeRepeating(nameof(CheckTimeAchievement), 0f, 1f); //업적 체크 함수
+    }
 
 	// This should only ever get called on first load and after an Assembly reload, You should never Disable the Steamworks Manager yourself.
 	protected virtual void OnEnable() {
@@ -172,6 +185,43 @@ public class SteamManager : MonoBehaviour {
 		// Run Steam client callbacks
 		SteamAPI.RunCallbacks();
 	}
+
+    bool IsInTimeRange(int startHour, int startMinute, int endHour, int endMinute)
+    {
+        // 글로벌 시간 기준
+        //DateTime now = DateTime.UtcNow;
+        DateTime now = DateTime.Now;
+
+        TimeSpan nowTime = now.TimeOfDay;
+        TimeSpan start = new TimeSpan(startHour, startMinute, 0);
+        TimeSpan end = new TimeSpan(endHour, endMinute, 0);
+
+        // 같은 날 범위 (예: 09:00 ~ 18:00)
+        if (start <= end)
+            return nowTime >= start && nowTime <= end;
+
+        // 자정 넘어가는 범위 (예: 22:00 ~ 02:00)
+        return nowTime >= start || nowTime <= end;
+    }
+
+    void CheckTimeAchievement()
+    {
+        if (_done)
+        {
+            CancelInvoke(nameof(CheckTimeAchievement));
+            return;
+        }
+
+        if (!IsInTimeRange(14, 00, 14, 01))
+            return;
+
+        SteamUserStats.SetAchievement("NEW_ACHIEVEMENT_17_0");
+        SteamUserStats.StoreStats();
+        _done = true;
+
+        Debug.Log($"Achievement Unlocked: NEW_ACHIEVEMENT_17_0");
+        CancelInvoke(nameof(CheckTimeAchievement));
+    }
 #else
 	public static bool Initialized {
 		get {
