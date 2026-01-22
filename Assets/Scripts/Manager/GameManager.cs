@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
 
     private void Set_BGM()
     {
-        if (SoundManager.Instance != null) return;
+        if (SoundManager.Instance == null) return;
 
         bool is_hard = UserGameData.Difficulty == Difficulty.Hard;
 
