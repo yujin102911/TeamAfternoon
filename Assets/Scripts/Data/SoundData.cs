@@ -69,6 +69,16 @@ public enum SoundID
     Player_Walk,
 
     Wind,
-    Stone
+    Stone,
 
+    EnemyEffect_Hard_0,
+    EnemyEffect_Hard_1,
+    EnemyEffect_Hard_2,
+
+    BGM_Hard,
+    BGM_Hard_Final,
+
+    Stone_Break,
+    Ice,
+    Ice_Break
 }

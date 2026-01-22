@@ -76,6 +76,8 @@ public class EnemyStoneVisualController : MonoBehaviour
                 Debug.Log($"[EnemyStoneVisualController] {sectorNum}번 섹터에 돌 모델 생성");
             }
         }
+
+        Play_Spawn_Sound();
     }
     private void ClearAllStones()
     {
@@ -86,7 +88,44 @@ public class EnemyStoneVisualController : MonoBehaviour
                 //Destroy(stone);
         }
         _activeStoneObjects.Clear();
+
+        Play_Break_Sound();
+
         Debug.Log("[EnemyStoneVisualController] 모든 돌 모델 제거 완료");
+    }
+
+    private void Play_Spawn_Sound()
+    {
+        bool is_ice = false;
+
+        if (GameManager.Instance != null)
+        {
+            is_ice = (GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard) && GameManager.Instance.CurrentStageData.StageNumber == 2;
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            SoundID id = is_ice ? SoundID.Ice : SoundID.Stone;
+
+            SoundManager.Instance.Play(id);
+        }
+    }
+
+    private void Play_Break_Sound() 
+    {
+        bool is_ice = false;
+
+        if (GameManager.Instance != null)
+        {
+            is_ice = (GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard) && GameManager.Instance.CurrentStageData.StageNumber == 2;
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            SoundID id = is_ice ? SoundID.Ice_Break : SoundID.Stone_Break;
+
+            SoundManager.Instance.Play(id);
+        }
     }
 
 }

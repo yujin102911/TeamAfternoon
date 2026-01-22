@@ -30,7 +30,7 @@ public class SettingPanel : MonoBehaviour
     [Header("언어 설정")]
     [SerializeField] private TMP_Dropdown languageDropdown;
 
-    private const string LanguageKey = "LANGUAGE_LOCALE_CODE"; // 예: "en", "ko-KR"
+    private const string LanguageKey = "LANGUAGE"; // 예: "en", "ko-KR"
 
     private List<Locale> _availableLocales = new List<Locale>();
     private bool _isInitializingLanguageUI = false;

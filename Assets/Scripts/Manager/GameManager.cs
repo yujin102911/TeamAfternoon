@@ -144,9 +144,29 @@ public class GameManager : MonoBehaviour
         LoadEnemyAtIndex(0, false);
 
         // 베틀씬 사운드
-        if (SoundManager.Instance != null)
+        Set_BGM();
+    }
+
+    private void Set_BGM()
+    {
+        if (SoundManager.Instance != null) return;
+
+        bool is_hard = UserGameData.Difficulty == Difficulty.Hard;
+
+        if (is_hard)
         {
-            if(currentStageData.StageNumber < 5)
+            if (currentStageData.StageNumber < 3)
+            {
+                SoundManager.Instance.Play(SoundID.BGM_Hard);
+            }
+            else
+            {
+                SoundManager.Instance.Play(SoundID.BGM_Hard_Final);
+            }
+        }
+        else
+        {
+            if (currentStageData.StageNumber < 5)
             {
                 SoundManager.Instance.Play(SoundID.BGM_Battle);
             }
@@ -155,7 +175,6 @@ public class GameManager : MonoBehaviour
                 SoundManager.Instance.Play(SoundID.BGM_Boss);
             }
         }
-            
     }
 
 

@@ -139,7 +139,8 @@ public class PlayerAttectEffect : MonoBehaviour
                 fx = Enforce_bowAttackFX_pool.GetEffect();
 
                 if (SoundManager.Instance != null)
-                    SoundManager.Instance.Play(SoundID.Player_Bow2);
+                    SoundManager.Instance.Play(SoundID.Player_Bow);
+                //SoundManager.Instance.Play(SoundID.Player_Bow2);
 
                 break;
             default:
