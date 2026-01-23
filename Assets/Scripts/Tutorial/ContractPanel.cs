@@ -85,6 +85,7 @@ public class ContractPanel : MonoBehaviour
             foreach (int block in _addBlocks)
             {
                 ServiceLocator.Instance.CurrentUser.AddUnlockedBlock(block);
+                ServiceLocator.Instance.SetTutorialClear(true);
             }
         }
         ServiceLocator.Instance.SaveNowUserData(); // 새로운 게임 데이터 저장
