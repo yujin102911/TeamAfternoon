@@ -101,6 +101,7 @@ public class StageLinkHandler : MonoBehaviour
 
     private void EnterStage(int id)
     {
+        if (_launcher != null && _launcher.IsLoading) return;
         Debug.Log($"[LinkHandler] 스테이지 {id}로 이동합니다.");
         GameManager.SelectedStageID = id;
         if (_launcher != null)

@@ -23,6 +23,8 @@ public class ContractPanel : MonoBehaviour
     [Header("Nail 설치마법사 Panel")]
     [SerializeField] private GameObject _nailPanel;
 
+    private bool _isSceneLoading = false;
+
     private void Awake()
     {
         _finishButton.onClick.AddListener(OnFinishButtonClick);
@@ -87,12 +89,17 @@ public class ContractPanel : MonoBehaviour
         }
         ServiceLocator.Instance.SaveNowUserData(); // 새로운 게임 데이터 저장
         StartCoroutine(End());
+
         //ServiceLocator.Instance.Scene.Load(_mainSceneName);
         // 추가로 UserData의 Tutorial클리어 처리 여부도 여기서 결정 + block 추가도 여기서 ~.~
     }
 
     private IEnumerator End()
     {
+        if (_isSceneLoading) yield break;
+
+        _isSceneLoading = true;
+
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
