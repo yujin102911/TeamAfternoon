@@ -19,6 +19,8 @@ public class AppLauncher : MonoBehaviour
     [SerializeField] private Image _flashImage;
     [SerializeField] private float _flashDuration = 0.1f;
 
+    public bool IsLoading { get; private set; } = false;
+
     private string[] _loadingMessages =
     {
         "Initializing Kerner...",
@@ -34,6 +36,10 @@ public class AppLauncher : MonoBehaviour
 
     public void LaunchBattle(string sceneName)
     {
+        if (IsLoading) return;
+
+        IsLoading = true;
+
         _loadingPanel.SetActive(true);
         foreach (var block in _progressBlocks) block.SetActive(false);
 

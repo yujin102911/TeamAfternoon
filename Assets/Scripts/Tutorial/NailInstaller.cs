@@ -14,6 +14,8 @@ public class NailInstaller : MonoBehaviour
     [SerializeField] private Image _progressBar;
     [SerializeField] private float _downloadDuration = 2.0f;
 
+    private bool _isSecneLoading = false;
+
     private void Awake()
     {
         _p1Btn.onClick.AddListener(Install);
@@ -52,12 +54,17 @@ public class NailInstaller : MonoBehaviour
 
     private void GoTuto()
     {
+        _endBtn.interactable = false;
         StartCoroutine(EndButton());
     }
 
     // end버튼 클릭 시 나오는 연출 IEnumerator
     private IEnumerator EndButton()
     {
+        if (_isSecneLoading) yield break;
+
+        _isSecneLoading = true;
+
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null &&  ServiceLocator.Instance.Scene != null)
         {
