@@ -21,6 +21,7 @@ public class HardContractPanel : MonoBehaviour
     public void OnFinishButtonClick()
     {
         ServiceLocator.Instance.SaveNowUserData();
+        ServiceLocator.Instance.SetTutorialClear(true);
         StartCoroutine(End());
 
     }
