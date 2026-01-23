@@ -229,6 +229,10 @@ public class TitleUI : MonoBehaviour
         }
         _lastStageInfoText.text = $"Day {currentDay}";
 
+        if (saveDTO.Difficulty == Difficulty.Hard)
+        {
+            _lastStageInfoText.text = $"Week {currentDay}";
+        }
         if (SteamManager.Initialized && SteamRemoteStorage.FileExists(SaveService.FILE_NAME))
         {
             long timestamp = SteamRemoteStorage.GetFileTimestamp(SaveService.FILE_NAME);
