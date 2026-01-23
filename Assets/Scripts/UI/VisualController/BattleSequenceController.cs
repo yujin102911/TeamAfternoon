@@ -19,10 +19,10 @@ public class BattleSequenceController : MonoBehaviour
     private GameStartPanel_VController _gamestartPanel;
 
     [Header("타임 라인 가림막")]
-    [SerializeField] Cover_Effect[] _coverEffects;
-    private Cover_Effect _prevCover;
-    private Cover_Effect _currentCover;
-    private Cover_Effect _nextCover;
+    [SerializeField] GameObject[] _coverEffects;
+    private GameObject _prevCover = null;
+    private GameObject _currentCover = null;
+    private GameObject _nextCover = null;
 
     [Header("연출 코드")]
     [SerializeField]
@@ -157,6 +157,15 @@ public class BattleSequenceController : MonoBehaviour
     // 연출 재생 후 끝나면 onComplete
     public void PlayerTurnStartSequence(Action onComplete)
     {
+        SwitchCover();
+
+        _timelineUI.SetActive_Slots(false);
+        //_nextCover.SetActive(false);
+        _prevCover.SetActive(true);
+
+        if (Debug_Text.Instance != null)
+            Debug_Text.Instance.Add_Message($"_prevCover: {_prevCover.gameObject.name}");
+
         StartCoroutine(CoSequence(onComplete));
     }
 
@@ -177,7 +186,15 @@ public class BattleSequenceController : MonoBehaviour
         GameManager.Instance.IsSequencePlaying = true;
         BattleUIManager.Instance.RefreshStartButtonState();
 
+        
+
         yield return StartCoroutine(ScrollLeft());
+
+        if (Debug_Text.Instance != null)
+            Debug_Text.Instance.Add_Message($"_currentCover: {_currentCover.gameObject.name}");
+
+        _currentCover.SetActive(false);
+        _timelineUI.SetActive_Slots(true);
 
         GameManager.Instance.IsSequencePlaying = false;
         BattleUIManager.Instance.RefreshStartButtonState();
@@ -206,25 +223,32 @@ public class BattleSequenceController : MonoBehaviour
     // 타임라인 원래대로 돌아오는 연출
     private IEnumerator ScrollLeft()
     {
-        _timelineUI.SetActive_Slots(false);
-        _nextCover.gameObject.SetActive(false);
-        _currentCover.gameObject.SetActive(true);
-
-        //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, true));
-
-        SwitchCover();
-
-        Coroutine beltReset = _resetController.Play();
-        Coroutine sliderReturn = _timelineSlider.Return(2.0f);
 
         
-        yield return beltReset;
-        yield return sliderReturn;
+
+        //Coroutine beltReset = _resetController.Play();
+        //Coroutine sliderReturn = _timelineSlider.Return(2.0f);
+
+
+        //yield return beltReset;
+        //yield return sliderReturn;
+
+        bool beltDone = false;
+        bool sliderDone = false;
+
+        StartCoroutine(RunAndFlag(_resetController.Play_IEnumerator(), () => beltDone = true));
+        StartCoroutine(RunAndFlag(_timelineSlider.Return_IEnumerator(2.0f), () => sliderDone = true));
+
+        yield return new WaitUntil(() => beltDone && sliderDone);
 
         //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
-        _currentCover.gameObject.SetActive(false);
+        
+    }
 
-        _timelineUI.SetActive_Slots(true);
+    private IEnumerator RunAndFlag(IEnumerator routine, Action onDone)
+    {
+        yield return StartCoroutine(routine);
+        onDone?.Invoke();
     }
 
     // 두루마기 올라가는 연출
@@ -548,14 +572,14 @@ public class BattleSequenceController : MonoBehaviour
 
         //열림
         //yield return StartCoroutine(_currentCover.Play_Effect(Direction.Down, 0.5f, false));
-        _currentCover.gameObject.SetActive(false);
+        _currentCover.SetActive(false);
         yield return null;
         _timelineUI.SetActive_Slots(true);
     }
 
     private void SwitchCover()
     {
-        Cover_Effect temp = _prevCover;
+        GameObject temp = _prevCover;
         _prevCover = _currentCover;
         _currentCover = _nextCover;
         _nextCover = temp;
