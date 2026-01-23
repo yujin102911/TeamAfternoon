@@ -11,6 +11,8 @@ public class HardContractPanel : MonoBehaviour
     [SerializeField] private IntroPanel _introPanel;
     [SerializeField] private Button _finishButton;
 
+    private bool _isSceneLoading = false;
+
     private void Awake()
     {
         _finishButton.onClick.AddListener(OnFinishButtonClick);
@@ -25,6 +27,10 @@ public class HardContractPanel : MonoBehaviour
 
     private IEnumerator End()
     {
+        if (_isSceneLoading) yield break;
+
+        _isSceneLoading = true;
+
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
