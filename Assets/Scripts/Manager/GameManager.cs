@@ -712,9 +712,6 @@ public class GameManager : MonoBehaviour
         _isBattleEnded = true;
         IsExecutingRound = false;
 
-        //배틀 타임스케일 초기화
-        Time.timeScale = 1f;
-
         //idle 정지
         _playerVisualController.Stop_PlayerIdle();
         _enemyVisualController.Stop_EnemyIdle();
@@ -775,6 +772,7 @@ public class GameManager : MonoBehaviour
         ServiceLocator.Instance.SaveNowUserData();
 
         OnBattleEnded?.Invoke(victory);
+
     }
     #endregion
 
