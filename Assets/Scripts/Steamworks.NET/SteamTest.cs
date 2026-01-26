@@ -34,12 +34,12 @@ public class SteamAchievementSimpleTest : MonoBehaviour
 
     private void Update()
     {
-        SteamAPI.RunCallbacks();
+        //SteamAPI.RunCallbacks();
     }
 
     private void OnDestroy()
     {
-        SteamAPI.Shutdown();
+        //SteamAPI.Shutdown();
     }
 
     // ✅ 업적 달성
