@@ -116,6 +116,9 @@ public class StepSlider : MonoBehaviour
 
         _timelineUI.Hide_Preview();
 
+        // 타임라인이 0일 때 미리보기 보이는 버그 수정
+        _timelineUI.SetCurrent_Tick(0);
+
         float time = 0f;
         slider.value = slider.maxValue; // 보정
         
