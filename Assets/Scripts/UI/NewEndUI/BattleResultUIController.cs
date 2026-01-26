@@ -82,6 +82,10 @@ public class BattleResultUIController : MonoBehaviour
     {
         yield return new WaitForSeconds(_delayBeforeResult);
 
+        //배틀 타임스케일 초기화
+        Time.timeScale = 1f;
+        Debug.Log("[BattleResultUIController] 전투 종료 - 배틀 타임스케일 초기화");
+
         UpdateStageInfo();
 
         if (victory == EndCondition.Victory)  // 승리시
