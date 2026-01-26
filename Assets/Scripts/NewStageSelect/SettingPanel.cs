@@ -56,7 +56,8 @@ public class SettingPanel : MonoBehaviour
     { "ko-KR", "한국어" },
     { "ja", "日本語" },
     { "zh-Hans", "简体中文" },
-    { "zh-Hant", "繁體中文" },
+    { "zh-TW", "繁體中文" },
+    { "ru", "Русский" },
 };
 
     private void Awake()

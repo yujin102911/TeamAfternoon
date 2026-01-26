@@ -38,6 +38,10 @@ public class TimeLineResetController : MonoBehaviour
         return StartCoroutine(PlayRoutine(duration));
     }
 
+    public IEnumerator Play_IEnumerator()
+    {
+        return PlayRoutine(duration);
+    }
 
     private IEnumerator PlayRoutine(float duration)
     {

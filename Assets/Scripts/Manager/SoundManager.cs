@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -24,6 +25,8 @@ public class SoundManager : MonoBehaviour
     private const string MasterKey = "MasterVol";
     private const string BGMKey = "BGMVol";
     private const string SFXKey = "SFXVol";
+
+    private Coroutine _bgmFadeCoroutine;
 
     private Dictionary<SoundID, SoundData> _soundMap;
 
@@ -97,13 +100,20 @@ public class SoundManager : MonoBehaviour
 
     void PlayBGM(SoundData data)
     {
+        //볼륨만 초기화
+        _bgmSource.volume = data.volume;
+
         if (_bgmSource.clip == data.clip)
             return;
 
         _bgmSource.clip = data.clip;
-        _bgmSource.volume = data.volume;
         _bgmSource.loop = true;
         _bgmSource.Play();
+    }
+
+    public void Set_BGM_Volume(float v)
+    {
+        _bgmSource.volume = v;
     }
 
     void PlaySFX(SoundData data)
@@ -163,4 +173,32 @@ public class SoundManager : MonoBehaviour
     }
 
     public float GetVolume(string key) => PlayerPrefs.GetFloat(key, 0.8f);
+
+    public void FadeBGMVolume(float targetVolume, float duration)
+    {
+        // 중복 코루틴 방지
+        if (_bgmFadeCoroutine != null)
+            StopCoroutine(_bgmFadeCoroutine);
+
+        _bgmFadeCoroutine = StartCoroutine(FadeBGMVolumeRoutine(targetVolume, duration));
+    }
+
+    private IEnumerator FadeBGMVolumeRoutine(float targetVolume, float duration)
+    {
+        float startVolume = _bgmSource.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            _bgmSource.volume = Mathf.Lerp(startVolume, targetVolume, t);
+            yield return null;
+        }
+
+        // 마지막 값 보정
+        _bgmSource.volume = targetVolume;
+        _bgmFadeCoroutine = null;
+    }
 }

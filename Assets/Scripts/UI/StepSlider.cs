@@ -84,6 +84,11 @@ public class StepSlider : MonoBehaviour
         return playRoutine;
     }
 
+    public IEnumerator Return_IEnumerator(float duration)
+    {
+        return ReturnRoutine(duration);
+    }
+
     private IEnumerator PlayRoutine(float duration)
     {
         slider.interactable = false; // 입력 차단
