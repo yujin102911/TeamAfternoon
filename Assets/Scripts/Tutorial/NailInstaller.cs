@@ -69,14 +69,28 @@ public class NailInstaller : MonoBehaviour
         if (ServiceLocator.Instance != null &&  ServiceLocator.Instance.Scene != null)
         {
             asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(_tutoSelectScene);
+        }
+        if (asyncLoad != null)
+        {
             asyncLoad.allowSceneActivation = false;
         }
+        else
+        {
+            Debug.LogError($"[NailInstaller] 씬 '{_tutoSelectScene}'을 찾을 수 없거나 로드에 실패했습니다. Build Settings를 확인하세요.");
+        }
+
         yield return new WaitForSeconds(0.5f);
         _introPanel.StartDayChange(0, 1);
         yield return _introPanel.FadeOutRoutine();
 
         if (asyncLoad != null)
+        {
             asyncLoad.allowSceneActivation = true;
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(_tutoSelectScene);
+        }
 
     }
 

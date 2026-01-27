@@ -332,6 +332,7 @@ public class OutroManager : MonoBehaviour
 
     private void GoToTitle()
     {
+        Time.timeScale = 1f;
         ServiceLocator.Instance.Scene.Load(titleScene);
     }
 
