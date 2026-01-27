@@ -12,6 +12,7 @@ public class Effect_TooltipPanel : MonoBehaviour
     [SerializeField] private GameObject root;
     [SerializeField] private RectTransform panelRt;   // root의 RectTransform
     [SerializeField] private RectTransform cell_Rt;   // cell_root의 RectTransform
+    [SerializeField] private RectTransform name_Rt;   // 효과 설명부의 RectTransform
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f); // 마우스 기준 오른쪽 위
 
     [Header("번역 텍스트")]
@@ -157,6 +158,7 @@ public class Effect_TooltipPanel : MonoBehaviour
 
         // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
         ForceRebuild(cell_Rt);
+        ForceRebuild(name_Rt);
         ForceRebuild(panelRt);
 
         RectTransform parentRt = panelRt.parent as RectTransform;
