@@ -18,6 +18,8 @@ public class SceneService
     /// <summary> 씬 로드 (비동기) </summary>
     public AsyncOperation LoadAsync(string sceneName)
     {
+        System.GC.Collect();
+
         string current = SceneManager.GetActiveScene().name;
         sceneHistory.Push(current);
 

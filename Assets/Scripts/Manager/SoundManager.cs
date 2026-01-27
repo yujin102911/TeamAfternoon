@@ -22,6 +22,8 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private List<SoundData> soundDatas;
 
+    [SerializeField] private int prewarmSfxSources = 8; // 필요하면 inspector에서 조절
+
     private const string MasterKey = "MasterVol";
     private const string BGMKey = "BGMVol";
     private const string SFXKey = "SFXVol";
@@ -59,6 +61,18 @@ public class SoundManager : MonoBehaviour
         foreach (var data in soundDatas)
             _soundMap[data.id] = data;
         LoadAndApplySettings();
+
+        // ✅ SFX 풀 미리 생성 (AddComponent 스파이크 방지)
+        for (int i = 0; i < prewarmSfxSources; i++)
+        {
+            var src = gameObject.AddComponent<AudioSource>();
+            src.outputAudioMixerGroup = sfxMixerGroup;
+            _sfxPool.Add(src);
+        }
+
+        // ✅ 자주 쓰는 UI 사운드 미리 로드 (첫 클릭 스파이크 방지)
+        PreloadClip(SoundID.UI_Click);
+        PreloadClip(SoundID.UI_Click2);
     }
 
     private void Update()
@@ -71,6 +85,15 @@ public class SoundManager : MonoBehaviour
         {
             Play(SoundID.UI_Click2);
         }
+    }
+
+    private void PreloadClip(SoundID id)
+    {
+        if (!_soundMap.TryGetValue(id, out var data)) return;
+        if (data == null || data.clip == null) return;
+
+        // 디코딩/로드 요청
+        data.clip.LoadAudioData();
     }
 
     private void LoadAndApplySettings()
