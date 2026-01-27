@@ -10,18 +10,41 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
     [SerializeField] private RectTransform panelRt;   // root의 RectTransform
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f); // 마우스 기준 오른쪽 위
 
+    [Header("표시 아이콘")]
+    [SerializeField]
+    private Image _icon;
+
     [Header("공격")]
     [SerializeField]
     private Pattern_Key_Data _attackData;
+    [SerializeField]
+    private Sprite _attackIcon;
+    [SerializeField]
+    private Color _attackColor;
+
     [Header("돌진")]
     [SerializeField]
     private Pattern_Key_Data _dashData;
+    [SerializeField]
+    private Sprite _dashIcon;
+    [SerializeField]
+    private Color _dashColor;
+
     [Header("바람")]
     [SerializeField]
     private Pattern_Key_Data _windData;
+    [SerializeField]
+    private Sprite _windIcon;
+    [SerializeField]
+    private Color _windColor;
+
     [Header("돌")]
     [SerializeField]
     private Pattern_Key_Data _stoneData;
+    [SerializeField]
+    private Sprite _stoneIcon;
+    [SerializeField]
+    private Color _stoneColor;
 
     [Header("기절 패널")]
     [SerializeField]
@@ -132,6 +155,9 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
         if (GameManager.Instance != null)
             is_hard = GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard;
 
+        _icon.sprite = _attackIcon;
+        _icon.color = _attackColor;
+
         switch (label)
         {
             case Pattern_Label.Attack:
@@ -141,14 +167,24 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
                 break;
             case Pattern_Label.Dash:
                 pattern_Key_Data = _dashData;
+
+                _icon.sprite = _dashIcon;
+                _icon.color = _dashColor;
+
                 if (is_hard)
                     _stunPanel.SetActive(true);
                 break;
             case Pattern_Label.Wind:
                 pattern_Key_Data = _windData;
+
+                _icon.sprite = _windIcon;
+                _icon.color = _windColor;
                 break;
             case Pattern_Label.Stone:
                 pattern_Key_Data = _stoneData;
+
+                _icon.sprite = _stoneIcon;
+                _icon.color = _stoneColor;
                 break;
         }
 
