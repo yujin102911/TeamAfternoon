@@ -63,8 +63,8 @@ public class LocalizationFontManager : MonoBehaviour
         string code = locale.Identifier.Code;
 
         // ✅ 같은 로케일/같은 폰트면 아무 것도 안 함 (씬 로드/이벤트 중복 호출 최소화)
-        if (_lastLocaleCode == code && _lastFont == TMP_Settings.defaultFontAsset)
-            return;
+        //if (_lastLocaleCode == code && _lastFont == TMP_Settings.defaultFontAsset)
+        //    return;
 
         TMP_FontAsset targetFont = null;
 
@@ -101,7 +101,7 @@ public class LocalizationFontManager : MonoBehaviour
         for (int i = 0; i < roots.Length; i++)
         {
             // includeInactive: false (비활성 포함하면 스파이크 커짐)
-            var texts = roots[i].GetComponentsInChildren<TextMeshProUGUI>(includeInactive: false);
+            var texts = roots[i].GetComponentsInChildren<TextMeshProUGUI>(includeInactive: true);
             for (int t = 0; t < texts.Length; t++)
             {
                 var text = texts[t];

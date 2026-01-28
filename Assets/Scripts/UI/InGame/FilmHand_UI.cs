@@ -150,12 +150,16 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (GameManager.Instance.IsExecutingRound) return;
+
         if (ghost != null)
             UpdateGhostPosition(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (GameManager.Instance.IsExecutingRound) return;
+
         // 드래그 종료
         Destroy(ghost);
         ghost = null;
