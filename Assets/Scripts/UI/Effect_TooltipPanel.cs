@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -152,38 +153,35 @@ public class Effect_TooltipPanel : MonoBehaviour
         _nameText.RefreshString();
         _descriptionText.RefreshString();
 
-
-        // ✅ pivot을 좌하단으로 강제(인스펙터에서 해도 됨)
-        panelRt.pivot = Vector2.zero; // (0,0) = 좌하단
-
-        // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
-        ForceRebuild(cell_Rt);
-        ForceRebuild(name_Rt);
-        ForceRebuild(panelRt);
-
-        RectTransform parentRt = panelRt.parent as RectTransform;
-        if (parentRt == null) return;
-
-        Vector2 targetScreenPos = screenPos + offset;
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            parentRt,
-            targetScreenPos,
-            cam,
-            out Vector2 localPos
-        );
-
-        // 1) 일단 “좌하단을 마우스+offset에”
-        panelRt.anchoredPosition = localPos;
-
-        // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
-        ClampToParent(panelRt, parentRt);     
+        StartCoroutine(RepositionNextFrame(screenPos, cam));
     }
 
     private void ForceRebuild(RectTransform rt)
     {
         // rt가 레이아웃 그룹/CSF가 붙은 "루트"라면 이것만으로 충분한 경우가 많음
         LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+    }
+
+    private IEnumerator RepositionNextFrame(Vector2 screenPos, Camera cam)
+    {
+        yield return null;                // 텍스트/레이아웃 반영 기다림
+        Canvas.ForceUpdateCanvases();     // 캔버스 레이아웃 강제 반영
+
+        ForceRebuild(cell_Rt);
+        ForceRebuild(name_Rt);
+        ForceRebuild(panelRt);
+
+        RectTransform parentRt = panelRt.parent as RectTransform;
+        if (parentRt == null) yield break;
+
+        Vector2 targetScreenPos = screenPos + offset;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRt, targetScreenPos, cam, out Vector2 localPos
+        );
+
+        panelRt.anchoredPosition = localPos;
+        ClampToParent(panelRt, parentRt);
     }
 
     ActionType? GetGroupKey(ActionType type)
@@ -200,21 +198,55 @@ public class Effect_TooltipPanel : MonoBehaviour
     }
 
 
-    private void ClampToParent(RectTransform rt, RectTransform parentRt)
+    private void ClampToParent(RectTransform tooltip, RectTransform parent)
     {
-        // rt는 pivot=(0,0) 기준이므로
-        // anchoredPosition은 “좌하단”
-        Vector2 pos = rt.anchoredPosition;
+        // 캔버스 레이아웃 최신화
+        Canvas.ForceUpdateCanvases();
 
-        float minX = parentRt.rect.xMin;
-        float maxX = parentRt.rect.xMax - rt.rect.width;
-        float minY = parentRt.rect.yMin;
-        float maxY = parentRt.rect.yMax - rt.rect.height;
+        // 코너 4개
+        Vector3[] tipCorners = new Vector3[4];
+        Vector3[] parentCorners = new Vector3[4];
 
-        pos.x = Mathf.Clamp(pos.x, minX, maxX);
-        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+        tooltip.GetWorldCorners(tipCorners);   // 0:LB 1:LT 2:RT 3:RB
+        parent.GetWorldCorners(parentCorners);
 
-        rt.anchoredPosition = pos;
+        float tipLeft = tipCorners[0].x;
+        float tipTop = tipCorners[1].y;
+        float tipRight = tipCorners[2].x;
+        float tipBottom = tipCorners[3].y;
+
+        float pLeft = parentCorners[0].x;
+        float pTop = parentCorners[1].y;
+        float pRight = parentCorners[2].x;
+        float pBottom = parentCorners[3].y;
+
+        // 부모 밖으로 나간 만큼 계산
+        float dx = 0f;
+        float dy = 0f;
+
+        if (tipRight > pRight) dx -= (tipRight - pRight);
+        if (tipLeft < pLeft) dx += (pLeft - tipLeft);
+
+        if (tipTop > pTop) dy -= (tipTop - pTop);
+        if (tipBottom < pBottom) dy += (pBottom - tipBottom);
+
+        if (dx == 0f && dy == 0f) return;
+
+        // world delta → parent local delta로 변환 후 위치 보정
+        Vector2 localDelta = WorldDeltaToParentLocal(parent, new Vector3(dx, dy, 0f));
+        tooltip.anchoredPosition += localDelta;
+    }
+
+    private Vector2 WorldDeltaToParentLocal(RectTransform parent, Vector3 worldDelta)
+    {
+        // 부모의 right/up 방향으로 투영해서 local delta로 변환
+        Vector3 right = parent.right;
+        Vector3 up = parent.up;
+
+        float localX = Vector3.Dot(worldDelta, right) / parent.lossyScale.x;
+        float localY = Vector3.Dot(worldDelta, up) / parent.lossyScale.y;
+
+        return new Vector2(localX, localY);
     }
 
     private void Set_Icon(EffectType effectType)

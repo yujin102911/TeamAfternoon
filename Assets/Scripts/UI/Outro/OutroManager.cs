@@ -248,6 +248,9 @@ public class OutroManager : MonoBehaviour
         if (endGamePanel != null)
         {
             endGamePanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Popup);
         }
     }
 

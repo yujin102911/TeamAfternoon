@@ -126,14 +126,23 @@ public class BattleResultUIController : MonoBehaviour
         if (victory == EndCondition.Victory)
         {
             if (_victoryPanel != null) _victoryPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Clear);
         }
         else if (victory == EndCondition.Dead)
         {
             if (_deadDefeatPanel != null) _deadDefeatPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Error);
         }
         else if( victory == EndCondition.RoundOver)
         {
             if (_roundOverDefeatPanel != null) _roundOverDefeatPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Error);
         }
     }
     public void GoToTitle()

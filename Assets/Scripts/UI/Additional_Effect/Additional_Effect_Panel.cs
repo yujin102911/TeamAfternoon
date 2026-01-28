@@ -29,6 +29,7 @@ public class Additional_Effect_Panel : MonoBehaviour
         for (int i = 0; i < _initialSize; i++)
         {
             GameObject obj = Instantiate(_blockPrefab, _spawnPoint);
+            obj.name = $"{i + 1}_effext";
             obj.SetActive(false);
             _handPool.Enqueue(obj);
         }

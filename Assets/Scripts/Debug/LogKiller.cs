@@ -7,7 +7,8 @@ public static class LogKiller
     private static void DisableLogs()
     {
 #if !UNITY_EDITOR
-        Debug.unityLogger.logEnabled = false;
+        Debug.unityLogger.logEnabled = true;
+        Debug.unityLogger.filterLogType = LogType.Exception;
 #endif
     }
 }

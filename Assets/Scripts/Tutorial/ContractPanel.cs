@@ -44,6 +44,9 @@ public class ContractPanel : MonoBehaviour
         {
             Debug.Log("설치하지 않음 선택");
             _realPopup.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Popup);
         }
     }
 
@@ -57,6 +60,8 @@ public class ContractPanel : MonoBehaviour
     /// </summary>
     private IEnumerator GoTutorialRoutine()
     {
+        _passButton.interactable = false;
+        _goTutorialButton.interactable = false;
         Debug.Log("튜토리얼을 시작합니다.");
         ServiceLocator.Instance.Cursor.StartAnimation("Loading");
         CanvasGroup cg = GetComponent<CanvasGroup>();
@@ -80,6 +85,7 @@ public class ContractPanel : MonoBehaviour
     private void GoWithoutTutorial()
     {
         _passButton.interactable = false;
+        _goTutorialButton.interactable = false;
         Debug.Log("튜토리얼을 진행하지 않고 게임을 시작합니다.");
         if (ServiceLocator.Instance.CurrentUser != null && _addBlocks != null)
         {

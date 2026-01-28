@@ -68,9 +68,6 @@ public class StageScene_Manager : MonoBehaviour
         GameManager.SelectedStageID = selected_stage_id; // (스테이지 ID는 1부터 시작하므로 +1)
         // 씬 전환
         ServiceLocator.Instance.Scene.Load(BattleScene_Name);
-
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.UI_Click4);
     }
 
     public void OnClick_DeckBtn()
