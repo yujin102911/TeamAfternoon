@@ -135,14 +135,21 @@ public class BattleResultUIController : MonoBehaviour
             if (_deadDefeatPanel != null) _deadDefeatPanel.SetActive(true);
 
             if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Error);
+            }
+                
         }
         else if( victory == EndCondition.RoundOver)
         {
             if (_roundOverDefeatPanel != null) _roundOverDefeatPanel.SetActive(true);
 
             if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Error);
+            }
         }
     }
     public void GoToTitle()
@@ -186,6 +193,11 @@ public class BattleResultUIController : MonoBehaviour
         int nextDay = 1;
         int totalStages = 0;
         string targetSceneName = "";
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopBGM();
+        }
 
         if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
         {

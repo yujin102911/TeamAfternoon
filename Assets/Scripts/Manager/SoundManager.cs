@@ -155,6 +155,12 @@ public class SoundManager : MonoBehaviour
         source.Play();
     }
 
+    public void StopBGM()
+    {
+        if(_bgmSource.isPlaying)
+            _bgmSource.Stop();
+    }
+
     public void StopSFX()
     {
         foreach (var src in _sfxPool)
