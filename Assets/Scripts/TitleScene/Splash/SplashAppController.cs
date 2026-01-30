@@ -47,6 +47,9 @@ public class SplashAppController : MonoBehaviour
         yield return new WaitForSeconds(_delayBetweenLogos);
 
         _contentAnimator.SetTrigger("PlayTeam");
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Splash);
         yield return StartCoroutine(WaitUntilAnimationEnd("TeamLogo"));
 
         yield return new WaitForSeconds(_finalDelay);
