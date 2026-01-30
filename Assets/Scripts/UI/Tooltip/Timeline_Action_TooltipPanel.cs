@@ -101,11 +101,7 @@ public class Timeline_Action_TooltipPanel : MonoBehaviour
         panelRt.anchoredPosition = localPos;
 
         // 화면(부모 Rect) 밖으로 나가지 않게 클램프
-        ClampToParent(panelRt, parentRt);
-
-        
-
-        
+        ClampToParent(panelRt, parentRt);  
     }
 
     private void ForceRebuild(RectTransform rt)
