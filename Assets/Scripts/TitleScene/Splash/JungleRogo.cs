@@ -3,10 +3,17 @@
 public class JungleRogo : MonoBehaviour
 {
     [SerializeField]
-    private AudioSource _audioSource;
+    private AudioSource _start;
+    [SerializeField]
+    private AudioSource _end;
 
-    public void Play_Click()
+    public void Play_Click_start()
     {
-        _audioSource.Play();
+        _start.Play();
+    }
+
+    public void Play_Click_end()
+    {
+        _end.Play();
     }
 }
