@@ -242,6 +242,9 @@ public class OutroManager : MonoBehaviour
             }
         }
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.FadeBGMVolume(0f, 0.7f);
+        yield return new WaitForSeconds(0.7f);
 
 
         Debug.Log("크레딧 종료 -> 최종 패널 표시");
@@ -250,7 +253,11 @@ public class OutroManager : MonoBehaviour
             endGamePanel.SetActive(true);
 
             if (SoundManager.Instance != null)
+            {
+                //SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Popup);
+            }
+                
         }
     }
 
