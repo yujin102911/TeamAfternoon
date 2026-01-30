@@ -80,5 +80,8 @@ public enum SoundID
 
     Stone_Break,
     Ice,
-    Ice_Break
+    Ice_Break,
+
+    Clip_PickUp, 
+    Clip_PickDown
 }

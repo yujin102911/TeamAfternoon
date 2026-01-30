@@ -315,6 +315,9 @@ public class TimelineManager : MonoBehaviour
 
             Debug.Log($"[TimelineDirector] 블록 배치 성공: {runtimeBlock.BaseData.BlockName} at T{startTick}");
 
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.Clip_PickDown);
+
             // UI 업데이트
             OnHandChanged?.Invoke(_currentHand);
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
@@ -331,6 +334,9 @@ public class TimelineManager : MonoBehaviour
 
         if (success)
         {
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.Clip_PickDown);
+
             // UI 업데이트
             OnTimelineChanged?.Invoke(_timelineSystem.PlacedBlocks, _timelineSystem.PrevPlacedBlocks);
             return true;

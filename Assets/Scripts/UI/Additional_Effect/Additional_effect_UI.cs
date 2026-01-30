@@ -81,6 +81,8 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void OnEnable()
     {
+        
+
         ApplyVisualState();
         //_nameText.RefreshString();
     }
@@ -89,6 +91,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         Destroy(ghost);
         ghost = null;
+        _isOverCost = false;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
     }
@@ -105,8 +108,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         _nameText.RefreshString();
         costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
         
-        if (TimelineManager.Instance != null)
-            SetAlpha(TimelineManager.Instance._currentMemory, TimelineManager.Instance.Max_memory);
+        
     }
 
     public void SetLock(bool isLocked)
@@ -124,6 +126,9 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
             cell.GetComponent<CanvasGroup>().alpha = 1.0f;
             canvasGroup.blocksRaycasts = true;
         }
+
+        if (TimelineManager.Instance != null)
+            SetAlpha(TimelineManager.Instance._currentMemory, TimelineManager.Instance.Max_memory);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -153,6 +158,9 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (GameManager.Instance.IsExecutingRound) return;
+        if (TimelineManager.Instance != null
+            && TimelineManager.Instance._currentMemory + Additional_Effect.cost > TimelineManager.Instance.Max_memory)
+            return;
 
         _isDragging = true;
 
@@ -258,7 +266,7 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         if (_isOverCost)
         {
             canvasGroup.alpha = 0.5f;
-            canvasGroup.blocksRaycasts = false;
+            //canvasGroup.blocksRaycasts = false;
         }
         else
         {
