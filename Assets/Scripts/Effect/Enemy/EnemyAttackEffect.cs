@@ -125,6 +125,8 @@ public class EnemyAttackEffect : MonoBehaviour, IEffectPoolOwner
             Second_StarPrefab.SetActive(true);
         }
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Stun);
     }
 
     public void Hide_Star()

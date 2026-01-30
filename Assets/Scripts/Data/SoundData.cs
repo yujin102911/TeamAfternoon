@@ -85,5 +85,7 @@ public enum SoundID
     Clip_PickUp, 
     Clip_PickDown,
 
-    Splash
+    Splash,
+
+    Stun
 }
