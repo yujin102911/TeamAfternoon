@@ -732,7 +732,7 @@ MonoBehaviour:
   _playerMaxHP: 3
   _mapSize: 0
   isTutorial: 0
-  currentStageData: {fileID: 11400000, guid: acd1d2760d2f5154a8896fff08a395a9, type: 2}
+  currentStageData: {fileID: 11400000, guid: 06be98f46b47cf142b4b87044ee5a6f6, type: 2}
   _effectNotification: {fileID: 8671400183281402840}
   isDebugging: 0
   _debugmodeChecking: {fileID: 8393543681242373734}
@@ -15909,7 +15909,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00006181002}
+  m_AnchoredPosition: {x: 0, y: 0.00002193451}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3940061277986326167
@@ -19711,8 +19711,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aae6326eb5df1a47abb72813b914253, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stonePrefab: {fileID: 536183397958834073, guid: 2b4a171078f55f54dba05c9b640e49c2, type: 3}
+  _GolemStonePrefab: {fileID: 536183397958834073, guid: d31d1a482ed29434c9577bcaf9908e3a, type: 3}
+  _dragon1StonePrefab: {fileID: 536183397958834073, guid: 15250da111d080a47a3390cdcccd829c, type: 3}
+  _dragon2StonePrefab: {fileID: 536183397958834073, guid: 16e7a557569b9ce4ea45013673f06625, type: 3}
+  _lightningStonePrefab: {fileID: 536183397958834073, guid: 24ec4785f3247df418082b2dd6cb4cde, type: 3}
   _icePrefab: {fileID: 536183397958834073, guid: d6ec8d9cab1e7ea48bcb47f933f3c3e2, type: 3}
+  _darkStonePrefab: {fileID: 536183397958834073, guid: 9726f860b8c9af7428cc4741aea8e841, type: 3}
   _offset: {x: 0, y: 0.35, z: 0}
 --- !u!114 &8732995940641344795 stripped
 MonoBehaviour:

@@ -4,8 +4,12 @@ using System.Collections.Generic;
 public class EnemyStoneVisualController : MonoBehaviour
 {
     [Header("설정")]
-    [SerializeField] private GameObject _stonePrefab;
+    [SerializeField] private GameObject _GolemStonePrefab;
+    [SerializeField] private GameObject _dragon1StonePrefab;
+    [SerializeField] private GameObject _dragon2StonePrefab;
+    [SerializeField] private GameObject _lightningStonePrefab;
     [SerializeField] private GameObject _icePrefab;
+    [SerializeField] private GameObject _darkStonePrefab;
     [SerializeField] private Vector3 _offset = new Vector3(0, 0.5f, 0);
 
     private MapSystem _mapSystem;
@@ -36,31 +40,64 @@ public class EnemyStoneVisualController : MonoBehaviour
             ClearAllStones();
         }
     }
+
+    private GameObject Choose_stone(int stage, bool is_hard)
+    {
+        if (is_hard)
+        {
+            switch (stage)
+            {
+                case 1:
+                    return _lightningStonePrefab;
+                case 2:
+                    return _icePrefab;
+                case 3:
+                    return _darkStonePrefab;
+                default:
+                    return null;
+            }
+        }
+        else
+        {
+            switch (stage)
+            {
+                case 4:
+                    return _GolemStonePrefab;
+                case 5:
+                    return _dragon1StonePrefab;
+                case 6:
+                    return _dragon2StonePrefab;
+                default:
+                    return null;
+            }
+        }
+    }
+
     private void CreateNewStones(List<int> stoneSectors)
     {
+        GameObject stone = null;
         int stageID = 0;
+        bool is_hard = false;
 
-        if (GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        if (GameManager.Instance != null)
+        {
             stageID = GameManager.Instance.CurrentStageData.StageNumber;
+            is_hard = GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard;
+        }
+
+        stone = Choose_stone(stageID, is_hard);
 
         foreach (int sectorNum in stoneSectors)
         {
             if (_activeStoneObjects.ContainsKey(sectorNum)) continue;
 
-            if (_mapSystem != null && _stonePrefab != null)
+            if (_mapSystem != null && stone != null)
             {
                 Vector3 spawnPos = _mapSystem.GetSectorPosition(sectorNum) + _offset;
 
                 GameObject stoneObj = null;
 
-                if (_icePrefab != null && stageID == 2 && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
-                {
-                    stoneObj = Instantiate(_icePrefab, spawnPos, Quaternion.identity);
-                }
-                else
-                {
-                    stoneObj = Instantiate(_stonePrefab, spawnPos, Quaternion.identity);
-                }
+                stoneObj = Instantiate(stone, spawnPos, Quaternion.identity);
 
 
                 SpriteRenderer sr = stoneObj.GetComponentInChildren<SpriteRenderer>();
