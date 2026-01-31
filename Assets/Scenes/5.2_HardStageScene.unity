@@ -3469,6 +3469,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPanel: {fileID: 242620814}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!1 &256054069
 GameObject:
   m_ObjectHideFlags: 0
@@ -4073,6 +4075,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPanel: {fileID: 480953498}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!114 &387585095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4337,19 +4341,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_SizeDelta.x
@@ -4389,11 +4393,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 960
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 540
       objectReference: {fileID: 0}
     - target: {fileID: 5974496900168644515, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4462,8 +4466,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4477602656620002852, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 438650497}
   m_SourcePrefab: {fileID: 100100000, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
+--- !u!1 &438650496 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4477602656620002852, guid: f9ad517b7a595514f9ab1ce98951cebf, type: 3}
+  m_PrefabInstance: {fileID: 438650495}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &438650497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438650496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210dab5295eda15469a30053e40abbd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetPanel: {fileID: 526449946}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!1 &450097238
 GameObject:
   m_ObjectHideFlags: 0
@@ -5124,6 +5151,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPanel: {fileID: 501978997}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!1 &514169961
 GameObject:
   m_ObjectHideFlags: 0
@@ -6391,6 +6420,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPanel: {fileID: 1418336734}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!114 &694500087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15272,6 +15303,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetPanel: {fileID: 1566605965}
+  _minVisibleHeight: 100
+  _minVisibleWidth: 50
 --- !u!1 &1574488477
 GameObject:
   m_ObjectHideFlags: 0
@@ -19473,6 +19506,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 555171271508239993, guid: 53500e428307f9b40b71bc38493dd799, type: 3}
+      propertyPath: _minVisibleHeight
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2234093444583658422, guid: 53500e428307f9b40b71bc38493dd799, type: 3}
       propertyPath: m_Name
       value: CantPanel
@@ -20065,6 +20102,10 @@ PrefabInstance:
       propertyPath: _targetPanel
       value: 
       objectReference: {fileID: 1634279975}
+    - target: {fileID: 4345957013664923914, guid: 07de01f7327ccdb438263c3494a4fb28, type: 3}
+      propertyPath: _minVisibleHeight
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4492061628928123117, guid: 07de01f7327ccdb438263c3494a4fb28, type: 3}
       propertyPath: m_Name
       value: DraggableArea
@@ -20165,6 +20206,10 @@ PrefabInstance:
     - target: {fileID: 3251128979340817681, guid: ee76913d54c8895429ff42d9df65409c, type: 3}
       propertyPath: m_Name
       value: CreditPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 4406927655861544851, guid: ee76913d54c8895429ff42d9df65409c, type: 3}
+      propertyPath: _minVisibleHeight
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 9091131974944011071, guid: ee76913d54c8895429ff42d9df65409c, type: 3}
       propertyPath: m_Pivot.x

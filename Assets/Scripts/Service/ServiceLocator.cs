@@ -27,6 +27,7 @@ public class ServiceLocator : MonoBehaviour
 
     [Header("테스트용 유저 데이터")]
     [SerializeField] private bool isTestMode = false;
+    [SerializeField] private bool isHard = false;
     [SerializeField] private UserGameData testUserData;
 
     [Header("커서 애니메이션 설정")]
@@ -61,7 +62,14 @@ public class ServiceLocator : MonoBehaviour
         {
             if (isTestMode)
             {
-                CurrentRepository = easyRepository;
+                if (isHard)
+                {
+                    CurrentRepository = hardRepository;
+                }
+                else
+                {
+                    CurrentRepository = easyRepository;
+                }
             }
         }
         

@@ -22,6 +22,10 @@ public class NailInstaller : MonoBehaviour
         _endBtn.onClick.AddListener(GoTuto);
     }
 
+    private void OnEnable()
+    {
+        transform.SetAsLastSibling();
+    }
 
     private void Install()
     {

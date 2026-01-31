@@ -82,6 +82,9 @@ public class ApplicationButton : MonoBehaviour
             _applicationPanel.SetActive(true);
             _applicationPanel.transform.SetAsLastSibling();
         }
+        EventSystem.current.SetSelectedGameObject(null);
+        _isSelected = false;
+        UpdateVisualState();
     }
     private void UpdateVisualState()
     {
