@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class EnemyVisualController : MonoBehaviour
 {
@@ -49,6 +50,8 @@ public class EnemyVisualController : MonoBehaviour
     private Dictionary<RuntimeEnemy, EnemyVisual> _visualMap = new Dictionary<RuntimeEnemy, EnemyVisual>();
     private List<RuntimeEnemy> _currentEnemies = new List<RuntimeEnemy>();
     private BattleSystem _battleSystem;
+
+    private Vector3 _enemyOffset = Vector3.zero;
 
     public event Action<bool> OnEnemySideChanged; // 적 위치 변경 이벤트
 
@@ -106,6 +109,8 @@ public class EnemyVisualController : MonoBehaviour
 
         foreach (RuntimeEnemy enemy in _battleSystem.Enemies)
         {
+            _enemyOffset = enemy.Data.EnemyPrefab.transform.position;
+
             //기본 우측 소환
             GameObject obj = Instantiate(enemy.Data.EnemyPrefab, _enemyRightPos);
 
@@ -253,10 +258,24 @@ public class EnemyVisualController : MonoBehaviour
 
         targetCamera.transform.position = camera_start;
 
-        Transform startPos = isLeft ? _enemyLeftPos : _enemyRightPos;
-        Transform endPos = isLeft ? _enemyRightPos : _enemyLeftPos;
+        Transform start = isLeft ? _enemyLeftPos : _enemyRightPos;
+        Transform end = isLeft ? _enemyRightPos : _enemyLeftPos;
 
-        _currentEnemy.transform.position = startPos.position;
+        Vector3 startPos = Vector3.zero;
+        Vector3 endPos = Vector3.zero;
+        
+        Vector3 offset = _enemyOffset;
+
+        // 위치 오프셋 반영
+        if (isLeft)
+        {
+            offset.x = -offset.x;
+        }
+
+        startPos = start.position + offset;
+        endPos = end.position - offset;
+
+        _currentEnemy.transform.position = startPos;
 
         ChangeAnim("Dash");
 
@@ -282,13 +301,13 @@ public class EnemyVisualController : MonoBehaviour
             //    Vector3.Lerp(camera_start, camera_end, curveT);
 
             _currentEnemy.transform.position =
-                Vector3.Lerp(startPos.position, endPos.position, curveT);
+                Vector3.Lerp(startPos, endPos, curveT);
 
             yield return null;
         }
 
         targetCamera.transform.position = camera_end;
-        _currentEnemy.transform.position = endPos.position;
+        _currentEnemy.transform.position = endPos;
 
         CameraShake.Instance.RePosition(camera_end);
 
@@ -407,7 +426,15 @@ public class EnemyVisualController : MonoBehaviour
             if (sr != null ) sr.flipX = !isLeft;
 
             Transform targetTr = isLeft ? _enemyLeftPos : _enemyRightPos;
-            _currentEnemy.transform.position = targetTr.position;
+            
+            Vector3 offset = _enemyOffset;
+
+            if (isLeft)
+            {
+                offset.x = -offset.x;
+            }
+
+            _currentEnemy.transform.position = targetTr.position + offset;
         }
 
         if (targetCamera != null)
@@ -428,7 +455,15 @@ public class EnemyVisualController : MonoBehaviour
             if (sr != null) sr.flipX = !actualIsLeft;
 
             Transform targetTr = actualIsLeft ? _enemyLeftPos : _enemyRightPos;
-            _currentEnemy.transform.position = targetTr.position;
+            
+            Vector3 offset = _enemyOffset;
+
+            if (actualIsLeft)
+            {
+                offset.x = -offset.x;
+            }
+
+            _currentEnemy.transform.position = targetTr.position + offset;
 
             if (targetCamera != null)
             {
