@@ -70,7 +70,7 @@ public class StartPanel : MonoBehaviour
     {
         _startPanelObject.SetActive(false);
     }
-    // 추후 자식 기능들도 여기에 추가하심 될듯용
+
     public void OpenQuit()
     {
         ResetPanelPosition(_quitPanelObject);
@@ -79,11 +79,13 @@ public class StartPanel : MonoBehaviour
     }
     public void OpenSettings()
     {
+        ResetPanelPosition(_settingPanelObject);
         _settingPanelObject.SetActive(true);
         CloseMenu () ;
     }
     public void OpenCredit()
     {
+        ResetPanelPosition(_creditPanelObject);
         _creditPanelObject.SetActive(true);
         CloseMenu ();
     }
