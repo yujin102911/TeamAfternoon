@@ -10,6 +10,7 @@ public class ContractPanel : MonoBehaviour
     [SerializeField] private Toggle _noToggle;
     [SerializeField] private Button _finishButton;
     [SerializeField] private IntroPanel _introPanel;
+    [SerializeField] private GameObject _parentPanel;
 
     [Header("씬 이름 설정")]
     [SerializeField] private string _mainSceneName = "MainScene";
@@ -76,6 +77,7 @@ public class ContractPanel : MonoBehaviour
         ServiceLocator.Instance.Cursor.StopAnimation();
         _nailPanel.SetActive(true);
         gameObject.SetActive(false);
+        _parentPanel.SetActive(false);
 
     }
 
