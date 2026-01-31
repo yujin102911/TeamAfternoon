@@ -11,6 +11,8 @@ public class SoundData : ScriptableObject
 
     public bool loop;
     public SoundType type;
+
+    public bool is_randomPitch = true;
 }
 
 public enum SoundType
@@ -87,5 +89,6 @@ public enum SoundID
 
     Splash,
 
-    Stun
+    Stun,
+    Heal
 }
