@@ -104,6 +104,9 @@ public class Additional_effect_UI : MonoBehaviour, IPointerEnterHandler, IPointe
         _nameText.TableEntryReference = Additional_Effect.effectName;
         _nameText.RefreshString();
         costText.text = $"{Additional_Effect.cost} <size=15>mb</size>";
+        
+        if (TimelineManager.Instance != null)
+            SetAlpha(TimelineManager.Instance._currentMemory, TimelineManager.Instance.Max_memory);
     }
 
     public void SetLock(bool isLocked)

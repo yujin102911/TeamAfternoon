@@ -84,6 +84,11 @@ public class StepSlider : MonoBehaviour
         return playRoutine;
     }
 
+    public IEnumerator Return_IEnumerator(float duration)
+    {
+        return ReturnRoutine(duration);
+    }
+
     private IEnumerator PlayRoutine(float duration)
     {
         slider.interactable = false; // 입력 차단
@@ -110,6 +115,9 @@ public class StepSlider : MonoBehaviour
         slider.interactable = false; // 입력 차단
 
         _timelineUI.Hide_Preview();
+
+        // 타임라인이 0일 때 미리보기 보이는 버그 수정
+        _timelineUI.SetCurrent_Tick(0);
 
         float time = 0f;
         slider.value = slider.maxValue; // 보정

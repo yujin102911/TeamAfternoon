@@ -26,8 +26,8 @@ public class SteamCloudJsonTest : MonoBehaviour
         }
     }
 
-    private void Update() => SteamAPI.RunCallbacks();
-    private void OnDestroy() => SteamAPI.Shutdown();
+    //private void Update() => SteamAPI.RunCallbacks();
+    //private void OnDestroy() => SteamAPI.Shutdown();
 
     [Button("JSON 저장 (Steam Cloud)")]
     public void SaveJsonToCloud()

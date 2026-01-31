@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,6 +38,39 @@ public class sector_EnemySlot : Enemy_slot
     private Sprite _dashRightSector;
     [SerializeField]
     private Sprite _dashLeftSector;
+    
+    [Header("번개")]
+    [TabGroup("Lightning")]
+    [SerializeField]
+    private Sprite _blueHitSector;
+    [TabGroup("Lightning")]
+    [SerializeField]
+    private Sprite _blueDashRightSector;
+    [TabGroup("Lightning")]
+    [SerializeField]
+    private Sprite _blueDashLeftSector;
+
+    [Header("얼음")]
+    [TabGroup("Ice")]
+    [SerializeField]
+    private Sprite _iceHitSector;
+    [TabGroup("Ice")]
+    [SerializeField]
+    private Sprite _iceDashRightSector;
+    [TabGroup("Ice")]
+    [SerializeField]
+    private Sprite _iceDashLeftSector;
+
+    [Header("어둠")]
+    [TabGroup("Dark")]
+    [SerializeField]
+    private Sprite _darkHitSector;
+    [TabGroup("Dark")]
+    [SerializeField]
+    private Sprite _darkDashRightSector;
+    [TabGroup("Dark")]
+    [SerializeField]
+    private Sprite _darkDashLeftSector;
 
     [Header("3*3 그리드")]
     [SerializeField]
@@ -60,17 +94,53 @@ public class sector_EnemySlot : Enemy_slot
 
     public override void Show(int tick, bool is_normal, Color color, string message, Special_Pattern pattern, List<int> sectors, bool is_left)
     {
+        bool is_hard = false;
+        int stage_num = -1;
+
+        Sprite hit = _hitSector;
+        Sprite right = _dashRightSector;
+        Sprite left = _dashLeftSector;
+
         Show_Slot();
 
-        if (GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        if (GameManager.Instance != null)
+        {
+            is_hard = GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard;
+            stage_num = GameManager.Instance.CurrentStageData.StageNumber;
+        }
+
+        //하드모드 섹터표시 결정
+        if (is_hard)
         {
             _backImage.sprite = _hardBack;
+
+            switch (stage_num)
+            {
+                case 1:
+                    hit = _blueHitSector;
+                    right = _blueDashRightSector;
+                    left = _blueDashLeftSector;
+                    break;
+                
+                case 2:
+                    hit = _iceHitSector;
+                    right = _iceDashRightSector;
+                    left = _iceDashLeftSector;
+                    break;
+                
+                case 3:
+                    hit = _darkHitSector;
+                    right = _darkDashRightSector;
+                    left = _darkDashLeftSector;
+                    break;
+            }
         }
         else
         {
-            _backImage.sprite= _nomalBack;
+            _backImage.sprite = _nomalBack;
         }
 
+        //섹터 사이즈 분류(3*3 or 4*3)
         if (is_normal)
         {
             _imageSectors = _nomalSectors;
@@ -94,7 +164,7 @@ public class sector_EnemySlot : Enemy_slot
                     {
                         if (sectors.Contains(i + 1))
                         {
-                            _imageSectors[i].sprite = _hitSector;
+                            _imageSectors[i].sprite = hit;
                         }
                         else
                         {
@@ -158,7 +228,7 @@ public class sector_EnemySlot : Enemy_slot
                     {
                         if (sectors.Contains(i + 1))
                         {
-                            _imageSectors[i].sprite = is_left ? _dashLeftSector : _dashRightSector;
+                            _imageSectors[i].sprite = is_left ? left : right;
                         }
                         else
                         {

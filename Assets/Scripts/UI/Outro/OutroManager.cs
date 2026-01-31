@@ -87,7 +87,13 @@ public class OutroManager : MonoBehaviour
 
         //BGM 변경: 배경 화면 씬
         if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.BGM_Stage);
+        {
+            SoundManager.Instance.Play(SoundID.BGM_Title);
+            SoundManager.Instance.Set_BGM_Volume(0.4f);
+        }
+            
+        
+            //SoundManager.Instance.Play(SoundID.BGM_Title);
 
         NextStep();
     }
@@ -202,7 +208,8 @@ public class OutroManager : MonoBehaviour
 
         //BGM 변경: 타이틀 씬
         if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.BGM_Title);
+            SoundManager.Instance.FadeBGMVolume(1f,0.2f);
+        //SoundManager.Instance.Play(SoundID.BGM_Title);
 
         if (endingCreditPanel != null)
         {
@@ -241,6 +248,9 @@ public class OutroManager : MonoBehaviour
         if (endGamePanel != null)
         {
             endGamePanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Popup);
         }
     }
 
@@ -325,6 +335,7 @@ public class OutroManager : MonoBehaviour
 
     private void GoToTitle()
     {
+        Time.timeScale = 1f;
         ServiceLocator.Instance.Scene.Load(titleScene);
     }
 

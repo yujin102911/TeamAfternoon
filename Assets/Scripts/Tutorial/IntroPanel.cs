@@ -26,11 +26,12 @@ public class IntroPanel : MonoBehaviour
         if (_introCanvasGroup != null) _introCanvasGroup.alpha = 0f;
         if (_dayCountText != null)
         {
-            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            UserGameData currentUser = ServiceLocator.Instance?.CurrentUser;
+            if (currentUser != null && ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
             {
                 _dayCountText.text = $"Day {_startDay:D2}";
             }
-            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            else if (currentUser != null && ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
             {
                 _dayCountText.text = $"Week {_startDay:D2}";
             }
@@ -50,7 +51,7 @@ public class IntroPanel : MonoBehaviour
             float elpased = 0f;
             while (elpased < _countUpDuration)
             {
-                elpased += Time.deltaTime;
+                elpased += Time.unscaledDeltaTime;
                 _introCanvasGroup.alpha = Mathf.Clamp01(elpased / _countUpDuration);
                 yield return null;
             }
@@ -59,36 +60,47 @@ public class IntroPanel : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < _countUpDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             int displayDay = (int)Mathf.Lerp(_startDay, _endDay, elapsed / _countUpDuration);
 
-            if (_dayCountText != null)
+            UserGameData currentUser = ServiceLocator.Instance?.CurrentUser;
+            if (currentUser != null)
             {
-                if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+                if (_dayCountText != null)
                 {
-                    _dayCountText.text = $"Day {displayDay:D2}";
-                }
-                else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
-                {
-                    _dayCountText.text = $"Week {displayDay:D2}";
+                    if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+                    {
+                        _dayCountText.text = $"Day {displayDay:D2}";
+                    }
+                    else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+                    {
+                        _dayCountText.text = $"Week {displayDay:D2}";
+                    }
                 }
             }
-
+            else
+            {
+                _dayCountText.text = $"Day {displayDay:D2}";
+            }
             yield return null;
+
         }
+
         if (_dayCountText != null)
         {
-            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            UserGameData currentUser = ServiceLocator.Instance?.CurrentUser;
+
+            if (currentUser != null && ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
             {
                 _dayCountText.text = $"Day {_endDay:D2}";
             }
-            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            else if (currentUser != null && ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
             {
                 _dayCountText.text = $"Week {_endDay:D2}";
             }
         }
 
-        yield return new WaitForSeconds(_stayDuration);
+        yield return new WaitForSecondsRealtime(_stayDuration);
 
     }
 }

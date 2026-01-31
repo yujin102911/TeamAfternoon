@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -21,9 +22,13 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private List<SoundData> soundDatas;
 
+    [SerializeField] private int prewarmSfxSources = 8; // 필요하면 inspector에서 조절
+
     private const string MasterKey = "MasterVol";
     private const string BGMKey = "BGMVol";
     private const string SFXKey = "SFXVol";
+
+    private Coroutine _bgmFadeCoroutine;
 
     private Dictionary<SoundID, SoundData> _soundMap;
 
@@ -56,6 +61,18 @@ public class SoundManager : MonoBehaviour
         foreach (var data in soundDatas)
             _soundMap[data.id] = data;
         LoadAndApplySettings();
+
+        // ✅ SFX 풀 미리 생성 (AddComponent 스파이크 방지)
+        for (int i = 0; i < prewarmSfxSources; i++)
+        {
+            var src = gameObject.AddComponent<AudioSource>();
+            src.outputAudioMixerGroup = sfxMixerGroup;
+            _sfxPool.Add(src);
+        }
+
+        // ✅ 자주 쓰는 UI 사운드 미리 로드 (첫 클릭 스파이크 방지)
+        PreloadClip(SoundID.UI_Click);
+        PreloadClip(SoundID.UI_Click2);
     }
 
     private void Update()
@@ -68,6 +85,15 @@ public class SoundManager : MonoBehaviour
         {
             Play(SoundID.UI_Click2);
         }
+    }
+
+    private void PreloadClip(SoundID id)
+    {
+        if (!_soundMap.TryGetValue(id, out var data)) return;
+        if (data == null || data.clip == null) return;
+
+        // 디코딩/로드 요청
+        data.clip.LoadAudioData();
     }
 
     private void LoadAndApplySettings()
@@ -97,13 +123,20 @@ public class SoundManager : MonoBehaviour
 
     void PlayBGM(SoundData data)
     {
+        //볼륨만 초기화
+        _bgmSource.volume = data.volume;
+
         if (_bgmSource.clip == data.clip)
             return;
 
         _bgmSource.clip = data.clip;
-        _bgmSource.volume = data.volume;
         _bgmSource.loop = true;
         _bgmSource.Play();
+    }
+
+    public void Set_BGM_Volume(float v)
+    {
+        _bgmSource.volume = v;
     }
 
     void PlaySFX(SoundData data)
@@ -163,4 +196,32 @@ public class SoundManager : MonoBehaviour
     }
 
     public float GetVolume(string key) => PlayerPrefs.GetFloat(key, 0.8f);
+
+    public void FadeBGMVolume(float targetVolume, float duration)
+    {
+        // 중복 코루틴 방지
+        if (_bgmFadeCoroutine != null)
+            StopCoroutine(_bgmFadeCoroutine);
+
+        _bgmFadeCoroutine = StartCoroutine(FadeBGMVolumeRoutine(targetVolume, duration));
+    }
+
+    private IEnumerator FadeBGMVolumeRoutine(float targetVolume, float duration)
+    {
+        float startVolume = _bgmSource.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            _bgmSource.volume = Mathf.Lerp(startVolume, targetVolume, t);
+            yield return null;
+        }
+
+        // 마지막 값 보정
+        _bgmSource.volume = targetVolume;
+        _bgmFadeCoroutine = null;
+    }
 }

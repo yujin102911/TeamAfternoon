@@ -1,6 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 public class EnemyPattern_TooltipPanel : MonoBehaviour
 {
@@ -9,18 +10,45 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
     [SerializeField] private RectTransform panelRt;   // root의 RectTransform
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f); // 마우스 기준 오른쪽 위
 
+    [Header("표시 아이콘")]
+    [SerializeField]
+    private Image _icon;
+
     [Header("공격")]
     [SerializeField]
     private Pattern_Key_Data _attackData;
+    [SerializeField]
+    private Sprite _attackIcon;
+    [SerializeField]
+    private Color _attackColor;
+
     [Header("돌진")]
     [SerializeField]
     private Pattern_Key_Data _dashData;
+    [SerializeField]
+    private Sprite _dashIcon;
+    [SerializeField]
+    private Color _dashColor;
+
     [Header("바람")]
     [SerializeField]
     private Pattern_Key_Data _windData;
+    [SerializeField]
+    private Sprite _windIcon;
+    [SerializeField]
+    private Color _windColor;
+
     [Header("돌")]
     [SerializeField]
     private Pattern_Key_Data _stoneData;
+    [SerializeField]
+    private Sprite _stoneIcon;
+    [SerializeField]
+    private Color _stoneColor;
+
+    [Header("기절 패널")]
+    [SerializeField]
+    private GameObject _stunPanel;
 
     [Header("수정할 UI연결")]
     [SerializeField] private TextMeshProUGUI nameTMP;
@@ -68,6 +96,9 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
         RectTransform parentRt = panelRt.parent as RectTransform;
         if (parentRt == null) return;
 
+        // ✅ 레이아웃 강제 갱신 (ContentSizeFitter/레이아웃 그룹 반영)
+        ForceRebuild(panelRt);
+
         Vector2 targetScreenPos = screenPos + offset;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -82,9 +113,14 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
 
         // 2) 화면(부모 Rect) 밖으로 나가지 않게 클램프
         ClampToParent(panelRt, parentRt);
+    }
 
-        
-
+    private void ForceRebuild(RectTransform rt)
+    {
+        // rt가 레이아웃 그룹/CSF가 붙은 "루트"라면 이것만으로 충분한 경우가 많음
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+        Canvas.ForceUpdateCanvases();
     }
 
     private void ClampToParent(RectTransform rt, RectTransform parentRt)
@@ -108,25 +144,47 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
     public void Hide()
     {
         this.gameObject.SetActive(false);
+        _stunPanel.SetActive(false);
     }
 
     private void Update_Info(Pattern_Label label, int stone_num)
     {
+        bool is_hard = false;
         Pattern_Key_Data pattern_Key_Data = null;
+
+        if (GameManager.Instance != null)
+            is_hard = GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard;
+
+        _icon.sprite = _attackIcon;
+        _icon.color = _attackColor;
 
         switch (label)
         {
             case Pattern_Label.Attack:
                 pattern_Key_Data = _attackData; 
+                if(is_hard)
+                    _stunPanel.SetActive(true);
                 break;
             case Pattern_Label.Dash:
                 pattern_Key_Data = _dashData;
+
+                _icon.sprite = _dashIcon;
+                _icon.color = _dashColor;
+
+                if (is_hard)
+                    _stunPanel.SetActive(true);
                 break;
             case Pattern_Label.Wind:
                 pattern_Key_Data = _windData;
+
+                _icon.sprite = _windIcon;
+                _icon.color = _windColor;
                 break;
             case Pattern_Label.Stone:
                 pattern_Key_Data = _stoneData;
+
+                _icon.sprite = _stoneIcon;
+                _icon.color = _stoneColor;
                 break;
         }
 
@@ -139,7 +197,7 @@ public class EnemyPattern_TooltipPanel : MonoBehaviour
 
         _typeText.TableEntryReference = pattern_Key_Data.Type_key;
 
-        if(GameManager.Instance != null && GameManager.Instance.UserGameData.Difficulty == Difficulty.Hard)
+        if(is_hard)
             _typeText.TableEntryReference = pattern_Key_Data.Hard_key;
 
         _nameText.RefreshString();

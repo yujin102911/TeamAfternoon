@@ -47,6 +47,9 @@ public class EscPanel : MonoBehaviour
         {
             savedTimeScale = Time.timeScale;
             Time.timeScale = 0;
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Popup);
         }
     }
 

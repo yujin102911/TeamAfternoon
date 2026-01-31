@@ -82,6 +82,10 @@ public class BattleResultUIController : MonoBehaviour
     {
         yield return new WaitForSeconds(_delayBeforeResult);
 
+        //배틀 타임스케일 초기화
+        Time.timeScale = 1f;
+        Debug.Log("[BattleResultUIController] 전투 종료 - 배틀 타임스케일 초기화");
+
         UpdateStageInfo();
 
         if (victory == EndCondition.Victory)  // 승리시
@@ -122,14 +126,23 @@ public class BattleResultUIController : MonoBehaviour
         if (victory == EndCondition.Victory)
         {
             if (_victoryPanel != null) _victoryPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Clear);
         }
         else if (victory == EndCondition.Dead)
         {
             if (_deadDefeatPanel != null) _deadDefeatPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Error);
         }
         else if( victory == EndCondition.RoundOver)
         {
             if (_roundOverDefeatPanel != null) _roundOverDefeatPanel.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Error);
         }
     }
     public void GoToTitle()

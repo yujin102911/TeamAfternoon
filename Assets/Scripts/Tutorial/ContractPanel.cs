@@ -44,6 +44,9 @@ public class ContractPanel : MonoBehaviour
         {
             Debug.Log("설치하지 않음 선택");
             _realPopup.SetActive(true);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.Play(SoundID.UI_Popup);
         }
     }
 
@@ -57,6 +60,8 @@ public class ContractPanel : MonoBehaviour
     /// </summary>
     private IEnumerator GoTutorialRoutine()
     {
+        _passButton.interactable = false;
+        _goTutorialButton.interactable = false;
         Debug.Log("튜토리얼을 시작합니다.");
         ServiceLocator.Instance.Cursor.StartAnimation("Loading");
         CanvasGroup cg = GetComponent<CanvasGroup>();
@@ -79,6 +84,8 @@ public class ContractPanel : MonoBehaviour
     /// </summary>
     private void GoWithoutTutorial()
     {
+        _passButton.interactable = false;
+        _goTutorialButton.interactable = false;
         Debug.Log("튜토리얼을 진행하지 않고 게임을 시작합니다.");
         if (ServiceLocator.Instance.CurrentUser != null && _addBlocks != null)
         {
@@ -98,21 +105,30 @@ public class ContractPanel : MonoBehaviour
     private IEnumerator End()
     {
         if (_isSceneLoading) yield break;
-
         _isSceneLoading = true;
 
         AsyncOperation asyncLoad = null;
+
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
             asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(_mainSceneName);
+        }
+        if (asyncLoad != null)
+        {
             asyncLoad.allowSceneActivation = false;
         }
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
         _introPanel.StartDayChange(0, 1);
         yield return _introPanel.FadeOutRoutine();
-
         if (asyncLoad != null)
+        {
             asyncLoad.allowSceneActivation = true;
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(_mainSceneName);
+        }
+
     }
 
 }

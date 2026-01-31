@@ -16,6 +16,11 @@ public class Additional_Effect_Panel : MonoBehaviour
 
     void Start()
     {
+        //UpdateHandUI(TimelineManager.Instance.effectData.Effect_DB, GameManager.Instance.CurrentStageData.LimitEffect);
+    }
+
+    private void OnEnable()
+    {
         UpdateHandUI(TimelineManager.Instance.effectData.Effect_DB, GameManager.Instance.CurrentStageData.LimitEffect);
     }
 
@@ -24,6 +29,7 @@ public class Additional_Effect_Panel : MonoBehaviour
         for (int i = 0; i < _initialSize; i++)
         {
             GameObject obj = Instantiate(_blockPrefab, _spawnPoint);
+            obj.name = $"{i + 1}_effext";
             obj.SetActive(false);
             _handPool.Enqueue(obj);
         }
@@ -65,8 +71,10 @@ public class Additional_Effect_Panel : MonoBehaviour
         int ix = 0;
         foreach (Additional_Effect effect in hand)
         {
-
             GameObject go = Get();
+
+            go.transform.SetAsLastSibling();
+
             Additional_effect_UI uiBlock = go.GetComponent<Additional_effect_UI>();
             if (uiBlock != null) uiBlock.Init(effect);
             
@@ -75,6 +83,7 @@ public class Additional_Effect_Panel : MonoBehaviour
             if (ix >= effect_num)
             {
                 uiBlock.SetLock(true);
+                Debug.Log("잠금!");
                 //return;
             }
             else

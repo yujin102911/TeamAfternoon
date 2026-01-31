@@ -5,6 +5,8 @@ public class Effect_DropZone : TimelineDropZone, IPointerClickHandler
 {
     public override void OnDrop(PointerEventData eventData)
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound) return;
+
         // 특수효과 전용 기능
         if(eventData.pointerDrag != null
             && eventData.pointerDrag.GetComponent<Additional_effect_UI>() != null)
@@ -49,6 +51,8 @@ public class Effect_DropZone : TimelineDropZone, IPointerClickHandler
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsExecutingRound) return;
+
         if (eventData.pointerDrag != null
             && eventData.pointerDrag.GetComponent<Additional_effect_UI>() != null)
         {

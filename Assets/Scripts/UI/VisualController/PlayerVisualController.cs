@@ -142,7 +142,10 @@ public class PlayerVisualController : MonoBehaviour
             _playerAnimator.CrossFade(animation, 0.2f);
         }
 
-        if (animation == "4_Hurt" && SoundManager.Instance != null)
+        if ((animation == "4_Hurt"
+            || animation == "9_Stun"
+            || animation == "10_NormalStun"
+            || animation == "11_ThunderStun") && SoundManager.Instance != null)
         {
             SoundManager.Instance.Play(SoundID.Player_hit);
             CameraShake.Instance.Shake(0.04f, 0.1f);

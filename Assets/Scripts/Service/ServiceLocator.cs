@@ -129,9 +129,17 @@ public class ServiceLocator : MonoBehaviour
     #region Reset Logic
     public void ResetDataToDefault(Difficulty mode)
     {
-        SaveService.DeleteSave();
+        try
+        {
+            SaveService.DeleteSave();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[ServiceLocator] 세이브 파일 삭제 실패 (무시하고 진행): {e.Message}");
+        }
         SetDifficulty(mode);
         CreateNewTutorial(mode);
+        SaveNowUserData();
     }
 
     [Button("게임 클리어 처리 버튼", ButtonSizes.Medium)]

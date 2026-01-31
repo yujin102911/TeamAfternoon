@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -15,6 +16,9 @@ public class LocalizationFontManager : MonoBehaviour
 
     [SerializeField]
     private LocaleFontPair[] localeFonts;
+
+    private string _lastLocaleCode;
+    private TMP_FontAsset _lastFont;
 
     private void Awake()
     {
@@ -42,8 +46,14 @@ public class LocalizationFontManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // 씬 로드 직후는 UI가 아직 다 안 붙었을 수 있어서 1프레임 뒤에 적용
+        StartCoroutine(ApplyAfterOneFrame());
+    }
+
+    private IEnumerator ApplyAfterOneFrame()
+    {
+        yield return null;
         ApplyFont(LocalizationSettings.SelectedLocale);
-        Debug.Log($"[Scene Loaded] {scene.name}");
     }
 
     private void ApplyFont(Locale locale)
@@ -52,25 +62,61 @@ public class LocalizationFontManager : MonoBehaviour
 
         string code = locale.Identifier.Code;
 
+        // ✅ 같은 로케일/같은 폰트면 아무 것도 안 함 (씬 로드/이벤트 중복 호출 최소화)
+        //if (_lastLocaleCode == code && _lastFont == TMP_Settings.defaultFontAsset)
+        //    return;
+
+        TMP_FontAsset targetFont = null;
+
         foreach (var pair in localeFonts)
         {
-            if (pair.localeCode == code)
+            if (pair != null && pair.localeCode == code)
             {
-                TMP_Settings.defaultFontAsset = pair.font;
-                RefreshAllTMP();
-                return;
+                targetFont = pair.font;
+                break;
             }
         }
 
-        Debug.LogWarning($"No font assigned for locale: {code}");
+        if (targetFont == null)
+        {
+            Debug.LogWarning($"No font assigned for locale: {code}");
+            return;
+        }
+
+        TMP_Settings.defaultFontAsset = targetFont;
+        _lastLocaleCode = code;
+        _lastFont = targetFont;
+
+        RefreshSceneTMP();
     }
 
-    private void RefreshAllTMP()
+    // ✅ 전체 씬 전수조사(FindObjectsByType + Inactive Include) 제거
+    // ✅ 현재 씬의 Root -> 자식으로만, "활성 오브젝트만" 갱신
+    private void RefreshSceneTMP()
     {
-        foreach (var text in Object.FindObjectsByType<TextMeshProUGUI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        var scene = SceneManager.GetActiveScene();
+        if (!scene.isLoaded) return;
+
+        var roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
         {
-            text.font = TMP_Settings.defaultFontAsset;
-            text.ForceMeshUpdate();
+            // includeInactive: false (비활성 포함하면 스파이크 커짐)
+            var texts = roots[i].GetComponentsInChildren<TextMeshProUGUI>(includeInactive: true);
+            for (int t = 0; t < texts.Length; t++)
+            {
+                var text = texts[t];
+                if (text == null) continue;
+
+                // 이미 같은 폰트면 스킵
+                if (text.font == TMP_Settings.defaultFontAsset) continue;
+
+                text.font = TMP_Settings.defaultFontAsset;
+
+                // ForceMeshUpdate()는 무거워서 제거
+                // 필요 최소 갱신만 요청
+                text.havePropertiesChanged = true;
+                text.SetAllDirty();
+            }
         }
     }
 }

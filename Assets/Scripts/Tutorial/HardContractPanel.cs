@@ -20,6 +20,7 @@ public class HardContractPanel : MonoBehaviour
 
     public void OnFinishButtonClick()
     {
+        _finishButton.interactable = false;
         ServiceLocator.Instance.SaveNowUserData();
         ServiceLocator.Instance.SetTutorialClear(true);
         StartCoroutine(End());
@@ -29,22 +30,28 @@ public class HardContractPanel : MonoBehaviour
     private IEnumerator End()
     {
         if (_isSceneLoading) yield break;
-
         _isSceneLoading = true;
 
         AsyncOperation asyncLoad = null;
+
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
             asyncLoad = ServiceLocator.Instance.Scene.LoadAsync(_hardMainSceneName);
+        }
+        if (asyncLoad != null)
+        {
             asyncLoad.allowSceneActivation = false;
         }
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
         _introPanel.StartDayChange(0, 1);
         yield return _introPanel.FadeOutRoutine();
-
         if (asyncLoad != null)
         {
             asyncLoad.allowSceneActivation = true;
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(_hardMainSceneName);
         }
     }
 
