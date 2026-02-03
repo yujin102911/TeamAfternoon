@@ -1,15 +1,35 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using Sirenix.OdinInspector;
-using System.Collections;
+﻿using Sirenix.OdinInspector;
 using Steamworks;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 
 public enum EndCondition
 {
     Victory,     // 승리
     Dead,        // 사망
     RoundOver,   // 라운드 초과
+}
+
+[System.Serializable]
+public class VictoryUIConfig
+{
+    [LabelText("난이도")] public Difficulty difficulty;
+    [LabelText("스테이지 번호")] public int stageNumber;
+
+    [Header("이미지 설정")]
+    [LabelText("결과 스프라이트")] public Sprite resultSprite;
+
+    [Header("오브젝트 설정")]
+    [LabelText("활성화 텍스트 오브젝트")] public GameObject textBoxObject;
+
+    [Header("텍스트 설정")]
+    [LabelText("플레이스홀더 문구")] public string placeholderText;
 }
 
 public class BattleResultUIController : MonoBehaviour
@@ -36,7 +56,7 @@ public class BattleResultUIController : MonoBehaviour
     [Header("Day 연출 설정")]
     [SerializeField] private CanvasGroup _fadeCanvasGroup;
     [SerializeField] private TextMeshProUGUI _dayCountText;
-    [SerializeField] private float _countUpDuration = 1.0f; 
+    [SerializeField] private float _countUpDuration = 1.0f;
     [SerializeField] private float _waitInBlack = 0.5f;
 
     [Header("씬 설정")]
@@ -46,6 +66,27 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private string _easyEndSceneName = "EasyOutro";
     [SerializeField] private string _hardEndSceneName = "HardOutro";
 
+    [SerializeField]
+    [TableList(AlwaysExpanded = true)]
+    private List<VictoryUIConfig> _victoryUIConfigs = new List<VictoryUIConfig>();
+
+    [Header("승리 UI 오브젝트 연결")]
+    [SerializeField] private Image _victoryResultImage;
+    [SerializeField] private TMP_InputField _mainInputField;
+    [SerializeField] private TextMeshProUGUI _countText;
+    [SerializeField] private TextMeshProUGUI _subTitleText;
+
+    [Header("글자수 제한 설정")]
+    [SerializeField] private int _maxCharacterLimit = 20;
+
+    [Header("현지화 설정")]
+    [SerializeField] private string _tableName = "UI Table";
+    [SerializeField] private string _easySubTitleFormatKey = "UI_VICTORY_EASY_SUBTITLE";
+    [SerializeField] private string _hardSubTitleFormatKey = "UI_VICTORY_HARD_SUBTITLE";
+
+    private TextMeshProUGUI _currentActiveCopyText;
+    private string _currentPlaceholderKey;
+
     private void Awake()
     {
         if (_victoryHomeButton != null)
@@ -54,30 +95,75 @@ public class BattleResultUIController : MonoBehaviour
         }
         if (_deadDefeatHomeButton != null)
         {
-             _deadDefeatHomeButton.onClick.AddListener(GoToTitle);
+            _deadDefeatHomeButton.onClick.AddListener(GoToTitle);
         }
-        if ( _roundOverDefeatHomeButton != null)
+        if (_roundOverDefeatHomeButton != null)
         {
             _roundOverDefeatHomeButton.onClick.AddListener(GoToTitle);
         }
+
+        if (_mainInputField != null)
+        {
+            _mainInputField.characterLimit = _maxCharacterLimit;
+            _mainInputField.onValueChanged.AddListener(HandleInputChanged);
+        }
     }
-    private void Start()
+    private void OnEnable()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.OnBattleEnded += HandleBattleEnded;
+
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
     }
 
-
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.OnBattleEnded -= HandleBattleEnded;
+
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    private void OnLocaleChanged(Locale locale)
+    {
+        if (_victoryPanel != null && _victoryPanel.activeSelf)
+        {
+            RefreshLocalizedTexts();
+        }
+    }
+
+    private void RefreshLocalizedTexts()
+    {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentStageData == null) return;
+        int currentStageNum = GameManager.Instance.CurrentStageData.StageNumber;
+
+        if (_subTitleText != null)
+        {
+            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+            {
+                _subTitleText.text = LocalizationSettings.StringDatabase.GetLocalizedString(
+                _tableName, _easySubTitleFormatKey, arguments: new object[] { currentStageNum });
+            }
+            else
+            {
+                _subTitleText.text = LocalizationSettings.StringDatabase.GetLocalizedString(
+                _tableName, _hardSubTitleFormatKey, arguments: new object[] { currentStageNum });
+            }
+            
+        }
+
+        if (!string.IsNullOrEmpty(_currentPlaceholderKey))
+        {
+            string localizedPH = LocalizationSettings.StringDatabase.GetLocalizedString(_tableName, _currentPlaceholderKey);
+            SetPlaceholderText(localizedPH);
+        }
     }
 
     private void HandleBattleEnded(EndCondition victory)
     {
         StartCoroutine(ProcessResultSequence(victory));
     }
+
     private IEnumerator ProcessResultSequence(EndCondition victory)
     {
         yield return new WaitForSeconds(_delayBeforeResult);
@@ -125,6 +211,7 @@ public class BattleResultUIController : MonoBehaviour
     {
         if (victory == EndCondition.Victory)
         {
+            SetupVictoryUI();
             if (_victoryPanel != null) _victoryPanel.SetActive(true);
 
             if (SoundManager.Instance != null)
@@ -139,9 +226,9 @@ public class BattleResultUIController : MonoBehaviour
                 SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Error);
             }
-                
+
         }
-        else if( victory == EndCondition.RoundOver)
+        else if (victory == EndCondition.RoundOver)
         {
             if (_roundOverDefeatPanel != null) _roundOverDefeatPanel.SetActive(true);
 
@@ -161,7 +248,7 @@ public class BattleResultUIController : MonoBehaviour
             {
                 ServiceLocator.Instance.Scene.Load(_easyMainSceneName);
             }
-            else if(ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+            else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
             {
                 ServiceLocator.Instance.Scene.Load(_hardMainSceneName);
             }
@@ -172,9 +259,55 @@ public class BattleResultUIController : MonoBehaviour
     {
         _victoryHomeButton.interactable = false;
 
+        SaveInputToTwitData();
+
         UnlockStageAchivement();
 
         StartCoroutine(ClearSequenceAndLoadAsync());
+    }
+
+    private void SaveInputToTwitData()
+    {
+        if (ServiceLocator.Instance == null || ServiceLocator.Instance.CurrentTwitData == null) return;
+        if (GameManager.Instance == null || GameManager.Instance.CurrentStageData == null) return;
+
+        int currentStageNum = GameManager.Instance.CurrentStageData.StageNumber;
+        Difficulty currentDifficulty = ServiceLocator.Instance.CurrentUser.Difficulty;
+
+        int nextDayNum = currentStageNum + 1;
+
+        string finalTitle = _mainInputField.text;
+
+        if (string.IsNullOrWhiteSpace(finalTitle))
+        {
+            var placeholderComponent = _mainInputField.placeholder as TextMeshProUGUI;
+            if (placeholderComponent != null)
+            {
+                finalTitle = placeholderComponent.text;
+            }
+        }
+
+        var targets = ServiceLocator.Instance.CurrentTwitData.TwitDatas
+        .Where(t => t.UploadDay == nextDayNum && t.Difficulty == currentDifficulty)
+        .ToList();
+
+        if (targets.Count > 0)
+        {
+            foreach (var twit in targets)
+            {
+                twit.videoTitle = finalTitle;
+                twit.IsVisible = true;
+            }
+
+            TwitSaveService.SetRandomReactionsForStage(
+            ServiceLocator.Instance.CurrentTwitData,
+            nextDayNum,
+            currentDifficulty
+            );
+
+            Debug.Log($"[BattleResult] 클리어 스테이지: {currentStageNum}, 트윗 업로드 날짜: {nextDayNum}");
+            Debug.Log($"[BattleResult] '{finalTitle}' 제목으로 {targets.Count}개 트윗 활성화 완료");
+        }
     }
 
     public void RetryStage()
@@ -182,6 +315,74 @@ public class BattleResultUIController : MonoBehaviour
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
         {
             ServiceLocator.Instance.Scene.Load(_battleSceneName);
+        }
+    }
+
+    private void SetupVictoryUI()
+    {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentStageData == null) return;
+
+        Difficulty currentDiff = ServiceLocator.Instance.CurrentUser.Difficulty;
+        int currentStage = GameManager.Instance.CurrentStageData.StageNumber;
+
+        _currentActiveCopyText = null;
+        foreach (var config in _victoryUIConfigs)
+        {
+            if (config.textBoxObject != null)
+                config.textBoxObject.SetActive(false);
+        }
+
+        var targetConfig = _victoryUIConfigs.Find(x => x.difficulty == currentDiff && x.stageNumber == currentStage);
+
+        if (targetConfig != null)
+        {
+            if (_victoryResultImage != null && targetConfig.resultSprite != null)
+            {
+                _victoryResultImage.sprite = targetConfig.resultSprite;
+            }
+            if (targetConfig.textBoxObject != null)
+            {
+                targetConfig.textBoxObject.SetActive(true);
+                _currentActiveCopyText = targetConfig.textBoxObject.GetComponentInChildren<TextMeshProUGUI>();
+            }
+
+            _currentPlaceholderKey = targetConfig.placeholderText;
+            RefreshLocalizedTexts();
+
+            if (_mainInputField != null)
+            {
+                _mainInputField.text = "";
+                HandleInputChanged("");
+            }
+            Debug.Log($"[BattleResult] {currentDiff} 난이도 {currentStage} 스테이지 UI 설정 완료");
+        }
+        else
+        {
+            Debug.LogWarning($"[BattleResult] 해당 스테이지({currentStage})에 대한 UI 설정 데이터가 없습니다.");
+        }
+    }
+
+    private void HandleInputChanged(string input)
+    {
+        if (_currentActiveCopyText != null)
+        {
+            _currentActiveCopyText.text = input;
+        }
+        if (_countText != null)
+        {
+            _countText.text = $"{input.Length} / {_maxCharacterLimit}";
+        }
+    }
+
+    public void SetPlaceholderText(string newText)
+    {
+        if (_mainInputField != null && _mainInputField.placeholder != null)
+        {
+            var placeholderText = _mainInputField.placeholder.GetComponent<TextMeshProUGUI>();
+            if (placeholderText != null)
+            {
+                placeholderText.text = newText;
+            }
         }
     }
 
