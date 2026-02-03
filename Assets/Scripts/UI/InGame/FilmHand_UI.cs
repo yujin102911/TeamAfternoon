@@ -146,10 +146,6 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
         // 원본은 숨기기 or 투명화
         canvasGroup.alpha = 0f;
         canvasGroup.blocksRaycasts = false;
-
-        // 클립 들 때 사운드
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.Clip_PickUp);
     }
 
     public void OnDrag(PointerEventData eventData)

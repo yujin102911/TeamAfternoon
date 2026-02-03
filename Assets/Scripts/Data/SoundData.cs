@@ -90,5 +90,10 @@ public enum SoundID
     Splash,
 
     Stun,
-    Heal
+    Heal,
+
+    Intro_typewriter,
+    Intro_ding,
+
+    None
 }
