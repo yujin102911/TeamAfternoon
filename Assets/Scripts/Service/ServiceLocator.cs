@@ -124,7 +124,6 @@ public class ServiceLocator : MonoBehaviour
     public void SaveNowUserData()
     {
         SaveService.Save(CurrentUser);
-        TwitSaveService.Save(CurrentTwitData);
     }
 
     public bool LoadGame()

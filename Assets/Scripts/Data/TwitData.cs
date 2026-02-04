@@ -60,6 +60,22 @@ public class TwitCommentData
     public string Content;
 
     [Header("대댓글 내용")]
-    public List<TwitCommentData> Cocoments = new List<TwitCommentData>();
+    public List<TwitReplyData> Cocoments = new List<TwitReplyData>();
 
+}
+
+[System.Serializable]
+public class TwitReplyData
+{
+    public string AuthorProfilePath;
+    public string Content;
+    [Header("대대댓글 내용")]
+    public List<TwitFinalReplyData> Cococoments = new List<TwitFinalReplyData>();
+}
+
+[System.Serializable]
+public class TwitFinalReplyData
+{
+    public string AuthorProfilePath;
+    public string Content;
 }

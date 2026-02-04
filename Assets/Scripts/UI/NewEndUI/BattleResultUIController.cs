@@ -110,8 +110,16 @@ public class BattleResultUIController : MonoBehaviour
     }
     private void OnEnable()
     {
+        
+    }
+
+    private void Start()
+    {
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.OnBattleEnded += HandleBattleEnded;
+            Debug.Log("구독 성공했어용");
+        }
 
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
     }
