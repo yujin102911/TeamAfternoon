@@ -526,6 +526,10 @@ public class BattleResultUIController : MonoBehaviour
             {
                 achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
             }
+            else
+            {
+                achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_1";
+            }
 
             SteamAchievementManager.Unlock(achievementKey);
         } 
