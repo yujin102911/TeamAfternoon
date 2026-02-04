@@ -129,8 +129,32 @@ public static class TwitSaveService
 
     public static bool HasSaveData()
     {
-        if (IsSteamAvailable && SteamRemoteStorage.FileExists(FILE_NAME)) return true;
-        return File.Exists(SavePath);
+        string json = "";
+
+        if (IsSteamAvailable && SteamRemoteStorage.FileExists(FILE_NAME))
+        {
+            int size = SteamRemoteStorage.GetFileSize(FILE_NAME);
+            byte[] buffer = new byte[size];
+            int read = SteamRemoteStorage.FileRead(FILE_NAME, buffer, size);
+            json = Encoding.UTF8.GetString(buffer, 0, read);
+        }
+        else if (File.Exists(SavePath))
+        {
+            json = File.ReadAllText(SavePath);
+        }
+
+        if (string.IsNullOrEmpty(json)) return false;
+
+        try
+        {
+            TwitSaveDTO dto = JsonUtility.FromJson<TwitSaveDTO>(json);
+            return dto != null && dto.TwitDatas != null && dto.TwitDatas.Count > 0;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[TwitSaveService] 데이터 확인 중 오류 발생: {e.Message}");
+            return false;
+        }
     }
 
 }

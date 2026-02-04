@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class TwitUI : MonoBehaviour
 {
@@ -110,8 +111,23 @@ public class TwitUI : MonoBehaviour
                 twit.IsLiked = isOn;
                 twit.LikeCount += isOn ? 1 : -1;
                 UpdateCounterUI(twit.RetweetCount, twit.LikeCount);
+                if (isOn)
+                {
+                    CheckAllLikedAchievement();
+                }
             });
         });
 
+    }
+    private void CheckAllLikedAchievement()
+    {
+        ServiceLocator locator = ServiceLocator.Instance;
+        if (locator.CurrentUser.Difficulty != Difficulty.Hard) return;
+
+        bool allLiked = locator.CurrentTwitData.TwitDatas.All(tag => tag.IsLiked);
+        if (allLiked)
+        {
+            SteamAchievementManager.Unlock("ACHIEVEMENT_ALL_LIKED");
+        }
     }
 }

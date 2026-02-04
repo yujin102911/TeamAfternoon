@@ -27,9 +27,8 @@ public class ServiceLocator : MonoBehaviour
     [SerializeField] private UserGameData easyModeTemplate;
     [SerializeField] private UserGameData hardModeTemplate;
 
-    [Header("시작 트윗 데이터(난이도 별)")]
-    [SerializeField] private TwitData easyTwitTemplate;
-    [SerializeField] private TwitData hardTwitTemplate;
+    [Header("시작 트윗 데이터")]
+    [SerializeField] private TwitData twitTemplate;
 
     [Header("테스트용 유저 데이터")]
     [SerializeField] private bool isTestMode = false;
@@ -89,11 +88,24 @@ public class ServiceLocator : MonoBehaviour
     public void CreateNewTutorial(Difficulty mode)
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
-        TwitData twitTemplate = (mode == Difficulty.Easy) ? easyTwitTemplate : hardTwitTemplate;
         CurrentUser = Instantiate(template);
-        CurrentTwitData = Instantiate(twitTemplate);
-
         CurrentUser.Difficulty = mode;
+
+        TwitData twitTemplateSource = this.twitTemplate;
+        if (mode == Difficulty.Hard)
+        {
+            if (TwitSaveService.HasSaveData())
+            {
+                TwitSaveService.Load(twitTemplateSource);
+                Debug.Log("[ServiceLocator] 하드 모드: 기존 트윗 데이터를 로드했습니다.");
+            }
+            else
+            {
+                Debug.Log("[ServiceLocator] 하드 모드: 세이브 데이터가 없어 기본 템플릿으로 시작합니다.");
+            }
+        }
+        CurrentTwitData = Instantiate(twitTemplateSource);
+
     }
 
     public void SetDifficulty(Difficulty mode)
@@ -128,10 +140,10 @@ public class ServiceLocator : MonoBehaviour
 
     public bool LoadGame()
     {
-        if (!SaveService.HasSaveData()) return false;
+        if (!SaveService.CanContinue()) return false;
 
         CurrentUser = Instantiate(hardModeTemplate);
-        CurrentTwitData = Instantiate(hardTwitTemplate);
+        CurrentTwitData = Instantiate(twitTemplate);
         SaveService.Load(CurrentUser);
         TwitSaveService.Load(CurrentTwitData);
         if (CurrentUser.Difficulty == Difficulty.Easy)
@@ -151,7 +163,10 @@ public class ServiceLocator : MonoBehaviour
         try
         {
             SaveService.DeleteSave();
-            TwitSaveService.DeleteSave();
+            if (mode == Difficulty.Easy) // 이지 - 하드의 트윗 데이터는 이어져야함
+            {
+                TwitSaveService.DeleteSave();
+            }
         }
         catch (System.Exception e)
         {
@@ -160,6 +175,7 @@ public class ServiceLocator : MonoBehaviour
         SetDifficulty(mode);     // 데이터 레포지토리
         CreateNewTutorial(mode); // 유저데이터 + 트윗데이터 생성
         SaveNowUserData();       // 저장
+        TwitSaveService.Save(CurrentTwitData);
     }
 
     [Button("게임 클리어 처리 버튼", ButtonSizes.Medium)]
