@@ -204,7 +204,12 @@ public class OutroManager : MonoBehaviour
     {
         CheckEndingAchievement();
         CheckDeathAchievement();
-        SetGameClear();
+        InitTwit();
+        if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+        {
+            SetGameClear();
+        }
+
 
         //BGM 변경: 타이틀 씬
         if (SoundManager.Instance != null)
@@ -328,6 +333,10 @@ public class OutroManager : MonoBehaviour
             incoming.color = c;
         }
     }
+
+    /// <summary>
+    /// 하드모드에만 누를 수 있는 버튼
+    /// </summary>
     private void QuitGame()
     {
         SaveService.DeleteSave();
@@ -344,6 +353,14 @@ public class OutroManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         ServiceLocator.Instance.Scene.Load(titleScene);
+    }
+
+    private void InitTwit()
+    {
+        if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+        {
+            TwitSaveService.DeleteSave();
+        }
     }
 
     private void SetGameClear()

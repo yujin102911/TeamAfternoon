@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class CommentUI : MonoBehaviour
@@ -16,42 +17,58 @@ public class CommentUI : MonoBehaviour
 
     public void SetData(TwitCommentData data, GameObject prefab, string videoTitle)
     {
-        string processedContent = data.Content;
+        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        HandleChildren(data.Cocoments, prefab, videoTitle);
+    }
+
+    public void SetData(TwitReplyData data, GameObject prefab, string videoTitle)
+    {
+        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        HandleChildren(data.Cococoments, prefab, videoTitle);
+    }
+
+    public void SetData(TwitFinalReplyData data, GameObject prefab, string videoTitle)
+    {
+        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        if (cocomentContainer != null) cocomentContainer.gameObject.SetActive(false);
+    }
+
+    private void FillUI(string profilePath, string content, string videoTitle)
+    {
+        string processedContent = content;
         if (!string.IsNullOrEmpty(videoTitle) && !string.IsNullOrEmpty(processedContent))
         {
             processedContent = processedContent.Replace(titleTag, videoTitle);
         }
         contentText.text = processedContent;
 
-        Sprite loadedSprite = null;
-        if (!string.IsNullOrEmpty(data.AuthorProfilePath))
-        {
-            loadedSprite = Resources.Load<Sprite>(data.AuthorProfilePath);
-        }
+        Sprite loadedSprite = string.IsNullOrEmpty(profilePath) ? null : Resources.Load<Sprite>(profilePath);
         authorProfile.sprite = (loadedSprite != null) ? loadedSprite : defaultProfileSprite;
+    }
 
-        if (cocomentContainer != null)
+    private void HandleChildren<T>(List<T> children, GameObject prefab, string videoTitle)
+    {
+        if (cocomentContainer == null) return;
+
+        if (children != null && children.Count > 0)
         {
-            if (data.Cocoments != null && data.Cocoments.Count > 0)
-            {
-                cocomentContainer.gameObject.SetActive(true);
+            cocomentContainer.gameObject.SetActive(true);
+            foreach (Transform child in cocomentContainer) Destroy(child.gameObject);
 
-                foreach (Transform child in cocomentContainer)
-                {
-                    if (Application.isPlaying) Destroy(child.gameObject);
-                }
-
-                foreach (var cocomentData in data.Cocoments)
-                {
-                    GameObject childObj = Instantiate(prefab, cocomentContainer);
-                    childObj.GetComponent<CommentUI>().SetData(cocomentData, prefab, videoTitle);
-                }
-                LayoutRebuilder.ForceRebuildLayoutImmediate(cocomentContainer.GetComponent<RectTransform>());
-            }
-            else
+            foreach (var childData in children)
             {
-                cocomentContainer.gameObject.SetActive(false);
+                GameObject childObj = Instantiate(prefab, cocomentContainer);
+                var ui = childObj.GetComponent<CommentUI>();
+
+                // 타입에 따라 다른 SetData 호출
+                if (childData is TwitReplyData rData) ui.SetData(rData, prefab, videoTitle);
+                else if (childData is TwitFinalReplyData fData) ui.SetData(fData, prefab, videoTitle);
             }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(cocomentContainer.GetComponent<RectTransform>());
+        }
+        else
+        {
+            cocomentContainer.gameObject.SetActive(false);
         }
     }
 

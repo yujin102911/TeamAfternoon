@@ -1,9 +1,22 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
+using System.Collections.Generic;
 
 public class TwitUI : MonoBehaviour
 {
+    [System.Serializable]
+    public class SpecialTextConfig
+    {
+        public int targetTwitID;
+        public GameObject textBoxObject;
+        public TextMeshProUGUI titleText;
+    }
+
+    [Header("제목 텍스트 설정")]
+    [SerializeField] private List<SpecialTextConfig> specialTextConfigs;
+
     [Header("UI 참조")]
     public TextMeshProUGUI authorNameText;
     public TextMeshProUGUI contentText;
@@ -37,6 +50,8 @@ public class TwitUI : MonoBehaviour
             processedContent = processedContent.Replace(titleTag, data.videoTitle);
         }
         contentText.text = processedContent;
+
+        UpdateSpecialTextBox(data.videoTitle);
 
         retweetToggle.onValueChanged.RemoveAllListeners();
         likeToggle.onValueChanged.RemoveAllListeners();
@@ -84,6 +99,24 @@ public class TwitUI : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
     }
 
+    private void UpdateSpecialTextBox(string videoTitle)
+    {
+        if (specialTextConfigs == null) return;
+
+        foreach (var config in specialTextConfigs)
+        {
+            if (config.textBoxObject == null) continue;
+
+            bool isTarget = (currentTwitID == config.targetTwitID);
+            config.textBoxObject.SetActive(isTarget);
+
+            if (isTarget && config.titleText != null)
+            {
+                config.titleText.text = videoTitle;
+            }
+        }
+    }
+
     private void UpdateCounterUI(int retweet, int like)
     {
         if (retweetCountText != null) retweetCountText.text = retweet.ToString();
@@ -110,8 +143,23 @@ public class TwitUI : MonoBehaviour
                 twit.IsLiked = isOn;
                 twit.LikeCount += isOn ? 1 : -1;
                 UpdateCounterUI(twit.RetweetCount, twit.LikeCount);
+                if (isOn)
+                {
+                    CheckAllLikedAchievement();
+                }
             });
         });
 
+    }
+    private void CheckAllLikedAchievement()
+    {
+        ServiceLocator locator = ServiceLocator.Instance;
+        if (locator.CurrentUser.Difficulty != Difficulty.Hard) return;
+
+        bool allLiked = locator.CurrentTwitData.TwitDatas.All(tag => tag.IsLiked);
+        if (allLiked)
+        {
+            SteamAchievementManager.Unlock("ACHIEVEMENT_ALL_LIKED");
+        }
     }
 }

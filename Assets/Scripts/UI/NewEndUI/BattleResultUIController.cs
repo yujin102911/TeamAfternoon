@@ -110,8 +110,16 @@ public class BattleResultUIController : MonoBehaviour
     }
     private void OnEnable()
     {
+        
+    }
+
+    private void Start()
+    {
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.OnBattleEnded += HandleBattleEnded;
+            Debug.Log("구독 성공했어용");
+        }
 
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
     }
@@ -366,8 +374,20 @@ public class BattleResultUIController : MonoBehaviour
     {
         if (_currentActiveCopyText != null)
         {
-            _currentActiveCopyText.text = input;
+            if (string.IsNullOrWhiteSpace(input) && _mainInputField != null && _mainInputField.placeholder != null)
+            {
+                var placeholderComponent = _mainInputField.placeholder.GetComponent<TextMeshProUGUI>();
+                if (placeholderComponent != null)
+                {
+                    _currentActiveCopyText.text = placeholderComponent.text;
+                }
+            }
+            else
+            {
+                _currentActiveCopyText.text = input;
+            }
         }
+
         if (_countText != null)
         {
             _countText.text = $"{input.Length} / {_maxCharacterLimit}";
@@ -517,6 +537,10 @@ public class BattleResultUIController : MonoBehaviour
             if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
             {
                 achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_0";
+            }
+            else
+            {
+                achievementKey = $"NEW_ACHIEVEMENT_{stageNum}_1";
             }
 
             SteamAchievementManager.Unlock(achievementKey);
