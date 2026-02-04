@@ -185,6 +185,41 @@ public class BoardData
         return changed;
     }
 
+    public List<Vector2Int> Chord(int x, int y)
+    {
+        var changed = new List<Vector2Int>();
+
+        if (!InBounds(x, y)) return changed;
+
+        var center = cells[x, y];
+        if (center.state != CellState.Revealed) return changed;
+        if (center.adjacent <= 0) return changed;
+
+        int flagCount = 0;
+
+        ForEachNeighbor(x, y, (nx, ny) =>
+        {
+            if (cells[nx, ny].state == CellState.Flagged)
+                flagCount++;
+        });
+
+        if (flagCount != center.adjacent)
+            return changed;
+
+        // 주변 자동 reveal
+        ForEachNeighbor(x, y, (nx, ny) =>
+        {
+            var n = cells[nx, ny];
+            if (n.state == CellState.Hidden)
+            {
+                changed.AddRange(Reveal(nx, ny));
+            }
+        });
+
+        return changed;
+    }
+
+
     // 게임오버 시 지뢰 공개
     public List<Vector2Int> RevealAllMines()
     {

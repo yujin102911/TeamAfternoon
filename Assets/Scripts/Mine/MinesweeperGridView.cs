@@ -166,8 +166,23 @@ public class MinesweeperGridView : MonoBehaviour
             hud.StartTimer();
         }
             
-
         var cell = board.Get(x, y);
+
+        // 이미 열린 칸이면 chord 시도
+        if (cell.state == CellState.Revealed)
+        {
+            var chordChanged = board.Chord(x, y);
+            ApplyChanged(chordChanged);
+
+            if (board.exploded)
+            {
+                gameOver = true;
+                hud.StopTimer();
+            }
+
+            return;
+        }
+
         if (cell.state == CellState.Flagged || cell.state == CellState.Revealed)
             return;
 
@@ -199,6 +214,27 @@ public class MinesweeperGridView : MonoBehaviour
         var changed = board.ToggleFlag(x, y);
         ApplyChanged(changed);
         RefreshHudCounters();
+    }
+
+    public void SetChordPreview(int cx, int cy, bool on)
+    {
+        for (int dy = -1; dy <= 1; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = cx + dx;
+                int ny = cy + dy;
+
+                if (nx < 0 || nx >= curW || ny < 0 || ny >= curH)
+                    continue;
+
+                int idx = ny * curW + nx;
+                if (idx < 0 || idx >= curCount) continue;
+
+                // Hidden 셀만 눌림 처리하고 싶으면 MineCell 내부에서 cover 체크하고 있으니 그대로 호출 OK
+                cellViews[idx].SetNeighborPreview(on);
+            }
     }
 
     private void ApplyChanged(List<Vector2Int> changed)
