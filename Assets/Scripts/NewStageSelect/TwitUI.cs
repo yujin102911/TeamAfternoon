@@ -42,14 +42,16 @@ public class TwitUI : MonoBehaviour
     public void SetData(TwitItem data, GameObject commentPrefab)
     {
         currentTwitID = data.TwitID;
-        authorNameText.text = $"{data.AuthorName}<size=20><color=#8e8e8e>•{data.UploadDay}일</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
-        
-        string processedContent = data.Content;
+        string authorName = data.LocalizedAuthorName.GetLocalizedString();
+        authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•{data.UploadDay}일</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+
+        string rawContent = data.LocalizedContent.GetLocalizedString();
+
         if (!string.IsNullOrEmpty(data.videoTitle))
         {
-            processedContent = processedContent.Replace(titleTag, data.videoTitle);
+            rawContent = rawContent.Replace(titleTag, data.videoTitle);
         }
-        contentText.text = processedContent;
+        contentText.text = rawContent;
 
         UpdateSpecialTextBox(data.videoTitle);
 

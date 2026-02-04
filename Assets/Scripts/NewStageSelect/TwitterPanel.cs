@@ -33,7 +33,7 @@ public class TwitterPanel : MonoBehaviour
         }
         var visibleTwits = twitDataSO.TwitDatas
             .Where(t => t.IsVisible)
-            .OrderByDescending(t => t.IsVisible)
+            .OrderByDescending(t => t.TwitID)
             .ToList();
         foreach (var twitItem in visibleTwits)
         {
