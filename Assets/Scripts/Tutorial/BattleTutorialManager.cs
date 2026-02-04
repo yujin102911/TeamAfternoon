@@ -106,7 +106,7 @@ public class BattleTutorialManager : MonoBehaviour
             GameManager.Instance.OnBattleEnded += CheckBattleVictory;
         }
 
-        ApplyStepUI(0);
+        //ApplyStepUI(0);
     }
 
     public void OnTutorialButtonClicked(string button)

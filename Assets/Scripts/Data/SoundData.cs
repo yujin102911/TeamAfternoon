@@ -11,6 +11,8 @@ public class SoundData : ScriptableObject
 
     public bool loop;
     public SoundType type;
+
+    public bool is_randomPitch = true;
 }
 
 public enum SoundType
@@ -80,5 +82,18 @@ public enum SoundID
 
     Stone_Break,
     Ice,
-    Ice_Break
+    Ice_Break,
+
+    Clip_PickUp, 
+    Clip_PickDown,
+
+    Splash,
+
+    Stun,
+    Heal,
+
+    Intro_typewriter,
+    Intro_ding,
+
+    None
 }

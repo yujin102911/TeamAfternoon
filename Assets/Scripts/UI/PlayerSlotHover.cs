@@ -77,6 +77,10 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
             TimelineManager.Instance.RemovePlacedBlock_OnTimeline(placedBlock);
 
         }
+
+        //들기 사운드
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Clip_PickUp);
     }
 
     public void OnDrag(PointerEventData eventData)

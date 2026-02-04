@@ -146,13 +146,28 @@ public class SoundManager : MonoBehaviour
 
         source.clip = data.clip;
         source.volume = data.volume;
-        source.pitch = Random.Range(
+
+        if (data.is_randomPitch)
+        {
+            source.pitch = Random.Range(
             data.pitch - 0.05f,
             data.pitch + 0.05f
-        );
+            );
+        }
+        else
+        {
+            source.pitch = data.pitch;
+        }
+
 
         source.loop = false;
         source.Play();
+    }
+
+    public void StopBGM()
+    {
+        if(_bgmSource.isPlaying)
+            _bgmSource.Stop();
     }
 
     public void StopSFX()

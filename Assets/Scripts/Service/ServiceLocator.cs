@@ -3,6 +3,7 @@ using Steamworks;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public enum Difficulty { Easy, Hard }
 
 public class ServiceLocator : MonoBehaviour
@@ -14,6 +15,7 @@ public class ServiceLocator : MonoBehaviour
     public UserGameData CurrentUser { get; private set; }
     public DataRepository CurrentRepository { get; private set; }
     public GlobalSaveDTO GlobalData { get; private set; }
+    public TwitData CurrentTwitData { get; private set; }
 
     public System.Action OnGlobalDataChanged;
 
@@ -25,9 +27,15 @@ public class ServiceLocator : MonoBehaviour
     [SerializeField] private UserGameData easyModeTemplate;
     [SerializeField] private UserGameData hardModeTemplate;
 
+    [Header("시작 트윗 데이터(난이도 별)")]
+    [SerializeField] private TwitData easyTwitTemplate;
+    [SerializeField] private TwitData hardTwitTemplate;
+
     [Header("테스트용 유저 데이터")]
     [SerializeField] private bool isTestMode = false;
+    [SerializeField] private bool isHard = false;
     [SerializeField] private UserGameData testUserData;
+    [SerializeField] private TwitData testTwitData;
 
     [Header("커서 애니메이션 설정")]
     [SerializeField] private List<CursorAnimation> cursorAnimations;
@@ -55,16 +63,23 @@ public class ServiceLocator : MonoBehaviour
             if (isTestMode)
             {
                 CurrentUser = Instantiate(testUserData);
+                CurrentTwitData = Instantiate(testTwitData);
             }
         }
-        if (easyRepository != null)
+        if (easyRepository != null && hardRepository != null)
         {
             if (isTestMode)
             {
-                CurrentRepository = hardRepository;
+                if (isHard)
+                {
+                    CurrentRepository = hardRepository;
+                }
+                else
+                {
+                    CurrentRepository = easyRepository;
+                }
             }
         }
-        
     }
 
 
@@ -74,7 +89,9 @@ public class ServiceLocator : MonoBehaviour
     public void CreateNewTutorial(Difficulty mode)
     {
         UserGameData template = (mode == Difficulty.Easy) ? easyModeTemplate : hardModeTemplate;
+        TwitData twitTemplate = (mode == Difficulty.Easy) ? easyTwitTemplate : hardTwitTemplate;
         CurrentUser = Instantiate(template);
+        CurrentTwitData = Instantiate(twitTemplate);
 
         CurrentUser.Difficulty = mode;
     }
@@ -107,6 +124,7 @@ public class ServiceLocator : MonoBehaviour
     public void SaveNowUserData()
     {
         SaveService.Save(CurrentUser);
+        TwitSaveService.Save(CurrentTwitData);
     }
 
     public bool LoadGame()
@@ -114,7 +132,9 @@ public class ServiceLocator : MonoBehaviour
         if (!SaveService.HasSaveData()) return false;
 
         CurrentUser = Instantiate(hardModeTemplate);
+        CurrentTwitData = Instantiate(hardTwitTemplate);
         SaveService.Load(CurrentUser);
+        TwitSaveService.Load(CurrentTwitData);
         if (CurrentUser.Difficulty == Difficulty.Easy)
         {
             CurrentRepository = easyRepository;
@@ -132,14 +152,15 @@ public class ServiceLocator : MonoBehaviour
         try
         {
             SaveService.DeleteSave();
+            TwitSaveService.DeleteSave();
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[ServiceLocator] 세이브 파일 삭제 실패 (무시하고 진행): {e.Message}");
         }
-        SetDifficulty(mode);
-        CreateNewTutorial(mode);
-        SaveNowUserData();
+        SetDifficulty(mode);     // 데이터 레포지토리
+        CreateNewTutorial(mode); // 유저데이터 + 트윗데이터 생성
+        SaveNowUserData();       // 저장
     }
 
     [Button("게임 클리어 처리 버튼", ButtonSizes.Medium)]

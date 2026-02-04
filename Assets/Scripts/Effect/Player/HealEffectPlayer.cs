@@ -24,6 +24,9 @@ public class HealEffectPlayer : MonoBehaviour
         rootGroup.alpha = 0.3f;
         gameObject.SetActive(true);
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.Play(SoundID.Heal);
+
         iconsAnimator.Play(playStateName, 0, 0f);
 
         float fadeStartAt = 0.0f;   // 바로 페이드 시작
