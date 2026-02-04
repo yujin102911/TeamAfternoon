@@ -1,5 +1,4 @@
-﻿using UnityEditor.Localization.Plugins.XLIFF.V12;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 

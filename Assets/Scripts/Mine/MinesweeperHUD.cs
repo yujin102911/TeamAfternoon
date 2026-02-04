@@ -4,6 +4,10 @@ using UnityEngine.UI;
 
 public class MinesweeperHUD : MonoBehaviour
 {
+    [Header("Difficulty")]
+    [SerializeField]
+    private GameObject _difficultyPanel;
+
     [SerializeField]
     private Image _faceIcon;
     [SerializeField] private TextMeshProUGUI minesText;
@@ -56,5 +60,11 @@ public class MinesweeperHUD : MonoBehaviour
         // 초 단위 정수로 표시(지뢰찾기 감성)
         int sec = Mathf.FloorToInt(elapsed);
         timerText.text = sec.ToString("000");
+    }
+
+    public void ToggleDifficulty()
+    {
+        bool isActive = _difficultyPanel.activeSelf;
+        _difficultyPanel.SetActive(!isActive);
     }
 }

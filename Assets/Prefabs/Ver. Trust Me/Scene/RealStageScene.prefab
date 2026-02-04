@@ -2321,6 +2321,7 @@ GameObject:
   - component: {fileID: 150533453180517961}
   - component: {fileID: 8643349187470667746}
   - component: {fileID: 1157438112659615465}
+  - component: {fileID: 4876914468122794536}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2402,12 +2403,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16
+  m_fontSize: 18
   m_fontSizeBase: 16
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 18
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -2446,6 +2447,46 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4876914468122794536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2410468017650249814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:aad008785cad5ad45ac2ce561df75088
+    m_TableEntryReference:
+      m_KeyId: 8166006650028032
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1157438112659615465}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &2410534421355438468
 GameObject:
   m_ObjectHideFlags: 0
@@ -2476,8 +2517,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1307708978541851421}
-  - {fileID: 8222755870832169276}
   - {fileID: 3902037542362438512}
+  - {fileID: 8222755870832169276}
   - {fileID: 5298630506452706714}
   - {fileID: 3993979762437381535}
   m_Father: {fileID: 0}
@@ -8522,7 +8563,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 6
-    m_Right: 6
+    m_Right: 12
     m_Top: 6
     m_Bottom: 6
   m_ChildAlignment: 0
@@ -11339,6 +11380,14 @@ PrefabInstance:
       propertyPath: testUserData
       value: 
       objectReference: {fileID: 11400000, guid: 26f86745976f2514f97b964acead32da, type: 2}
+    - target: {fileID: 4262571771471649371, guid: cdbb3167228b0a443afc0fb3dd56b2af, type: 3}
+      propertyPath: easyTwitTemplate
+      value: 
+      objectReference: {fileID: 11400000, guid: 08cbd896d2cdac349bd9213c531ad3a4, type: 2}
+    - target: {fileID: 4262571771471649371, guid: cdbb3167228b0a443afc0fb3dd56b2af, type: 3}
+      propertyPath: hardTwitTemplate
+      value: 
+      objectReference: {fileID: 11400000, guid: 08cbd896d2cdac349bd9213c531ad3a4, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
