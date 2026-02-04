@@ -374,8 +374,20 @@ public class BattleResultUIController : MonoBehaviour
     {
         if (_currentActiveCopyText != null)
         {
-            _currentActiveCopyText.text = input;
+            if (string.IsNullOrWhiteSpace(input) && _mainInputField != null && _mainInputField.placeholder != null)
+            {
+                var placeholderComponent = _mainInputField.placeholder.GetComponent<TextMeshProUGUI>();
+                if (placeholderComponent != null)
+                {
+                    _currentActiveCopyText.text = placeholderComponent.text;
+                }
+            }
+            else
+            {
+                _currentActiveCopyText.text = input;
+            }
         }
+
         if (_countText != null)
         {
             _countText.text = $"{input.Length} / {_maxCharacterLimit}";
