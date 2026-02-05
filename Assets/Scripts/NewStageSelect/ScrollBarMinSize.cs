@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-// [ExecuteInEditMode]를 넣으면 에디터 상태에서도 바로 확인 가능합니다.
 [ExecuteInEditMode]
 public class ScrollbarMinSize : MonoBehaviour
 {
     private Scrollbar _scrollbar;
+    [SerializeField] private ScrollRect scrollRect; // 인스펙터에서 ScrollRect를 연결해주세요!
 
     [Header("설정")]
     [Range(0.05f, 0.5f)]
@@ -14,18 +14,46 @@ public class ScrollbarMinSize : MonoBehaviour
     void OnEnable()
     {
         _scrollbar = GetComponent<Scrollbar>();
-    }
-
-    // ScrollRect가 LateUpdate에서 크기를 계산하므로, 
-    // 그보다 늦은 시점이나 비슷한 시점에 값을 보정해줍니다.
-    void LateUpdate()
-    {
-        if (_scrollbar != null)
+        if (scrollRect != null)
         {
-            if (_scrollbar.size < minSize)
-            {
-                _scrollbar.size = minSize;
-            }
+            // 값이 바뀔 때마다 실행되도록 리스너 등록
+            scrollRect.onValueChanged.AddListener(OnScrollChanged);
         }
     }
+
+    void Start()
+    {
+        if (scrollRect != null)
+        {
+            OnScrollChanged(scrollRect.normalizedPosition);
+        }
+    }
+
+    void OnDisable()
+    {
+        if (scrollRect != null)
+        {
+            scrollRect.onValueChanged.RemoveListener(OnScrollChanged);
+        }
+    }
+
+    // ScrollRect의 계산이 끝난 후 호출되어 깜빡임을 방지함
+    void OnScrollChanged(Vector2 value)
+    {
+        if (_scrollbar != null && _scrollbar.size < minSize)
+        {
+            _scrollbar.size = minSize;
+        }
+    }
+    public void ManualRefresh()
+    {
+        // _scrollbar가 아직 할당 전이라면 여기서 직접 찾아줍니다.
+        if (_scrollbar == null) _scrollbar = GetComponent<Scrollbar>();
+
+        if (_scrollbar != null && scrollRect != null)
+        {
+            if (_scrollbar.size < minSize) _scrollbar.size = minSize;
+        }
+    }
+
 }

@@ -52,6 +52,25 @@ public class TwitterPanel : MonoBehaviour
             CreateTwitItem(twitItem);
         }
         Canvas.ForceUpdateCanvases();
+
+        UpdateScrollbarSize();
+
+        StartCoroutine(RefreshScrollbarNextFrame());
+    }
+
+    private System.Collections.IEnumerator RefreshScrollbarNextFrame()
+    {
+        yield return null; // 한 프레임 대기
+        UpdateScrollbarSize();
+    }
+
+    private void UpdateScrollbarSize()
+    {
+        var minSizeScript = contentTransform.parent.parent.GetComponentInChildren<ScrollbarMinSize>();
+        if (minSizeScript != null)
+        {
+            minSizeScript.ManualRefresh();
+        }
     }
 
     private void CreateTwitItem(TwitItem data)
