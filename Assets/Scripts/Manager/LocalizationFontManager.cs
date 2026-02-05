@@ -88,6 +88,8 @@ public class LocalizationFontManager : MonoBehaviour
         _lastFont = targetFont;
 
         RefreshSceneTMP();
+
+        ScheduleDefendersInScene();
     }
 
     // ✅ 전체 씬 전수조사(FindObjectsByType + Inactive Include) 제거
@@ -117,6 +119,20 @@ public class LocalizationFontManager : MonoBehaviour
                 text.havePropertiesChanged = true;
                 text.SetAllDirty();
             }
+        }
+    }
+
+    private void ScheduleDefendersInScene()
+    {
+        var scene = SceneManager.GetActiveScene();
+        if (!scene.isLoaded) return;
+
+        var roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            var defenders = roots[i].GetComponentsInChildren<FontDefender>(includeInactive: true);
+            for (int d = 0; d < defenders.Length; d++)
+                defenders[d]?.ScheduleLock();
         }
     }
 }

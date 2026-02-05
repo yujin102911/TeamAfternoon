@@ -186,6 +186,28 @@ public class SteamManager : MonoBehaviour {
 		SteamAPI.RunCallbacks();
 	}
 
+    public static void OpenOverlayWebPage(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
+        if (!Initialized)
+        {
+            Debug.LogWarning("[Steam] Not initialized. Fallback OpenURL.");
+            Application.OpenURL(url);
+            return;
+        }
+
+        if (!SteamUtils.IsOverlayEnabled())
+        {
+            Debug.LogWarning("[Steam] Overlay disabled. Fallback OpenURL.");
+            Application.OpenURL(url);
+            return;
+        }
+
+        SteamFriends.ActivateGameOverlayToWebPage(url);
+    }
+
     bool IsInTimeRange(int startHour, int startMinute, int endHour, int endMinute)
     {
         // 글로벌 시간 기준
@@ -223,10 +245,20 @@ public class SteamManager : MonoBehaviour {
         CancelInvoke(nameof(CheckTimeAchievement));
     }
 #else
+	public static void OpenOverlayWebPage(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
+        Application.OpenURL(url);
+    }
+
 	public static bool Initialized {
 		get {
 			return false;
 		}
 	}
 #endif // !DISABLESTEAMWORKS
+
+
 }
