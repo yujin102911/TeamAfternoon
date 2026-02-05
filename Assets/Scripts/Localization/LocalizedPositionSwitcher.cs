@@ -22,6 +22,12 @@ public class LocalizedPositionSwitcher : MonoBehaviour
         if (!targetRectTransform) targetRectTransform = GetComponent<RectTransform>();
     }
 
+    private void OnEnable()
+    {
+        var locale = LocalizationSettings.SelectedLocale;
+        Apply(locale);
+    }
+
     private void Start()
     {
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
