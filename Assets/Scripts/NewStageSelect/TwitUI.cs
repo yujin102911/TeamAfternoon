@@ -4,9 +4,6 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine.Localization;
 
 public class TwitUI : MonoBehaviour
@@ -50,7 +47,16 @@ public class TwitUI : MonoBehaviour
     public void SetData(TwitItem data, GameObject commentPrefab)
     {
         currentTwitID = data.TwitID;
-        string authorName = data.LocalizedAuthorName.GetLocalizedString();
+        string authorName = "Unknown";
+        if (!data.LocalizedAuthorName.IsEmpty &&
+        data.LocalizedAuthorName.TableReference.ReferenceType != UnityEngine.Localization.Tables.TableReference.Type.Empty)
+        {
+            authorName = data.LocalizedAuthorName.GetLocalizedString();
+        }
+        else
+        {
+            Debug.LogWarning($"[TwitUI] ID {data.TwitID}의 LocalizedAuthorName 설정이 누락되었습니다.");
+        }
         if (data.Difficulty == Difficulty.Easy)
         {
             authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•Day{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
@@ -61,9 +67,14 @@ public class TwitUI : MonoBehaviour
         }
 
         string rawContent = data.LocalizedContent.GetLocalizedString();
-        if (!string.IsNullOrEmpty(data.videoTitle))
+        if (!data.LocalizedContent.IsEmpty &&
+        data.LocalizedContent.TableReference.ReferenceType != UnityEngine.Localization.Tables.TableReference.Type.Empty)
         {
-            rawContent = rawContent.Replace(titleTag, data.videoTitle);
+            rawContent = data.LocalizedContent.GetLocalizedString();
+        }
+        else
+        {
+            Debug.LogWarning($"[TwitUI] ID {data.TwitID}의 LocalizedContent 설정이 누락되었습니다.");
         }
 
         rawContent = ReplaceEmojiToSpriteTag(rawContent);
