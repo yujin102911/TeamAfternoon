@@ -769,7 +769,6 @@ public class GameManager : MonoBehaviour
             );
 
 
-        ServiceLocator.Instance.SaveNowUserData();
 
         OnBattleEnded?.Invoke(victory);
 

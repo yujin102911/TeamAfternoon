@@ -91,20 +91,28 @@ public class ServiceLocator : MonoBehaviour
         CurrentUser = Instantiate(template);
         CurrentUser.Difficulty = mode;
 
-        TwitData twitTemplateSource = this.twitTemplate;
+        CurrentTwitData = Instantiate(this.twitTemplate);
+
         if (mode == Difficulty.Hard)
         {
             if (TwitSaveService.HasSaveData())
             {
-                TwitSaveService.Load(twitTemplateSource);
+                TwitSaveService.Load(CurrentTwitData);
                 Debug.Log("[ServiceLocator] 하드 모드: 기존 트윗 데이터를 로드했습니다.");
             }
             else
             {
                 Debug.Log("[ServiceLocator] 하드 모드: 세이브 데이터가 없어 기본 템플릿으로 시작합니다.");
             }
+            foreach (var twit in CurrentTwitData.TwitDatas)
+            {
+                if (twit.Difficulty == Difficulty.Easy)
+                {
+                    twit.IsVisible = true;
+                }
+            }
+            SetTutorialClear(true);
         }
-        CurrentTwitData = Instantiate(twitTemplateSource);
 
     }
 
