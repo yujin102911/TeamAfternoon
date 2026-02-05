@@ -10404,9 +10404,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6024134596411382853, guid: 61060487815df10448daa046c7fa5d03, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 158713947}
     - targetCorrespondingSourceObject: {fileID: 2683818520005207994, guid: 61060487815df10448daa046c7fa5d03, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1925569857}
@@ -10416,6 +10413,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5335512786901446410, guid: 61060487815df10448daa046c7fa5d03, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1925569856}
+    - targetCorrespondingSourceObject: {fileID: 6024134596411382853, guid: 61060487815df10448daa046c7fa5d03, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 158713947}
   m_SourcePrefab: {fileID: 100100000, guid: 61060487815df10448daa046c7fa5d03, type: 3}
 --- !u!20 &1925569853 stripped
 Camera:
@@ -14759,10 +14759,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1185044505}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 199.82, y: -83.91}
-  m_SizeDelta: {x: 960.41, y: 107.52}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1158, y: 458}
+  m_SizeDelta: {x: 960.41, y: 107.51999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3000419825327232137
 CanvasRenderer:
@@ -18896,18 +18896,18 @@ MonoBehaviour:
   targetRectTransform: {fileID: 2992501904773260229}
   localePositions:
   - localeCode: en
-    anchoredPosition: {x: 198, y: -177}
+    anchoredPosition: {x: 1158, y: 361}
   - localeCode: ko-KR
-    anchoredPosition: {x: 198, y: -78}
+    anchoredPosition: {x: 1158, y: 458}
   - localeCode: ja
-    anchoredPosition: {x: 198, y: -78}
+    anchoredPosition: {x: 1158, y: 456}
   - localeCode: zh-Hans
-    anchoredPosition: {x: 198, y: -81}
+    anchoredPosition: {x: 1158, y: 445}
   - localeCode: zh-TW
-    anchoredPosition: {x: 198, y: -82}
+    anchoredPosition: {x: 1158, y: 455}
   - localeCode: ru
-    anchoredPosition: {x: 198, y: -142}
-  fallbackPosition: {x: 198, y: -78}
+    anchoredPosition: {x: 1158, y: 398}
+  fallbackPosition: {x: 1158, y: 361}
   useFallback: 1
 --- !u!224 &7004274224369876668
 RectTransform:

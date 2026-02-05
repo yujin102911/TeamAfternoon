@@ -3562,6 +3562,7 @@ GameObject:
   - component: {fileID: 7151910278806094654}
   - component: {fileID: 3615386027416594704}
   - component: {fileID: 3797044022457155824}
+  - component: {fileID: 5226161137341536610}
   m_Layer: 5
   m_Name: DraggableArea
   m_TagString: Untagged
@@ -3628,6 +3629,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5226161137341536610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4477602656620002852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210dab5295eda15469a30053e40abbd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetPanel: {fileID: 5974496900168644515}
+  _minVisibleHeight: 50
+  _minVisibleWidth: 50
 --- !u!1 &4726551710015046257
 GameObject:
   m_ObjectHideFlags: 0
