@@ -266,7 +266,7 @@ public class BattleResultUIController : MonoBehaviour
         _victoryHomeButton.interactable = false;
 
         SaveInputToTwitData();
-
+        ServiceLocator.Instance.SaveNowUserData();
         UnlockStageAchivement();
 
         StartCoroutine(ClearSequenceAndLoadAsync());
