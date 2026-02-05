@@ -32,19 +32,19 @@ public class BuildInfoToggle : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            if (panel != null)
-                panel.SetActive(!panel.activeSelf);
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            ServiceLocator.Instance.SetGameClear();
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            ServiceLocator.Instance.SetGameInit();
-        }
+        //if (Input.GetKeyDown(KeyCode.F1))
+        //{
+        //    if (panel != null)
+        //        panel.SetActive(!panel.activeSelf);
+        //}
+        //if (Input.GetKeyDown(KeyCode.F2))
+        //{
+        //    ServiceLocator.Instance.SetGameClear();
+        //}
+        //if (Input.GetKeyDown(KeyCode.F3))
+        //{
+        //    ServiceLocator.Instance.SetGameInit();
+        //}
 
     }
 
