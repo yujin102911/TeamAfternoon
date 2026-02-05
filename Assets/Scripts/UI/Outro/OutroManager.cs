@@ -12,6 +12,10 @@ public class ScenarioStep
     public string dialogueKey;
     public Image background;
 
+    [Header("타이틀 치환 설정")]
+    [Tooltip("치환할 [ENTER_TITLE]이 있는 트윗의 ID를 입력하세요. (0이면 무시)")]
+    public int targetTwitID;
+
     [Tooltip("체크하면 페이드 효과 없이 바로 이미지가 바뀝니다.")]
     public bool instantChange;
 
@@ -66,6 +70,9 @@ public class OutroManager : MonoBehaviour
 
     [Header("Scenario Data")]
     public List<ScenarioStep> scenarioList;
+
+    [Header("치환 설정")]
+    [SerializeField] private string titleTag = "[ENTER_TITLE]";
 
     private int currentIndex = -1;
     private bool isTyping = false;
@@ -137,8 +144,8 @@ public class OutroManager : MonoBehaviour
     private void OnDialogueChanged(string value)
     {
         if (string.IsNullOrEmpty(value)) return;
+        currentFullText = ProcessTitleTag(value);
 
-        currentFullText = value;
         StopCoroutine("TypewriterEffect");
         StartCoroutine("TypewriterEffect");
     }
@@ -394,6 +401,29 @@ public class OutroManager : MonoBehaviour
             achievementKey = "NEW_ACHIEVEMENT_8_0";
         }
         SteamAchievementManager.Unlock(achievementKey);
+    }
+
+    private string ProcessTitleTag(string rawText)
+    {
+        // 현재 인덱스가 유효하지 않거나 태그가 포함되어 있지 않으면 그대로 반환
+        if (currentIndex < 0 || currentIndex >= scenarioList.Count || !rawText.Contains(titleTag))
+            return rawText;
+
+        int targetID = scenarioList[currentIndex].targetTwitID;
+        if (targetID <= 0) return rawText;
+
+        // ServiceLocator를 통해 트윗 데이터에서 제목을 찾음
+        var twitData = ServiceLocator.Instance.CurrentTwitData;
+        if (twitData != null)
+        {
+            var targetTwit = twitData.TwitDatas.Find(t => t.TwitID == targetID);
+            if (targetTwit != null && !string.IsNullOrEmpty(targetTwit.videoTitle))
+            {
+                return rawText.Replace(titleTag, targetTwit.videoTitle);
+            }
+        }
+
+        return rawText;
     }
 
     #endregion
