@@ -28,7 +28,6 @@ public class SteamAchievementSimpleTest : MonoBehaviour
     void Start()
     {
         InvokeRepeating(nameof(CheckTimeAchievement), 0f, 1f); // 1초마다
-        Debug.Log($"{_done}");
     }
 
 

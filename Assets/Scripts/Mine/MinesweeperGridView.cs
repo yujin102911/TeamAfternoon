@@ -39,7 +39,7 @@ public class MinesweeperGridView : MonoBehaviour
     private BoardData board;
 
     private int curW, curH, curCount;
-    private bool gameOver;
+    public bool gameOver;
 
     private const int MAX_W = 30;
     private const int MAX_H = 16;
@@ -178,6 +178,19 @@ public class MinesweeperGridView : MonoBehaviour
             {
                 gameOver = true;
                 hud.StopTimer();
+                hud.SetFaceLose();
+                return;
+            }
+
+            if (board.CheckWin())
+            {
+                // 클리어 처리
+                gameOver = true;
+                hud.StopTimer();
+                hud.SetFaceWin();
+                if(_lastDifficulty == Mine_Difficulty.Hard)
+                    SteamAchievementManager.Unlock("ACHIEVEMENT_MINE_CLEAR");
+                return;
             }
 
             return;
@@ -193,6 +206,7 @@ public class MinesweeperGridView : MonoBehaviour
         if (board.exploded)
         {
             // 게임오버 연출/입력잠금은 여기서
+            gameOver = true;
             hud.StopTimer();
             hud.SetFaceLose();
             return;
@@ -201,9 +215,11 @@ public class MinesweeperGridView : MonoBehaviour
         if (board.CheckWin())
         {
             // 클리어 처리
+            gameOver = true;
             hud.StopTimer();
             hud.SetFaceWin();
-            //SteamAchievementManager.Unlock("");
+            if (_lastDifficulty == Mine_Difficulty.Hard)
+                SteamAchievementManager.Unlock("ACHIEVEMENT_MINE_CLEAR");
         }
 
         Debug.Log($"[gridView] Left Clicked Cell ({cell.state})");
