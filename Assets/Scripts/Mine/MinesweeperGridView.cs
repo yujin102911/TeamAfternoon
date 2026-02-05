@@ -203,6 +203,7 @@ public class MinesweeperGridView : MonoBehaviour
             // 클리어 처리
             hud.StopTimer();
             hud.SetFaceWin();
+            //SteamAchievementManager.Unlock("");
         }
 
         Debug.Log($"[gridView] Left Clicked Cell ({cell.state})");
