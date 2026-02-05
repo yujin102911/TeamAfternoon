@@ -296,6 +296,7 @@ RectTransform:
   - {fileID: 1275743865}
   - {fileID: 775156903}
   - {fileID: 1626829963}
+  - {fileID: 1564787685}
   - {fileID: 1901771766}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1081,6 +1082,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275743864}
   m_CullTransparentMesh: 1
+--- !u!1 &1564787684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1564787685}
+  - component: {fileID: 1564787687}
+  - component: {fileID: 1564787686}
+  m_Layer: 5
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1564787685
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564787684}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 195345704}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -90.6, y: 210.39005}
+  m_SizeDelta: {x: 543.12, y: 121.22}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1564787686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564787684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1564787687
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1564787684}
+  m_CullTransparentMesh: 1
 --- !u!1 &1626829962
 GameObject:
   m_ObjectHideFlags: 0
@@ -1445,7 +1521,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 42.73, y: 40.33}
+  m_AnchoredPosition: {x: 77.4, y: 40.33}
   m_SizeDelta: {x: 809.78, y: 396.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1901771767
@@ -1468,18 +1544,15 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<sprite="MovieIcon" name="MovieIcon">
+  m_text: '<sprite="real_emojis" index=0><sprite="real_emojis" index=1><sprite="real_emojis"
+    index=2><sprite="real_emojis" index=3><sprite="real_emojis" index=4><sprite="real_emojis"
+    index=5><sprite="real_emojis" index=6><sprite="real_emojis" index=7><sprite="real_emojis"
+    index=8><sprite="real_emojis" index=9><sprite="real_emojis" index=10><sprite="real_emojis"
+    index=11><sprite="real_emojis" index=12><sprite="real_emojis" index=13>
 
-    <sprite="EmojiOne" name="1f605">
 
-    <sprite="emojis"
-    name="emojis_0">
-
-    fkfkfkfkfkf<sprite="emojis" index=1><sprite="emojis" index=2><sprite="emojis"
-    index=3><sprite="emojis" index=4><sprite="emojis" index=5><sprite="emojis" index=6><sprite="emojis"
-    index=8><sprite="emojis" index=9><sprite="emojis" index=10><sprite="emojis" index=11><sprite="emojis"
-    index=12><sprite="emojis" index=13><sprite="emojis" index=14><sprite="emojis"
-    index=16>'
+    <sprite="real_emojis"
+    name="1f339">'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 65001ea7888b6fc459dc2690c0a72224, type: 2}
   m_sharedMaterial: {fileID: -6101879909903100628, guid: 65001ea7888b6fc459dc2690c0a72224, type: 2}
