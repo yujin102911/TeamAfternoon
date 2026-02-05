@@ -49,11 +49,11 @@ public class TwitUI : MonoBehaviour
         string authorName = data.LocalizedAuthorName.GetLocalizedString();
         if (data.Difficulty == Difficulty.Easy)
         {
-            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•Day{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e> • Day{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
         }
         else
         {
-            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•Week{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e> • Week{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
         }
 
         string rawContent = data.LocalizedContent.GetLocalizedString();
