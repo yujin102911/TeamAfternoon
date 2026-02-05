@@ -41,6 +41,7 @@ public class MineCell : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     public void OnPointerClick(PointerEventData eventData)
     {
         if (owner == null) return;
+        if (owner.gameOver) return;
 
 
         if (eventData.button == PointerEventData.InputButton.Right)
@@ -53,6 +54,7 @@ public class MineCell : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     public void OnPointerDown(PointerEventData eventData)
     {
         if (owner == null) return;
+        if (owner.gameOver) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
         SetPreview(true);
@@ -68,6 +70,7 @@ public class MineCell : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     public void OnPointerUp(PointerEventData eventData)
     {
         if (owner == null) return;
+        if (owner.gameOver) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
         if (!isPressedLeft) return;
 

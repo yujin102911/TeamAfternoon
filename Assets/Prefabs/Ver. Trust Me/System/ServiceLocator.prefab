@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 557342654655359047}
   - component: {fileID: 4262571771471649371}
+  - component: {fileID: 4640778685678824953}
   m_Layer: 0
   m_Name: ServiceLocator
   m_TagString: Untagged
@@ -48,8 +49,7 @@ MonoBehaviour:
   hardRepository: {fileID: 11400000, guid: 77fa3d098cb8b2a43ab982bda34f38d3, type: 2}
   easyModeTemplate: {fileID: 11400000, guid: 544ecce3d31bb554586b09c68e66abc0, type: 2}
   hardModeTemplate: {fileID: 11400000, guid: f8a50728151ddff43afc20838d65d579, type: 2}
-  easyTwitTemplate: {fileID: 11400000, guid: 08cbd896d2cdac349bd9213c531ad3a4, type: 2}
-  hardTwitTemplate: {fileID: 11400000, guid: 08cbd896d2cdac349bd9213c531ad3a4, type: 2}
+  twitTemplate: {fileID: 0}
   isTestMode: 0
   isHard: 0
   testUserData: {fileID: 0}
@@ -73,3 +73,16 @@ MonoBehaviour:
     - {fileID: 2800000, guid: 177a8ae83eba029439c9520d2e496835, type: 3}
     FPS: 10
     Hotspot: {x: 0, y: 0}
+--- !u!114 &4640778685678824953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78774575999327037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06c35d11ffe420b4bb13c4befb14afb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
