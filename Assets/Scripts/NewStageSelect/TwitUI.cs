@@ -77,6 +77,11 @@ public class TwitUI : MonoBehaviour
             Debug.LogWarning($"[TwitUI] ID {data.TwitID}의 LocalizedContent 설정이 누락되었습니다.");
         }
 
+        if (!string.IsNullOrEmpty(data.videoTitle))
+        {
+            rawContent = rawContent.Replace(titleTag, data.videoTitle);
+        }
+
         rawContent = ReplaceEmojiToSpriteTag(rawContent);
 
         contentText.text = rawContent;
