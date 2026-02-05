@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine.Localization;
 
 public class TwitUI : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class TwitUI : MonoBehaviour
         public int targetTwitID;
         public GameObject textBoxObject;
         public TextMeshProUGUI titleText;
+        public TextMeshProUGUI subTitleText;
+        public LocalizedString localizedSubTitle;
+        public int dayValue;
     }
 
     [Header("제목 텍스트 설정")]
@@ -43,10 +47,16 @@ public class TwitUI : MonoBehaviour
     {
         currentTwitID = data.TwitID;
         string authorName = data.LocalizedAuthorName.GetLocalizedString();
-        authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•{data.UploadDay}일</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+        if (data.Difficulty == Difficulty.Easy)
+        {
+            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•Day{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+        }
+        else
+        {
+            authorNameText.text = $"{authorName}<size=20><color=#8e8e8e>•Week{data.UploadDay}</size></color>\n<size=22><color=#5a5a5a>{data.AuthorID}</size></color>";
+        }
 
         string rawContent = data.LocalizedContent.GetLocalizedString();
-
         if (!string.IsNullOrEmpty(data.videoTitle))
         {
             rawContent = rawContent.Replace(titleTag, data.videoTitle);
@@ -112,9 +122,15 @@ public class TwitUI : MonoBehaviour
             bool isTarget = (currentTwitID == config.targetTwitID);
             config.textBoxObject.SetActive(isTarget);
 
-            if (isTarget && config.titleText != null)
+            if (isTarget)
             {
-                config.titleText.text = videoTitle;
+                if (config.titleText != null)
+                    config.titleText.text = videoTitle;
+
+                if (config.subTitleText != null && !config.localizedSubTitle.IsEmpty)
+                {
+                    config.subTitleText.text = config.localizedSubTitle.GetLocalizedString(config.dayValue);
+                }
             }
         }
     }
