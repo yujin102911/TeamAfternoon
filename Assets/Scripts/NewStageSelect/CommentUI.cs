@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 
 public class CommentUI : MonoBehaviour
@@ -17,25 +18,26 @@ public class CommentUI : MonoBehaviour
 
     public void SetData(TwitCommentData data, GameObject prefab, string videoTitle)
     {
-        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        FillUI(data.AuthorProfilePath, data.LocalizedContent, videoTitle);
         HandleChildren(data.Cocoments, prefab, videoTitle);
     }
 
     public void SetData(TwitReplyData data, GameObject prefab, string videoTitle)
     {
-        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        FillUI(data.AuthorProfilePath, data.LocalizedContent, videoTitle);
         HandleChildren(data.Cococoments, prefab, videoTitle);
     }
 
     public void SetData(TwitFinalReplyData data, GameObject prefab, string videoTitle)
     {
-        FillUI(data.AuthorProfilePath, data.Content, videoTitle);
+        FillUI(data.AuthorProfilePath, data.LocalizedContent, videoTitle);
         if (cocomentContainer != null) cocomentContainer.gameObject.SetActive(false);
     }
 
-    private void FillUI(string profilePath, string content, string videoTitle)
+    private void FillUI(string profilePath, LocalizedString localizedContent, string videoTitle)
     {
-        string processedContent = content;
+        string processedContent = localizedContent.GetLocalizedString();
+        
         if (!string.IsNullOrEmpty(videoTitle) && !string.IsNullOrEmpty(processedContent))
         {
             processedContent = processedContent.Replace(titleTag, videoTitle);

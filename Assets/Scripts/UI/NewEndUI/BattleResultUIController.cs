@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.UI;
+using VInspector.Libs;
 
 public enum EndCondition
 {
@@ -28,8 +29,12 @@ public class VictoryUIConfig
     [Header("오브젝트 설정")]
     [LabelText("활성화 텍스트 오브젝트")] public GameObject textBoxObject;
 
+    [Header("텍스트 컴포넌트 연결")]
+    [LabelText("제목 텍스트(CopyText)")] public TextMeshProUGUI titleText;
+    [LabelText("서브타이틀(Day/Week)")] public TextMeshProUGUI subTitleText;
+
     [Header("텍스트 설정")]
-    [LabelText("플레이스홀더 문구")] public string placeholderText;
+    [LabelText("플레이스홀더 문구")] public LocalizedString placeholderLocalizedKey;
 }
 
 public class BattleResultUIController : MonoBehaviour
@@ -74,7 +79,6 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private Image _victoryResultImage;
     [SerializeField] private TMP_InputField _mainInputField;
     [SerializeField] private TextMeshProUGUI _countText;
-    [SerializeField] private TextMeshProUGUI _subTitleText;
 
     [Header("글자수 제한 설정")]
     [SerializeField] private int _maxCharacterLimit = 20;
@@ -85,7 +89,8 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private string _hardSubTitleFormatKey = "UI_VICTORY_HARD_SUBTITLE";
 
     private TextMeshProUGUI _currentActiveCopyText;
-    private string _currentPlaceholderKey;
+    private LocalizedString _currentPlaceholderLocalized;
+    private TextMeshProUGUI _currentActiveSubTitleText; 
 
     private void Awake()
     {
@@ -145,25 +150,18 @@ public class BattleResultUIController : MonoBehaviour
         if (GameManager.Instance == null || GameManager.Instance.CurrentStageData == null) return;
         int currentStageNum = GameManager.Instance.CurrentStageData.StageNumber;
 
-        if (_subTitleText != null)
+        if (_currentActiveSubTitleText != null)
         {
-            if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
-            {
-                _subTitleText.text = LocalizationSettings.StringDatabase.GetLocalizedString(
-                _tableName, _easySubTitleFormatKey, arguments: new object[] { currentStageNum });
-            }
-            else
-            {
-                _subTitleText.text = LocalizationSettings.StringDatabase.GetLocalizedString(
-                _tableName, _hardSubTitleFormatKey, arguments: new object[] { currentStageNum });
-            }
-            
+            string key = (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
+                         ? _easySubTitleFormatKey : _hardSubTitleFormatKey;
+
+            _currentActiveSubTitleText.text = LocalizationSettings.StringDatabase.GetLocalizedString(
+                _tableName, key, arguments: new object[] { currentStageNum });
         }
 
-        if (!string.IsNullOrEmpty(_currentPlaceholderKey))
+        if (_currentPlaceholderLocalized != null && !_currentPlaceholderLocalized.IsEmpty)
         {
-            string localizedPH = LocalizationSettings.StringDatabase.GetLocalizedString(_tableName, _currentPlaceholderKey);
-            SetPlaceholderText(localizedPH);
+            SetPlaceholderText(_currentPlaceholderLocalized.GetLocalizedString());
         }
     }
 
@@ -334,6 +332,8 @@ public class BattleResultUIController : MonoBehaviour
         int currentStage = GameManager.Instance.CurrentStageData.StageNumber;
 
         _currentActiveCopyText = null;
+        _currentActiveSubTitleText = null;
+
         foreach (var config in _victoryUIConfigs)
         {
             if (config.textBoxObject != null)
@@ -351,10 +351,11 @@ public class BattleResultUIController : MonoBehaviour
             if (targetConfig.textBoxObject != null)
             {
                 targetConfig.textBoxObject.SetActive(true);
-                _currentActiveCopyText = targetConfig.textBoxObject.GetComponentInChildren<TextMeshProUGUI>();
+                _currentActiveCopyText = targetConfig.titleText;
+                _currentActiveSubTitleText = targetConfig.subTitleText;
             }
 
-            _currentPlaceholderKey = targetConfig.placeholderText;
+            _currentPlaceholderLocalized = targetConfig.placeholderLocalizedKey;
             RefreshLocalizedTexts();
 
             if (_mainInputField != null)

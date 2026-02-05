@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Localization;
+using Sirenix.OdinInspector;
 
 
 [CreateAssetMenu(fileName = "New Twit Data", menuName = "Data/TwitData")]
 public class TwitData : ScriptableObject
 {
     [Header("트윗 정보")]
+    [ListDrawerSettings(ListElementLabelName = "TwitID")]
+    [Searchable]
     public List<TwitItem> TwitDatas = new List<TwitItem>();
 }
 
@@ -17,14 +21,14 @@ public class TwitItem
     public int TwitID;
 
     [Header("작성자 정보")]
-    public string AuthorName;
+    public LocalizedString LocalizedAuthorName;
     public string AuthorID;
     public string AuthorProfilePath;
 
     [Header("게시물 정보")]
     public Difficulty Difficulty;
     public int UploadDay;
-    public string Content;
+    public LocalizedString LocalizedContent;
     public bool IsVisible;
     public bool hasImage;
     public string ImagePath;
@@ -57,7 +61,7 @@ public class TwitCommentData
     public string AuthorProfilePath;
 
     [Header("댓글 내용")]
-    public string Content;
+    public LocalizedString LocalizedContent;
 
     [Header("대댓글 내용")]
     public List<TwitReplyData> Cocoments = new List<TwitReplyData>();
@@ -68,7 +72,7 @@ public class TwitCommentData
 public class TwitReplyData
 {
     public string AuthorProfilePath;
-    public string Content;
+    public LocalizedString LocalizedContent;
     [Header("대대댓글 내용")]
     public List<TwitFinalReplyData> Cococoments = new List<TwitFinalReplyData>();
 }
@@ -77,5 +81,5 @@ public class TwitReplyData
 public class TwitFinalReplyData
 {
     public string AuthorProfilePath;
-    public string Content;
+    public LocalizedString LocalizedContent;
 }
