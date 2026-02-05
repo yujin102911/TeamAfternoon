@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Localization.Settings;
 
 public class TwitterPanel : MonoBehaviour
 {
@@ -15,6 +16,17 @@ public class TwitterPanel : MonoBehaviour
     [SerializeField] private Transform contentTransform;
 
     private void OnEnable()
+    {
+        RefreshFeed();
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    private void OnLocaleChanged(UnityEngine.Localization.Locale locale)
     {
         RefreshFeed();
     }
@@ -39,6 +51,7 @@ public class TwitterPanel : MonoBehaviour
         {
             CreateTwitItem(twitItem);
         }
+        Canvas.ForceUpdateCanvases();
     }
 
     private void CreateTwitItem(TwitItem data)
