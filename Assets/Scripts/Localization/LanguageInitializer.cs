@@ -40,6 +40,8 @@ public class LanguageInitializer : MonoBehaviour
         }
 
         // 3️⃣ 그래도 없으면 첫 번째(Locale Table에서 맨 위)
-        LocalizationSettings.SelectedLocale = locales[0];
+        var english = locales.Find(l => l.Identifier.Code == "en");
+        LocalizationSettings.SelectedLocale = english != null ? english : locales[0];
+
     }
 }
