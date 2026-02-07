@@ -20885,7 +20885,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000011086464}
+  m_AnchoredPosition: {x: 0, y: 0.000041514635}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3940061277986326167
@@ -25061,6 +25061,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2482019908085773449}
     - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
+      propertyPath: _freezeDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
       propertyPath: _mainInputField
       value: 
       objectReference: {fileID: 2901653024202680231}
@@ -25090,7 +25094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
       propertyPath: _freezeFadeDuration
-      value: 0.3
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1564554710718755972, guid: 22b38c8dc944d9b45850c0ae826c3d75, type: 3}
       propertyPath: _victoryResultImage

@@ -201,6 +201,10 @@ public class BattleResultUIController : MonoBehaviour
         }
         else  // 어떻게든 패배 시
         {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
+            }
             if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
             {
                 ServiceLocator.Instance.Cursor.StartAnimation("Loading");
@@ -255,7 +259,6 @@ public class BattleResultUIController : MonoBehaviour
 
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Error);
             }
 
