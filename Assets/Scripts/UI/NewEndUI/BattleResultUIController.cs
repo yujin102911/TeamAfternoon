@@ -332,7 +332,12 @@ public class BattleResultUIController : MonoBehaviour
             {
                 twit.videoTitle = finalTitle;
                 twit.IsVisible = true;
+                if (twit.TwitID == 100)
+                {
+                    twit.IsLiked = true;
+                }
             }
+            
 
             TwitSaveService.SetRandomReactionsForStage(
             ServiceLocator.Instance.CurrentTwitData,
