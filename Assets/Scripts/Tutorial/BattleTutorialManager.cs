@@ -18,6 +18,7 @@ public enum TutorialCondition
     RoundExecutionFinished,
     FinalComplexCondition,
     BattleVictory,
+    RenderingFinished,
 }
 
 [System.Serializable]
@@ -70,6 +71,9 @@ public class BattleTutorialManager : MonoBehaviour
     [SerializeField] private List<int> _addBlocks;
     [SerializeField] private Button _lastButton;
 
+    [Header("외부 패널 연결")]
+    [SerializeField] private RenderingPanel _renderingPanel;
+
     private void Awake()
     {
         _lastButton.onClick.AddListener(ButtonClicked);
@@ -105,8 +109,56 @@ public class BattleTutorialManager : MonoBehaviour
         {
             GameManager.Instance.OnBattleEnded += CheckBattleVictory;
         }
+        if (_renderingPanel != null)
+        {
+            _renderingPanel.OnRenderingFinished += CheckRenderingFinished;
+        }
 
         //ApplyStepUI(0);
+    }
+
+    private void OnDestroy() // ✅ [권장] 구독 해제 (메모리 관리)
+    {
+        if (_renderingPanel != null)
+        {
+            _renderingPanel.OnRenderingFinished -= CheckRenderingFinished;
+        }
+        _timelineUI.OnEnemySlotHovered -= CheckHoverCondition;
+        _handPanel.OnFilterChanged -= CheckFilterCondition;
+        _stepSlider.OnStepSelected -= CheckSliderCondition;
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.OnTimelineChanged -= (blocks, prev) => {
+                CheckPlacementCondition(blocks, prev);
+                CheckDirectionCondition(blocks, prev);
+                CheckPlacementAndDirection();
+                CheckComplexCondition();
+                CheckFinalComplexCondition();
+            };
+
+            TimelineManager.Instance.OnEffectChanged -= (effects) => {
+                CheckEffectCondition(effects);
+                CheckComplexCondition();
+                CheckFinalComplexCondition();
+            };
+
+            TimelineManager.Instance.OnExecutionFinished -= CheckExecutionFinished;
+        }
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnBattleEnded -= CheckBattleVictory;
+        }
+    }
+
+    private void CheckRenderingFinished()
+    {
+        if (currentIndex >= steps.Length) return;
+
+        TutorialStep currentStep = steps[currentIndex];
+        if (currentStep.condition == TutorialCondition.RenderingFinished)
+        {
+            CompleteStep();
+        }
     }
 
     public void OnTutorialButtonClicked(string button)
