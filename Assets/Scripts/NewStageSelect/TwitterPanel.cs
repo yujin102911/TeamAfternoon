@@ -5,6 +5,8 @@ using UnityEngine.Localization.Settings;
 
 public class TwitterPanel : MonoBehaviour
 {
+    public static event System.Action OnPanelOpened;
+
     [Header("연결된 데이터")]
     [SerializeField] private TwitData twitDataSO;
 
@@ -17,6 +19,8 @@ public class TwitterPanel : MonoBehaviour
 
     private void OnEnable()
     {
+        OnPanelOpened?.Invoke();
+
         RefreshFeed();
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
     }
