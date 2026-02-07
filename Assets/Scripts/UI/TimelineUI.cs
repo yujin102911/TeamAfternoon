@@ -53,6 +53,10 @@ public class TimelineUI : MonoBehaviour
     [SerializeField]
     private Vector2 tooltipOffset = new Vector3(10f, 10f);
 
+    [Header("호버 색상 설정")]
+    public Color _hoverGreenColor = Color.white;
+    public Color _hoverRedColor = Color.white;
+
     [Header("색상 설정")]
     public Color normalColor = Color.white;
     public Color cursorColor = Color.yellow;

@@ -18,8 +18,7 @@ public struct DifficultySetting
 public class MinesweeperGridView : MonoBehaviour
 {
     [Header("Debug")]
-    [SerializeField]
-    Mine_Difficulty startDifficulty = Mine_Difficulty.Easy;
+    [SerializeField] private Mine_Difficulty startDifficulty = Mine_Difficulty.Easy;
     private Mine_Difficulty _lastDifficulty = Mine_Difficulty.None;
 
     [SerializeField] private MinesweeperHUD hud;
@@ -39,16 +38,19 @@ public class MinesweeperGridView : MonoBehaviour
     private BoardData board;
 
     private int curW, curH, curCount;
+
+    // MineCell에서 체크하니 public 유지(프로퍼티로 바꿔도 OK)
     public bool gameOver;
 
     private const int MAX_W = 30;
     private const int MAX_H = 16;
     private const int MAX_CELLS = MAX_W * MAX_H; // 480
 
+    public MineCell currentPressedCell { get; private set; }
+
     private void Awake()
     {
         WarmupCells(MAX_CELLS);
-        
     }
 
     private void OnEnable()
@@ -56,12 +58,11 @@ public class MinesweeperGridView : MonoBehaviour
         if (_lastDifficulty == Mine_Difficulty.None)
             _lastDifficulty = startDifficulty;
 
-        SetDifficulty(_lastDifficulty); // 기본 난이도
+        SetDifficulty(_lastDifficulty);
     }
 
     private void WarmupCells(int count)
     {
-        // 최초 1회 생성
         for (int i = 0; i < count; i++)
         {
             var cell = Instantiate(cellPrefab, gridRoot);
@@ -74,14 +75,14 @@ public class MinesweeperGridView : MonoBehaviour
     {
         if (board == null) return;
 
+        ClearAllPreviews();
+
         board.Reset();
         gameOver = false;
 
-        // 현재 활성화된 셀들만 리셋
         for (int i = 0; i < curCount; i++)
             cellViews[i].ResetVisual();
 
-        // HUD 리셋
         hud.ResetHUD(board.mineCount);
         hud.StopTimer();
     }
@@ -90,27 +91,20 @@ public class MinesweeperGridView : MonoBehaviour
     {
         switch (i)
         {
-            case 0:
-                _lastDifficulty = Mine_Difficulty.Easy;
-                SetDifficulty(Mine_Difficulty.Easy);
-                break;
-
-            case 1:
-                _lastDifficulty = Mine_Difficulty.Normal;
-                SetDifficulty(Mine_Difficulty.Normal);
-                break;
-
-            case 2:
-                _lastDifficulty = Mine_Difficulty.Hard;
-                SetDifficulty(Mine_Difficulty.Hard);
-                break;
+            case 0: _lastDifficulty = Mine_Difficulty.Easy; break;
+            case 1: _lastDifficulty = Mine_Difficulty.Normal; break;
+            case 2: _lastDifficulty = Mine_Difficulty.Hard; break;
+            default: return;
         }
-    }
 
+        SetDifficulty(_lastDifficulty);
+    }
 
     public void SetDifficulty(Mine_Difficulty diff)
     {
         var s = GetSetting(diff);
+
+        ClearAllPreviews();
 
         _panelRoot.sizeDelta = new Vector2(s.Panel_Width, s.Panel_Height);
 
@@ -118,15 +112,13 @@ public class MinesweeperGridView : MonoBehaviour
         curH = s.height;
         curCount = curW * curH;
 
-        // GridLayoutGroup: 열 개수 = width
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         grid.constraintCount = curW;
 
-        // BoardData 새로 생성(또는 기존 보드 재사용하고 Reset)
         board = new BoardData(curW, curH, s.mines);
+
         gameOver = false;
 
-        // 셀 활성/비활성 + 좌표 바인딩 + 비주얼 리셋
         for (int i = 0; i < cellViews.Count; i++)
         {
             bool active = i < curCount;
@@ -136,12 +128,13 @@ public class MinesweeperGridView : MonoBehaviour
 
             int x = i % curW;
             int y = i / curW;
+
             cellViews[i].Bind(x, y);
             cellViews[i].ResetVisual();
         }
 
-        // HUD 리셋
         hud.ResetHUD(s.mines);
+        hud.StopTimer();
     }
 
     private DifficultySetting GetSetting(Mine_Difficulty diff)
@@ -150,25 +143,26 @@ public class MinesweeperGridView : MonoBehaviour
             if (settings[i].difficulty == diff)
                 return settings[i];
 
-        // 못 찾으면 첫 번째
         return settings[0];
     }
 
-    // --------- 입력 콜백 ----------
+    // =========================================================
+    // 게임 입력
+    // =========================================================
+
     public void OnCellLeftClick(int x, int y)
     {
         if (gameOver) return;
 
-        // 첫 클릭이면 지뢰 생성(첫 클릭 안전)
         if (!board.generated)
         {
             board.GenerateMines(new Vector2Int(x, y));
             hud.StartTimer();
         }
-            
+
         var cell = board.Get(x, y);
 
-        // 이미 열린 칸이면 chord 시도
+        // ✅ 네 규칙: Revealed 칸 좌클릭이면 chord 시도
         if (cell.state == CellState.Revealed)
         {
             var chordChanged = board.Chord(x, y);
@@ -184,11 +178,10 @@ public class MinesweeperGridView : MonoBehaviour
 
             if (board.CheckWin())
             {
-                // 클리어 처리
                 gameOver = true;
                 hud.StopTimer();
                 hud.SetFaceWin();
-                if(_lastDifficulty == Mine_Difficulty.Hard)
+                if (_lastDifficulty == Mine_Difficulty.Hard)
                     SteamAchievementManager.Unlock("ACHIEVEMENT_MINE_CLEAR");
                 return;
             }
@@ -196,16 +189,14 @@ public class MinesweeperGridView : MonoBehaviour
             return;
         }
 
-        if (cell.state == CellState.Flagged || cell.state == CellState.Revealed)
+        if (cell.state == CellState.Flagged)
             return;
 
-        // 여기서 Reveal 로직(지뢰면 게임오버, 0이면 퍼짐)으로 이어지면 됨
         var changed = board.Reveal(x, y);
         ApplyChanged(changed);
 
         if (board.exploded)
         {
-            // 게임오버 연출/입력잠금은 여기서
             gameOver = true;
             hud.StopTimer();
             hud.SetFaceLose();
@@ -214,24 +205,26 @@ public class MinesweeperGridView : MonoBehaviour
 
         if (board.CheckWin())
         {
-            // 클리어 처리
             gameOver = true;
             hud.StopTimer();
             hud.SetFaceWin();
             if (_lastDifficulty == Mine_Difficulty.Hard)
                 SteamAchievementManager.Unlock("ACHIEVEMENT_MINE_CLEAR");
         }
-
-        Debug.Log($"[gridView] Left Clicked Cell ({cell.state})");
     }
 
     public void OnCellRightClick(int x, int y)
     {
-        // 첫 클릭 전에도 깃발은 가능하게(보통 허용)
+        if (gameOver) return; // ✅ 추가
+
         var changed = board.ToggleFlag(x, y);
         ApplyChanged(changed);
         RefreshHudCounters();
     }
+
+    // =========================================================
+    // Chord Preview: 주변 8칸 눌림 표시
+    // =========================================================
 
     public void SetChordPreview(int cx, int cy, bool on)
     {
@@ -249,7 +242,6 @@ public class MinesweeperGridView : MonoBehaviour
                 int idx = ny * curW + nx;
                 if (idx < 0 || idx >= curCount) continue;
 
-                // Hidden 셀만 눌림 처리하고 싶으면 MineCell 내부에서 cover 체크하고 있으니 그대로 호출 OK
                 cellViews[idx].SetNeighborPreview(on);
             }
     }
@@ -269,5 +261,84 @@ public class MinesweeperGridView : MonoBehaviour
     private void RefreshHudCounters()
     {
         hud.SetMinesRemaining(board.RemainingMines);
+    }
+
+    // =========================================================
+    // 드래그 프레스 UX (MineCell이 호출)
+    // =========================================================
+
+    public void BeginPress(MineCell cell)
+    {
+        if (gameOver || cell == null) return;
+
+        if (currentPressedCell != null && currentPressedCell != cell)
+            EndPressInternal(currentPressedCell);
+
+        currentPressedCell = cell;
+
+        cell.SetPreview(true);
+
+        if (cell.IsRevealedNumberCell())
+            SetChordPreview(cell.x, cell.y, true);
+    }
+
+    public void MovePress(MineCell cell)
+    {
+        if (gameOver || cell == null) return;
+        if (currentPressedCell == cell) return;
+
+        if (currentPressedCell != null)
+            EndPressInternal(currentPressedCell);
+
+        currentPressedCell = cell;
+
+        cell.SetPreview(true);
+
+        if (cell.IsRevealedNumberCell())
+            SetChordPreview(cell.x, cell.y, true);
+    }
+
+    // MineCell의 PointerUp에서 호출: cancel=false이면 실행
+    public void EndPress(MineCell cell, bool cancel)
+    {
+        if (gameOver || cell == null) return;
+        if (currentPressedCell != cell) return;
+
+        EndPressInternal(cell);
+
+        if (cancel) return;
+
+        OnCellLeftClick(cell.x, cell.y);
+    }
+
+    private void EndPressInternal(MineCell cell)
+    {
+        SetChordPreview(cell.x, cell.y, false);
+        cell.SetPreview(false);
+
+        if (currentPressedCell == cell)
+            currentPressedCell = null;
+    }
+
+    private void ClearAllPreviews()
+    {
+        // 난이도 변경/재시작 때 프리뷰가 남는 것 방지
+        for (int i = 0; i < cellViews.Count; i++)
+        {
+            if (!cellViews[i].gameObject.activeSelf) continue;
+
+            cellViews[i].SetPreview(false);
+            cellViews[i].SetNeighborPreview(false);
+        }
+
+        currentPressedCell = null;
+    }
+
+    public void CancelPress()
+    {
+        if (currentPressedCell == null)
+            return;
+
+        EndPress(currentPressedCell, cancel: true);
     }
 }

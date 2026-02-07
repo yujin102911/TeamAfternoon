@@ -8,6 +8,8 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     public TimelineUI timelineUI;
     public Image image;
     public Color originalColor;
+    public Color hoverGreenColor = new Color(0.61f, 0.92f, 0.73f);
+    public Color hoverRedColor = new Color(1f, 0.6f, 0.6f);
 
     void Awake()
     {
@@ -119,7 +121,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
 
             // 배치 가능한지 확인
             bool canPlace = TimelineManager.Instance.CanPlaceAt(tickIndex, block_info.BaseData.BlockLength, block_info);
-            if (image) image.color = canPlace ? new Color(0.5f, 1f, 0.5f) : new Color(1f, 0.6f, 0.6f);
+            if (image) image.color = canPlace ? hoverGreenColor : hoverRedColor;
         }
 
     }
@@ -128,7 +130,7 @@ public class TimelineDropZone : MonoBehaviour, IDropHandler, IPointerEnterHandle
     {
         // 색상 원래대로
         if (eventData.pointerDrag != null && image != null
-            && (IsColorSimilar(image.color, new Color(0.5f, 1f, 0.5f))) || IsColorSimilar(image.color, new Color(1f, 0.6f, 0.6f)))
+            && (IsColorSimilar(image.color, hoverGreenColor)) || IsColorSimilar(image.color, hoverRedColor))
         {
             image.color = originalColor;
         }
