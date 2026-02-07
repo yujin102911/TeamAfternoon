@@ -6,6 +6,8 @@ using Sirenix.OdinInspector;
 
 public class RenderingPanel : MonoBehaviour
 {
+    public event Action OnRenderingFinished;
+
     [Header("UI 설정")]
     [SerializeField] private List<GameObject> _progressBlocks = new List<GameObject>();
 
@@ -52,6 +54,7 @@ public class RenderingPanel : MonoBehaviour
         ServiceLocator.Instance.Cursor.StopAnimation();
 
         onComplete?.Invoke();
+        OnRenderingFinished?.Invoke();
         gameObject.SetActive(false);
     }
 

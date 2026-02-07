@@ -44,6 +44,12 @@ public class BattleResultUIController : MonoBehaviour
     [SerializeField] private GameObject _deadDefeatPanel;
     [SerializeField] private GameObject _roundOverDefeatPanel;
 
+    [Header("에러 프리징 연출 설정")]
+    [SerializeField] private GameObject _freezePanel;
+    [SerializeField] private CanvasGroup _freezeCanvasGroup;
+    [SerializeField] private float _freezeDuration = 2.0f;
+    [SerializeField] private float _freezeFadeDuration = 0.5f;
+
     [Header("버튼 연결")]
     [SerializeField] private Button _victoryHomeButton;
     [SerializeField] private Button _deadDefeatHomeButton;
@@ -193,13 +199,38 @@ public class BattleResultUIController : MonoBehaviour
                 ShowResultPanel(victory);
             }
         }
-        else if (victory == EndCondition.Dead)
+        else  // 어떻게든 패배 시
         {
-            // 패배 시엔 렌더링 패널 없이 바로 띵~
-            ShowResultPanel(victory);
-        }
-        else if (victory == EndCondition.RoundOver)
-        {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.StopBGM();
+            }
+            if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
+            {
+                ServiceLocator.Instance.Cursor.StartAnimation("Loading");
+            }
+            if (_freezePanel != null)
+            {
+                _freezePanel.SetActive(true);
+                if (_freezeCanvasGroup != null)
+                {
+                    _freezeCanvasGroup.alpha = 0f;
+                    float elapsed = 0f;
+                    while (elapsed < _freezeDuration)
+                    {
+                        elapsed += Time.deltaTime;
+                        _freezeCanvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / _freezeFadeDuration);
+                        yield return null;
+                    }
+                    _freezeCanvasGroup.alpha = 1f;
+                }
+            }
+            
+            yield return new WaitForSeconds(_freezeDuration);
+            if (ServiceLocator.Instance != null && ServiceLocator.Instance.Cursor != null)
+            {
+                ServiceLocator.Instance.Cursor.StopAnimation();
+            }
             ShowResultPanel(victory);
         }
     }
@@ -228,7 +259,6 @@ public class BattleResultUIController : MonoBehaviour
 
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.StopBGM();
                 SoundManager.Instance.Play(SoundID.UI_Error);
             }
 
