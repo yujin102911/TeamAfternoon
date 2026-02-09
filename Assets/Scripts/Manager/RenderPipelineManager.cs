@@ -9,6 +9,12 @@ public class RenderPipelineManager : MonoBehaviour
     [SerializeField] private UniversalRendererData lowRenderer;
     [SerializeField] private UniversalRendererData highRenderer;
 
+    private const string RP_KEY = "RP_MODE"; // 0=low, 1=high
+    private int _currentRendererIndex = 0;
+
+    public int GetCurrentRendererIndex() => _currentRendererIndex;
+    public bool IsHigh() => _currentRendererIndex == 1;
+
     void Awake()
     {
         if (Instance != null)
@@ -25,13 +31,13 @@ public class RenderPipelineManager : MonoBehaviour
 
     void Start()
     {
-        bool high = PlayerPrefs.GetInt("RP_MODE", 0) == 1;
+        bool high = PlayerPrefs.GetInt(RP_KEY, 0) == 1;
         ApplyPipeline(high);
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        bool high = PlayerPrefs.GetInt("RP_MODE", 0) == 1;
+        bool high = PlayerPrefs.GetInt(RP_KEY, 0) == 1;
         ApplyPipeline(high);
     }
 
@@ -46,6 +52,17 @@ public class RenderPipelineManager : MonoBehaviour
         var camData = camera.GetComponent<UniversalAdditionalCameraData>();
         if (camData == null) return;
 
-        camData.SetRenderer(high ? 1 : 0);
+        int index = high ? 1 : 0;
+
+        camData.SetRenderer(index);
+
+        manager._currentRendererIndex = index;
+        PlayerPrefs.SetInt(RP_KEY, index == 1 ? 1 : 0);
+    }
+
+    public int GetCurrentRender()
+    {
+        // 1) 캐시값 우선 (가장 확실)
+        return _currentRendererIndex;
     }
 }

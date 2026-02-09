@@ -479,13 +479,15 @@ public class BattleResultUIController : MonoBehaviour
         {
             if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
             {
+                TwitSaveService.SetVisibleForEasyContinue(ServiceLocator.Instance.CurrentTwitData);
                 targetSceneName = _easyEndSceneName;
             }
             else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
             {
+                TwitSaveService.SetVisibleForHardContinue(ServiceLocator.Instance.CurrentTwitData);
                 targetSceneName = _hardEndSceneName;
             }
-                Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
+            Debug.Log("마지막 스테이지 클리어. 엔딩씬으로 넘어갑니다.");
         }
         AsyncOperation asyncLoad = null;
         if (ServiceLocator.Instance != null && ServiceLocator.Instance.Scene != null)
