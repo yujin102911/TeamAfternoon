@@ -105,6 +105,10 @@ public class ServiceLocator : MonoBehaviour
             }
             foreach (var twit in CurrentTwitData.TwitDatas)
             {
+                if (twit.Difficulty == Difficulty.Hard)
+                {
+                    twit.IsVisible = false;
+                }
                 if (twit.Difficulty == Difficulty.Easy || (twit.Difficulty == Difficulty.Hard && twit.UploadDay == 1))
                 {
                     twit.IsVisible = true;
