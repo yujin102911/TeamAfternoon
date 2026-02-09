@@ -103,23 +103,14 @@ public class ServiceLocator : MonoBehaviour
             {
                 Debug.Log("[ServiceLocator] 하드 모드: 세이브 데이터가 없어 기본 템플릿으로 시작합니다.");
             }
-            foreach (var twit in CurrentTwitData.TwitDatas)
-            {
-                if (twit.Difficulty == Difficulty.Hard)
-                {
-                    twit.IsVisible = false;
-                }
-                if (twit.Difficulty == Difficulty.Easy || (twit.Difficulty == Difficulty.Hard && twit.UploadDay == 1))
-                {
-                    twit.IsVisible = true;
-                }
-            }
-            SetTutorialClear(true);
+            TwitSaveService.SetVisibleForHardInit(CurrentTwitData);
             TwitSaveService.InitializeVideoTitles(CurrentTwitData);
+            SetTutorialClear(true);
 
         }
         if (mode == Difficulty.Easy)
         {
+            TwitSaveService.SetVisibleForEasyInit(CurrentTwitData);
             TwitSaveService.SetRandomReactionsAll(CurrentTwitData);
         }
 
