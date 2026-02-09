@@ -83,6 +83,7 @@ public class SettingPanel : MonoBehaviour
         fullscreenToggle.onValueChanged.RemoveListener(OnFullscreenToggleChanged_Immediate);
         fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged_Immediate);
 
+        pipelineToggle.onValueChanged.RemoveListener(OnPipelineToggleChanged);
         pipelineToggle.onValueChanged.AddListener(OnPipelineToggleChanged);
     }
 
@@ -94,7 +95,14 @@ public class SettingPanel : MonoBehaviour
 
         // 초기값 세팅 시 이벤트 발동 방지
         fullscreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
-        pipelineToggle.isOn = PlayerPrefs.GetInt(RP_KEY, 0) == 1;
+
+        bool isHighNow =
+    (RenderPipelineManager.Instance != null)
+    ? RenderPipelineManager.Instance.IsHigh()
+    : (PlayerPrefs.GetInt(RP_KEY, 0) == 1);
+
+        pipelineToggle.SetIsOnWithoutNotify(isHighNow);
+        PlayerPrefs.SetInt(RP_KEY, isHighNow ? 1 : 0);
 
         yield return LocalizationSettings.InitializationOperation;
 
@@ -393,6 +401,8 @@ public class SettingPanel : MonoBehaviour
 
     void OnPipelineToggleChanged(bool high)
     {
+        if (_isInitializing) return;
+
         PlayerPrefs.SetInt(RP_KEY, high ? 1 : 0);
         PlayerPrefs.Save();
 
