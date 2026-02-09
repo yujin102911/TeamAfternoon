@@ -32,6 +32,7 @@ public class TwitItem
     public bool IsVisible;
     public bool hasImage;
     public string ImagePath;
+    public LocalizedString LocalizedVideoTitle;
     public string videoTitle;
 
     [Header("댓글")]

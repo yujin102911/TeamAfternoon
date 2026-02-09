@@ -94,6 +94,38 @@ public static class TwitSaveService
         }
     }
 
+    public static void SetRandomReactionsAll(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas != null && targetSO.TwitDatas.Count > 0)
+        {
+            foreach (var twit in targetSO.TwitDatas)
+            {
+                twit.RetweetCount = UnityEngine.Random.Range(twit.MinRetweet, twit.MaxRetweet + 1);
+                twit.LikeCount = UnityEngine.Random.Range(twit.MinLike, twit.MaxLike + 1);
+            }
+            Save(targetSO);
+            Debug.Log($"[TwitSaveService] 전체 트윗({targetSO.TwitDatas.Count}개)의 반응 수치 랜덤 설정 완료");
+        }
+        else
+        {
+            Debug.LogWarning("[TwitSaveService] 설정할 트윗 데이터가 없습니다.");
+        }
+    }
+
+    public static void InitializeVideoTitles(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (TwitItem twit in targetSO.TwitDatas)
+        {
+            if (twit.LocalizedVideoTitle != null && !twit.LocalizedVideoTitle.IsEmpty && string.IsNullOrEmpty(twit.videoTitle))
+            {
+                twit.videoTitle = twit.LocalizedVideoTitle.GetLocalizedString();
+            }
+        }
+        Save(targetSO );
+        Debug.Log("[TwitSaveService] 모든 트윗의 비디오 제목이 현재 언어 설정으로 초기화되었습니다.");
+    }
+
 
     public static void DeleteSave()
     {

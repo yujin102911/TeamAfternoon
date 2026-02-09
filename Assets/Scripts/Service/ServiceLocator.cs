@@ -92,7 +92,6 @@ public class ServiceLocator : MonoBehaviour
         CurrentUser.Difficulty = mode;
 
         CurrentTwitData = Instantiate(this.twitTemplate);
-
         if (mode == Difficulty.Hard)
         {
             if (TwitSaveService.HasSaveData())
@@ -112,6 +111,12 @@ public class ServiceLocator : MonoBehaviour
                 }
             }
             SetTutorialClear(true);
+            TwitSaveService.InitializeVideoTitles(CurrentTwitData);
+
+        }
+        if (mode == Difficulty.Easy)
+        {
+            TwitSaveService.SetRandomReactionsAll(CurrentTwitData);
         }
 
     }

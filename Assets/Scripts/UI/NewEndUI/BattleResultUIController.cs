@@ -295,6 +295,7 @@ public class BattleResultUIController : MonoBehaviour
         _victoryHomeButton.interactable = false;
 
         SaveInputToTwitData();
+        TwitSaveService.Save(ServiceLocator.Instance.CurrentTwitData);
         ServiceLocator.Instance.SaveNowUserData();
         UnlockStageAchivement();
 
@@ -337,13 +338,6 @@ public class BattleResultUIController : MonoBehaviour
                     twit.IsLiked = true;
                 }
             }
-            
-
-            TwitSaveService.SetRandomReactionsForStage(
-            ServiceLocator.Instance.CurrentTwitData,
-            nextDayNum,
-            currentDifficulty
-            );
 
             Debug.Log($"[BattleResult] 클리어 스테이지: {currentStageNum}, 트윗 업로드 날짜: {nextDayNum}");
             Debug.Log($"[BattleResult] '{finalTitle}' 제목으로 {targets.Count}개 트윗 활성화 완료");
