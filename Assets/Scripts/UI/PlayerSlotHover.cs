@@ -105,7 +105,7 @@ public class PlayerSlotHover : MonoBehaviour, IPointerEnterHandler, IPointerExit
         {
             Update_UIUX(false);
 
-            if (TimelineManager.Instance != null)
+            if (TimelineManager.Instance != null && TimelineManager.Instance.CanPlaceEffect(tick))
             {
                 TimelineManager.Instance.RemovePlacedBlock(placedBlock);
                 
