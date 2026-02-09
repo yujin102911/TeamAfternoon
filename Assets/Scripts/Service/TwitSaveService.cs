@@ -204,7 +204,8 @@ public static class TwitSaveService
         if (targetSO.TwitDatas == null) return;
         foreach (var twit in targetSO.TwitDatas)
         {
-            twit.IsVisible = (twit.Difficulty == Difficulty.Hard && twit.UploadDay <= 3);
+            bool isEasyAll = (twit.Difficulty == Difficulty.Easy);
+            twit.IsVisible = (twit.Difficulty == Difficulty.Hard && twit.UploadDay <= 3) || isEasyAll;
         }
         Save(targetSO);
         Debug.Log("[TwitSaveService] Hard Continue 상태로 IsVisible 설정 완료 (Week 3까지)");
