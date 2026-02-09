@@ -112,6 +112,20 @@ public static class TwitSaveService
         }
     }
 
+    public static void InitializeVideoTitles(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (TwitItem twit in targetSO.TwitDatas)
+        {
+            if (twit.LocalizedVideoTitle != null && !twit.LocalizedVideoTitle.IsEmpty && string.IsNullOrEmpty(twit.videoTitle))
+            {
+                twit.videoTitle = twit.LocalizedVideoTitle.GetLocalizedString();
+            }
+        }
+        Save(targetSO );
+        Debug.Log("[TwitSaveService] 모든 트윗의 비디오 제목이 현재 언어 설정으로 초기화되었습니다.");
+    }
+
 
     public static void DeleteSave()
     {

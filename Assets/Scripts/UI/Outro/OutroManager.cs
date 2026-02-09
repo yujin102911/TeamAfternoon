@@ -89,7 +89,7 @@ public class OutroManager : MonoBehaviour
         if (endingCreditPanel != null) endingCreditPanel.SetActive(false);
         if (endGamePanel != null) endGamePanel.SetActive(false);
 
-        if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+        if (quitButton != null) quitButton.onClick.AddListener(GoToTitle);
         if (goToTitle != null) goToTitle.onClick.AddListener(GoToTitle);
 
         //BGM 변경: 배경 화면 씬
@@ -211,7 +211,7 @@ public class OutroManager : MonoBehaviour
     {
         CheckEndingAchievement();
         CheckDeathAchievement();
-        InitTwit();
+        //InitTwit();
         if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
         {
             SetGameClear();
@@ -346,7 +346,7 @@ public class OutroManager : MonoBehaviour
     /// </summary>
     private void QuitGame()
     {
-        SaveService.DeleteSave();
+        //SaveService.DeleteSave();
         Debug.Log("모든 세이브 데이터가 삭제되었습니다.");
 
 #if UNITY_EDITOR
@@ -375,7 +375,7 @@ public class OutroManager : MonoBehaviour
         Debug.Log("[OutroManager] 게임 클리어 처리");
         ServiceLocator.Instance.GlobalData.IsGameCleared = true;
         GlobalSaveService.Save(ServiceLocator.Instance.GlobalData);
-        SaveService.DeleteSave();
+        //SaveService.DeleteSave();
     }
 
     #region Achievement Methods

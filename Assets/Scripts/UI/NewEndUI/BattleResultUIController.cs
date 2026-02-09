@@ -295,6 +295,7 @@ public class BattleResultUIController : MonoBehaviour
         _victoryHomeButton.interactable = false;
 
         SaveInputToTwitData();
+        TwitSaveService.Save(ServiceLocator.Instance.CurrentTwitData);
         ServiceLocator.Instance.SaveNowUserData();
         UnlockStageAchivement();
 
