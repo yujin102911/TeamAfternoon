@@ -188,5 +188,50 @@ public static class TwitSaveService
             return false;
         }
     }
+    public static void SetVisibleForEasyContinue(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (var twit in targetSO.TwitDatas)
+        {
+            twit.IsVisible = (twit.Difficulty == Difficulty.Easy && twit.UploadDay <= 6);
+        }
+        Save(targetSO);
+        Debug.Log("[TwitSaveService] Easy Continue 상태로 IsVisible 설정 완료 (Day 6까지)");
+    }
 
+    public static void SetVisibleForHardContinue(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (var twit in targetSO.TwitDatas)
+        {
+            twit.IsVisible = (twit.Difficulty == Difficulty.Hard && twit.UploadDay <= 3);
+        }
+        Save(targetSO);
+        Debug.Log("[TwitSaveService] Hard Continue 상태로 IsVisible 설정 완료 (Week 3까지)");
+    }
+
+    public static void SetVisibleForHardInit(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (var twit in targetSO.TwitDatas)
+        {
+            bool isEasyAll = (twit.Difficulty == Difficulty.Easy);
+            bool isHardWeek1 = (twit.Difficulty == Difficulty.Hard && twit.UploadDay == 1);
+
+            twit.IsVisible = isEasyAll || isHardWeek1;
+        }
+        Save(targetSO);
+        Debug.Log("[TwitSaveService] Hard Init 상태로 IsVisible 설정 완료 (Easy 전체 + Hard Week 1)");
+    }
+
+    public static void SetVisibleForEasyInit(TwitData targetSO)
+    {
+        if (targetSO.TwitDatas == null) return;
+        foreach (var twit in targetSO.TwitDatas)
+        {
+            twit.IsVisible = (twit.Difficulty == Difficulty.Easy && twit.UploadDay == 1);
+        }
+        Save(targetSO);
+        Debug.Log("[TwitSaveService] Easy Init 상태로 IsVisible 설정 완료 (Easy Day 1)");
+    }
 }

@@ -214,7 +214,12 @@ public class OutroManager : MonoBehaviour
         //InitTwit();
         if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Easy)
         {
+            TwitSaveService.SetVisibleForEasyContinue(ServiceLocator.Instance.CurrentTwitData);
             SetGameClear();
+        }
+        else if (ServiceLocator.Instance.CurrentUser.Difficulty == Difficulty.Hard)
+        {
+            TwitSaveService.SetVisibleForHardContinue(ServiceLocator.Instance.CurrentTwitData);
         }
 
 
