@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class SettingPanel : MonoBehaviour
@@ -29,6 +30,11 @@ public class SettingPanel : MonoBehaviour
 
     [Header("언어 설정")]
     [SerializeField] private TMP_Dropdown languageDropdown;
+
+    [Header("CRT 토글")]
+    [SerializeField] private Toggle pipelineToggle;
+
+    private const string RP_KEY = "RP_MODE";
 
     private const string LanguageKey = "LANGUAGE"; // 예: "en", "ko-KR"
 
@@ -76,6 +82,8 @@ public class SettingPanel : MonoBehaviour
 
         fullscreenToggle.onValueChanged.RemoveListener(OnFullscreenToggleChanged_Immediate);
         fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged_Immediate);
+
+        pipelineToggle.onValueChanged.AddListener(OnPipelineToggleChanged);
     }
 
     private IEnumerator Start()
@@ -86,6 +94,7 @@ public class SettingPanel : MonoBehaviour
 
         // 초기값 세팅 시 이벤트 발동 방지
         fullscreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
+        pipelineToggle.isOn = PlayerPrefs.GetInt(RP_KEY, 1) == 1;
 
         yield return LocalizationSettings.InitializationOperation;
 
@@ -380,6 +389,14 @@ public class SettingPanel : MonoBehaviour
         // 저장(다음 실행 때 유지)
         PlayerPrefs.SetString(LanguageKey, selected.Identifier.Code);
         PlayerPrefs.Save();
+    }
+
+    void OnPipelineToggleChanged(bool high)
+    {
+        PlayerPrefs.SetInt(RP_KEY, high ? 1 : 0);
+        PlayerPrefs.Save();
+
+        RenderPipelineManager.ApplyPipelineAsset(high);
     }
 
 }
