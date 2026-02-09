@@ -92,7 +92,7 @@ public class ServiceLocator : MonoBehaviour
         CurrentUser.Difficulty = mode;
 
         CurrentTwitData = Instantiate(this.twitTemplate);
-
+        TwitSaveService.SetRandomReactionsAll(CurrentTwitData); // 모든 리액션 데이터 설정 완료
         if (mode == Difficulty.Hard)
         {
             if (TwitSaveService.HasSaveData())
