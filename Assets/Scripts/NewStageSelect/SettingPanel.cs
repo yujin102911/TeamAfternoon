@@ -94,7 +94,7 @@ public class SettingPanel : MonoBehaviour
 
         // 초기값 세팅 시 이벤트 발동 방지
         fullscreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
-        pipelineToggle.isOn = PlayerPrefs.GetInt(RP_KEY, 1) == 1;
+        pipelineToggle.isOn = PlayerPrefs.GetInt(RP_KEY, 0) == 1;
 
         yield return LocalizationSettings.InitializationOperation;
 
@@ -396,7 +396,7 @@ public class SettingPanel : MonoBehaviour
         PlayerPrefs.SetInt(RP_KEY, high ? 1 : 0);
         PlayerPrefs.Save();
 
-        RenderPipelineManager.ApplyPipelineAsset(high);
+        RenderPipelineManager.ApplyPipeline(high);
     }
 
 }
