@@ -180,25 +180,25 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
-            Debug.Log("[GameManager] F10 키 입력 감지 - 현재 스테이지 클리어 처리 실행");
-            ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
-            OnBattleEnded?.Invoke(EndCondition.Victory);
-        }
-        if (Input.GetKeyDown(KeyCode.F9))
-        {
-            ToggleDebugging();
-            if (isDebugging == true)
-            {
-                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 진입(무적, 라운드 무제한)");
-            }
-            else
-            {
-                Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 해제");
-            }
+        //if (Input.GetKeyDown(KeyCode.F10))
+        //{
+        //    Debug.Log("[GameManager] F10 키 입력 감지 - 현재 스테이지 클리어 처리 실행");
+        //    ServiceLocator.Instance.CurrentUser.SetStageCleared(currentStageData.StageNumber);
+        //    OnBattleEnded?.Invoke(EndCondition.Victory);
+        //}
+        //if (Input.GetKeyDown(KeyCode.F9))
+        //{
+        //    ToggleDebugging();
+        //    if (isDebugging == true)
+        //    {
+        //        Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 진입(무적, 라운드 무제한)");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("[GameManager] F9 키 입력 감지 - 디버그 모드 해제");
+        //    }
 
-        }
+        //}
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.Z))
         {
             Debug.Log("[GameManager] Ctrl + Z 입력 감지 - 도전과제 호출");
