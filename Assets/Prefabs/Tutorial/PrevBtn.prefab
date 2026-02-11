@@ -100,7 +100,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 24
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 30, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -189,6 +189,7 @@ GameObject:
   - component: {fileID: 1208924677110854354}
   - component: {fileID: 8335294275926136702}
   - component: {fileID: 7582278860454143588}
+  - component: {fileID: 2609934252923223903}
   m_Layer: 5
   m_Name: PrevBtn
   m_TagString: Untagged
@@ -213,8 +214,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -123.4, y: -118.2}
-  m_SizeDelta: {x: 126, y: 39}
+  m_AnchoredPosition: {x: -104.75, y: -122.49}
+  m_SizeDelta: {x: 209.5, y: 81.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1208924677110854354
 CanvasRenderer:
@@ -237,7 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -310,3 +311,19 @@ MonoBehaviour:
           m_StringArgument: BUTTON1
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2609934252923223903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7902375378171348554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 665c961b08a5ece47a7fed1e40e3545d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonText: {fileID: 1709560985109567673}
+  normalScale: 1
+  hoverScale: 1.1
+  smoothSpeed: 10
