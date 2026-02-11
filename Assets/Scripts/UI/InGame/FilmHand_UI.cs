@@ -51,14 +51,14 @@ public class FilmHand_UI : Film_UI, IPointerEnterHandler, IPointerExitHandler, I
 
     private void Update()
     {
-        if (!isTutorial)
-        {
-            int num = GetNumberKeyDown();
-            if (num >= 1 && num <= 9 && _isPointerOver && TimelineManager.Instance != null)
-            {
-                bool tryPlace = TimelineManager.Instance.TryPlaceBlock(RuntimeBlock, num);
-            }
-        }
+        //if (!isTutorial)
+        //{
+        //    int num = GetNumberKeyDown();
+        //    if (num >= 1 && num <= 9 && _isPointerOver && TimelineManager.Instance != null)
+        //    {
+        //        bool tryPlace = TimelineManager.Instance.TryPlaceBlock(RuntimeBlock, num);
+        //    }
+        //}
         
     }
     int GetNumberKeyDown()

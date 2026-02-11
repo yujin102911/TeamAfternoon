@@ -42,32 +42,7 @@ public class BattleUIManager : MonoBehaviour
         {
             _currentSpeedIndex = 0;
             _speedButtonIcon.sprite = _speedSprites[_currentSpeedIndex];
-            _speedButton.onClick.AddListener(() =>
-            {
-                if (TimelineManager.Instance != null)
-                {
-                    _currentSpeedIndex++;
-
-                    switch(_currentSpeedIndex % _speedSprites.Length)
-                    {
-                        case 0:
-                            TimelineManager.Instance.SetTimeScale(1.0f);
-                            _speedButtonIcon.sprite = _speedSprites[0];
-                            _speedTxt.text = $"X1";
-                            break;
-                        case 1:
-                            TimelineManager.Instance.SetTimeScale(1.5f);
-                            _speedButtonIcon.sprite = _speedSprites[1];
-                            _speedTxt.text = $"X2";
-                            break;
-                        case 2:
-                            TimelineManager.Instance.SetTimeScale(2.0f);
-                            _speedButtonIcon.sprite = _speedSprites[2];
-                            _speedTxt.text = $"X3";
-                            break;
-                    }
-                }
-            });
+            _speedButton.onClick.AddListener(Speed_Change);
         }
     }
 
@@ -99,6 +74,11 @@ public class BattleUIManager : MonoBehaviour
         }
         RefreshStartButtonState();
         StartSpeedButton();
+
+        if(ShortcutManager.Instance != null)
+        {
+            ShortcutManager.Instance.Register(new ActionCommand("multiple",Speed_Change));
+        }
         //RefreshSectorSelectionPanel();
     }
 
@@ -114,6 +94,41 @@ public class BattleUIManager : MonoBehaviour
             TimelineManager.Instance.OnTextMemoryChanged -= Update_TextSlider_Both;
             TimelineManager.Instance.OnFastMemoryChanged -= Update_TextSlider_Fast;
             //battle.UpdateCureGauage -= HandleCureChanged;
+        }
+    }
+
+    private void Speed_Change()
+    {
+        if (GameManager.Instance != null)
+        {
+            if (!GameManager.Instance.IsGameStarted || GameManager.Instance.IsBattleEnded)
+            {
+                return;
+            }
+        }
+
+        if (TimelineManager.Instance != null)
+        {
+            _currentSpeedIndex++;
+
+            switch (_currentSpeedIndex % _speedSprites.Length)
+            {
+                case 0:
+                    TimelineManager.Instance.SetTimeScale(1.0f);
+                    _speedButtonIcon.sprite = _speedSprites[0];
+                    _speedTxt.text = $"X1";
+                    break;
+                case 1:
+                    TimelineManager.Instance.SetTimeScale(1.5f);
+                    _speedButtonIcon.sprite = _speedSprites[1];
+                    _speedTxt.text = $"X2";
+                    break;
+                case 2:
+                    TimelineManager.Instance.SetTimeScale(2.0f);
+                    _speedButtonIcon.sprite = _speedSprites[2];
+                    _speedTxt.text = $"X3";
+                    break;
+            }
         }
     }
 
