@@ -24,12 +24,17 @@ public enum TutorialCondition
 [System.Serializable]
 public class TutorialStep
 {
+    public bool canGoBack;
     public TutorialCondition condition;
 
     [TabGroup("UI 설정")] public List<GameObject> hideUIs; // 시작 시 끌 UI들
     [TabGroup("UI 설정")] public List<GameObject> showUIs; // 시작 시 켤 UI들
 
     public string targetButtonName;
+
+    public KeyCode targetKey = KeyCode.None;
+    public KeyCode backTargetKey = KeyCode.None;
+
     public int targetTick;
     public int targetBlockID;
     public int checkDirectionTick;
@@ -79,6 +84,35 @@ public class BattleTutorialManager : MonoBehaviour
         _lastButton.onClick.AddListener(ButtonClicked);
     }
 
+    private void Update()
+    {
+        CheckKeyInput();
+    }
+
+
+    private void CheckKeyInput()
+    {
+        if (currentIndex >= steps.Length) return;
+
+        TutorialStep currentStep = steps[currentIndex];
+
+        if (currentStep.condition == TutorialCondition.ButtonClicked && currentStep.targetKey != KeyCode.None)
+        {
+            if (Input.GetKeyDown(currentStep.targetKey))
+            {
+                Debug.Log($"[{currentStep.targetKey}] 키 입력으로 단계 완료: {currentStep.targetButtonName}");
+                CompleteStep();
+            }
+        }
+        if (currentStep.canGoBack && currentStep.backTargetKey != KeyCode.None)
+        {
+            if (Input.GetKeyDown(currentStep.backTargetKey))
+            {
+                Debug.Log($"[{currentStep.backTargetKey}] 키 입력으로 이전 단계 이동");
+                GoBackStep();
+            }
+        }
+    }
 
     #region 튜토리얼 내부용 로직
     private void Start()
@@ -447,6 +481,31 @@ public class BattleTutorialManager : MonoBehaviour
                 if (ui != null) ui.SetActive(true);
         }
     }
+
+    public void GoBackStep()
+    {
+        if (currentIndex <= 0) return;
+        if (!steps[currentIndex].canGoBack) return;
+
+        currentIndex--;
+        ReverseStepUI(currentIndex);
+        Debug.Log($"{currentIndex}단계 완료 상태가 취소되었습니다. 이제 다시 이 단계를 수행해야 합니다.");
+    }
     
+    private void ReverseStepUI(int index)
+    {
+        if (index >= steps.Length) return;
+        TutorialStep currentStep = steps[index];
+        if (currentStep.showUIs != null)
+        {
+            foreach (GameObject ui in currentStep.showUIs)
+                if (ui != null) ui.SetActive(false);
+        }
+        if (currentStep.hideUIs != null)
+        {
+            foreach (GameObject ui in currentStep.hideUIs)
+                if (ui != null) ui.SetActive(true);
+        }
+    }
 
 }

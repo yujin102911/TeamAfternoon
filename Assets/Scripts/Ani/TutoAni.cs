@@ -1,5 +1,5 @@
-using UnityEngine;
-using UnityEngine.UI; // Image ÄÄÆ÷³ÍÆ® »ç¿ëÀ» À§ÇØ ÇÊ¿ä
+ï»¿using UnityEngine;
+using UnityEngine.UI;
 
 public class UIAnimation : MonoBehaviour
 {
@@ -13,18 +13,18 @@ public class UIAnimation : MonoBehaviour
 
     [Header("Option 1: Relative Settings")]
     public float pingPongDuration = 2.0f;
-    public Vector2 relativeOffset = new Vector2(200f, 0f); // UI´Â ÇÈ¼¿ ´ÜÀ§ÀÌ¹Ç·Î °ªÀ» Å©°Ô ÀâÀ¸¼¼¿ä.
+    public Vector2 relativeOffset = new Vector2(200f, 0f);
 
     [Header("Option 2: Absolute Settings")]
     public float moveDuration = 2.0f;
     public float fadeDuration = 1.0f;
-    public Vector3 startPos = new Vector3(-200, 0, 0); // RectTransform ±âÁØ ÁÂÇ¥
+    public Vector3 startPos = new Vector3(-200, 0, 0);
     public Vector3 endPos = new Vector3(200, 0, 0);
 
     private float timer = 0f;
     private Vector3 initialOrigin;
-    private RectTransform rectTransform; // UI À§Ä¡ Á¦¾î¿ë
-    private Image targetImage;           // UI ÄÃ·¯ Á¦¾î¿ë
+    private RectTransform rectTransform;
+    private Image targetImage;
     private Color originalColor;
 
     void Start()
@@ -32,7 +32,7 @@ public class UIAnimation : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
         targetImage = GetComponent<Image>();
 
-        initialOrigin = rectTransform.anchoredPosition; // UI´Â anchoredPositionÀÌ ±âÁØÀÔ´Ï´Ù.
+        initialOrigin = rectTransform.anchoredPosition;
 
         if (targetImage != null)
             originalColor = targetImage.color;
@@ -43,7 +43,8 @@ public class UIAnimation : MonoBehaviour
 
     void Update()
     {
-        timer += Time.deltaTime;
+        // í•µì‹¬ ìˆ˜ì •: Time.deltaTime ëŒ€ì‹  Time.unscaledDeltaTime ì‚¬ìš©
+        timer += Time.unscaledDeltaTime;
 
         if (currentMode == AnimMode.RelativePingPong)
         {

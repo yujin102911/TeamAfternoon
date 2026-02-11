@@ -11,6 +11,7 @@ public class StartPanel : MonoBehaviour
     [SerializeField] private GameObject _quitPanelObject;
     [SerializeField] private GameObject _creditPanelObject;
     [SerializeField] private GameObject _settingPanelObject;
+    [SerializeField] private GameObject _logoutPanelObject;
 
     [Header("위치 설정")]
     [SerializeField] private Vector2 _fixedPosition = Vector2.zero;
@@ -22,6 +23,7 @@ public class StartPanel : MonoBehaviour
     [SerializeField] private Button _quitButton;
     [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _creditButton;
+    [SerializeField] private Button _logoutButton;
     [SerializeField] private TextMeshProUGUI _timeText;
 
     private void Awake()
@@ -32,6 +34,7 @@ public class StartPanel : MonoBehaviour
         _quitButton.onClick.AddListener(OpenQuit);
         _settingsButton.onClick.AddListener(OpenSettings);
         _creditButton.onClick.AddListener(OpenCredit);
+        _logoutButton.onClick.AddListener(OpenLogout);
         CloseMenu();
     }
 
@@ -87,6 +90,13 @@ public class StartPanel : MonoBehaviour
     {
         ResetPanelPosition(_creditPanelObject);
         _creditPanelObject.SetActive(true);
+        CloseMenu ();
+    }
+
+    public void OpenLogout()
+    {
+        ResetPanelPosition(_logoutPanelObject);
+        _logoutPanelObject.SetActive(true);
         CloseMenu ();
     }
 
