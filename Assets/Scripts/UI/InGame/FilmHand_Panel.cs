@@ -276,6 +276,11 @@ public class FilmHand_Panel : MonoBehaviour
             return;
         }
 
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
+
         if (_currentSortType == HandSortType.Length)
         {
             _currentSortType = HandSortType.Action;
@@ -344,6 +349,11 @@ public class FilmHand_Panel : MonoBehaviour
         if (GameManager.Instance != null && !GameManager.Instance.IsGameStarted || GameManager.Instance.IsBattleEnded)
         {
             return;
+        }
+
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
         }
 
         SetAll(false);

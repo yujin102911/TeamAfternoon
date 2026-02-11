@@ -70,6 +70,11 @@ public class ShortcutBootstrap : MonoBehaviour
             return;
         }
 
+        if (CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
+
         if (_handPanelBtn.gameObject.activeInHierarchy)
             _handPanelBtn.onClick.Invoke();
         else

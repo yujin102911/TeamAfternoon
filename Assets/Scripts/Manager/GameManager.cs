@@ -672,6 +672,11 @@ public class GameManager : MonoBehaviour
         //idle 정지
         _playerVisualController.Stop_PlayerIdle();
         _enemyVisualController.Stop_EnemyIdle();
+
+        if(CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
     }
     private void HandleRoundInterrupted()
     {

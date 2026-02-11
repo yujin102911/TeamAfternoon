@@ -22,6 +22,11 @@ public class ToggleFilterCommand : IShortcutCommand
             return;
         }
 
+        if(CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
+
         _toggle.isOn = !_toggle.isOn;
     }
 }
