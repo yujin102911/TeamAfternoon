@@ -18,6 +18,11 @@ public class StepSlider : MonoBehaviour
 
     public event System.Action<int> OnStepSelected;
 
+    // 반복 이동 관련
+    private float _repeatInterval = 0.15f;
+    private float _repeatTimer = 0f;
+    private int _lastRepeatDir = 0;
+
     void Start()
     {
         slider.minValue = 0;
@@ -26,11 +31,28 @@ public class StepSlider : MonoBehaviour
 
         slider.onValueChanged.AddListener(OnSliderChanged);
         Debug.Log(slider.onValueChanged.GetPersistentEventCount());
+
+        if(ShortcutManager.Instance != null)
+        {
+            ShortcutManager.Instance.Onrelease += ResetRepeat;
+
+            ShortcutManager.Instance.Register(new SliderStepCommand("timeline.step.prev", this, -1));
+
+            ShortcutManager.Instance.Register(new SliderStepCommand("timeline.step.next", this, +1));
+        }
     }
 
     private void OnEnable()
     {
         
+    }
+
+    private void OnDestroy()
+    {
+        if(ShortcutManager.Instance != null)
+        {
+            ShortcutManager.Instance.Onrelease -= ResetRepeat;
+        }
     }
 
     void OnSliderChanged(float value)
@@ -144,5 +166,46 @@ public class StepSlider : MonoBehaviour
             playRoutine = null;
         }
         slider.interactable = false;
+    }
+
+    public void MoveStep(int delta)
+    {
+        if (!slider.interactable)
+            return;
+
+        int current = Mathf.RoundToInt(slider.value);
+        int next = Mathf.Clamp(current + delta, 0, steps - 1);
+
+        if (next != current)
+            slider.value = next;
+    }
+
+    public void MoveStepRepeated(int delta, float dt)
+    {
+        if (!slider.interactable)
+            return;
+
+        // 방향 바뀌면 즉시 한 번 이동
+        if (_lastRepeatDir != delta)
+        {
+            MoveStep(delta);
+            _repeatTimer = 0f;
+            _lastRepeatDir = delta;
+            return;
+        }
+
+        _repeatTimer += dt;
+
+        if (_repeatTimer >= _repeatInterval)
+        {
+            _repeatTimer = 0f;
+            MoveStep(delta);
+        }
+    }
+
+    public void ResetRepeat()
+    {
+        _repeatTimer = 0f;
+        _lastRepeatDir = 0;
     }
 }

@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
     private bool _isBattleEnded = false;
     [SerializeField] private bool isDebugging = false;
     [SerializeField] private GameObject _debugmodeChecking;
+    private bool _isGamestarted = false;
 
     // UI 용 변수
     private int _currentPhase = 1; // 기본 1
@@ -106,6 +107,8 @@ public class GameManager : MonoBehaviour
     public bool IsSequencePlaying { get; set; } = false;
     public bool IsRoundInterrupted { get; private set; }
     public bool IsDebugging => isDebugging;
+
+    public bool IsGameStarted => _isGamestarted;
     #endregion
 
     #region Events
@@ -145,6 +148,17 @@ public class GameManager : MonoBehaviour
 
         // 베틀씬 사운드
         Set_BGM();
+
+        
+
+        if (ShortcutManager.Instance != null)
+        {
+            ShortcutManager.Instance.Register(new ActionCommand(
+                "game.excute",
+                ExecuteRound,
+                () => _isGamestarted && !IsExecutingRound && !IsBattleEnded
+            ));
+        }
     }
 
     private void Set_BGM()
@@ -510,6 +524,8 @@ public class GameManager : MonoBehaviour
 
         //5섹터 고정 및 게임 시작
         _mapSystem.Handle_SetSector(5);
+        
+        _isGamestarted = true;
     }
 
     public void OnIntroCompleted()
@@ -581,14 +597,12 @@ public class GameManager : MonoBehaviour
     // 버튼과 연결
     public void ExecuteRound()
     {
+        if (_isBattleEnded) return;
         if (_isExecutingRound)
         {
             Debug.LogWarning("[GameManager] 이미 라운드가 실행 중입니다.");
             return;
         }
-
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.Play(SoundID.SFX_Execute);
 
         StartCoroutine(ExecuteRoundCoroutine());
     }
@@ -658,6 +672,11 @@ public class GameManager : MonoBehaviour
         //idle 정지
         _playerVisualController.Stop_PlayerIdle();
         _enemyVisualController.Stop_EnemyIdle();
+
+        if(CardTooltip.Instance != null)
+        {
+            CardTooltip.Instance.Hide();
+        }
     }
     private void HandleRoundInterrupted()
     {
