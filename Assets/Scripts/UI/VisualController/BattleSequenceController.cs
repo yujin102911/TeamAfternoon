@@ -157,11 +157,11 @@ public class BattleSequenceController : MonoBehaviour
     // 연출 재생 후 끝나면 onComplete
     public void PlayerTurnStartSequence(Action onComplete)
     {
-        SwitchCover();
+        //SwitchCover();
 
         _timelineUI.SetActive_Slots(false);
         //_nextCover.SetActive(false);
-        _prevCover.SetActive(true);
+        //_prevCover.SetActive(true);
 
         if (Debug_Text.Instance != null)
             Debug_Text.Instance.Add_Message($"_prevCover: {_prevCover.gameObject.name}");
@@ -193,7 +193,7 @@ public class BattleSequenceController : MonoBehaviour
         if (Debug_Text.Instance != null)
             Debug_Text.Instance.Add_Message($"_currentCover: {_currentCover.gameObject.name}");
 
-        _currentCover.SetActive(false);
+        //_currentCover.SetActive(false);
         _timelineUI.SetActive_Slots(true);
 
         GameManager.Instance.IsSequencePlaying = false;

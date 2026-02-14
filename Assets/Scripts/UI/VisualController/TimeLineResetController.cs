@@ -45,6 +45,11 @@ public class TimeLineResetController : MonoBehaviour
 
     private IEnumerator PlayRoutine(float duration)
     {
+        for(int i = 0; i < beltPieces.Length; i++)
+        {
+            beltPieces[i].GetComponent<Cover_controller>().ShowCover();
+        }
+
         float time = 0f;
 
         while (time < duration)
@@ -95,6 +100,9 @@ public class TimeLineResetController : MonoBehaviour
         {
             RectTransform child = _container.GetChild(i).GetComponent<RectTransform>();
             child.anchoredPosition = _beltStartPositions[i];
+
+            if(i == 1)
+                child.GetComponent<Cover_controller>().HideCover();
         }
     }
 }
